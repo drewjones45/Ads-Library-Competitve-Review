@@ -18,7 +18,7 @@ import statistics
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
 from ..storage import connect
 
@@ -72,19 +72,29 @@ class CreativeRecord:
     analyzed_at: str
     summary: str | None
     analysis: dict
+    # Ad-level fields needed for popularity_score weighting (NULL on standalone
+    # creatives that aren't tied to a paid ad — homepage / brand-store screenshots).
+    serp_position_rank: int | None = None
+    start_date: str | None = None
+    last_seen: str | None = None
+    active: int = 0
 
 
 @dataclass
 class AttributeTallies:
-    """Counts per attribute. Each is a Counter[str → int]."""
+    """Counts per attribute. Each is a Counter[str → number]. When weight_fn
+    is supplied to `_tally`, counters hold float weights (sum-of-weights) and
+    `n_total` becomes the sum of per-record weights, so share() still divides
+    correctly."""
     scalar: dict[str, Counter] = field(default_factory=dict)
     boolean: dict[str, Counter] = field(default_factory=dict)  # value: 'true'/'false'/'none'
     listed: dict[str, Counter] = field(default_factory=dict)
-    n_total: int = 0  # number of creatives tallied
+    n_total: float = 0  # number of creatives tallied (or sum-of-weights)
 
     def share(self, attr: str, value: str) -> float:
         """% of creatives where the given attribute has the given value (or
-        the list contains the value, for list attrs)."""
+        the list contains the value, for list attrs). Works for both counted
+        and weighted tallies."""
         if self.n_total == 0:
             return 0.0
         c = self.scalar.get(attr) or self.boolean.get(attr) or self.listed.get(attr)
@@ -111,7 +121,8 @@ def pull_analyzed_creatives(
         "       comp.name AS comp_name, a.id AS ad_id, "
         "       COALESCE(a.ad_archive_id, '') AS ad_archive_id, "
         "       COALESCE(a.first_seen, cr.analyzed_at) AS first_seen, "
-        "       cr.asset_path, cr.analyzed_at, cr.analysis_json "
+        "       cr.asset_path, cr.analyzed_at, cr.analysis_json, "
+        "       a.serp_position_rank, a.start_date, a.last_seen, a.active "
         "FROM creatives cr "
         "LEFT JOIN ads a ON a.id = cr.ad_id "
         "JOIN competitors comp ON comp.id = COALESCE(a.competitor_id, cr.competitor_id) "
@@ -143,23 +154,49 @@ def pull_analyzed_creatives(
             analyzed_at=r["analyzed_at"],
             summary=analysis.get("summary_one_line"),
             analysis=analysis,
+            serp_position_rank=r["serp_position_rank"],
+            start_date=r["start_date"],
+            last_seen=r["last_seen"],
+            active=r["active"] or 0,
         ))
     return out
 
 
-def _tally(records: Iterable[CreativeRecord]) -> AttributeTallies:
+def _tally(
+    records: Iterable[CreativeRecord],
+    weight_fn: Callable[[CreativeRecord], float] | None = None,
+) -> AttributeTallies:
+    """Count attribute occurrences across records.
+
+    When `weight_fn` is None (default), each record contributes 1 to every counter
+    it touches — current behavior.
+
+    When `weight_fn(rec) -> float` is provided, each record's contribution is its
+    weight. Records with weight <= 0 are skipped entirely. `n_total` becomes the
+    sum of weights so share() still divides correctly. Used for the
+    'By popularity' BvB toggle.
+    """
     t = AttributeTallies()
     for rec in records:
+        # Use int(1) for the unweighted path so n_total stays an integer for
+        # display (e.g. "250 analyzed", not "250.0 analyzed"). The weighted path
+        # naturally produces floats.
+        if weight_fn is None:
+            weight: float | int = 1
+        else:
+            weight = weight_fn(rec)
+            if weight <= 0:
+                continue
         a = rec.analysis
-        t.n_total += 1
+        t.n_total += weight
         for attr in _SCALAR_ATTRS:
             v = a.get(attr)
             if isinstance(v, str) and v:
-                t.scalar.setdefault(attr, Counter())[v] += 1
+                t.scalar.setdefault(attr, Counter())[v] += weight
         for attr in _BOOL_ATTRS:
             v = a.get(attr)
             label = "true" if v is True else "false" if v is False else "unknown"
-            t.boolean.setdefault(attr, Counter())[label] += 1
+            t.boolean.setdefault(attr, Counter())[label] += weight
         for label, path in _NESTED_BOOLS:
             cur: Any = a
             for k in path:
@@ -167,13 +204,13 @@ def _tally(records: Iterable[CreativeRecord]) -> AttributeTallies:
                 if cur is None:
                     break
             lbl = "true" if cur is True else "false" if cur is False else "unknown"
-            t.boolean.setdefault(label, Counter())[lbl] += 1
+            t.boolean.setdefault(label, Counter())[lbl] += weight
         for attr in _LIST_ATTRS:
             v = a.get(attr) or []
             if isinstance(v, list):
                 for item in v:
                     if isinstance(item, str) and item:
-                        t.listed.setdefault(attr, Counter())[item.lower()] += 1
+                        t.listed.setdefault(attr, Counter())[item.lower()] += weight
     return t
 
 

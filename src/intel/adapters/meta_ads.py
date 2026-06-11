@@ -244,10 +244,15 @@ class MetaAdsAdapter(Adapter):
             asset_dir=asset_dir,
         )
         # Re-shape: scraped ads use the same field names as _normalize_graph_ad
-        # output (intentional). Just stamp the page_id we already knew.
-        for ad in scraped:
+        # output (intentional). Just stamp the page_id we already knew, plus
+        # the DOM-order index — Meta's Ad Library page is sorted by
+        # total_impressions desc (see meta_ads_scrape.LIB_URL), so the index IS
+        # the served-most-first rank. Graph-path ads leave this key absent and
+        # land as NULL — that's correct, the API has no rank concept.
+        for i, ad in enumerate(scraped):
             ad["page_id"] = self.source.page_id
             ad["competitor_id"] = self.competitor.id
+            ad["serp_position_rank"] = i
         return scraped
 
     def fetch(self) -> IngestResult:

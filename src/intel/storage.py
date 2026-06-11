@@ -61,9 +61,12 @@ CREATE TABLE IF NOT EXISTS ads (
   link_url TEXT,
   publisher_platforms TEXT,
   raw_json TEXT,
+  serp_position_rank INTEGER,          -- Meta Ad Library SERP rank (0=top), scrape-only
   UNIQUE(ad_archive_id)
 );
 CREATE INDEX IF NOT EXISTS idx_ads_competitor ON ads(competitor_id);
+-- idx_ads_comp_rank is created in _migrate_ads_table() so it can land on existing
+-- DBs after the ALTER TABLE for serp_position_rank.
 
 -- Creative assets. Optionally linked to a paid ad; can also be standalone
 -- (e.g. images extracted from an Amazon brand store).
@@ -202,6 +205,73 @@ def utcnow() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+# Blended popularity weights — v1 defaults, locked in via plan review.
+# 0.55 SERP rank (Meta's own sort) + 0.35 run duration + 0.10 active bonus.
+_POP_RANK_WEIGHT = 0.55
+_POP_DURATION_WEIGHT = 0.35
+_POP_ACTIVE_BONUS = 0.10
+_POP_DURATION_CAP_DAYS = 60.0  # past 60d, more days don't keep accruing
+
+
+def popularity_score(
+    rank: int | None,
+    start_date: str | None,
+    last_seen: str | None,
+    active: int | bool,
+    brand_max_rank: int,
+) -> float:
+    """Blended ad-popularity proxy in [0, 1].
+
+    Inputs (all available on the `ads` row):
+      rank             — `serp_position_rank` (0 = top of Meta's "served-most-first"
+                         sort; NULL for graph-API rows that have no rank concept).
+      start_date       — ISO 'YYYY-MM-DD' or NULL.
+      last_seen        — ISO timestamp from the most recent ingest.
+      active           — 0/1, derived from `is_active_inferred` at ingest time.
+      brand_max_rank   — the highest rank seen for this brand in the current
+                         scrape (passed by the caller so we don't subquery here).
+
+    The formula:
+      rank_component     = 1 - rank / max(brand_max_rank, 1)   (NULL rank → 0)
+      duration_component = min(duration_days / 60, 1)          (NULL start → 0)
+      active_bonus       = 0.10 if active else 0
+      score              = 0.55 * rank_component + 0.35 * duration_component + bonus
+
+    Honest limits (do not delete; surface in the dashboard tooltip):
+      1. Intra-brand only. A 200-ad brand's rank-1 and a 5-ad brand's rank-1 are
+         not comparable. We normalize by brand_max_rank so the formula doesn't
+         pretend otherwise, but cross-brand sorting is still misleading.
+      2. Evergreen confound. Run duration treats "always-on hygiene ad" the same
+         as "scaled winner."
+      3. No raw impressions. This is a proxy. Meta does not expose impression
+         numbers for commercial US advertisers; numeric ranges only land for
+         EU political / social-issue ads (currently 0% of our corpus).
+      4. Scrape cap. ads beyond `meta_ads_scrape.max_cards` (200 by default)
+         have NULL rank and collapse to duration-only scoring.
+    """
+    rank_component = 0.0
+    if rank is not None and brand_max_rank > 0:
+        # rank=0 → top; rank=brand_max_rank → bottom.
+        rank_component = max(0.0, 1.0 - float(rank) / max(brand_max_rank, 1))
+    duration_component = 0.0
+    if start_date and last_seen:
+        try:
+            # Accept both 'YYYY-MM-DD' (start_date) and ISO timestamps (last_seen).
+            start = datetime.fromisoformat(start_date[:10])
+            end = datetime.fromisoformat(last_seen[:10])
+            days = max((end - start).days, 0)
+            duration_component = min(days / _POP_DURATION_CAP_DAYS, 1.0)
+        except (ValueError, TypeError):
+            duration_component = 0.0
+    active_bonus = _POP_ACTIVE_BONUS if active else 0.0
+    score = (
+        _POP_RANK_WEIGHT * rank_component
+        + _POP_DURATION_WEIGHT * duration_component
+        + active_bonus
+    )
+    return max(0.0, min(1.0, score))
+
+
 def content_hash(payload: bytes | str) -> str:
     if isinstance(payload, str):
         payload = payload.encode("utf-8")
@@ -217,7 +287,22 @@ def init_db(db_path: Path | None = None) -> Path:
     with sqlite3.connect(p) as conn:
         conn.executescript(SCHEMA)
         _migrate_creatives_table(conn)
+        _migrate_ads_table(conn)
     return p
+
+
+def _migrate_ads_table(conn: sqlite3.Connection) -> None:
+    """Add `serp_position_rank` column + index to pre-existing `ads` tables.
+    Idempotent: a no-op once applied."""
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(ads)").fetchall()}
+    if not cols:
+        return  # fresh DB; SCHEMA already created it
+    if "serp_position_rank" not in cols:
+        conn.execute("ALTER TABLE ads ADD COLUMN serp_position_rank INTEGER")
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_ads_comp_rank "
+        "ON ads(competitor_id, serp_position_rank)"
+    )
 
 
 def _migrate_creatives_table(conn: sqlite3.Connection) -> None:
@@ -320,6 +405,7 @@ def connect(db_path: Path | None = None) -> Iterator[sqlite3.Connection]:
     # Idempotent forward-migrations — cheap (PRAGMA call); short-circuits if no work to do.
     _migrate_creatives_table(conn)
     _migrate_homepage_promos_table(conn)
+    _migrate_ads_table(conn)
     conn.commit()
     try:
         yield conn
@@ -396,12 +482,15 @@ def upsert_ad(conn: sqlite3.Connection, competitor_id: str, ad: dict) -> tuple[i
         "SELECT id, first_seen FROM ads WHERE ad_archive_id=?", (archive_id,)
     ).fetchone()
     now = utcnow()
+    rank = ad.get("serp_position_rank")
     if existing:
+        # serp_position_rank: always overwrite with the freshest scrape, even with NULL
+        # (graph-path ads have no rank; leaving NULL is correct).
         conn.execute(
             "UPDATE ads SET last_seen=?, active=?, end_date=COALESCE(?, end_date), "
             "body_text=COALESCE(?, body_text), cta_type=COALESCE(?, cta_type), "
             "link_url=COALESCE(?, link_url), publisher_platforms=COALESCE(?, publisher_platforms), "
-            "raw_json=? WHERE id=?",
+            "raw_json=?, serp_position_rank=? WHERE id=?",
             (
                 now,
                 active,
@@ -411,14 +500,16 @@ def upsert_ad(conn: sqlite3.Connection, competitor_id: str, ad: dict) -> tuple[i
                 ad.get("link_url"),
                 json.dumps(ad.get("publisher_platforms")) if ad.get("publisher_platforms") else None,
                 json.dumps(ad),
+                rank,
                 existing["id"],
             ),
         )
         return existing["id"], False
     cur = conn.execute(
         "INSERT INTO ads(competitor_id, ad_archive_id, page_id, page_name, first_seen, last_seen, "
-        "active, start_date, end_date, body_text, cta_type, link_url, publisher_platforms, raw_json) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "active, start_date, end_date, body_text, cta_type, link_url, publisher_platforms, raw_json, "
+        "serp_position_rank) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (
             competitor_id,
             archive_id,
@@ -434,6 +525,7 @@ def upsert_ad(conn: sqlite3.Connection, competitor_id: str, ad: dict) -> tuple[i
             ad.get("link_url"),
             json.dumps(ad.get("publisher_platforms")) if ad.get("publisher_platforms") else None,
             json.dumps(ad),
+            rank,
         ),
     )
     return cur.lastrowid or 0, True

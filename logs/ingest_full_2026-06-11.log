@@ -1,0 +1,115 @@
+=== BOBS INGEST 2026-06-11T16:40:11Z ===
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+homepage ashleyfurniture_com__root: blocked by 'perimeterx' anti-bot wall — recording as blocked observation
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+homepage wayfair_com__root: blocked by 'perimeterx' anti-bot wall — recording as blocked observation
+                                Ingestion report                                
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┓
+┃ competitor ┃ source     ┃ ok ┃ changed ┃ sev  ┃ new_ads ┃ offers ┃ summary   ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━┩
+│ bobs       │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 7         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ chrome_d… │
+│            │            │    │         │      │         │        │ hero_ima… │
+│            │            │    │         │      │         │        │ html_pa   │
+│ bobs       │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 17      │ 0      │ 2         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ active_a… │
+│            │            │    │         │      │         │        │ ad_count  │
+│ ashley     │ website|h… │ ✓  │ no      │ 0.00 │ 0       │ 0      │           │
+│ ashley     │ meta_ads|… │ ✓  │ no      │ 0.00 │ 0       │ 0      │           │
+│ rooms_to_… │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 5         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ chrome_d… │
+│            │            │    │         │      │         │        │ hero_ima… │
+│            │            │    │         │      │         │        │ html_pa   │
+│ rooms_to_… │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 179     │ 0      │ 1         │
+│            │ To Go:US   │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ active_a… │
+│ raymour_f… │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 4         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ hero_ima… │
+│            │            │    │         │      │         │        │ html_pat… │
+│            │            │    │         │      │         │        │ regions,  │
+│            │            │    │         │      │         │        │ scr       │
+│ raymour_f… │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 7       │ 0      │ 2         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ active_a… │
+│            │            │    │         │      │         │        │ ad_count  │
+│ value_city │ website|h… │ ✓  │ no      │ 0.00 │ 0       │ 0      │           │
+│ value_city │ meta_ads|… │ ✓  │ no      │ 0.00 │ 0       │ 0      │           │
+│ american_… │ website|h… │ ✓  │ no      │ 0.00 │ 0       │ 0      │           │
+│ american_… │ meta_ads|… │ ✓  │ no      │ 0.00 │ 0       │ 0      │           │
+│ wayfair    │ website|h… │ ✓  │ no      │ 0.00 │ 0       │ 0      │           │
+│ wayfair    │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 124     │ 0      │ 1         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ active_a… │
+│ revlon     │ amazon_br… │ ✓  │ yes     │ 0.40 │ 0       │ 0      │ 2         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ pages,    │
+│            │            │    │         │      │         │        │ totals    │
+└────────────┴────────────┴────┴─────────┴──────┴─────────┴────────┴───────────┘
+=== BOBS DONE 2026-06-11T16:45:54Z ===
+
+=== TREX INGEST 2026-06-11T16:45:54Z ===
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+                                Ingestion report                                
+┏━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━┓
+┃ competitor ┃ source    ┃ ok ┃ changed ┃ sev  ┃ new_ads ┃ offers ┃ summary    ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━┩
+│ trex       │ website|… │ ✓  │ no      │ 0.00 │ 0       │ 0      │            │
+│ trex       │ meta_ads… │ ✓  │ yes     │ 1.00 │ 9       │ 0      │ 1 field(s) │
+│            │           │    │         │      │         │        │ changed:   │
+│            │           │    │         │      │         │        │ active_ar… │
+│ timbertech │ website|… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 4 field(s) │
+│            │           │    │         │      │         │        │ changed:   │
+│            │           │    │         │      │         │        │ hero_imag… │
+│            │           │    │         │      │         │        │ html_path, │
+│            │           │    │         │      │         │        │ screensho… │
+│ timbertech │ meta_ads… │ ✓  │ yes     │ 1.00 │ 4       │ 0      │ 2 field(s) │
+│            │           │    │         │      │         │        │ changed:   │
+│            │           │    │         │      │         │        │ active_ar… │
+│            │           │    │         │      │         │        │ ad_count   │
+│ fiberon    │ website|… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 5 field(s) │
+│            │           │    │         │      │         │        │ changed:   │
+│            │           │    │         │      │         │        │ chrome_dr… │
+│            │           │    │         │      │         │        │ hero_imag… │
+│            │           │    │         │      │         │        │ html_pa    │
+│ deckorato… │ website|… │ ✓  │ yes     │ 0.60 │ 0       │ 0      │ 3 field(s) │
+│            │           │    │         │      │         │        │ changed:   │
+│            │           │    │         │      │         │        │ hero_imag… │
+│            │           │    │         │      │         │        │ html_path, │
+│            │           │    │         │      │         │        │ screensho… │
+│ deckorato… │ meta_ads… │ ✓  │ yes     │ 1.00 │ 1       │ 0      │ 2 field(s) │
+│            │           │    │         │      │         │        │ changed:   │
+│            │           │    │         │      │         │        │ active_ar… │
+│            │           │    │         │      │         │        │ ad_count   │
+└────────────┴───────────┴────┴─────────┴──────┴─────────┴────────┴────────────┘
+=== TREX DONE 2026-06-11T16:48:44Z ===
+
+=== POST-INGEST RANK COUNTS ===
+--- data/intel.db ---
+american_freight|7|7|0|6
+ashley|13|13|0|12
+bobs|215|176|0|175
+raymour_flanigan|59|55|0|54
+rooms_to_go|679|0||
+wayfair|324|200|0|199
+--- data/trex.db ---
+deckorators|42|42|0|41
+timbertech|119|109|0|108
+trex|209|200|0|199

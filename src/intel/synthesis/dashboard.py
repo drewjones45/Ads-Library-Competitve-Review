@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from ..config import DATA_DIR
-from ..storage import connect
+from ..storage import connect, popularity_score
 from .creative_readout import (
     _LIST_ATTRS,
     _SCALAR_ATTRS,
@@ -140,6 +140,55 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
             (cid, since),
         ).fetchall()
         recent_ads[cid] = [dict(r) for r in rows]
+
+    # Top-served ads per brand — ranked by the popularity_score proxy
+    # (SERP rank + run duration + active bonus). See storage.popularity_score
+    # for the formula + honesty limits. Window is the entire competitor history,
+    # not the last N days — the popularity signal is most informative when
+    # comparing across an ad's lifetime, not just the recency window.
+    top_ads: dict[str, list] = {}
+    for cid in [b["id"] for b in brands]:
+        # brand_max_rank = the largest rank seen for this brand across all
+        # observations. Used to normalize so rank-N is "bottom of the listing"
+        # regardless of how many cards Meta returned.
+        max_rank_row = conn.execute(
+            "SELECT MAX(serp_position_rank) FROM ads WHERE competitor_id=? "
+            "AND serp_position_rank IS NOT NULL",
+            (cid,),
+        ).fetchone()
+        brand_max_rank = (max_rank_row[0] or 0) if max_rank_row else 0
+        rows = conn.execute(
+            "SELECT a.id, a.ad_archive_id, a.first_seen, a.last_seen, a.start_date, "
+            "a.active, a.body_text, a.cta_type, a.link_url, a.page_name, "
+            "a.serp_position_rank, "
+            "(SELECT c.asset_path FROM creatives c "
+            "  WHERE c.ad_id=a.id AND c.asset_path IS NOT NULL "
+            "  ORDER BY c.id LIMIT 1) AS thumb_path "
+            "FROM ads a WHERE a.competitor_id=?",
+            (cid,),
+        ).fetchall()
+        scored = []
+        for r in rows:
+            d = dict(r)
+            d["popularity_score"] = popularity_score(
+                d.get("serp_position_rank"),
+                d.get("start_date"),
+                d.get("last_seen"),
+                d.get("active") or 0,
+                brand_max_rank,
+            )
+            # Run duration in days, for the dashboard chip.
+            d["run_days"] = 0
+            if d.get("start_date") and d.get("last_seen"):
+                try:
+                    start = datetime.fromisoformat(d["start_date"][:10])
+                    end = datetime.fromisoformat(d["last_seen"][:10])
+                    d["run_days"] = max((end - start).days, 0)
+                except (ValueError, TypeError):
+                    pass
+            scored.append(d)
+        scored.sort(key=lambda d: d["popularity_score"], reverse=True)
+        top_ads[cid] = scored[:12]
 
     # Brand-store data per brand: most recent landing screenshot + last 24 analyzed
     # brand-store image creatives. Empty dict for brands without an amazon store.
@@ -365,6 +414,27 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
         all_by_comp_for_bvb.setdefault(rec.competitor_id, []).append(rec)
     bvb_comp_tallies = {cid: _tally(recs) for cid, recs in all_by_comp_for_bvb.items()}
 
+    # WEIGHTED variant: tally only paid-ad creatives, weighted by popularity_score.
+    # Homepage / brand-store / website creatives have ad_id == 0 and drop out — the
+    # popularity signal is undefined for them. UI label this "By popularity
+    # (Meta ads only)" so users know what they're looking at.
+    bvb_comp_tallies_weighted = {}
+    for cid, recs in all_by_comp_for_bvb.items():
+        ad_recs_only = [r for r in recs if r.ad_id]
+        if not ad_recs_only:
+            bvb_comp_tallies_weighted[cid] = _tally([])  # empty tally with n_total=0
+            continue
+        # brand_max_rank derived from the same ad pool we're weighting over.
+        ranks = [r.serp_position_rank for r in ad_recs_only if r.serp_position_rank is not None]
+        brand_max_rank = max(ranks) if ranks else 0
+
+        def _weight(rec, _max=brand_max_rank):
+            return popularity_score(
+                rec.serp_position_rank, rec.start_date, rec.last_seen,
+                rec.active, _max,
+            )
+        bvb_comp_tallies_weighted[cid] = _tally(ad_recs_only, weight_fn=_weight)
+
     # Tallies serialized for brand-vs-brand JS rendering.
     def _ser(t):
         return {
@@ -374,6 +444,7 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
             "listed": {k: dict(v) for k, v in t.listed.items()},
         }
     brand_tallies_ser = {cid: _ser(t) for cid, t in bvb_comp_tallies.items()}
+    brand_tallies_weighted_ser = {cid: _ser(t) for cid, t in bvb_comp_tallies_weighted.items()}
     set_tally_ser = _ser(set_tally)
 
     return {
@@ -386,6 +457,7 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
         "distinct": distinct,
         "whitespace": whitespace,
         "recent_ads": recent_ads,
+        "top_ads": top_ads,
         "brand_store_by_brand": brand_store_by_brand,
         "homepage_by_brand": homepage_by_brand,
         "latest_briefing": dict(latest_briefing) if latest_briefing else None,
@@ -393,6 +465,7 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
         "client_creatives": creatives_index,
         "client_ads": ads_index,
         "client_tallies": brand_tallies_ser,
+        "client_tallies_weighted": brand_tallies_weighted_ser,
         "client_set_tally": set_tally_ser,
     }
 
@@ -880,14 +953,29 @@ function renderBvbCol(brandId, tally, peerTally) {
 function renderBvb() {
   const a = document.getElementById('bvb-a').value;
   const b = document.getElementById('bvb-b').value;
-  const tA = DATA.client_tallies[a], tB = DATA.client_tallies[b];
-  if (!tA || !tB) return;
+  // 'By count' uses all analyzed creatives (Meta + homepage + brand-store).
+  // 'By popularity' weights each Meta-ad creative by its popularity_score and
+  // drops standalone creatives — see _collect for the rationale.
+  const mode = document.querySelector('input[name="bvb-mode"]:checked')?.value || 'count';
+  const src = (mode === 'popularity')
+    ? (DATA.client_tallies_weighted || DATA.client_tallies)
+    : DATA.client_tallies;
+  const tA = src[a], tB = src[b];
+  if (!tA || !tB) {
+    document.getElementById('bvb-left').innerHTML =
+      `<p class="muted">No data for this brand in the selected view.</p>`;
+    document.getElementById('bvb-right').innerHTML = '';
+    return;
+  }
   document.getElementById('bvb-left').innerHTML = renderBvbCol(a, tA, tB);
   document.getElementById('bvb-right').innerHTML = renderBvbCol(b, tB, tA);
 }
 populateBrandSelectors();
 document.getElementById('bvb-a')?.addEventListener('change', renderBvb);
 document.getElementById('bvb-b')?.addEventListener('change', renderBvb);
+document.querySelectorAll('input[name="bvb-mode"]').forEach(r =>
+  r.addEventListener('change', renderBvb)
+);
 renderBvb();
 
 // ---- DELTA VIEW: new since X ----
@@ -1374,9 +1462,154 @@ def _render_homepage_block(hp_data: dict | None, dashboard_dir: Path) -> str:
     """
 
 
+def _render_most_served_snapshot(brands: list, top_ads_by_brand: dict, dashboard_dir: Path) -> str:
+    """A header-strip view showing the rank-1 ad per brand. Intentionally simple:
+    one thumbnail, brand name, rank/days chips. Brands without ranked ads show '—'."""
+    cards = []
+    for b in brands:
+        cid = b["id"]
+        top = top_ads_by_brand.get(cid) or []
+        first = top[0] if top else None
+        if not first or first.get("popularity_score", 0) <= 0:
+            cards.append(f"""
+            <a href="#brand-{_esc(cid)}" style="background:#f4f7fb;border:1px solid #d8dee5;
+                       border-radius:5px;padding:10px 12px;display:flex;flex-direction:column;
+                       gap:6px;text-decoration:none;color:#1f2c4a;min-width:0">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;
+                          color:#1f2c4a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                {_esc(b['name'])}</div>
+              <div style="background:#e6e8ec;color:#666;aspect-ratio:1.4/1;border-radius:3px;
+                          display:flex;align-items:center;justify-content:center;font-size:24px">—</div>
+              <div class="muted" style="font-size:10px">no ranked ads</div>
+            </a>
+            """)
+            continue
+        thumb_html = ''
+        if first.get("thumb_path"):
+            rel = _relpath(Path(first["thumb_path"]), dashboard_dir)
+            thumb_html = (
+                f'<img src="{rel}" loading="lazy" alt="top served ad" '
+                f'style="width:100%;aspect-ratio:1.4/1;object-fit:cover;border-radius:3px">'
+            )
+        else:
+            thumb_html = (
+                '<div style="background:#e6e8ec;color:#666;aspect-ratio:1.4/1;border-radius:3px;'
+                'display:flex;align-items:center;justify-content:center;font-size:11px">'
+                'no thumbnail</div>'
+            )
+        rank = first.get("serp_position_rank")
+        rank_label = f"#{int(rank)+1}" if rank is not None else "—"
+        days = int(first.get("run_days") or 0)
+        cards.append(f"""
+        <a href="#brand-{_esc(cid)}" style="background:white;border:1px solid #d8dee5;
+                   border-radius:5px;padding:10px 12px;display:flex;flex-direction:column;
+                   gap:6px;text-decoration:none;color:#1f2c4a;min-width:0">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;
+                      color:#1f2c4a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+            {_esc(b['name'])}</div>
+          {thumb_html}
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <span style="background:#0a3818;color:#d4f057;font-size:10px;font-weight:700;
+                         letter-spacing:0.5px;padding:2px 6px;border-radius:3px">RANK {rank_label}</span>
+            <span style="background:#eaf2ff;color:#1f4a8a;font-size:10px;font-weight:700;
+                         letter-spacing:0.5px;padding:2px 6px;border-radius:3px">{days}d</span>
+          </div>
+        </a>
+        """)
+    # margin-left:240px aligns with the fixed-position nav (see CSS for header/main).
+    # max-width:1320px matches `main` so the strip aligns visually with sections below.
+    return f"""
+    <section id="most-served" style="margin-left:240px;background:#fafbfc;
+                                     border-bottom:1px solid #e6e8ec;padding:14px 28px;
+                                     max-width:1320px;margin-right:auto">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+                  color:#666;margin-bottom:10px">Most-served snapshot
+        <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">
+          — each brand's top-scoring ad by popularity proxy (SERP rank × run duration, intra-brand only)
+        </span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
+        {''.join(cards)}
+      </div>
+    </section>
+    """
+
+
+def _render_top_served_panel(top_ads: list, dashboard_dir: Path) -> str:
+    """Render the per-brand 'Top served ads' panel. See storage.popularity_score
+    for the underlying signal. Intentionally intra-brand only — do not infer
+    cross-brand ranking from these cards."""
+    if not top_ads:
+        return (
+            '<p class="muted">No served-rank data yet. '
+            'Re-run <code>intel ingest</code> to populate.</p>'
+        )
+    cards = []
+    for ad in top_ads:
+        body = (ad.get("body_text") or "").replace("\n", " ")[:140]
+        cta = ad.get("cta_type") or "—"
+        link = ad.get("link_url")
+        rank = ad.get("serp_position_rank")
+        rank_chip = (
+            f'<span style="background:#0a3818;color:#d4f057;font-size:10px;'
+            f'font-weight:700;letter-spacing:0.5px;padding:2px 7px;border-radius:3px">'
+            f'RANK #{int(rank)+1}</span>'
+            if rank is not None
+            else (
+                '<span style="background:#f0f2f5;color:#666;font-size:10px;'
+                'font-weight:700;letter-spacing:0.5px;padding:2px 7px;border-radius:3px">'
+                'RANK —</span>'
+            )
+        )
+        days_chip = (
+            f'<span style="background:#eaf2ff;color:#1f4a8a;font-size:10px;'
+            f'font-weight:700;letter-spacing:0.5px;padding:2px 7px;border-radius:3px">'
+            f'{int(ad["run_days"])}d RUNNING</span>'
+            if ad.get("run_days")
+            else ''
+        )
+        active = ad.get("active") or 0
+        active_chip = (
+            '<span style="background:#e6f4ea;color:#1e7e34;font-size:10px;'
+            'font-weight:700;letter-spacing:0.5px;padding:2px 7px;border-radius:3px">ACTIVE</span>'
+            if active
+            else '<span style="background:#fbe9e7;color:#a13b1e;font-size:10px;'
+                 'font-weight:700;letter-spacing:0.5px;padding:2px 7px;border-radius:3px">INACTIVE</span>'
+        )
+        thumb_html = ''
+        if ad.get("thumb_path"):
+            rel = _relpath(Path(ad["thumb_path"]), dashboard_dir)
+            thumb_html = (
+                f'<img src="{rel}" loading="lazy" alt="ad {_esc(ad["ad_archive_id"])}" '
+                f'style="width:100%;aspect-ratio:1.4/1;object-fit:cover;border-radius:3px;'
+                f'background:#f0f2f5">'
+            )
+        cta_html = (
+            f'<a href="{_esc(link)}" target="_blank" '
+            f'style="color:#1f2c4a;text-decoration:none;font-weight:600">{_esc(cta)}</a>'
+            if link
+            else _esc(cta)
+        )
+        cards.append(f"""
+        <div style="background:white;border:1px solid #e6e8ec;border-radius:4px;
+                    padding:10px;display:flex;flex-direction:column;gap:8px">
+          {thumb_html}
+          <div style="display:flex;gap:4px;flex-wrap:wrap">{rank_chip}{days_chip}{active_chip}</div>
+          <div style="font-size:12.5px;line-height:1.4;color:#1f2c4a;flex:1">{_esc(body)}</div>
+          <div style="font-size:11px;color:#666"><span class="muted">CTA</span> {cta_html}</div>
+          <div style="font-size:10px;color:#999;font-family:monospace">{_esc(ad['ad_archive_id'])}</div>
+        </div>
+        """)
+    return (
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));'
+        f'gap:10px">{"".join(cards)}</div>'
+    )
+
+
 def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_dir: Path,
                            bs_data: dict | None = None,
-                           hp_data: dict | None = None) -> str:
+                           hp_data: dict | None = None,
+                           top_ads: list | None = None) -> str:
     # Creative gallery
     gallery_items = []
     for rec in recs[:36]:
@@ -1431,6 +1664,7 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
     pri = brand["priority"] or "medium"
     brand_store_html = _render_brand_store_block(bs_data, dashboard_dir)
     homepage_html = _render_homepage_block(hp_data, dashboard_dir)
+    top_served_html = _render_top_served_panel(top_ads or [], dashboard_dir)
     return f"""
     <section id="brand-{_esc(brand['id'])}">
       <h2>{_esc(brand['name'])} <span class="muted">— {_esc(brand['vertical'])} · priority {_esc(pri)}</span></h2>
@@ -1448,7 +1682,14 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
           <div class="stat"><div class="label">Ad creatives analyzed</div><div class="value">{brand['creatives_analyzed']}/{brand['creatives_total']}</div></div>
           <div class="stat"><div class="label">Top CTA</div><div class="value" style="font-size:16px">{_esc(brand['top_cta'] or '—')}</div></div>
         </div>
-        <h4 style="margin:14px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#555">Creative gallery</h4>
+        <h4 style="margin:14px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#555">
+          Top served ads
+          <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400;font-size:11px">
+            — ranked by Meta's "most served" sort × run duration (intra-brand only, proxy not raw impressions)
+          </span>
+        </h4>
+        {top_served_html}
+        <h4 style="margin:18px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#555">Creative gallery</h4>
         {gallery_html}
         <h4 style="margin:18px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#555">Recent ads (last {{days}} days)</h4>
         {ads_html}
@@ -1542,6 +1783,17 @@ def build_dashboard(
       <div class="bvb-controls">
         <div><label>Brand A</label><select id="bvb-a"></select></div>
         <div><label>Brand B</label><select id="bvb-b"></select></div>
+        <div class="bvb-mode" style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:11px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:#666">Weight</label>
+          <div style="display:flex;gap:10px;font-size:13px">
+            <label style="display:flex;gap:5px;align-items:center;cursor:pointer">
+              <input type="radio" name="bvb-mode" value="count" checked> By count
+            </label>
+            <label style="display:flex;gap:5px;align-items:center;cursor:pointer">
+              <input type="radio" name="bvb-mode" value="popularity"> By popularity <span class="muted" style="font-size:11px">(Meta ads only)</span>
+            </label>
+          </div>
+        </div>
       </div>
       <div class="bvb-split">
         <div class="bvb-col" id="bvb-left"></div>
@@ -1585,10 +1837,12 @@ def build_dashboard(
     for brand in data["brands"]:
         recs = data["by_comp_recs"].get(brand["id"], [])
         recent = data["recent_ads"].get(brand["id"], [])
+        top = data["top_ads"].get(brand["id"], [])
         bs_data = data["brand_store_by_brand"].get(brand["id"])
         hp_data = data["homepage_by_brand"].get(brand["id"])
         sections_html.append(
-            _render_brand_section(brand, recs, recent, out_dir, bs_data=bs_data, hp_data=hp_data)
+            _render_brand_section(brand, recs, recent, out_dir,
+                                   bs_data=bs_data, hp_data=hp_data, top_ads=top)
             .replace("{days}", str(days))
         )
 
@@ -1653,6 +1907,7 @@ def build_dashboard(
   <h1>{_esc(product_name)}</h1>
   <div class="meta">Generated {_esc(data['generated_at'])} · window: last {days}d · {len(data['brands'])} brands</div>
 </header>
+{_render_most_served_snapshot(data['brands'], data['top_ads'], out_dir)}
 <nav>{nav_html}</nav>
 <main>
 {''.join(sections_html)}

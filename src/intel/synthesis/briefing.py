@@ -13,7 +13,7 @@ from typing import Any
 import anthropic
 
 from ..config import load_settings
-from ..storage import connect, record_briefing
+from ..storage import connect, popularity_score, record_briefing
 
 
 class MissingApiKey(RuntimeError):
@@ -33,7 +33,8 @@ BRIEFING_SYSTEM = """You are a senior marketing strategist writing a competitive
 Audience: brand marketing leadership for a consumer/DTC brand.
 
 You will receive a JSON corpus of:
-- new ads launched per competitor (last N days)
+- new ads launched per competitor (last N days) — the "what's just changed" view
+- top served ads per competitor (popularity-ranked, lifetime) — the "what's actually working" view; ranked by Meta Ad Library's own sort × run duration. Use this to identify the ads carrying each competitor's spend, regardless of when they launched. Note: this is a proxy (Meta does not expose raw impressions for commercial US ads), intra-brand only.
 - offer/promo changes detected on competitor sites
 - on-site messaging changes (hero/banner/popup deltas)
 - Amazon brand store activity (page counts, image counts, hero text) for brands that sell on Amazon
@@ -77,6 +78,7 @@ def build_corpus(days: int = 7) -> dict[str, Any]:
                 "name": c["name"],
                 "vertical": c["vertical"],
                 "new_ads": [],
+                "top_ads": [],
                 "offers": [],
                 "site_changes": [],
                 "brand_store_changes": [],
@@ -90,6 +92,55 @@ def build_corpus(days: int = 7) -> dict[str, Any]:
                 (c["id"], since),
             ).fetchall():
                 entry["new_ads"].append(dict(ad))
+
+            # top_ads: lifetime view, ranked by popularity_score proxy. NOT
+            # filtered by the window — these are the ads we believe are carrying
+            # the brand's spend right now, whenever they launched.
+            max_rank = conn.execute(
+                "SELECT MAX(serp_position_rank) FROM ads "
+                "WHERE competitor_id=? AND serp_position_rank IS NOT NULL",
+                (c["id"],),
+            ).fetchone()[0] or 0
+            ad_rows = conn.execute(
+                "SELECT ad_archive_id, first_seen, last_seen, start_date, active, "
+                "body_text, cta_type, serp_position_rank "
+                "FROM ads WHERE competitor_id=?",
+                (c["id"],),
+            ).fetchall()
+            scored = []
+            for r in ad_rows:
+                d = dict(r)
+                d["popularity_score"] = round(popularity_score(
+                    d.get("serp_position_rank"),
+                    d.get("start_date"),
+                    d.get("last_seen"),
+                    d.get("active") or 0,
+                    max_rank,
+                ), 3)
+                if d.get("start_date") and d.get("last_seen"):
+                    try:
+                        s = datetime.fromisoformat(d["start_date"][:10])
+                        e = datetime.fromisoformat(d["last_seen"][:10])
+                        d["run_days"] = max((e - s).days, 0)
+                    except (ValueError, TypeError):
+                        d["run_days"] = 0
+                else:
+                    d["run_days"] = 0
+                scored.append(d)
+            scored.sort(key=lambda d: d["popularity_score"], reverse=True)
+            # Trim body_text to keep the corpus compact; the LLM needs enough
+            # to recognize the ad, not the full body.
+            for d in scored[:5]:
+                body = (d.get("body_text") or "").replace("\n", " ")[:240]
+                entry["top_ads"].append({
+                    "ad_archive_id": d["ad_archive_id"],
+                    "serp_rank": (d.get("serp_position_rank") + 1) if d.get("serp_position_rank") is not None else None,
+                    "run_days": d["run_days"],
+                    "active": bool(d.get("active")),
+                    "popularity_score": d["popularity_score"],
+                    "body_snippet": body,
+                    "cta_type": d.get("cta_type"),
+                })
             for o in conn.execute(
                 "SELECT observed_at, kind, value, threshold, description, source "
                 "FROM offers WHERE competitor_id=? AND observed_at >= ? ORDER BY observed_at DESC LIMIT 50",

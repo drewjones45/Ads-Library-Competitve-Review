@@ -38,6 +38,10 @@ import markdown
 sys.path.insert(0, str(Path(__file__).parent))
 from strategy_visual_data import DEPLOYMENTS
 
+# Reach into the intel package for the shared popularity scorer.
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+from intel.storage import popularity_score  # noqa: E402
+
 # Shared accent — Adology design system, consistent across deployments
 ACCENT = "#d4f057"   # chartreuse
 ACCENT_DIM = "#9ab33d"
@@ -307,6 +311,104 @@ def _b64_image(path, max_width=None, max_height=None):
     return f"data:{mime or 'image/jpeg'};base64,{base64.b64encode(p.read_bytes()).decode('ascii')}"
 
 
+def top_creatives_by_reach(conn, d):
+    """Auto-populated companion to reference_board(): each brand's top served
+    ads, ranked by the popularity_score proxy (SERP rank × run duration).
+    Editorial captions live in reference_board; this section is hard data."""
+    labels = d["brand_labels"]
+    brand_order = d["brand_order"]
+    blocks = []
+    for cid in brand_order:
+        if cid not in labels:
+            continue
+        max_rank_row = conn.execute(
+            "SELECT MAX(serp_position_rank) FROM ads WHERE competitor_id=? "
+            "AND serp_position_rank IS NOT NULL",
+            (cid,),
+        ).fetchone()
+        max_rank = (max_rank_row[0] or 0) if max_rank_row else 0
+        rows = conn.execute(
+            "SELECT a.ad_archive_id, a.serp_position_rank, a.start_date, "
+            "a.last_seen, a.active, a.body_text, a.cta_type, "
+            "(SELECT c.asset_path FROM creatives c "
+            "  WHERE c.ad_id=a.id AND c.asset_path IS NOT NULL "
+            "  ORDER BY c.id LIMIT 1) AS thumb_path "
+            "FROM ads a WHERE a.competitor_id=?",
+            (cid,),
+        ).fetchall()
+        if not rows:
+            continue
+        scored = []
+        for r in rows:
+            d_row = dict(r)
+            d_row["popularity_score"] = popularity_score(
+                d_row.get("serp_position_rank"),
+                d_row.get("start_date"),
+                d_row.get("last_seen"),
+                d_row.get("active") or 0,
+                max_rank,
+            )
+            if d_row.get("start_date") and d_row.get("last_seen"):
+                try:
+                    from datetime import datetime as _dt
+                    s = _dt.fromisoformat(d_row["start_date"][:10])
+                    e = _dt.fromisoformat(d_row["last_seen"][:10])
+                    d_row["run_days"] = max((e - s).days, 0)
+                except (ValueError, TypeError):
+                    d_row["run_days"] = 0
+            else:
+                d_row["run_days"] = 0
+            scored.append(d_row)
+        scored = [s for s in scored if s["popularity_score"] > 0]
+        scored.sort(key=lambda r: r["popularity_score"], reverse=True)
+        top = scored[:4]
+        if not top:
+            continue
+        cards = []
+        for ad in top:
+            b64 = _b64_image(ad.get("thumb_path"), max_width=400, max_height=400) if ad.get("thumb_path") else ""
+            img_html = (
+                f'<img src="{b64}" alt="ad {_html.escape(str(ad["ad_archive_id"]))}"/>'
+                if b64
+                else '<div class="tcr-noimg">no thumbnail</div>'
+            )
+            rank_label = (
+                f"#{int(ad['serp_position_rank']) + 1}"
+                if ad.get("serp_position_rank") is not None
+                else "—"
+            )
+            body = (ad.get("body_text") or "").replace("\n", " ").strip()[:140]
+            cta = ad.get("cta_type") or ""
+            cards.append(f"""
+            <div class="tcr-card">
+              <a href="https://www.facebook.com/ads/library/?id={_html.escape(str(ad['ad_archive_id']))}" target="_blank" rel="noopener">
+                {img_html}
+              </a>
+              <div class="tcr-chips">
+                <span class="tcr-chip tcr-rank">RANK {rank_label}</span>
+                <span class="tcr-chip tcr-days">{int(ad['run_days'])}d</span>
+              </div>
+              <p class="tcr-body">{_html.escape(body)}</p>
+              <div class="tcr-meta">
+                <span class="tcr-cta">{_html.escape(cta)}</span>
+                <code class="tcr-id">#{_html.escape(str(ad['ad_archive_id']))}</code>
+              </div>
+            </div>""")
+        blocks.append(f"""
+        <section class="tcr-brand">
+          <h3 class="tcr-brand-title">{_html.escape(labels[cid])}</h3>
+          <div class="tcr-grid">{"".join(cards)}</div>
+        </section>""")
+    if not blocks:
+        return ""
+    return f"""<section class="top-creatives-reach">
+      <div class="eyebrow">Top served ads</div>
+      <h2 class="board-title">What's actually carrying spend</h2>
+      <p class="tcr-intro">Ranked by Meta Ad Library's "most-served" sort × run duration. <strong>Proxy, not raw impressions</strong> — Meta does not expose impression numbers for commercial US advertisers. Intra-brand only; a brand with 200 ads and a brand with 5 ads are not comparable. Auto-populated from the corpus; see Reference Board below for hand-curated picks.</p>
+      {"".join(blocks)}
+    </section>"""
+
+
 def reference_board(conn, d):
     labels = d["brand_labels"]
     themes_html = []
@@ -326,20 +428,20 @@ def reference_board(conn, d):
             if not b64: continue
             items_html.append(f'''
             <div class="ref-item">
-              <a href="https://www.facebook.com/ads/library/?id={ad_id}" target="_blank" rel="noopener">
-                <img src="{b64}" alt="ad {ad_id}"/>
+              <a href="https://www.facebook.com/ads/library/?id={_html.escape(str(ad_id))}" target="_blank" rel="noopener">
+                <img src="{b64}" alt="ad {_html.escape(str(ad_id))}"/>
               </a>
               <div class="ref-meta">
-                <span class="ref-brand">{labels.get(cid, cid)}</span>
-                <code class="ref-id">#{ad_id}</code>
+                <span class="ref-brand">{_html.escape(labels.get(cid, cid))}</span>
+                <code class="ref-id">#{_html.escape(str(ad_id))}</code>
               </div>
-              <p class="ref-caption">{item["caption"]}</p>
+              <p class="ref-caption">{_html.escape(item["caption"])}</p>
             </div>''')
         if not items_html: continue
         themes_html.append(f'''
         <section class="ref-theme">
-          <h3 class="ref-theme-title">{theme["title"]}</h3>
-          <p class="ref-theme-intro">{theme["intro"]}</p>
+          <h3 class="ref-theme-title">{_html.escape(theme["title"])}</h3>
+          <p class="ref-theme-intro">{_html.escape(theme["intro"])}</p>
           <div class="ref-grid">{"".join(items_html)}</div>
         </section>''')
 
@@ -886,6 +988,109 @@ figure.quadrant-chart svg {{ border-radius: 6px 6px 0 0; }}
   line-height: 1.5;
 }}
 
+/* ---- top served creatives (auto-populated) ---- */
+section.top-creatives-reach {{
+  margin-top: 88px;
+  padding-top: 36px;
+  border-top: 2px solid var(--accent);
+}}
+section.top-creatives-reach > .eyebrow {{ margin-top: 0; }}
+section.top-creatives-reach .board-title {{
+  font-family: "Charter", Georgia, serif;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 14px;
+  max-width: 640px;
+}}
+.tcr-intro {{
+  color: var(--ink-muted);
+  font-style: italic;
+  margin: 0 0 40px;
+  font-size: 14.5px;
+  font-family: "Charter", Georgia, serif;
+  line-height: 1.55;
+  max-width: 720px;
+}}
+.tcr-intro strong {{ color: var(--accent); font-weight: 700; font-style: normal; }}
+.tcr-brand {{ margin-bottom: 48px; }}
+.tcr-brand-title {{
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 16px;
+}}
+.tcr-grid {{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+}}
+.tcr-card {{
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  border-radius: 4px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}}
+.tcr-card a {{ display: block; border: none; }}
+.tcr-card img {{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: #1a1a1a;
+  border-radius: 3px;
+  display: block;
+}}
+.tcr-noimg {{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #1a1a1a;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-muted);
+  font-size: 11px;
+}}
+.tcr-chips {{ display: flex; gap: 5px; flex-wrap: wrap; }}
+.tcr-chip {{
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 2px 7px;
+  border-radius: 3px;
+}}
+.tcr-chip.tcr-rank {{
+  background: rgba(212, 240, 87, 0.13);
+  color: var(--accent);
+  border: 1px solid rgba(212, 240, 87, 0.3);
+}}
+.tcr-chip.tcr-days {{
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-dim);
+  border: 1px solid var(--bg-card-border);
+}}
+.tcr-body {{
+  font-family: "Charter", Georgia, serif;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+  margin: 0;
+  flex: 1;
+}}
+.tcr-meta {{
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  font-size: 11px;
+}}
+.tcr-cta {{ color: var(--accent); font-weight: 700; }}
+.tcr-id {{ color: var(--ink-muted); font-family: monospace; font-size: 10px; }}
+
 /* ---- reference board ---- */
 section.reference-board {{
   margin-top: 88px;
@@ -1295,6 +1500,7 @@ def render(deployment_key, md_text, brand_label, date):
         appeal = chart_appeal_split(conn, d)
         refboard = reference_board(conn, d)
         sitecontent = site_content_section(conn, d)
+        topcreatives = top_creatives_by_reach(conn, d)
     finally:
         conn.close()
 
@@ -1322,10 +1528,12 @@ def render(deployment_key, md_text, brand_label, date):
     # Apply inline highlighting (brand names + curated phrases)
     html_body = apply_inline_highlights(html_body, d["brand_labels"], d.get("highlight_phrases", []))
 
-    # Site Content Deep-Dive + Reference board before methodology footer
+    # Site Content Deep-Dive + Top served ads + Reference board before methodology footer
     extras = ""
     if sitecontent:
         extras += sitecontent
+    if topcreatives:
+        extras += topcreatives
     if refboard:
         extras += refboard
     if extras:
