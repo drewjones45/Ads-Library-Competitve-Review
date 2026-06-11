@@ -1,0 +1,30 @@
+[project]
+name = "intel"
+version = "0.1.0"
+description = "Agentic competitive intelligence — Meta Ads Library, on-site offers, creative vision analysis, weekly briefings"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=0.40.0",
+    "httpx>=0.27.0",
+    "beautifulsoup4>=4.12.0",
+    "pyyaml>=6.0",
+    "click>=8.1.0",
+    "python-dotenv>=1.0.0",
+    "rich>=13.7.0",
+    "Pillow>=10.0.0",
+    "imagehash>=4.3.1",
+]
+
+[project.optional-dependencies]
+browser = ["playwright>=1.45.0"]
+dev = ["pytest>=8.0.0"]
+
+[project.scripts]
+intel = "intel.cli:cli"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

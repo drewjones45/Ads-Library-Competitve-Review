@@ -1,0 +1,1626 @@
+[
+  {
+    "phash": "861b6c3d64da0fa3",
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [
+        "composite deck board"
+      ],
+      "key_features": [
+        "brand_logo",
+        "text_only_card"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "durability"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#b89674",
+        "#7a5a3c",
+        "#3a2a1c"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Deckorators",
+      "seasonal_tags": [],
+      "notable_text": "SUMMIT DECKING. REDEFINING PERFORMANCE.",
+      "background_color": "brown",
+      "scene_description": "Close-up tan composite deck boards with bold brand statement",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Deckorators Summit decking close-up with bold brand performance tagline.",
+      "confidence": 0.92
+    }
+  },
+  {
+    "phash": "8f407e494dd01f8f",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [
+        "composite deck",
+        "outdoor furniture on deck",
+        "umbrella",
+        "railing"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "model_present"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "social_proof"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 4,
+        "diversity_signals": [
+          "age_range_broad",
+          "skin_tone_diverse"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#b59778",
+        "#2f7fb5",
+        "#7d6347"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Deckorators",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "VOS VOISINS NE MANQUERONT PAS DE LA REMARQUER",
+      "background_color": "brown",
+      "scene_description": "Aerial view of family gathered on deck with umbrella",
+      "model_gender": "mixed",
+      "model_demo": "multigenerational adults",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "use_case",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Family entertaining on Deckorators deck French-language stand-out ad.",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "97403f681fc017f9",
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [
+        "composite deck board",
+        "flower planter"
+      ],
+      "key_features": [
+        "brand_logo",
+        "product_close_up"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#b59576",
+        "#e35a9f",
+        "#5e3f24"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Deckorators",
+      "seasonal_tags": [
+        "spring",
+        "summer"
+      ],
+      "notable_text": "VOS VOISINS NE MANQUERONT PAS DE LA REMARQUER",
+      "background_color": "brown",
+      "scene_description": "Tan deck boards with pink petunia planter and French tagline",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Deckorators deck planks with petunias and French stand-out brand tagline.",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "98644eb9fc972558",
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [
+        "outdoor living report magazine",
+        "deck design booklet"
+      ],
+      "key_features": [
+        "brand_logo",
+        "product_close_up"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "novelty",
+        "aesthetic"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#7a6a5a",
+        "#ffffff",
+        "#2c2823"
+      ],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Deckorators",
+      "seasonal_tags": [],
+      "notable_text": "THE LATEST TRENDS IN OUTDOOR LIVING.",
+      "background_color": "brown",
+      "scene_description": "Outdoor Living Report magazine open on a wooden deck background",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Deckorators 2026 Outdoor Living Report magazine promoting design trends.",
+      "confidence": 0.93
+    }
+  },
+  {
+    "phash": "9f483d621e8835f9",
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [
+        "composite deck board",
+        "flower planter"
+      ],
+      "key_features": [
+        "brand_logo",
+        "product_close_up"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#b69578",
+        "#e25e9e",
+        "#5d3f24"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Deckorators",
+      "seasonal_tags": [
+        "spring",
+        "summer"
+      ],
+      "notable_text": "THE NEIGHBORS WILL NOTICE",
+      "background_color": "brown",
+      "scene_description": "Tan deck planks with petunias and bold stand-out headline",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Deckorators decking with petunias and 'Neighbors Will Notice' headline.",
+      "confidence": 0.92
+    }
+  },
+  {
+    "phash": "b74f2478758703c3",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": [
+        "composite deck board"
+      ],
+      "key_features": [
+        "brand_logo",
+        "product_close_up",
+        "lifestyle_setting"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "durability",
+        "aesthetic"
+      ],
+      "hook_style": "demo",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": [
+          "single_demo"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#3e5a3a",
+        "#a78b6d",
+        "#1f1d18"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Deckorators",
+      "seasonal_tags": [],
+      "notable_text": "SUMMIT DECKING. REDEFINING WHAT'S POSSIBLE.",
+      "background_color": "green",
+      "scene_description": "Contractor carries deck boards on shoulder outdoors with bold tagline",
+      "model_gender": "male",
+      "model_demo": "adult male contractor",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Contractor carries Deckorators Summit boards over shoulder outdoors.",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "b93338f89b8b0ba8",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": [
+        "composite deck board",
+        "deck framing",
+        "deck fasteners"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "cta_button_in_image"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "durability",
+        "social_proof",
+        "convenience"
+      ],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": [
+          "single_demo"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#b59071",
+        "#5c4a36",
+        "#caa789"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Deckorators",
+      "seasonal_tags": [],
+      "notable_text": "YOUR CLIENTS WILL NOTICE",
+      "background_color": "brown",
+      "scene_description": "Pro installer fitting Deckorators deck boards with certification call-out",
+      "model_gender": "male",
+      "model_demo": "adult male contractor",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": "BECOME A CERTIFIED PRO TODAY",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [
+        "Deckorators Certified Pro"
+      ],
+      "awards_or_rankings": [],
+      "summary_one_line": "Pro installer with Deckorators boards inviting contractors to certify.",
+      "confidence": 0.91
+    }
+  },
+  {
+    "phash": "c4e7aae82fb3089c",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [
+        "composite deck",
+        "outdoor furniture on deck",
+        "pink flamingo decor"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "model_present"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "social_proof"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 4,
+        "diversity_signals": [
+          "age_range_broad",
+          "skin_tone_diverse"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#9d7456",
+        "#e76a8c",
+        "#516b34"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Deckorators",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "VOS VOISINS NE MANQUERONT PAS DE LA REMARQUER",
+      "background_color": "multi",
+      "scene_description": "Friends with pink flamingos on deck, French stand-out headline",
+      "model_gender": "mixed",
+      "model_demo": "multigenerational adults",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "use_case",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Group on Deckorators deck holding pink flamingos with French headline.",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "c693b8445fb064eb",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [
+        "composite deck",
+        "Adirondack chair",
+        "house exterior"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "model_present"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "social_proof"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 2,
+        "diversity_signals": [
+          "single_demo"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#5b9bd9",
+        "#7b563a",
+        "#d2c5a8"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Deckorators",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "VOS VOISINS NE MANQUERONT PAS DE LA REMARQUER",
+      "background_color": "blue",
+      "scene_description": "Woman waves to neighbor from Adirondack chair on deck",
+      "model_gender": "female",
+      "model_demo": "adult woman with neighbor",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "use_case",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Woman waves to neighbor from Deckorators deck under blue sky.",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "ca4b6d755593428e",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": [
+        "composite deck board",
+        "hammock",
+        "wicker outdoor chair",
+        "planter"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "durability"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#a07a55",
+        "#2f2a26",
+        "#d7b78a"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Deckorators",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "SUMMIT DECKING. REDEFINING WHAT'S POSSIBLE.",
+      "background_color": "brown",
+      "scene_description": "Styled deck with hammock and wicker chair, Summit decking branding",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "use_case",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Styled outdoor deck with hammock promoting Deckorators Summit decking.",
+      "confidence": 0.92
+    }
+  },
+  {
+    "phash": "916824957ecee596",
+    "analysis": {
+      "photography_style": "flat_lay",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [
+        "deck planning guide",
+        "smartphone screen with design site"
+      ],
+      "key_features": [
+        "brand_logo",
+        "product_close_up",
+        "multi_product_collage"
+      ],
+      "text_overlay": {
+        "present": false,
+        "density": "none",
+        "copy_lean": "none"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "convenience",
+        "novelty"
+      ],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#8e8d88",
+        "#3a342b",
+        "#d2c8b6"
+      ],
+      "aspect_ratio_guess": "16:9",
+      "logo_visible": true,
+      "logo_brand": "TimberTech",
+      "seasonal_tags": [],
+      "notable_text": "Deck planning guide & checklist",
+      "background_color": "gray",
+      "scene_description": "Flat-lay phone and deck planning checklist with palm leaf shadow",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "TimberTech deck planning guide and phone shown in flat-lay style.",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "92e0e71f10b4cbd9",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [
+        "composite deck",
+        "wicker outdoor furniture",
+        "deck railing",
+        "coffee table"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "sustainability"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#c47854",
+        "#7a6759",
+        "#4f5c5e"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "TimberTech",
+      "seasonal_tags": [
+        "fall"
+      ],
+      "notable_text": "Inspired by nature, born from technology",
+      "background_color": "brown",
+      "scene_description": "Sunset deck with wicker furniture overlooking treetops",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "use_case",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "TimberTech deck at sunset with wicker seating and brand tagline.",
+      "confidence": 0.92
+    }
+  },
+  {
+    "phash": "99a0c71ff187c631",
+    "analysis": {
+      "photography_style": "mixed",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": [
+        "composite deck board",
+        "deck installation",
+        "miter saw cutting deck board"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "product_close_up",
+        "multi_product_collage"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "sustainability",
+        "durability"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 2,
+        "diversity_signals": [
+          "single_demo"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#ffffff",
+        "#1f3a52",
+        "#7a93a8",
+        "#2b2b2b"
+      ],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "High-quality products with real wood looks",
+      "background_color": "white",
+      "scene_description": "Two duotone images of contractors handling and cutting composite deck boards",
+      "model_gender": "male",
+      "model_demo": "adult male contractor",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Benefit-led ad highlighting real wood looks with images of TimberTech installers at work",
+      "confidence": 0.86
+    }
+  },
+  {
+    "phash": "9ebee3c04183263f",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": [
+        "composite deck board",
+        "contractor carrying board"
+      ],
+      "key_features": [
+        "brand_logo",
+        "cta_button_in_image",
+        "lifestyle_setting",
+        "model_present"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "social_proof",
+        "aesthetic"
+      ],
+      "hook_style": "social_proof",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": [
+          "single_demo"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#ffffff",
+        "#3c5d7a",
+        "#a9b9c4",
+        "#1d2530"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "TimberTech / The Board (AZEK)",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "Join the decking pros who trust TimberTech",
+      "background_color": "white",
+      "scene_description": "Duotone contractor carrying deck board across deck with vineyard barn behind",
+      "model_gender": "male",
+      "model_demo": "adult male contractor",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": "SIGN UP",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Loyalty program recruitment ad inviting contractors to join The Board by AZEK",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "aa2e3dda6825631b",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [
+        "composite deck board",
+        "deck color swatches",
+        "outdoor lounge furniture on deck"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "multi_product_collage",
+        "product_close_up"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "novelty"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#b9a98c",
+        "#7a6a52",
+        "#3a3a36",
+        "#dad2c2"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "TimberTech",
+      "seasonal_tags": [
+        "summer",
+        "spring"
+      ],
+      "notable_text": "TimberTech",
+      "background_color": "beige",
+      "scene_description": "Overhead view of light wood-tone deck with lounge chairs and color swatch callouts",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Aerial deck shot showcasing four TimberTech composite board collections and colors",
+      "confidence": 0.92
+    }
+  },
+  {
+    "phash": "b838c7d6f0e66644",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [
+        "composite deck boards",
+        "deck lighting",
+        "railing post light",
+        "outdoor deck"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "multi_product_collage",
+        "product_close_up"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "convenience"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#b5a18a",
+        "#735844",
+        "#dcd2c2",
+        "#3b3b3b"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "TimberTech",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "Deck Design Guide",
+      "background_color": "white",
+      "scene_description": "Collage of composite deck scenes, lighting and board details promoting Deck Design Guide",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Lead-gen ad for TimberTech Deck Design Guide showcasing deck, lighting and board options",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "b914c76bb018c7c7",
+    "analysis": {
+      "photography_style": "mixed",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": [
+        "deck magazine",
+        "composite deck",
+        "outdoor furniture on deck",
+        "patio scenes"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "multi_product_collage"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "convenience"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#d8d2c8",
+        "#7a6450",
+        "#2b2b2b",
+        "#a89378"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "TimberTech",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "Explore trending deck designs, stunning spaces for entertaining and more",
+      "background_color": "beige",
+      "scene_description": "Inspired Outdoors magazine cover with deck design page spreads underneath",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "Get inspired",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Lead magnet promoting Inspired Outdoors deck design magazine with sample spreads",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "bcb8e363038373b8",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": [
+        "composite deck board",
+        "contractor carrying board"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "model_present"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "social_proof",
+        "aesthetic"
+      ],
+      "hook_style": "social_proof",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": [
+          "single_demo"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#ffffff",
+        "#3a5b78",
+        "#a8b8c5",
+        "#1c252f"
+      ],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "The Board / AZEK",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "Join the pros who trust TimberTech",
+      "background_color": "white",
+      "scene_description": "Duotone contractor carries deck board across deck with rural barn backdrop",
+      "model_gender": "male",
+      "model_demo": "adult male contractor",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Contractor loyalty ad promoting The Board program by AZEK with TimberTech credibility",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "bf38c0c7943a6bc1",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [
+        "deck planning guide booklet",
+        "composite deck",
+        "outdoor dining furniture"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "product_close_up"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "convenience",
+        "aesthetic"
+      ],
+      "hook_style": "problem_solution",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#ffffff",
+        "#5d4128",
+        "#a98758",
+        "#2b2b2b"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "TimberTech",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "Get Your Deck Planning Guide & Checklist",
+      "background_color": "white",
+      "scene_description": "Overhead deck scene with dining set holding TimberTech Deck Planning Guide booklet",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Lead magnet ad offering TimberTech Deck Planning Guide and included checklist",
+      "confidence": 0.92
+    }
+  },
+  {
+    "phash": "cc4db35248ad5eb2",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [
+        "contractor cutting deck board",
+        "miter saw",
+        "composite deck board"
+      ],
+      "key_features": [
+        "lifestyle_setting",
+        "model_present",
+        "product_close_up"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "convenience",
+        "social_proof"
+      ],
+      "hook_style": "social_proof",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": [
+          "single_demo"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#ffffff",
+        "#3b5c79",
+        "#a8b8c5",
+        "#1d252f"
+      ],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": [],
+      "notable_text": "One program, endless rewards",
+      "background_color": "white",
+      "scene_description": "Duotone contractor at miter saw with five-benefit checklist for loyalty program",
+      "model_gender": "male",
+      "model_demo": "adult male contractor",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Contractor program ad listing five benefits: leads, training, rewards, locator and growth",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "d9f2260c27d1d8f2",
+    "analysis": {
+      "photography_style": "text_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": [
+        "loyalty program brand mark"
+      ],
+      "key_features": [
+        "brand_logo",
+        "cta_button_in_image",
+        "text_only_card"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "social_proof",
+        "convenience"
+      ],
+      "hook_style": "social_proof",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#4d5a6b",
+        "#ffffff"
+      ],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "The Board by AZEK",
+      "seasonal_tags": [],
+      "notable_text": "THE BOARD",
+      "background_color": "gray",
+      "scene_description": "Text-only card with The Board logo and SIGN UP button on slate background",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": "SIGN UP",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Plain-color CTA card inviting top-tier pros to sign up for The Board loyalty program",
+      "confidence": 0.94
+    }
+  },
+  {
+    "phash": "ff7f809a34a4c81a",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": [
+        "contractor operating miter saw",
+        "composite deck board"
+      ],
+      "key_features": [
+        "lifestyle_setting",
+        "model_present",
+        "product_close_up"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "convenience",
+        "warranty"
+      ],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": [
+          "single_demo"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#ffffff",
+        "#3a5a78",
+        "#a7b7c5",
+        "#1d252f"
+      ],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": [],
+      "notable_text": "Designed for easy work and seamless installation",
+      "background_color": "white",
+      "scene_description": "Duotone contractor cutting composite board on miter saw with warranty copy below",
+      "model_gender": "male",
+      "model_demo": "adult male contractor",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Installer-focused ad emphasizing easy installation and industry-leading warranties",
+      "confidence": 0.9
+    }
+  },
+  {
+    "phash": "ff87f0c2b8e02cc8",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [
+        "composite deck boards",
+        "deck color sample",
+        "porch with furniture"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "multi_product_collage"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "novelty"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#7a4d2f",
+        "#a07248",
+        "#c8b48c",
+        "#3a3a36"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "TimberTech",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "TimberTech",
+      "background_color": "brown",
+      "scene_description": "Warm-toned porch deck with four collection color swatches along the side",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Warm wood-tone deck scene showcasing four TimberTech composite collections and colors",
+      "confidence": 0.92
+    }
+  },
+  {
+    "phash": "ffb07c8eaaa49680",
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [
+        "composite deck boards",
+        "deck color swatches",
+        "outdoor lounge furniture on deck",
+        "railing system"
+      ],
+      "key_features": [
+        "brand_logo",
+        "lifestyle_setting",
+        "multi_product_collage"
+      ],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [
+        "aesthetic",
+        "durability"
+      ],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": [
+          "n/a"
+        ]
+      },
+      "dominant_colors_hex": [
+        "#c2a07a",
+        "#7a5a3a",
+        "#3a3a36",
+        "#dcd0bc"
+      ],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "TimberTech",
+      "seasonal_tags": [
+        "summer"
+      ],
+      "notable_text": "TimberTech",
+      "background_color": "beige",
+      "scene_description": "Hillside deck with sectional and rug showing four TimberTech collection swatches",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Lifestyle deck shot with sectional furniture highlighting four TimberTech color collections",
+      "confidence": 0.92
+    }
+  }
+]

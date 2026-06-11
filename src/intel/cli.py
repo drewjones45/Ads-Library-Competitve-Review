@@ -1,0 +1,580 @@
+"""intel — CLI for agentic competitive intelligence.
+
+Examples:
+  intel init                           # create db, register competitors from yaml
+  intel ingest                         # run all sources for all competitors
+  intel ingest --competitor glossier   # one competitor
+  intel ads --days 7                   # show new ads in window
+  intel offers --days 14
+  intel brief --days 7                 # write a weekly briefing
+  intel whitespace --vertical skincare
+  intel analyze-creative path/to.jpg
+  intel dashboard --open-after         # generate + open HTML dashboard
+  intel agent "what's the biggest competitive move this week?"
+"""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+import click
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.table import Table
+
+from .agent import run_agent
+from .analysis.creative import analyze_creative_image
+from .analysis.creative_batch import analyze_pending
+from .analysis.offers import extract_offers_from_text
+from .analysis.themes import cluster_hooks
+from .config import DATA_DIR, DB_PATH, load_competitors
+from .runner import ingest_all, ingest_competitor
+from .storage import connect, init_db, upsert_competitor
+from .synthesis.briefing import MissingApiKey, generate_briefing
+from .synthesis.creative_readout import cross_set_comparison, per_brand_readout
+from .synthesis.dashboard import build_dashboard
+from .synthesis.whitespace import detect_whitespace
+
+console = Console()
+
+
+@click.group()
+def cli() -> None:
+    """Agentic competitive intelligence tools."""
+
+
+@cli.command()
+def status() -> None:
+    """Print db location, row counts per table, and api-key presence."""
+    import os
+    t = Table(title="intel status")
+    t.add_column("key"); t.add_column("value")
+    t.add_row("data_dir", str(DATA_DIR))
+    t.add_row("db_path", str(DB_PATH))
+    t.add_row("ANTHROPIC_API_KEY", "set" if os.environ.get("ANTHROPIC_API_KEY") else "[red]missing[/red]")
+    t.add_row(
+        "META_AD_LIBRARY_ACCESS_TOKEN",
+        "set" if os.environ.get("META_AD_LIBRARY_ACCESS_TOKEN") else "[yellow]missing[/yellow]",
+    )
+    if DB_PATH.exists():
+        with connect() as conn:
+            for tbl in ["competitors", "sources", "observations", "ads", "creatives", "offers", "briefings", "audit_log"]:
+                n = conn.execute(f"SELECT COUNT(*) c FROM {tbl}").fetchone()["c"]
+                t.add_row(f"db.{tbl}", str(n))
+    else:
+        t.add_row("db", "[yellow]not initialized — run `intel init`[/yellow]")
+    console.print(t)
+
+
+@cli.command()
+def init() -> None:
+    """Create the database and register competitors from config/competitors.yaml."""
+    init_db()
+    comps = load_competitors()
+    with connect() as conn:
+        for c in comps:
+            upsert_competitor(conn, c)
+    console.print(f"[green]ok[/green] registered {len(comps)} competitors")
+    for c in comps:
+        console.print(f"  - {c.id} ({c.name}) — {len(c.sources)} sources")
+
+
+@cli.command()
+@click.option("--competitor", "competitor_id", default=None, help="single competitor id; else all")
+def ingest(competitor_id: str | None) -> None:
+    """Run adapters → diff → enrich for one or all competitors."""
+    reports = ingest_competitor(competitor_id) if competitor_id else ingest_all()
+    t = Table(title="Ingestion report", show_lines=False)
+    t.add_column("competitor"); t.add_column("source"); t.add_column("ok"); t.add_column("changed")
+    t.add_column("sev"); t.add_column("new_ads"); t.add_column("offers"); t.add_column("summary")
+    for r in reports:
+        t.add_row(
+            r.competitor_id,
+            r.source_key[:60],
+            "✓" if r.ok else "✗",
+            "yes" if r.changed else "no",
+            f"{r.severity:.2f}",
+            str(len(r.new_ads)),
+            str(r.offers_extracted),
+            (r.change_summary or r.error or "")[:60],
+        )
+    console.print(t)
+
+
+@cli.command()
+@click.option("--days", default=7, type=int)
+@click.option("--competitor", "competitor_id", default=None)
+def ads(days: int, competitor_id: str | None) -> None:
+    """List new ads detected in the last N days."""
+    q = "SELECT competitor_id, ad_archive_id, page_name, first_seen, body_text FROM ads WHERE first_seen >= datetime('now', ?)"
+    params: list = [f"-{days} days"]
+    if competitor_id:
+        q += " AND competitor_id=?"; params.append(competitor_id)
+    q += " ORDER BY first_seen DESC LIMIT 50"
+    with connect() as conn:
+        rows = conn.execute(q, params).fetchall()
+    t = Table(title=f"New ads — last {days}d ({len(rows)} rows)")
+    t.add_column("competitor"); t.add_column("archive_id"); t.add_column("page"); t.add_column("first_seen"); t.add_column("body")
+    for r in rows:
+        t.add_row(r["competitor_id"], r["ad_archive_id"], r["page_name"] or "", r["first_seen"], (r["body_text"] or "")[:80])
+    console.print(t)
+
+
+@cli.command()
+@click.option("--days", default=14, type=int)
+@click.option("--competitor", "competitor_id", default=None)
+def offers(days: int, competitor_id: str | None) -> None:
+    """List offers detected in the last N days."""
+    q = "SELECT competitor_id, observed_at, kind, value, threshold, description FROM offers WHERE observed_at >= datetime('now', ?)"
+    params: list = [f"-{days} days"]
+    if competitor_id:
+        q += " AND competitor_id=?"; params.append(competitor_id)
+    q += " ORDER BY observed_at DESC LIMIT 50"
+    with connect() as conn:
+        rows = conn.execute(q, params).fetchall()
+    t = Table(title=f"Offers — last {days}d ({len(rows)} rows)")
+    t.add_column("competitor"); t.add_column("when"); t.add_column("kind"); t.add_column("value"); t.add_column("threshold"); t.add_column("desc")
+    for r in rows:
+        t.add_row(r["competitor_id"], r["observed_at"], r["kind"] or "", r["value"] or "", r["threshold"] or "", (r["description"] or "")[:60])
+    console.print(t)
+
+
+@cli.command()
+@click.option("--days", default=7, type=int)
+@click.option("--scope", default=None, help="label, e.g. 'weekly'")
+@click.option("--print-corpus", is_flag=True, help="print the structured corpus, not the briefing")
+@click.option("--no-llm", is_flag=True, help="render a deterministic templated briefing (no Anthropic key needed)")
+def brief(days: int, scope: str | None, print_corpus: bool, no_llm: bool) -> None:
+    """Generate (and persist) a competitive briefing."""
+    if print_corpus:
+        from .synthesis.briefing import build_corpus
+        corpus = build_corpus(days)
+        console.print_json(json.dumps(corpus, default=str))
+        return
+    try:
+        result = generate_briefing(days=days, scope=scope, use_llm=not no_llm)
+    except MissingApiKey as e:
+        console.print(f"[red]error:[/red] {e}")
+        sys.exit(1)
+    console.rule(f"[bold]{result['title']}[/bold] (id={result['briefing_id']})")
+    console.print(Markdown(result["body_md"]))
+
+
+@cli.command()
+@click.option("--vertical", default=None)
+def whitespace(vertical: str | None) -> None:
+    """Surface angles/formats/offers the competitive set is NOT using."""
+    res = detect_whitespace(vertical=vertical)
+    if "error" in res:
+        console.print(f"[red]error[/red]: {res['error']}")
+        return
+    t = Table(title="Whitespace candidates")
+    t.add_column("angle"); t.add_column("rationale"); t.add_column("hypothesis"); t.add_column("effort"); t.add_column("conf")
+    for w in res.get("whitespace", []):
+        t.add_row(
+            w.get("angle", ""), w.get("rationale", "")[:80],
+            w.get("testable_hypothesis", "")[:80], w.get("effort", ""),
+            f"{w.get('confidence', 0):.2f}",
+        )
+    console.print(t)
+
+
+@cli.command("analyze-creative")
+@click.argument("image_path")
+def analyze_creative_cmd(image_path: str) -> None:
+    """Vision-classify a single creative image."""
+    res = analyze_creative_image(image_path)
+    console.print_json(json.dumps(res, default=str, indent=2))
+
+
+@cli.command("analyze-creatives")
+@click.option("--competitor", "competitor_id", default=None, help="single competitor; else all brands")
+@click.option("--limit", default=50, type=int, help="max NEW model calls (skips already-analyzed)")
+@click.option("--no-dedupe-phash", is_flag=True, help="don't reuse analysis for identical images")
+@click.option("--force-reanalyze", is_flag=True,
+              help="re-run analysis on already-analyzed creatives (e.g. after a taxonomy expansion). "
+                   "Skips phash dedup since the old phash-matched analysis was produced under the prior schema.")
+def analyze_creatives_cmd(
+    competitor_id: str | None, limit: int, no_dedupe_phash: bool, force_reanalyze: bool,
+) -> None:
+    """Batch-analyze unanalyzed creative images (vision + taxonomy).
+
+    Idempotent — re-running only analyzes net-new creatives. Reuses prior
+    analysis for visually identical images (perceptual-hash match) unless
+    --no-dedupe-phash is set. Use --force-reanalyze to re-run on already-
+    analyzed creatives (intended for taxonomy upgrades).
+    """
+    report = analyze_pending(
+        competitor_id=competitor_id,
+        limit=limit,
+        dedupe_by_phash=not no_dedupe_phash,
+        force_reanalyze=force_reanalyze,
+    )
+    console.print(str(report))
+    if report.errors:
+        console.print("\n[red]errors:[/red]")
+        for e in report.errors[:5]:
+            console.print(f"  - {e}")
+        if len(report.errors) > 5:
+            console.print(f"  …+{len(report.errors)-5} more")
+
+
+@cli.command("creative-readout")
+@click.option("--competitor", "competitor_id", required=True, help="brand id from competitors.yaml")
+@click.option("--days", default=7, type=int, help="window for 'net new' (ads first_seen)")
+@click.option("--save", default=None, type=click.Path(), help="also write markdown to a file")
+def creative_readout_cmd(competitor_id: str, days: int, save: str | None) -> None:
+    """Per-brand creative readout — net new + attribute distribution."""
+    res = per_brand_readout(competitor_id, window_days=days)
+    console.print(Markdown(res["body_md"]))
+    if save:
+        from pathlib import Path
+        Path(save).parent.mkdir(parents=True, exist_ok=True)
+        Path(save).write_text(res["body_md"], encoding="utf-8")
+        console.print(f"\n[green]wrote[/green] {save}")
+
+
+@cli.command("creative-comparison")
+@click.option("--days", default=30, type=int, help="window for ads first_seen")
+@click.option("--save", default=None, type=click.Path(), help="also write markdown to a file")
+def creative_comparison_cmd(days: int, save: str | None) -> None:
+    """Cross-competitor creative comparison — popularity, distinctiveness, whitespace."""
+    res = cross_set_comparison(window_days=days)
+    console.print(Markdown(res["body_md"]))
+    if save:
+        from pathlib import Path
+        Path(save).parent.mkdir(parents=True, exist_ok=True)
+        Path(save).write_text(res["body_md"], encoding="utf-8")
+        console.print(f"\n[green]wrote[/green] {save}")
+
+
+@cli.command("cluster-hooks")
+@click.option("--competitor", "competitor_id", default=None)
+@click.option("--limit", default=50, type=int)
+def cluster_hooks_cmd(competitor_id: str | None, limit: int) -> None:
+    """Cluster recent ads' body copy into hook themes."""
+    q = "SELECT ad_archive_id, body_text FROM ads WHERE active=1"
+    params: list = []
+    vertical = ""
+    if competitor_id:
+        q += " AND competitor_id=?"; params.append(competitor_id)
+        with connect() as conn:
+            row = conn.execute("SELECT vertical FROM competitors WHERE id=?", (competitor_id,)).fetchone()
+            vertical = (row["vertical"] if row else "") or ""
+    q += " ORDER BY first_seen DESC LIMIT ?"; params.append(int(limit))
+    with connect() as conn:
+        rows = conn.execute(q, params).fetchall()
+    ads = [{"ad_archive_id": r["ad_archive_id"], "body_text": r["body_text"]} for r in rows]
+    res = cluster_hooks(ads, vertical=vertical)
+    console.print_json(json.dumps(res, default=str, indent=2))
+
+
+@cli.command("extract-offers")
+@click.argument("text", required=False)
+def extract_offers_cmd(text: str | None) -> None:
+    """Run offer extraction on stdin or arg. e.g. echo 'FREE shipping' | intel extract-offers"""
+    if not text:
+        text = sys.stdin.read()
+    if not text.strip():
+        console.print("[red]no text provided[/red]")
+        return
+    res = extract_offers_from_text(text)
+    console.print_json(json.dumps(res, default=str, indent=2))
+
+
+@cli.command()
+@click.argument("goal", nargs=-1, required=True)
+@click.option("--max-iters", default=15, type=int)
+@click.option("--verbose", is_flag=True, help="stream tool calls to stderr")
+def agent(goal: tuple[str, ...], max_iters: int, verbose: bool) -> None:
+    """Run the orchestrating agent. The model picks which tools to call.
+
+    Example:
+      intel agent "give me this week's competitive briefing"
+      intel agent "did any competitor launch a sale in the last 3 days?"
+    """
+    g = " ".join(goal)
+    log = (lambda s: click.echo(s, err=True)) if verbose else None
+    result = run_agent(g, max_iters=max_iters, log=log)
+    console.rule("agent answer")
+    if result["final_text"]:
+        # Render as markdown if it looks like markdown.
+        if any(tok in result["final_text"] for tok in ("# ", "## ", "- ", "**")):
+            console.print(Markdown(result["final_text"]))
+        else:
+            console.print(result["final_text"])
+    else:
+        console.print("[yellow](no final text — stop_reason="
+                      f"{result['stop_reason']})[/yellow]")
+    console.print(f"\n[dim]tool calls: {len(result['tool_calls'])} | "
+                  f"stop: {result['stop_reason']}[/dim]")
+
+
+@cli.command()
+@click.option("--limit", default=10, type=int)
+def briefings(limit: int) -> None:
+    """List recent briefings stored in the db."""
+    with connect() as conn:
+        rows = conn.execute(
+            "SELECT id, created_at, scope, title FROM briefings ORDER BY created_at DESC LIMIT ?", (limit,)
+        ).fetchall()
+    t = Table(title="Briefings")
+    t.add_column("id"); t.add_column("created_at"); t.add_column("scope"); t.add_column("title")
+    for r in rows:
+        t.add_row(str(r["id"]), r["created_at"], r["scope"], r["title"])
+    console.print(t)
+
+
+@cli.command()
+@click.option("--out", default=None, type=click.Path(),
+              help="output dir; default reports/<UTC-date>/dashboard")
+@click.option("--days", default=30, type=int)
+@click.option("--org-name", default="Horizon Commerce", help="organization label in header eyebrow")
+@click.option("--product-name", default="Creative & Competitive Intelligence",
+              help="product/page title shown as h1")
+@click.option("--open-after", is_flag=True, help="open the dashboard in your default browser after build")
+def dashboard(out: str | None, days: int, org_name: str, product_name: str, open_after: bool) -> None:
+    """Render a static HTML dashboard from the current DB + creatives."""
+    from datetime import datetime as _dt
+    if out is None:
+        out = f"reports/{_dt.utcnow().date().isoformat()}/dashboard"
+    result = build_dashboard(out, days=days, org_name=org_name, product_name=product_name)
+    console.print(f"[green]wrote[/green] {result['path']}  "
+                  f"({result['n_brands']} brands · {result['n_analyzed']} analyzed creatives · "
+                  f"{result['size_bytes']//1024} KB)")
+    if open_after:
+        import webbrowser
+        webbrowser.open(f"file://{Path(result['path']).resolve()}")
+
+
+@cli.command()
+@click.argument("briefing_id", type=int)
+def show_briefing(briefing_id: int) -> None:
+    """Render a stored briefing."""
+    with connect() as conn:
+        row = conn.execute("SELECT * FROM briefings WHERE id=?", (briefing_id,)).fetchone()
+    if not row:
+        console.print(f"[red]no briefing {briefing_id}[/red]")
+        return
+    console.rule(f"[bold]{row['title']}[/bold]")
+    console.print(Markdown(row["body_md"]))
+
+
+@cli.command("test-amazon-store")
+@click.argument("store_url")
+@click.option("--out-dir", default=None, type=click.Path(),
+              help="output dir for screenshots/HTML/images; default reports/<date>/amazon-test/")
+@click.option("--max-subpages", default=0, type=int,
+              help="0 = landing only (Phase B1 default); higher = follow sub-pages (Phase B2)")
+@click.option("--headed", is_flag=True, help="run Playwright in headed mode (helpful for debugging anti-bot)")
+def test_amazon_store_cmd(store_url: str, out_dir: str | None, max_subpages: int, headed: bool) -> None:
+    """Smoke-test the Amazon Brand Store adapter against a single URL.
+
+    Doesn't touch the db — just runs the scrape and reports what was captured.
+    Useful for verifying a store_url before adding it to competitors.yaml, or
+    diagnosing 503/anti-bot issues.
+
+    Example:
+      intel test-amazon-store https://www.amazon.com/stores/page/<UUID>
+    """
+    from datetime import datetime as _dt
+    from .adapters.amazon_brand_store import scrape_brand_store
+    if out_dir is None:
+        out_dir = f"reports/{_dt.utcnow().date().isoformat()}/amazon-test"
+    out = Path(out_dir).resolve()
+    asset_root = out / "creative"
+    raw_root = out / "raw"
+    console.print(f"[bold]scraping[/bold] {store_url}")
+    console.print(f"  asset_root: {asset_root}")
+    console.print(f"  raw_root:   {raw_root}")
+    pages = scrape_brand_store(
+        store_url,
+        asset_dir=asset_root, raw_dir=raw_root,
+        max_subpages=max_subpages, headless=not headed,
+    )
+    if not pages:
+        console.print("[red]no pages returned[/red]")
+        return
+    t = Table(title=f"{len(pages)} page(s) captured")
+    t.add_column("page_key"); t.add_column("title"); t.add_column("images"); t.add_column("sublinks"); t.add_column("error")
+    for p in pages:
+        t.add_row(
+            p.page_key[:14],
+            (p.title or "")[:50],
+            str(len(p.image_local_paths)),
+            str(len(p.subpage_links)),
+            (p.error or "")[:60],
+        )
+    console.print(t)
+    if pages[0].screenshot_path:
+        console.print(f"\n[green]open landing screenshot:[/green] {pages[0].screenshot_path}")
+
+
+@cli.command("test-homepage")
+@click.argument("url")
+@click.option("--out-dir", default=None, type=click.Path(),
+              help="output dir for screenshot/HTML/images; default reports/<date>/homepage-test/")
+@click.option("--max-images", default=30, type=int, help="cap captured images per page")
+@click.option("--headed", is_flag=True, help="run Playwright in headed mode (helpful for debugging)")
+def test_homepage_cmd(url: str, out_dir: str | None, max_images: int, headed: bool) -> None:
+    """Smoke-test the website adapter against a single URL.
+
+    Doesn't touch the db — runs Playwright + chrome filter + image capture and
+    reports what was captured + dropped. Useful for verifying a new brand
+    homepage before wiring it through ingest.
+
+    Example:
+      intel test-homepage https://www.mybobs.com
+    """
+    from datetime import datetime as _dt
+    from .adapters.website import scrape_homepage
+    if out_dir is None:
+        out_dir = f"reports/{_dt.utcnow().date().isoformat()}/homepage-test"
+    out = Path(out_dir).resolve()
+    asset_root = out / "creative"
+    raw_root = out / "raw"
+    console.print(f"[bold]scraping[/bold] {url}")
+    console.print(f"  asset_root: {asset_root}")
+    console.print(f"  raw_root:   {raw_root}")
+    sp = scrape_homepage(
+        url,
+        asset_dir=asset_root, raw_dir=raw_root,
+        max_images=max_images, headless=not headed,
+    )
+    if sp.error:
+        console.print(f"[red]error:[/red] {sp.error}")
+        return
+    parsed = getattr(sp, "parsed", {}) or {}
+    t = Table(title=f"capture: {sp.page_key}")
+    t.add_column("field"); t.add_column("value")
+    t.add_row("title",          (sp.title or "")[:80])
+    t.add_row("hero_text",      (sp.hero_text or "")[:80])
+    t.add_row("images saved",   str(len(sp.image_local_paths)))
+    t.add_row("chrome dropped", str(parsed.get("chrome_dropped", 0)))
+    t.add_row("regions/hero",   str(len((parsed.get("regions") or {}).get("hero") or [])))
+    t.add_row("regions/banner", str(len((parsed.get("regions") or {}).get("banner_or_promo") or [])))
+    t.add_row("screenshot",     sp.screenshot_path or "")
+    t.add_row("hero crop",      parsed.get("hero_image_path") or "")
+    console.print(t)
+    if sp.image_local_paths:
+        console.print("\n[bold]first 5 saved images:[/bold]")
+        for p in sp.image_local_paths[:5]:
+            console.print(f"  {p}")
+
+
+# ---- evals ----------------------------------------------------------------
+
+@cli.group()
+def evals() -> None:
+    """Hill-climbing eval harness (bible §6). Tasks live in src/intel/evals/tasks/."""
+
+
+@evals.command("build-seed")
+def evals_build_seed() -> None:
+    """Snapshot the live db into src/intel/evals/fixtures/seed.db."""
+    from .evals.seed import build_seed
+    dest, summary = build_seed()
+    console.print(f"[green]wrote[/green] {dest}  ({summary['size_bytes']//1024} KB)")
+    for k, v in summary["counts"].items():
+        console.print(f"  {k}: {v}")
+
+
+@evals.command("list")
+def evals_list() -> None:
+    """List discovered eval tasks."""
+    from .evals import discover_tasks
+    tasks = discover_tasks()
+    t = Table(title=f"{len(tasks)} tasks")
+    t.add_column("id"); t.add_column("category"); t.add_column("title"); t.add_column("needs key")
+    for tk in tasks:
+        t.add_row(tk.id, tk.category, tk.title, "yes" if tk.requires_anthropic_key else "no")
+    console.print(t)
+
+
+@evals.command("run")
+@click.option("--task", "task_filter", default=None,
+              help="comma-separated task ids or categories; default = all")
+@click.option("--out", default=None, type=click.Path(),
+              help="output dir for HTML dashboard; default reports/<date>/evals")
+@click.option("--no-dashboard", is_flag=True, help="skip the HTML dashboard step")
+@click.option("--open-after", is_flag=True, help="open the dashboard in your browser")
+@click.option("--notes", default=None, help="freeform notes to attach to this run")
+def evals_run(task_filter: str | None, out: str | None, no_dashboard: bool,
+              open_after: bool, notes: str | None) -> None:
+    """Run the eval suite, score, persist, render the HTML dashboard."""
+    from datetime import datetime as _dt
+    from .evals import discover_tasks
+    from .evals.runner import run_suite, filter_tasks, SEED_DB
+    if not SEED_DB.exists():
+        console.print("[yellow]seed.db not found — building from live db…[/yellow]")
+        from .evals.seed import build_seed
+        build_seed()
+    tasks = filter_tasks(discover_tasks(), task_filter)
+    if not tasks:
+        console.print("[red]no tasks matched[/red]")
+        sys.exit(1)
+    console.rule(f"[bold]intel evals — {len(tasks)} task(s)[/bold]")
+    run_id, results = run_suite(tasks, notes=notes)
+    n_pass = sum(1 for r in results if r.status == "PASS")
+    n_slow = sum(1 for r in results if r.status == "PASS_SLOW")
+    n_fail = sum(1 for r in results if r.status in ("FAIL", "ERROR"))
+    n_skip = sum(1 for r in results if r.status == "SKIP")
+    scoreable = n_pass + n_slow + n_fail
+    headline = (n_pass + 0.5 * n_slow) / scoreable if scoreable else 0.0
+    console.print(
+        f"\n[bold]run #{run_id}[/bold]: [green]{n_pass} pass[/green] · "
+        f"[yellow]{n_slow} slow[/yellow] · [red]{n_fail} fail[/red] · "
+        f"[dim]{n_skip} skip[/dim]  →  headline = [bold]{headline*100:.0f}%[/bold]"
+    )
+    if not no_dashboard:
+        from .evals.dashboard import build_eval_dashboard
+        if out is None:
+            out = f"reports/{_dt.utcnow().date().isoformat()}/evals"
+        res = build_eval_dashboard(out, run_id=run_id)
+        console.print(f"[green]wrote[/green] {res['path']}  ({res['size_bytes']//1024} KB)")
+        if open_after:
+            import webbrowser
+            webbrowser.open(f"file://{Path(res['path']).resolve()}")
+
+
+@evals.command("dashboard")
+@click.option("--out", default=None, type=click.Path())
+@click.option("--run-id", default=None, type=int, help="render a specific run; default = latest")
+@click.option("--open-after", is_flag=True)
+def evals_dashboard(out: str | None, run_id: int | None, open_after: bool) -> None:
+    """Rebuild the HTML dashboard without re-running tasks."""
+    from datetime import datetime as _dt
+    from .evals.dashboard import build_eval_dashboard
+    if out is None:
+        out = f"reports/{_dt.utcnow().date().isoformat()}/evals"
+    res = build_eval_dashboard(out, run_id=run_id)
+    console.print(f"[green]wrote[/green] {res['path']}  ({res['size_bytes']//1024} KB)")
+    if open_after:
+        import webbrowser
+        webbrowser.open(f"file://{Path(res['path']).resolve()}")
+
+
+@evals.command("history")
+@click.option("--limit", default=20, type=int)
+def evals_history(limit: int) -> None:
+    """List recent eval runs."""
+    with connect() as conn:
+        rows = conn.execute(
+            "SELECT id, started_at, headline_score, pass_count, pass_slow_count, "
+            "fail_count, skip_count, git_sha, notes FROM eval_runs "
+            "ORDER BY id DESC LIMIT ?", (limit,)
+        ).fetchall()
+    t = Table(title=f"eval runs (most-recent {limit})")
+    t.add_column("id"); t.add_column("started"); t.add_column("score")
+    t.add_column("pass/slow/fail/skip"); t.add_column("git"); t.add_column("notes")
+    for r in rows:
+        score = f"{(r['headline_score'] or 0)*100:.0f}%"
+        psfs = f"{r['pass_count']}/{r['pass_slow_count']}/{r['fail_count']}/{r['skip_count']}"
+        t.add_row(str(r["id"]), r["started_at"][:16].replace("T", " "), score,
+                  psfs, r["git_sha"] or "", (r["notes"] or "")[:40])
+    console.print(t)
+
+
+if __name__ == "__main__":
+    cli()

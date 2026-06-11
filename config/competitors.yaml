@@ -1,0 +1,141 @@
+# Source registry for Bob's Discount Furniture competitive set.
+#
+# Bob's positioning: value-tier furniture, primarily East Coast / Mid-Atlantic,
+# expanding south + west. Competitive set chosen as:
+#   - direct value-tier brick-and-mortar (Ashley, Rooms To Go, Raymour, Value City, American Freight)
+#   - online disruptor competing for same household budget (Wayfair)
+#
+# Meta page_ids were verified by querying ads_archive with search_page_ids and
+# inspecting whether returned ads use the brand's voice. method: scrape uses the
+# Playwright path against the public Ad Library web UI — preferred for US
+# commercial ads because the Graph API often omits currently-active commercial
+# ads even when they're publicly visible on the web UI.
+
+competitors:
+  - id: bobs
+    name: Bob's Discount Furniture
+    vertical: furniture
+    priority: high
+    sources:
+      - type: website
+        url: https://www.mybobs.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "188327264572436"       # verified: Bob's Discount Furniture
+        page_name: Bob's Discount Furniture
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: ashley
+    name: Ashley Furniture
+    vertical: furniture
+    priority: high
+    sources:
+      - type: website
+        url: https://www.ashleyfurniture.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "1623105244652335"      # verified: 'Ashley' US brand page
+        page_name: Ashley
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: rooms_to_go
+    name: Rooms To Go
+    vertical: furniture
+    priority: high
+    sources:
+      - type: website
+        url: https://www.roomstogo.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      # TODO: page_id unknown — RTG's brand page doesn't surface in Ad Library API
+      # search. Get the ID from the Ad Library web UI: search 'Rooms To Go',
+      # click "View Ads" on the official store card, copy view_all_page_id=...
+      # from the URL, paste below + set method: scrape.
+      - type: meta_ads
+        page_name: Rooms To Go
+        country: US
+        cadence: daily
+
+  - id: raymour_flanigan
+    name: Raymour & Flanigan
+    vertical: furniture
+    priority: high           # most direct east-coast comp
+    sources:
+      - type: website
+        url: https://www.raymourflanigan.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "75165887238"           # verified: Raymour & Flanigan Furniture and Mattresses
+        page_name: Raymour & Flanigan Furniture and Mattresses
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: value_city
+    name: Value City Furniture
+    vertical: furniture
+    priority: medium
+    sources:
+      - type: website
+        url: https://www.valuecityfurniture.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "128582671248"          # verified: Value City Furniture
+        page_name: Value City Furniture
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: american_freight
+    name: American Freight
+    vertical: furniture
+    priority: medium
+    sources:
+      - type: website
+        url: https://www.americanfreight.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "615803871845212"       # verified: American Freight Furniture and Mattress (most active page)
+        page_name: American Freight Furniture and Mattress
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: wayfair
+    name: Wayfair
+    vertical: furniture
+    priority: high           # online disruptor — different model, same wallet
+    sources:
+      - type: website
+        url: https://www.wayfair.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "215686331786877"       # verified via Ad Library web UI
+        page_name: Wayfair
+        country: US
+        cadence: daily
+        method: scrape
+
+  # ---- smoke-test brand for the Amazon Brand Store adapter (Phase B1/B2). ----
+  # Revlon isn't in the furniture set; it's here purely to exercise the adapter
+  # against a known-working brand-store URL. Remove or replace once the user
+  # adds Amazon stores for the actual competitive set.
+  - id: revlon
+    name: Revlon
+    vertical: beauty
+    priority: low
+    sources:
+      - type: amazon_brand_store
+        store_url: https://www.amazon.com/stores/page/364D28DB-26D7-4785-A6FF-69BDCB675CEA
+        cadence: weekly
+        max_subpages: 2     # landing + 2 sub-pages (≈70s per ingest)

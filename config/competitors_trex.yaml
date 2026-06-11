@@ -1,0 +1,113 @@
+# Source registry for Trex composite-decking competitive set.
+#
+# Trex positioning: market leader in capped composite + railing, premium-tier.
+# Competitive set chosen as the 3 primary composite/PVC decking peers:
+#   - TimberTech (AZEK Building Products) — closest peer, capped composite + PVC
+#   - Fiberon (Fortune Brands) — #2 share in capped composite
+#   - Deckorators (Universal Forest Products) — capped composite + mineral-based
+#
+# Source mix per brand: meta_ads + website (no Amazon Brand Store — decking is
+# dealer/contractor-distributed, not Amazon-fronted).
+#
+# -----------------------------------------------------------------------------
+# Meta page_id resolution playbook (READ THIS BEFORE ADDING NEW BRANDS)
+# -----------------------------------------------------------------------------
+# The reliable procedure — DO NOT skip steps:
+#
+#   1. ads_library_search MCP, search_terms=<brand>, countries=["US"]
+#   2. Scan results — find an ad whose `page_name` exactly matches the brand.
+#      Note its `page_id`. (Skip ads from dealers/contractors mentioning the
+#      brand — page_name won't match.)
+#   3. VERIFY: ads_library_search with page_ids=["<found_id>"], confirm the
+#      returned page_name matches and the ad volume looks plausible.
+#   4. Only then write the page_id into this file.
+#
+# What NOT to do (these failure modes are real and have happened):
+#   - Don't WebFetch facebook.com URLs — they return 403/login walls and you'll
+#     have to guess from URL patterns.
+#   - Don't trust page_ids extracted from `/p/<slug>-<id>/` or
+#     `/pages/<name>/<id>/` URLs — they may point to corporate parents,
+#     defunct pages, or unrelated reorgs (we wasted a cycle on
+#     `100066812745817` which was an AZEK parent page with 0 ads).
+#   - Don't trust `view_all_page_id=` values scraped from Google snippets —
+#     they're from someone else's search URL and may resolve to a totally
+#     different brand. (We tried `1799439046949386` for Deckorators; it was
+#     Milk Makeup. 90 contaminated ads had to be deleted before re-ingest.)
+#
+# What's expected to fail gracefully:
+#   - A brand that genuinely doesn't run direct US Meta ads (only dealers post
+#     about them) won't have a brand-page page_id. Leave the meta_ads source
+#     out entirely; don't fake a page_name-only source — the scrape adapter
+#     requires a page_id and will error. Fiberon falls in this bucket today.
+#
+# Per-brand resolution results (2026-06-08):
+#   trex       → 217185870553  VERIFIED via MCP (427 ads, page_name "Trex Company")
+#   timbertech → 117769721578407  VERIFIED via MCP (191 ads, page_name "TimberTech")
+#   deckorators → 92071173761  VERIFIED via MCP (51 ads, page_name "Deckorators")
+#   fiberon    → none (50-result search returned only dealer ads — Alside,
+#               PLJ Carpentry, Payless Building, Carter Lumber, etc. — no
+#               page_name="Fiberon" anywhere; brand doesn't run direct US ads)
+
+competitors:
+  - id: trex
+    name: Trex
+    vertical: decking
+    priority: high
+    sources:
+      - type: website
+        url: https://www.trex.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "217185870553"            # Trex Company — VERIFIED via ads_library_search MCP
+        page_name: Trex Company
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: timbertech
+    name: TimberTech (AZEK)
+    vertical: decking
+    priority: high
+    sources:
+      - type: website
+        url: https://www.timbertech.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "117769721578407"         # TimberTech — VERIFIED via ads_library_search MCP
+        page_name: TimberTech
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: fiberon
+    name: Fiberon
+    vertical: decking
+    priority: high
+    sources:
+      - type: website
+        url: https://www.fiberondecking.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      # NO meta_ads source: Fiberon does not run direct brand-page ads in US.
+      # 50-result keyword search returned only dealer/contractor ads (Alside,
+      # PLJ Carpentry, Payless Building Supply, Carter Lumber, Home Depot).
+      # If Fiberon starts running direct ads, follow the playbook above to
+      # resolve their page_id via ads_library_search MCP.
+
+  - id: deckorators
+    name: Deckorators
+    vertical: decking
+    priority: high
+    sources:
+      - type: website
+        url: https://www.deckorators.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "92071173761"             # Deckorators — VERIFIED via ads_library_search MCP
+        page_name: Deckorators
+        country: US
+        cadence: daily
+        method: scrape

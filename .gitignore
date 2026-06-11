@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+data/intel.db
+data/intel.db-journal
+data/snapshots/
+data/creative/
+data/raw/
+.pytest_cache/
+dist/
+build/

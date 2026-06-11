@@ -1,0 +1,27 @@
+# Strategic weighting for severity scoring (Section 20)
+# Higher weight = higher priority in briefings and alerts.
+weights:
+  creative: 1.0       # new ads, creative shifts
+  promo: 0.9          # price drops, BOGO, free shipping changes
+  hero: 0.7           # homepage messaging shifts
+  popup: 0.6
+  catalog: 0.5
+  corporate: 0.3      # press, hiring, leadership
+
+# Suppress noise (Section 17)
+noise_filters:
+  ignore_url_params:
+    - utm_
+    - gclid
+    - fbclid
+    - _ga
+  min_text_diff_chars: 25
+  min_pixel_diff_pct: 1.5
+
+# LLM cost controls (Section 24)
+llm:
+  enrich_only_on_change: true
+  cache_creative_analysis: true
+  reasoning_model: claude-opus-4-7
+  vision_model: claude-sonnet-4-6
+  cheap_model: claude-haiku-4-5-20251001

@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<title>Intel · Eval Dashboard</title>
+<style>
+:root {
+  --bg: #f6f7fb; --panel: #ffffff; --border: #e3e5ec; --text: #1f2c4a;
+  --muted: #6b7280; --green: #16a34a; --yellow: #d97706; --red: #dc2626;
+  --skip: #94a3b8; --brand: #5a9fdf; --brand-dark: #1f2c4a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+       background: var(--bg); color: var(--text); }
+header { background: linear-gradient(135deg, #1f2c4a 0%, #2d4373 100%); color: white;
+         padding: 22px 32px; }
+header h1 { margin: 0 0 4px; font-size: 22px; }
+header .meta { opacity: 0.7; font-size: 12px; }
+main { padding: 24px 32px 80px; max-width: 1320px; }
+section { background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+          padding: 20px; margin-bottom: 20px; }
+section h2 { margin: 0 0 14px; font-size: 16px; letter-spacing: 0.02em; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+/* Headline card */
+.headline { display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center; }
+.score-big { font-size: 56px; font-weight: 700; line-height: 1; }
+.score-delta { font-size: 14px; margin-left: 10px; }
+.score-delta.up { color: var(--green); }
+.score-delta.down { color: var(--red); }
+.score-delta.flat { color: var(--muted); }
+.headline .counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.headline .counts .pill { padding: 8px 12px; border-radius: 6px; background: #f1f3f7; text-align: center; }
+.headline .counts .pill .n { font-size: 22px; font-weight: 600; }
+.headline .counts .pill .lbl { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em; }
+.headline .counts .pill.pass .n { color: var(--green); }
+.headline .counts .pill.slow .n { color: var(--yellow); }
+.headline .counts .pill.fail .n { color: var(--red); }
+.headline .counts .pill.skip .n { color: var(--skip); }
+
+/* Trend chart */
+.trend-wrap { position: relative; }
+.trend-svg { width: 100%; height: 180px; display: block; }
+.trend-axis { stroke: var(--border); stroke-width: 1; }
+.trend-line { fill: none; stroke: var(--brand); stroke-width: 2.5; }
+.trend-pt { fill: var(--brand); }
+.trend-pt:hover { fill: var(--brand-dark); cursor: pointer; }
+.trend-pt.current { fill: var(--brand-dark); stroke: white; stroke-width: 2; }
+.trend-label { font-size: 10px; fill: var(--muted); }
+
+/* Per-task grid */
+.tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.task-tile { padding: 12px; border-radius: 8px; border: 1px solid var(--border);
+             cursor: pointer; transition: transform 0.08s; background: white; }
+.task-tile:hover { transform: translateY(-2px); border-color: var(--brand); }
+.task-tile.active { border-color: var(--brand-dark); box-shadow: 0 0 0 2px rgba(31,44,74,0.15); }
+.task-tile .id { font-weight: 600; font-size: 13px; }
+.task-tile .status { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+                     padding: 2px 6px; border-radius: 3px; display: inline-block; margin-top: 2px; }
+.task-tile.PASS { background: #ecfdf5; }
+.task-tile.PASS .status { background: var(--green); color: white; }
+.task-tile.PASS_SLOW { background: #fef3c7; }
+.task-tile.PASS_SLOW .status { background: var(--yellow); color: white; }
+.task-tile.FAIL, .task-tile.ERROR { background: #fef2f2; }
+.task-tile.FAIL .status, .task-tile.ERROR .status { background: var(--red); color: white; }
+.task-tile.SKIP { background: #f8fafc; opacity: 0.7; }
+.task-tile.SKIP .status { background: var(--skip); color: white; }
+.task-tile .title { font-size: 11px; color: var(--muted); margin-top: 6px;
+                    line-height: 1.3; min-height: 28px; }
+.task-tile .meta-row { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+/* Filters */
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.filters .chip { padding: 4px 10px; border-radius: 12px; background: #eef0f4;
+                 cursor: pointer; font-size: 12px; user-select: none; }
+.filters .chip.active { background: var(--brand-dark); color: white; }
+.filters .chip:hover { background: var(--brand); color: white; }
+.filters .label { font-size: 11px; color: var(--muted); text-transform: uppercase;
+                  letter-spacing: 0.1em; align-self: center; margin-right: 4px; }
+
+/* Drill-down panel */
+.drill { background: #f8fafc; border-radius: 8px; padding: 18px; }
+.drill h3 { margin: 0 0 4px; font-size: 16px; }
+.drill .subtitle { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+.drill .graders-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.drill .graders-table th, .drill .graders-table td { padding: 6px 8px; text-align: left;
+                                                       border-bottom: 1px solid var(--border); }
+.drill .graders-table th { font-weight: 600; color: var(--muted); font-size: 11px;
+                            text-transform: uppercase; letter-spacing: 0.08em; }
+.drill .graders-table .pass { color: var(--green); }
+.drill .graders-table .fail { color: var(--red); }
+.drill .graders-table .speed { color: var(--yellow); font-size: 10px; margin-left: 4px; }
+.drill .output { background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--border);
+                 font-family: ui-monospace, SFMono-Regular, monospace; font-size: 11px;
+                 max-height: 400px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+.drill .err { background: #fef2f2; color: #991b1b; padding: 10px; border-radius: 6px; font-size: 12px;
+              font-family: ui-monospace, monospace; white-space: pre-wrap; }
+
+/* Cost panel */
+.cost-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 4px;
+             font-size: 12px; }
+.cost-grid .h { font-weight: 600; color: var(--muted); font-size: 10px;
+                text-transform: uppercase; letter-spacing: 0.1em; padding: 6px; border-bottom: 1px solid var(--border); }
+.cost-grid .cell { padding: 6px; border-bottom: 1px solid var(--border); }
+.cost-grid .num { text-align: right; font-variant-numeric: tabular-nums; }
+.cost-total { font-weight: 600; }
+
+/* Run selector */
+.runsel { float: right; font-size: 12px; }
+.runsel select { padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; }
+
+/* Empty state */
+.empty { text-align: center; padding: 40px; color: var(--muted); }
+</style>
+</head><body>
+<header>
+  <h1>Intel · Eval Dashboard</h1>
+  <div class="meta">2026-06-04 04:56 UTC · bible-aligned hill-climbing</div>
+</header>
+<main>
+        <section>
+          <div class="runsel">run: <select id="run-select"></select></div>
+          <h2>Headline</h2>
+          <div class="headline">
+            <div>
+              <div class="score-big">100% <span class="score-delta up">+100.0 pts vs #5</span></div>
+              <div style="color:var(--muted); font-size:12px; margin-top:4px;">
+                run #6 · 2026-06-04T04:56:04+00:00
+                
+              </div>
+            </div>
+            <div class="counts">
+              <div class="pill pass"><div class="n">10</div><div class="lbl">pass</div></div>
+              <div class="pill slow"><div class="n">0</div><div class="lbl">slow</div></div>
+              <div class="pill fail"><div class="n">0</div><div class="lbl">fail</div></div>
+              <div class="pill skip"><div class="n">0</div><div class="lbl">skip</div></div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>Score trend</h2>
+          <div class="trend-wrap"><svg id="trend" class="trend-svg"></svg></div>
+          <div style="color:var(--muted); font-size:11px; margin-top:6px;">
+            One point per eval run. Hover for details. Bible §6: keep what climbs, revert what doesn't.
+          </div>
+        </section>
+        <section>
+          <h2>Tasks <span style="color:var(--muted); font-weight:400; font-size:12px;">(click to drill in)</span></h2>
+          <div class="filters" id="filter-status"></div>
+          <div class="filters" id="filter-category"></div>
+          <div class="tasks-grid" id="tasks-grid"></div>
+        </section>
+
+        <section>
+          <h2>Drill-down</h2>
+          <div class="drill" id="drill"></div>
+        </section>
+
+        <section>
+          <h2>Cost / token usage <span style="color:var(--muted); font-weight:400; font-size:12px;">(estimated)</span></h2>
+          <div id="cost-summary"></div>
+        </section></main>
+<script id="eval-data" type="application/json">{"runs": [{"id": 1, "started_at": "2026-06-03T15:57:55+00:00", "finished_at": "2026-06-03T15:57:55+00:00", "git_sha": null, "task_count": 3, "pass_count": 3, "pass_slow_count": 0, "fail_count": 0, "skip_count": 0, "headline_score": 1.0, "notes": null}, {"id": 2, "started_at": "2026-06-03T15:58:26+00:00", "finished_at": "2026-06-03T15:58:26+00:00", "git_sha": null, "task_count": 10, "pass_count": 3, "pass_slow_count": 0, "fail_count": 0, "skip_count": 7, "headline_score": 1.0, "notes": "Phase 0 baseline (no API key)"}, {"id": 3, "started_at": "2026-06-04T04:41:07+00:00", "finished_at": "2026-06-04T04:41:07+00:00", "git_sha": null, "task_count": 10, "pass_count": 3, "pass_slow_count": 0, "fail_count": 0, "skip_count": 7, "headline_score": 1.0, "notes": "post Phase H3 (homepage adapter + hero extractor + WEBSITE dashboard lane)"}, {"id": 4, "started_at": "2026-06-04T04:51:57+00:00", "finished_at": "2026-06-04T04:51:57+00:00", "git_sha": null, "task_count": 10, "pass_count": 9, "pass_slow_count": 0, "fail_count": 1, "skip_count": 0, "headline_score": 0.9, "notes": "Claude-Code-stub: hand-authored canned responses against fixtures"}, {"id": 5, "started_at": "2026-06-04T04:53:27+00:00", "finished_at": "2026-06-04T04:53:27+00:00", "git_sha": null, "task_count": 1, "pass_count": 0, "pass_slow_count": 0, "fail_count": 1, "skip_count": 0, "headline_score": 0.0, "notes": "R5 only: stub briefing regex fix"}, {"id": 6, "started_at": "2026-06-04T04:56:04+00:00", "finished_at": "2026-06-04T04:56:04+00:00", "git_sha": null, "task_count": 10, "pass_count": 10, "pass_slow_count": 0, "fail_count": 0, "skip_count": 0, "headline_score": 1.0, "notes": "Claude-Code-stub run #2: env-key planted, briefing should hit stub"}], "current": {"id": 6, "started_at": "2026-06-04T04:56:04+00:00", "finished_at": "2026-06-04T04:56:04+00:00", "git_sha": null, "task_count": 10, "pass_count": 10, "pass_slow_count": 0, "fail_count": 0, "skip_count": 0, "headline_score": 1.0, "notes": "Claude-Code-stub run #2: env-key planted, briefing should hit stub"}, "tasks": [{"id": 35, "task_id": "F1", "title": "Vision on low-quality image signals uncertainty via confidence", "category": "failure_mode", "status": "PASS", "elapsed_ms": 182, "error": null, "skipped_reason": null, "graders": [{"name": "no_error", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "confidence reflects ambiguity (<0.85)", "passed": true, "is_speed": false, "detail": "confidence=0.45"}, {"name": "wall_time <= 30.0s", "passed": true, "is_speed": true, "detail": "elapsed=0.18s"}], "output": {"photography_style": "lifestyle", "production_style": "polished_brand", "product_emphasis": "lifestyle_forward", "products_visible": ["bed", "nightstand"], "key_features": ["lifestyle_setting"], "text_overlay": {"present": false, "density": "none", "copy_lean": "none"}, "urgency_cues": {"present": false, "examples": []}, "value_props": [], "hook_style": "aesthetic", "emotional_vs_rational": "emotional", "casting": {"people_visible": false, "approx_count": 0, "diversity_signals": ["n/a"]}, "dominant_colors_hex": ["#e8d7d2", "#b89476", "#d6c5ad"], "aspect_ratio_guess": "1:1", "logo_visible": false, "logo_brand": null, "seasonal_tags": [], "notable_text": null, "background_color": "beige", "scene_description": "Blurred indoor scene, appears to show bedroom furniture", "model_gender": "not_visible", "model_demo": null, "product_in_use": "displayed_only", "before_after_present": false, "cta_verbatim_text": null, "creative_context": "unknown", "hero_banner_present": null, "category_nav_visible": null, "shoppable_imagery": null, "product_grouping": "n/a", "certifications_visible": [], "awards_or_rankings": [], "summary_one_line": "Heavily blurred indoor scene, appears to show furniture but details indiscernible.", "confidence": 0.45, "_phash": "f6fc8323f41c8463"}}, {"id": 36, "task_id": "F2", "title": "Zero-activity briefing degrades gracefully (no hallucinated ads)", "category": "failure_mode", "status": "PASS", "elapsed_ms": 8, "error": null, "skipped_reason": null, "graders": [{"name": "no_error", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "no hallucinated ad ids in zero-activity briefing", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "explicitly states quiet window", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "wall_time <= 20.0s", "passed": true, "is_speed": true, "detail": "elapsed=0.01s"}], "output": {"briefing_id": 7, "title": "Briefing \u2014 quiet window (0d)", "body_md": "No material competitive activity in the last 0 days.", "corpus": {"window_days": 0, "competitors": {"bobs": {"name": "Bob's Discount Furniture", "vertical": "furniture", "new_ads": [], "offers": [], "site_changes": [], "brand_store_changes": [], "homepage_creatives": [], "homepage_promos": []}, "ashley": {"name": "Ashley Furniture", "vertical": "furniture", "new_ads": [], "offers": [], "site_changes": [], "brand_store_changes": [], "homepage_creatives": [], "homepage_promos": []}, "rooms_to_go": {"name": "Rooms To Go", "vertical": "furniture", "new_ads": [], "offers": [], "site_changes": [], "brand_store_changes": [], "homepage_creatives": [], "homepage_promos": []}, "raymour_flanigan": {"name": "Raymour & Flanigan", "vertical": "furniture", "new_ads": [], "offers": [], "site_changes": [], "brand_store_changes": [], "homepage_creatives": [], "homepage_promos": []}, "value_city": {"name": "Value City Furniture", "vertical": "furniture", "new_ads": [], "offers": [], "site_changes": [], "brand_store_changes": [], "homepage_creatives": [], "homepage_promos": []}, "american_freight": {"name": "American Freight", "vertical": "furniture", "new_ads": [], "offers": [], "site_changes": [], "brand_store_changes": [], "homepage_creatives": [], "homepage_promos": []}, "wayfair": {"name": "Wayfair", "vertical": "furniture", "new_ads": [], "offers": [], "site_changes": [], "brand_store_changes": [], "homepage_creatives": [], "homepage_promos": []}}}}}, {"id": 37, "task_id": "R1", "title": "Vision taxonomy on lifestyle image produces structured output", "category": "regression", "status": "PASS", "elapsed_ms": 5, "error": null, "skipped_reason": null, "graders": [{"name": "no_error", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "valid photography_style enum", "passed": true, "is_speed": false, "detail": "got 'lifestyle'"}, {"name": "valid hook_style enum", "passed": true, "is_speed": false, "detail": "got 'aesthetic'"}, {"name": "valid production_style enum", "passed": true, "is_speed": false, "detail": "got 'polished_brand'"}, {"name": "dominant_colors_hex non-empty", "passed": true, "is_speed": false, "detail": "len=4"}, {"name": "confidence >= 0.5", "passed": true, "is_speed": false, "detail": "got 0.9"}, {"name": "wall_time <= 30.0s", "passed": true, "is_speed": true, "detail": "elapsed=0.01s"}], "output": {"photography_style": "lifestyle", "production_style": "polished_brand", "product_emphasis": "lifestyle_forward", "products_visible": ["bed", "nightstand", "dresser", "mirror", "table lamp"], "key_features": ["brand_logo", "lifestyle_setting", "multi_product_collage"], "text_overlay": {"present": true, "density": "light", "copy_lean": "brand_led"}, "urgency_cues": {"present": false, "examples": []}, "value_props": ["aesthetic"], "hook_style": "aesthetic", "emotional_vs_rational": "emotional", "casting": {"people_visible": false, "approx_count": 0, "diversity_signals": ["n/a"]}, "dominant_colors_hex": ["#f3d9d6", "#c79a7e", "#dccab0", "#7a5b48"], "aspect_ratio_guess": "1:1", "logo_visible": true, "logo_brand": "Bob's Discount Furniture", "seasonal_tags": [], "notable_text": "BOB'S Discount Furniture \u00b7 mybobs.com", "background_color": "pink", "scene_description": "Pink bedroom with rattan-wood bed, nightstand, dresser, lavender accents", "model_gender": "not_visible", "model_demo": null, "product_in_use": "displayed_only", "before_after_present": false, "cta_verbatim_text": null, "creative_context": "unknown", "hero_banner_present": null, "category_nav_visible": null, "shoppable_imagery": null, "product_grouping": "collection", "certifications_visible": [], "awards_or_rankings": [], "summary_one_line": "Bob's Discount Furniture lifestyle bedroom set with rattan wood and pink walls.", "confidence": 0.9, "_phash": "f6f68323f41c8463"}}, {"id": 38, "task_id": "R2", "title": "Offer extraction finds percent_off + free_shipping + code", "category": "regression", "status": "PASS", "elapsed_ms": 1, "error": null, "skipped_reason": null, "graders": [{"name": "offers non-empty", "passed": true, "is_speed": false, "detail": "len=3"}, {"name": "offers contains kind=percent_off", "passed": true, "is_speed": false, "detail": "kinds=['percent_off', 'code', 'free_shipping']"}, {"name": "offers contains kind=free_shipping", "passed": true, "is_speed": false, "detail": "kinds=['percent_off', 'code', 'free_shipping']"}, {"name": "value contains a number", "passed": true, "is_speed": false, "detail": "text[:80]='20%'"}, {"name": "wall_time <= 15.0s", "passed": true, "is_speed": true, "detail": "elapsed=0.00s"}], "output": {"offers": [{"kind": "percent_off", "value": "20%", "threshold": null, "description": "20% off entire order", "starts_on": null, "ends_on": null, "confidence": 0.92}, {"kind": "code", "value": "SAVE20", "threshold": null, "description": "Promo code SAVE20", "starts_on": null, "ends_on": null, "confidence": 0.92}, {"kind": "free_shipping", "value": "free shipping", "threshold": "orders over $50", "description": "Free shipping on orders over $50", "starts_on": null, "ends_on": null, "confidence": 0.9}]}}, {"id": 39, "task_id": "R3", "title": "Cross-set comparison surfaces distinctiveness + whitespace", "category": "regression", "status": "PASS", "elapsed_ms": 2, "error": null, "skipped_reason": null, "graders": [{"name": "no_error", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "has distinctiveness section", "passed": true, "is_speed": false, "detail": "text[:80]='# Cross-competitor creative comparison\\n\\n_Window: ads first_seen in last 60d \u00b7 44'"}, {"name": "has whitespace section", "passed": true, "is_speed": false, "detail": "text[:80]='# Cross-competitor creative comparison\\n\\n_Window: ads first_seen in last 60d \u00b7 44'"}, {"name": "references real brands", "passed": true, "is_speed": false, "detail": "text[:80]='# Cross-competitor creative comparison\\n\\n_Window: ads first_seen in last 60d \u00b7 44'"}, {"name": "wall_time <= 5.0s", "passed": true, "is_speed": true, "detail": "elapsed=0.00s"}], "output": {"n_creatives": 44, "n_brands": 5, "set_tally": "AttributeTallies(scalar={'photography_style': Counter({'lifestyle': 22, 'studio_product_only': 19, 'text_only': 2, 'mixed': 1}), 'production_style': Counter({'polished_brand': 42, 'meme_graphic': 1, 'ugc_creator_style': 1}), 'product_emphasis': Counter({'product_forward': 27, 'balanced': 12, 'lifestyle_forward': 5}), 'hook_style': Counter({'aesthetic': 24, 'demo': 9, 'urgency': 7, 'founder_story': 1, 'problem_solution': 1, 'social_proof': 1, 'meme': 1}), 'emotional_vs_rational': Counter({'emotional': 24, 'rational': 20}), 'aspect_ratio_guess': Counter({'1:1': 38, '9:16': 6})}, boolean={'logo_visible': Counter({'false': 22, 'true': 22}), 'before_after_present': Counter({'unknown': 44}), 'hero_banner_present': Counter({'unknown': 44}), 'category_nav_visible': Counter({'unknown': 44}), 'shoppable_imagery': Counter({'unknown': 44}), 'text_overlay.present': Counter({'true': 30, 'false': 14}), 'urgency_cues.present': Counter({'false': 38, 'true': 6}), 'casting.people_visible': Counter({'false': 43, 'true': 1})}, listed={'products_visible': Counter({'dining table': 7, 'sectional sofa': 6, 'bed frame': 6, 'bedding': 6, 'mattress': 6, 'dining chairs': 5, 'recliner': 5, 'nightstand': 4, 'table lamp': 4, 'throw pillows': 4, 'sofa': 4, 'pillows': 4, 'counter stool': 3, 'throw pillow': 3, 'mirror': 3, 'pendant light': 3, 'bathroom vanity': 3, 'dining bench': 2, 'loveseat': 2, 'recliner sofa': 2, 'mirrors': 2, 'faucets': 2, 'table lamps': 1, 'accent chair': 1, 'dresser': 1, 'accent rug': 1, 'decor vases': 1, 'ottoman bench': 1, 'sheets': 1, 'box spring': 1, 'outdoor sectional': 1, 'outdoor coffee table': 1, 'outdoor cushions': 1, 'outdoor rug': 1, 'umbrella': 1, 'media console': 1, 'modular sectional sofa': 1, 'coffee table': 1, 'ottoman': 1, 'fry pan': 1, 'potholder': 1, 'faucet': 1, 'duvet': 1, 'comforter': 1}), 'key_features': Counter({'product_close_up': 25, 'brand_logo': 22, 'lifestyle_setting': 22, 'multi_product_collage': 11, 'text_only_card': 7, 'discount_badge': 6, 'limited_time_text': 3, 'price_compare': 2, 'free_shipping_badge': 2, 'price_visible': 2, 'before_after': 1}), 'value_props': Counter({'price': 26, 'aesthetic': 14, 'novelty': 13, 'convenience': 11, 'efficacy': 3, 'social_proof': 2}), 'seasonal_tags': Counter({'summer': 3, 'back_to_school': 1})}, n_total=44)", "comp_tallies": {"bobs": "AttributeTallies(scalar={'photography_style': Counter({'lifestyle': 7, 'studio_product_only': 3}), 'production_style': Counter({'polished_brand': 10}), 'product_emphasis': Counter({'balanced': 6, 'product_forward': 3, 'lifestyle_forward': 1}), 'hook_style': Counter({'aesthetic': 6, 'demo': 3, 'founder_story': 1}), 'emotional_vs_rational': Counter({'emotional': 7, 'rational': 3}), 'aspect_ratio_guess': Counter({'1:1': 7, '9:16': 3})}, boolean={'logo_visible': Counter({'true': 7, 'false': 3}), 'before_after_present': Counter({'unknown': 10}), 'hero_banner_present': Counter({'unknown': 10}), 'category_nav_visible': Counter({'unknown': 10}), 'shoppable_imagery': Counter({'unknown': 10}), 'text_overlay.present': Counter({'true': 7, 'false': 3}), 'urgency_cues.present': Counter({'false': 10}), 'casting.people_visible': Counter({'false': 9, 'true': 1})}, listed={'products_visible': Counter({'bed frame': 3, 'nightstand': 3, 'table lamp': 3, 'dining table': 3, 'dining chairs': 3, 'counter stool': 2, 'throw pillow': 2, 'bedding': 2, 'dining bench': 2, 'sectional sofa': 1, 'table lamps': 1, 'accent chair': 1, 'dresser': 1, 'mirror': 1, 'pendant light': 1}), 'key_features': Counter({'brand_logo': 7, 'lifestyle_setting': 7, 'product_close_up': 3, 'text_only_card': 3, 'multi_product_collage': 1}), 'value_props': Counter({'price': 10, 'novelty': 2, 'convenience': 2, 'aesthetic': 1}), 'seasonal_tags': Counter({'summer': 2})}, n_total=10)", "ashley": "AttributeTallies(scalar={'photography_style': Counter({'lifestyle': 4}), 'production_style': Counter({'polished_brand': 4}), 'product_emphasis': Counter({'balanced': 3, 'lifestyle_forward': 1}), 'hook_style': Counter({'aesthetic': 4}), 'emotional_vs_rational': Counter({'emotional': 4}), 'aspect_ratio_guess': Counter({'1:1': 4})}, boolean={'logo_visible': Counter({'true': 3, 'false': 1}), 'before_after_present': Counter({'unknown': 4}), 'hero_banner_present': Counter({'unknown': 4}), 'category_nav_visible': Counter({'unknown': 4}), 'shoppable_imagery': Counter({'unknown': 4}), 'text_overlay.present': Counter({'true': 4}), 'urgency_cues.present': Counter({'false': 4}), 'casting.people_visible': Counter({'false': 4})}, listed={'products_visible': Counter({'dining table': 2, 'dining chairs': 2, 'sectional sofa': 1, 'accent rug': 1, 'throw pillows': 1, 'bed frame': 1, 'bedding': 1, 'decor vases': 1}), 'key_features': Counter({'lifestyle_setting': 4, 'brand_logo': 3, 'multi_product_collage': 3}), 'value_props': Counter({'aesthetic': 4, 'novelty': 3, 'convenience': 1})}, n_total=4)", "raymour_flanigan": "AttributeTallies(scalar={'photography_style': Counter({'lifestyle': 6, 'text_only': 2, 'studio_product_only': 2}), 'production_style': Counter({'polished_brand': 10}), 'product_emphasis': Counter({'product_forward': 5, 'balanced': 3, 'lifestyle_forward': 2}), 'hook_style': Counter({'aesthetic': 5, 'urgency': 3, 'demo': 1, 'problem_solution': 1}), 'emotional_vs_rational': Counter({'emotional': 6, 'rational': 4}), 'aspect_ratio_guess': Counter({'1:1': 9, '9:16': 1})}, boolean={'logo_visible': Counter({'false': 9, 'true': 1}), 'before_after_present': Counter({'unknown': 10}), 'hero_banner_present': Counter({'unknown': 10}), 'category_nav_visible': Counter({'unknown': 10}), 'shoppable_imagery': Counter({'unknown': 10}), 'text_overlay.present': Counter({'true': 8, 'false': 2}), 'urgency_cues.present': Counter({'false': 6, 'true': 4}), 'casting.people_visible': Counter({'false': 10})}, listed={'key_features': Counter({'product_close_up': 6, 'lifestyle_setting': 6, 'discount_badge': 3, 'text_only_card': 3, 'multi_product_collage': 3, 'limited_time_text': 2, 'price_compare': 2, 'brand_logo': 1}), 'value_props': Counter({'price': 4, 'aesthetic': 4, 'novelty': 3, 'convenience': 3, 'efficacy': 3}), 'products_visible': Counter({'pillows': 3, 'sofa': 2, 'bedding': 2, 'mattress': 2, 'bed frame': 1, 'ottoman bench': 1, 'pendant light': 1, 'table lamp': 1, 'sheets': 1, 'throw pillows': 1, 'box spring': 1, 'outdoor sectional': 1, 'outdoor coffee table': 1, 'outdoor cushions': 1, 'outdoor rug': 1, 'umbrella': 1, 'sectional sofa': 1, 'dining table': 1, 'recliner': 1, 'media console': 1}), 'seasonal_tags': Counter({'summer': 1})}, n_total=10)", "american_freight": "AttributeTallies(scalar={'photography_style': Counter({'studio_product_only': 10}), 'production_style': Counter({'polished_brand': 10}), 'product_emphasis': Counter({'product_forward': 10}), 'hook_style': Counter({'urgency': 4, 'aesthetic': 3, 'demo': 2, 'social_proof': 1}), 'emotional_vs_rational': Counter({'rational': 10}), 'aspect_ratio_guess': Counter({'1:1': 9, '9:16': 1})}, boolean={'logo_visible': Counter({'true': 10}), 'before_after_present': Counter({'unknown': 10}), 'hero_banner_present': Counter({'unknown': 10}), 'category_nav_visible': Counter({'unknown': 10}), 'shoppable_imagery': Counter({'unknown': 10}), 'text_overlay.present': Counter({'true': 10}), 'urgency_cues.present': Counter({'false': 8, 'true': 2}), 'casting.people_visible': Counter({'false': 10})}, listed={'products_visible': Counter({'recliner': 4, 'mattress': 4, 'sectional sofa': 3, 'sofa': 2, 'loveseat': 2, 'recliner sofa': 2, 'modular sectional sofa': 1, 'coffee table': 1, 'throw pillows': 1, 'ottoman': 1}), 'key_features': Counter({'brand_logo': 10, 'product_close_up': 6, 'multi_product_collage': 4, 'discount_badge': 3, 'free_shipping_badge': 2, 'price_visible': 2, 'limited_time_text': 1}), 'value_props': Counter({'price': 10, 'convenience': 2, 'social_proof': 1})}, n_total=10)", "wayfair": "AttributeTallies(scalar={'photography_style': Counter({'lifestyle': 5, 'studio_product_only': 4, 'mixed': 1}), 'production_style': Counter({'polished_brand': 8, 'meme_graphic': 1, 'ugc_creator_style': 1}), 'product_emphasis': Counter({'product_forward': 9, 'lifestyle_forward': 1}), 'hook_style': Counter({'aesthetic': 6, 'demo': 3, 'meme': 1}), 'emotional_vs_rational': Counter({'emotional': 7, 'rational': 3}), 'aspect_ratio_guess': Counter({'1:1': 9, '9:16': 1})}, boolean={'logo_visible': Counter({'false': 9, 'true': 1}), 'before_after_present': Counter({'unknown': 10}), 'hero_banner_present': Counter({'unknown': 10}), 'category_nav_visible': Counter({'unknown': 10}), 'shoppable_imagery': Counter({'unknown': 10}), 'text_overlay.present': Counter({'false': 9, 'true': 1}), 'urgency_cues.present': Counter({'false': 10}), 'casting.people_visible': Counter({'false': 10})}, listed={'products_visible': Counter({'bathroom vanity': 3, 'mirror': 2, 'mirrors': 2, 'faucets': 2, 'counter stool': 1, 'fry pan': 1, 'potholder': 1, 'bed frame': 1, 'bedding': 1, 'throw pillows': 1, 'nightstand': 1, 'pendant light': 1, 'dining table': 1, 'faucet': 1, 'throw pillow': 1, 'duvet': 1, 'comforter': 1, 'pillows': 1}), 'key_features': Counter({'product_close_up': 10, 'lifestyle_setting': 5, 'brand_logo': 1, 'before_after': 1, 'text_only_card': 1}), 'value_props': Counter({'novelty': 5, 'aesthetic': 5, 'convenience': 3, 'price': 2, 'social_proof': 1}), 'seasonal_tags': Counter({'back_to_school': 1})}, n_total=10)"}, "body_md": "# Cross-competitor creative comparison\n\n_Window: ads first_seen in last 60d \u00b7 44 analyzed creatives across 5 brands._\n\n## Brand sample sizes\n\n- `bobs`: 10 analyzed creative(s)\n- `raymour_flanigan`: 10 analyzed creative(s)\n- `american_freight`: 10 analyzed creative(s)\n- `wayfair`: 10 analyzed creative(s)\n- `ashley`: 4 analyzed creative(s)\n\n## Set-wide attribute popularity\n\n### photography_style\n\n| brand | `lifestyle` | `studio_product_only` | `text_only` | `mixed` | n |\n|---|---|---|---|---|---|\n| `american_freight` | 0% | 100% | 0% | 0% | 10 |\n| `ashley` | 100% | 0% | 0% | 0% | 4 |\n| `bobs` | 70% | 30% | 0% | 0% | 10 |\n| `raymour_flanigan` | 60% | 20% | 20% | 0% | 10 |\n| `wayfair` | 50% | 40% | 0% | 10% | 10 |\n| **set** | **50%** | **43%** | **5%** | **2%** | **44** |\n\n### production_style\n\n| brand | `polished_brand` | `meme_graphic` | `ugc_creator_style` | n |\n|---|---|---|---|---|\n| `american_freight` | 100% | 0% | 0% | 10 |\n| `ashley` | 100% | 0% | 0% | 4 |\n| `bobs` | 100% | 0% | 0% | 10 |\n| `raymour_flanigan` | 100% | 0% | 0% | 10 |\n| `wayfair` | 80% | 10% | 10% | 10 |\n| **set** | **95%** | **2%** | **2%** | **44** |\n\n### product_emphasis\n\n| brand | `product_forward` | `balanced` | `lifestyle_forward` | n |\n|---|---|---|---|---|\n| `american_freight` | 100% | 0% | 0% | 10 |\n| `ashley` | 0% | 75% | 25% | 4 |\n| `bobs` | 30% | 60% | 10% | 10 |\n| `raymour_flanigan` | 50% | 30% | 20% | 10 |\n| `wayfair` | 90% | 0% | 10% | 10 |\n| **set** | **61%** | **27%** | **11%** | **44** |\n\n### hook_style\n\n| brand | `aesthetic` | `demo` | `urgency` | `founder_story` | `problem_solution` | n |\n|---|---|---|---|---|---|---|\n| `american_freight` | 30% | 20% | 40% | 0% | 0% | 10 |\n| `ashley` | 100% | 0% | 0% | 0% | 0% | 4 |\n| `bobs` | 60% | 30% | 0% | 10% | 0% | 10 |\n| `raymour_flanigan` | 50% | 10% | 30% | 0% | 10% | 10 |\n| `wayfair` | 60% | 30% | 0% | 0% | 0% | 10 |\n| **set** | **55%** | **20%** | **16%** | **2%** | **2%** | **44** |\n\n### emotional_vs_rational\n\n| brand | `emotional` | `rational` | n |\n|---|---|---|---|\n| `american_freight` | 0% | 100% | 10 |\n| `ashley` | 100% | 0% | 4 |\n| `bobs` | 70% | 30% | 10 |\n| `raymour_flanigan` | 60% | 40% | 10 |\n| `wayfair` | 70% | 30% | 10 |\n| **set** | **55%** | **45%** | **44** |\n\n### aspect_ratio_guess\n\n| brand | `1:1` | `9:16` | n |\n|---|---|---|---|\n| `american_freight` | 90% | 10% | 10 |\n| `ashley` | 100% | 0% | 4 |\n| `bobs` | 70% | 30% | 10 |\n| `raymour_flanigan` | 90% | 10% | 10 |\n| `wayfair` | 90% | 10% | 10 |\n| **set** | **86%** | **14%** | **44** |\n\n### products_visible (top values, % of creatives containing)\n\n| brand | `dining table` | `sectional sofa` | `bed frame` | `bedding` | `mattress` | `dining chairs` | `recliner` | n |\n|---|---|---|---|---|---|---|---|---|\n| `american_freight` | 0% | 30% | 0% | 0% | 40% | 0% | 40% | 10 |\n| `ashley` | 50% | 25% | 25% | 25% | 0% | 50% | 0% | 4 |\n| `bobs` | 30% | 10% | 30% | 20% | 0% | 30% | 0% | 10 |\n| `raymour_flanigan` | 10% | 10% | 10% | 20% | 20% | 0% | 10% | 10 |\n| `wayfair` | 10% | 0% | 10% | 10% | 0% | 0% | 0% | 10 |\n| **set** | **16%** | **14%** | **14%** | **14%** | **14%** | **11%** | **11%** | **44** |\n\n### key_features (top values, % of creatives containing)\n\n| brand | `product_close_up` | `brand_logo` | `lifestyle_setting` | `multi_product_collage` | `text_only_card` | `discount_badge` | `limited_time_text` | n |\n|---|---|---|---|---|---|---|---|---|\n| `american_freight` | 60% | 100% | 0% | 40% | 0% | 30% | 10% | 10 |\n| `ashley` | 0% | 75% | 100% | 75% | 0% | 0% | 0% | 4 |\n| `bobs` | 30% | 70% | 70% | 10% | 30% | 0% | 0% | 10 |\n| `raymour_flanigan` | 60% | 10% | 60% | 30% | 30% | 30% | 20% | 10 |\n| `wayfair` | 100% | 10% | 50% | 0% | 10% | 0% | 0% | 10 |\n| **set** | **57%** | **50%** | **50%** | **25%** | **16%** | **14%** | **7%** | **44** |\n\n### value_props (top values, % of creatives containing)\n\n| brand | `price` | `aesthetic` | `novelty` | `convenience` | `efficacy` | `social_proof` | n |\n|---|---|---|---|---|---|---|---|\n| `american_freight` | 100% | 0% | 0% | 20% | 0% | 10% | 10 |\n| `ashley` | 0% | 100% | 75% | 25% | 0% | 0% | 4 |\n| `bobs` | 100% | 10% | 20% | 20% | 0% | 0% | 10 |\n| `raymour_flanigan` | 40% | 40% | 30% | 30% | 30% | 0% | 10 |\n| `wayfair` | 20% | 50% | 50% | 30% | 0% | 10% | 10 |\n| **set** | **59%** | **32%** | **30%** | **25%** | **7%** | **5%** | **44** |\n\n### seasonal_tags (top values, % of creatives containing)\n\n| brand | `summer` | `back_to_school` | n |\n|---|---|---|---|\n| `american_freight` | 0% | 0% | 10 |\n| `ashley` | 0% | 0% | 4 |\n| `bobs` | 20% | 0% | 10 |\n| `raymour_flanigan` | 10% | 0% | 10 |\n| `wayfair` | 0% | 10% | 10 |\n| **set** | **7%** | **2%** | **44** |\n\n## Distinctiveness \u2014 where each brand over-indexes vs the set\n\n| brand | attribute | value | brand share | set share | delta |\n|---|---|---|---|---|---|\n| `ashley` | value_props | `aesthetic` | 100% | 32% | +68% |\n| `american_freight` | photography_style | `studio_product_only` | 100% | 43% | +57% |\n| `wayfair` | key_features | `product_close_up` | 100% | 57% | +43% |\n| `bobs` | value_props | `price` | 100% | 59% | +41% |\n| `raymour_flanigan` | value_props | `efficacy` | 30% | 7% | +23% |\n\n## Per-brand whitespace \u2014 top set values this brand has 0% of\n\n**`american_freight`** \u2014 present in the set, absent for this brand:\n  - emotional_vs_rational = `emotional` (used by 55% of set)\n  - photography_style = `lifestyle` (used by 50% of set)\n  - key_features = `lifestyle_setting` (used by 50% of set)\n  - value_props = `aesthetic` (used by 32% of set)\n  - value_props = `novelty` (used by 30% of set)\n  - product_emphasis = `balanced` (used by 27% of set)\n\n**`ashley`** \u2014 present in the set, absent for this brand:\n  - product_emphasis = `product_forward` (used by 61% of set)\n  - value_props = `price` (used by 59% of set)\n  - key_features = `product_close_up` (used by 57% of set)\n  - emotional_vs_rational = `rational` (used by 45% of set)\n  - photography_style = `studio_product_only` (used by 43% of set)\n  - hook_style = `demo` (used by 20% of set)\n\n**`wayfair`** \u2014 present in the set, absent for this brand:\n  - product_emphasis = `balanced` (used by 27% of set)\n  - key_features = `multi_product_collage` (used by 25% of set)\n"}}, {"id": 40, "task_id": "R5", "title": "LLM briefing cites real ad_archive_ids", "category": "regression", "status": "PASS", "elapsed_ms": 23, "error": null, "skipped_reason": null, "graders": [{"name": "no_error", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "briefing has [#ad:N] citations (>=2)", "passed": true, "is_speed": false, "detail": "found 6 explicit citations"}, {"name": "all citations resolve to real ads", "passed": true, "is_speed": false, "detail": "all 6 resolve"}, {"name": "wall_time <= 60.0s", "passed": true, "is_speed": true, "detail": "elapsed=0.02s"}], "output": null}, {"id": 41, "task_id": "R6", "title": "Deterministic briefing covers active competitors", "category": "regression", "status": "PASS", "elapsed_ms": 9, "error": null, "skipped_reason": null, "graders": [{"name": "no_error", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "briefing persisted", "passed": true, "is_speed": false, "detail": "got 9"}, {"name": "has header", "passed": true, "is_speed": false, "detail": "text[:80]='# Competitive Briefing \u2014 last 30d (deterministic, no LLM)\\n\\n## TL;DR\\n\\n- 220 new a'"}, {"name": "has TL;DR section", "passed": true, "is_speed": false, "detail": "text[:80]='# Competitive Briefing \u2014 last 30d (deterministic, no LLM)\\n\\n## TL;DR\\n\\n- 220 new a'"}, {"name": "references new ads", "passed": true, "is_speed": false, "detail": "text[:80]='# Competitive Briefing \u2014 last 30d (deterministic, no LLM)\\n\\n## TL;DR\\n\\n- 220 new a'"}, {"name": "wall_time <= 3.0s", "passed": true, "is_speed": true, "detail": "elapsed=0.01s"}], "output": null}, {"id": 42, "task_id": "R7", "title": "Hook clustering produces \u22651 cluster on furniture ads", "category": "regression", "status": "PASS", "elapsed_ms": 23, "error": null, "skipped_reason": null, "graders": [{"name": "no_error", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "clusters non-empty", "passed": true, "is_speed": false, "detail": "len=3"}, {"name": "wall_time <= 45.0s", "passed": true, "is_speed": true, "detail": "elapsed=0.02s"}], "output": {"clusters": [{"theme": "value_pricing_urgency", "hook_style": "urgency", "ad_archive_ids": ["1520951576697884", "3807605292703161", "1105248095100175", "1469696164849361", "1457045912754573", "26939154299004885", "1673690163799544", "940192022029019", "1863825857636492", "1840107930034862"], "exemplar": "Save big \u2014 limited-time deals on bedroom + living room"}, {"theme": "lifestyle_aesthetic", "hook_style": "aesthetic", "ad_archive_ids": ["1651549322939960", "1512808127138402", "1997303367800071", "1212521874125738", "988867120189943", "1275327827842333", "1453175089598921", "1900090137539550", "979148267796938", "1702044221204143"], "exemplar": "More styles. More ways to love your space."}, {"theme": "social_proof_quality", "hook_style": "social_proof", "ad_archive_ids": ["818089577821995", "1208824624354029", "955424163488552", "1643550866689181", "2158144314773572", "881542944443071", "1467013997994079", "1545650020318404", "2015560909315793", "2103188477192337"], "exemplar": "The furniture customers love \u2014 at everyday low prices"}], "whitespace": ["founder/maker-story content \u2014 none of the set leans on this angle", "sustainability/responsible-sourcing messaging"]}}, {"id": 43, "task_id": "R8", "title": "Whitespace detection returns testable hypotheses", "category": "regression", "status": "PASS", "elapsed_ms": 3, "error": null, "skipped_reason": null, "graders": [{"name": "no_error", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "whitespace non-empty", "passed": true, "is_speed": false, "detail": "len=3"}, {"name": "first hypothesis is non-empty", "passed": true, "is_speed": false, "detail": "text[:80]='If we render an empty-room photo and overlay AI-styled variations, CTR on the co'"}, {"name": "wall_time <= 45.0s", "passed": true, "is_speed": true, "detail": "elapsed=0.00s"}], "output": {"whitespace": [{"angle": "AI-staged room visualization", "rationale": "Furniture set leans on studio + lifestyle product shots; nobody is using generative styling to let shoppers preview a room.", "testable_hypothesis": "If we render an empty-room photo and overlay AI-styled variations, CTR on the configurator ad will beat a static lifestyle baseline by \u226515%.", "effort": "medium", "confidence": 0.65}, {"angle": "Transparent supply-chain sourcing story", "rationale": "Value/pricing dominates the set's messaging \u2014 none lean ethical sourcing or US-made provenance.", "testable_hypothesis": "If we run a 'where it comes from' creative against under-35 audiences, save-rate should beat the discount-led control by \u226510%.", "effort": "low", "confidence": 0.6}, {"angle": "Designer-collab capsule drops", "rationale": "Set is dominated by everyday-low-price positioning; no limited-edition or designer-led capsules.", "testable_hypothesis": "A 4-week capsule with a known interior designer drives 2x media efficiency vs an unbranded promo creative.", "effort": "high", "confidence": 0.55}]}}, {"id": 44, "task_id": "R9", "title": "Per-brand creative readout (bobs) has expected sections", "category": "regression", "status": "PASS", "elapsed_ms": 1, "error": null, "skipped_reason": null, "graders": [{"name": "no_error", "passed": true, "is_speed": false, "detail": "ok"}, {"name": "brand name in title", "passed": true, "is_speed": false, "detail": "text[:80]=\"# Creative readout \u2014 Bob's Discount Furniture (`bobs`)\\n\\n_Window: ads first_seen \""}, {"name": "attribute breakdowns present", "passed": true, "is_speed": false, "detail": "text[:80]=\"# Creative readout \u2014 Bob's Discount Furniture (`bobs`)\\n\\n_Window: ads first_seen \""}, {"name": "wall_time <= 3.0s", "passed": true, "is_speed": true, "detail": "elapsed=0.00s"}], "output": {"competitor_id": "bobs", "competitor_name": "Bob's Discount Furniture", "total_analyzed": 10, "net_new_count": 10, "tallies": "AttributeTallies(scalar={'photography_style': Counter({'lifestyle': 7, 'studio_product_only': 3}), 'production_style': Counter({'polished_brand': 10}), 'product_emphasis': Counter({'balanced': 6, 'product_forward': 3, 'lifestyle_forward': 1}), 'hook_style': Counter({'aesthetic': 6, 'demo': 3, 'founder_story': 1}), 'emotional_vs_rational': Counter({'emotional': 7, 'rational': 3}), 'aspect_ratio_guess': Counter({'1:1': 7, '9:16': 3})}, boolean={'logo_visible': Counter({'true': 7, 'false': 3}), 'before_after_present': Counter({'unknown': 10}), 'hero_banner_present': Counter({'unknown': 10}), 'category_nav_visible': Counter({'unknown': 10}), 'shoppable_imagery': Counter({'unknown': 10}), 'text_overlay.present': Counter({'true': 7, 'false': 3}), 'urgency_cues.present': Counter({'false': 10}), 'casting.people_visible': Counter({'false': 9, 'true': 1})}, listed={'products_visible': Counter({'bed frame': 3, 'nightstand': 3, 'table lamp': 3, 'dining table': 3, 'dining chairs': 3, 'counter stool': 2, 'throw pillow': 2, 'bedding': 2, 'dining bench': 2, 'sectional sofa': 1, 'table lamps': 1, 'accent chair': 1, 'dresser': 1, 'mirror': 1, 'pendant light': 1}), 'key_features': Counter({'brand_logo': 7, 'lifestyle_setting': 7, 'product_close_up': 3, 'text_only_card': 3, 'multi_product_collage': 1}), 'value_props': Counter({'price': 10, 'novelty': 2, 'convenience': 2, 'aesthetic': 1}), 'seasonal_tags': Counter({'summer': 2})}, n_total=10)", "tallies_new": "AttributeTallies(scalar={'photography_style': Counter({'lifestyle': 7, 'studio_product_only': 3}), 'production_style': Counter({'polished_brand': 10}), 'product_emphasis': Counter({'balanced': 6, 'product_forward': 3, 'lifestyle_forward': 1}), 'hook_style': Counter({'aesthetic': 6, 'demo': 3, 'founder_story': 1}), 'emotional_vs_rational': Counter({'emotional': 7, 'rational': 3}), 'aspect_ratio_guess': Counter({'1:1': 7, '9:16': 3})}, boolean={'logo_visible': Counter({'true': 7, 'false': 3}), 'before_after_present': Counter({'unknown': 10}), 'hero_banner_present': Counter({'unknown': 10}), 'category_nav_visible': Counter({'unknown': 10}), 'shoppable_imagery': Counter({'unknown': 10}), 'text_overlay.present': Counter({'true': 7, 'false': 3}), 'urgency_cues.present': Counter({'false': 10}), 'casting.people_visible': Counter({'false': 9, 'true': 1})}, listed={'products_visible': Counter({'bed frame': 3, 'nightstand': 3, 'table lamp': 3, 'dining table': 3, 'dining chairs': 3, 'counter stool': 2, 'throw pillow': 2, 'bedding': 2, 'dining bench': 2, 'sectional sofa': 1, 'table lamps': 1, 'accent chair': 1, 'dresser': 1, 'mirror': 1, 'pendant light': 1}), 'key_features': Counter({'brand_logo': 7, 'lifestyle_setting': 7, 'product_close_up': 3, 'text_only_card': 3, 'multi_product_collage': 1}), 'value_props': Counter({'price': 10, 'novelty': 2, 'convenience': 2, 'aesthetic': 1}), 'seasonal_tags': Counter({'summer': 2})}, n_total=10)", "body_md": "# Creative readout \u2014 Bob's Discount Furniture (`bobs`)\n\n_Window: ads first_seen in last 60 day(s)._\n\n- **Total analyzed creatives:** 10\n- **Net new (in window):** 10\n\n## Net-new creatives in window\n\n- ad `26993283757027647` \u2014 Grey upholstered counter stool on plain white background \u2014 catalog-style product shot.\n  - `/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/bobs/26993283757027647/image_0.jpg`\n- ad `1896984334352352` \u2014 Navy chaise sectional with bull-print art in coral-orange branded frame.\n  - `/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/bobs/1896984334352352/image_0.jpg`\n- ad `2167701817326285` \u2014 Reeded-wood bed with pink-and-white bedding in teal-bordered branded frame.\n  - `/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/bobs/2167701817326285/image_0.jpg`\n- ad `1952642545357567` \u2014 Navy fabric accent chair with cream sherpa pillow on plain white background.\n  - `/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/bobs/1952642545357567/image_0.jpg`\n- ad `2144069053105105` \u2014 Marble-topped dining table with grey chairs in bright yellow branded frame.\n  - `/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/bobs/2144069053105105/image_0.jpg`\n- ad `983886368018861` \u2014 Coordinated reeded-wood bedroom set: bed, nightstand, dresser, mirror in soft pink room.\n  - `/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/bobs/983886368018861/image_0.jpg`\n- ad `1716446656010711` \u2014 Grey upholstered counter stool on plain white background \u2014 catalog-style product shot.\n  - `/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/bobs/1716446656010711/image_0.jpg`\n- ad `3063837467284752` \u2014 Bob mascot figurine standing on dark dining table in sun-lit modern dining room.\n  - `/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/bobs/3063837467284752/image_0.jpg`\n- ad `2135947513646931` \u2014 Reeded-wood bed with pink-and-white bedding in teal-bordered branded frame.\n  - `/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/bobs/2135947513646931/image_0.jpg`\n- ad `2143174836530519` \u2014 Marble-topped dining table with grey chairs in bright yellow branded frame.\n  - `/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/bobs/2143174836530519/image_0.jpg`\n\n## Attribute distribution (all analyzed)\n\n**photography_style** _(n=10)_\n- `lifestyle`: 7  (70%)\n- `studio_product_only`: 3  (30%)\n\n**production_style** _(n=10)_\n- `polished_brand`: 10  (100%)\n\n**product_emphasis** _(n=10)_\n- `balanced`: 6  (60%)\n- `product_forward`: 3  (30%)\n- `lifestyle_forward`: 1  (10%)\n\n**hook_style** _(n=10)_\n- `aesthetic`: 6  (60%)\n- `demo`: 3  (30%)\n- `founder_story`: 1  (10%)\n\n**emotional_vs_rational** _(n=10)_\n- `emotional`: 7  (70%)\n- `rational`: 3  (30%)\n\n**aspect_ratio_guess** _(n=10)_\n- `1:1`: 7  (70%)\n- `9:16`: 3  (30%)\n\n**logo_visible** _(true / false / unknown)_\n- `true`: 7  (70%)\n- `false`: 3  (30%)\n\n**before_after_present** _(true / false / unknown)_\n- `unknown`: 10  (100%)\n\n**hero_banner_present** _(true / false / unknown)_\n- `unknown`: 10  (100%)\n\n**category_nav_visible** _(true / false / unknown)_\n- `unknown`: 10  (100%)\n\n**shoppable_imagery** _(true / false / unknown)_\n- `unknown`: 10  (100%)\n\n**text_overlay.present** _(true / false / unknown)_\n- `true`: 7  (70%)\n- `false`: 3  (30%)\n\n**urgency_cues.present** _(true / false / unknown)_\n- `false`: 10  (100%)\n\n**casting.people_visible** _(true / false / unknown)_\n- `true`: 1  (10%)\n- `false`: 9  (90%)\n\n**products_visible** _(top values across 10 creatives)_\n- `bed frame`: 3\n- `nightstand`: 3\n- `table lamp`: 3\n- `dining table`: 3\n- `dining chairs`: 3\n- `counter stool`: 2\n- `throw pillow`: 2\n- `bedding`: 2\n\n**key_features** _(top values across 10 creatives)_\n- `brand_logo`: 7\n- `lifestyle_setting`: 7\n- `product_close_up`: 3\n- `text_only_card`: 3\n- `multi_product_collage`: 1\n\n**value_props** _(top values across 10 creatives)_\n- `price`: 10\n- `novelty`: 2\n- `convenience`: 2\n- `aesthetic`: 1\n\n**seasonal_tags** _(top values across 10 creatives)_\n- `summer`: 2\n\n\n## Distribution among net-new only\n\n**photography_style** _(n=10)_\n- `lifestyle`: 7  (70%)\n- `studio_product_only`: 3  (30%)\n\n**production_style** _(n=10)_\n- `polished_brand`: 10  (100%)\n\n**product_emphasis** _(n=10)_\n- `balanced`: 6  (60%)\n- `product_forward`: 3  (30%)\n- `lifestyle_forward`: 1  (10%)\n\n**hook_style** _(n=10)_\n- `aesthetic`: 6  (60%)\n- `demo`: 3  (30%)\n- `founder_story`: 1  (10%)\n\n**emotional_vs_rational** _(n=10)_\n- `emotional`: 7  (70%)\n- `rational`: 3  (30%)\n\n**aspect_ratio_guess** _(n=10)_\n- `1:1`: 7  (70%)\n- `9:16`: 3  (30%)\n\n**logo_visible** _(true / false / unknown)_\n- `true`: 7  (70%)\n- `false`: 3  (30%)\n\n**before_after_present** _(true / false / unknown)_\n- `unknown`: 10  (100%)\n\n**hero_banner_present** _(true / false / unknown)_\n- `unknown`: 10  (100%)\n\n**category_nav_visible** _(true / false / unknown)_\n- `unknown`: 10  (100%)\n\n**shoppable_imagery** _(true / false / unknown)_\n- `unknown`: 10  (100%)\n\n**text_overlay.present** _(true / false / unknown)_\n- `true`: 7  (70%)\n- `false`: 3  (30%)\n\n**urgency_cues.present** _(true / false / unknown)_\n- `false`: 10  (100%)\n\n**casting.people_visible** _(true / false / unknown)_\n- `true`: 1  (10%)\n- `false`: 9  (90%)\n\n**products_visible** _(top values across 10 creatives)_\n- `bed frame`: 3\n- `nightstand`: 3\n- `table lamp`: 3\n- `dining table`: 3\n- `dining chairs`: 3\n- `counter stool`: 2\n- `throw pillow`: 2\n- `bedding`: 2\n\n**key_features** _(top values across 10 creatives)_\n- `brand_logo`: 7\n- `lifestyle_setting`: 7\n- `product_close_up`: 3\n- `text_only_card`: 3\n- `multi_product_collage`: 1\n\n**value_props** _(top values across 10 creatives)_\n- `price`: 10\n- `novelty`: 2\n- `convenience`: 2\n- `aesthetic`: 1\n\n**seasonal_tags** _(top values across 10 creatives)_\n- `summer`: 2\n\n\n## Top dominant colors (pooled across all creatives)\n\n- `#ffffff` \u2014 9 creative(s)\n- `#9a8772` \u2014 4 creative(s)\n- `#cccccc` \u2014 3 creative(s)\n- `#c9b69a` \u2014 3 creative(s)\n- `#f0d8c8` \u2014 3 creative(s)\n- `#3a2a22` \u2014 2 creative(s)"}}], "calls": [], "pricing": {"claude-opus-4-7": {"in": 15.0, "out": 75.0, "cache_read": 1.5, "cache_write": 18.75}, "claude-sonnet-4-6": {"in": 3.0, "out": 15.0, "cache_read": 0.3, "cache_write": 3.75}, "claude-haiku-4-5-20251001": {"in": 0.8, "out": 4.0, "cache_read": 0.08, "cache_write": 1.0}, "_default": {"in": 3.0, "out": 15.0, "cache_read": 0.3, "cache_write": 3.75}}}</script>
+<script>
+const DATA = JSON.parse(document.getElementById('eval-data').textContent);
+const runs = DATA.runs;
+const current = DATA.current;
+const tasks = DATA.tasks;
+const calls = DATA.calls;
+const pricing = DATA.pricing;
+
+// ---- run selector ----
+const sel = document.getElementById('run-select');
+if (sel) {
+  runs.slice().reverse().forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.id;
+    const score = (r.headline_score * 100).toFixed(0);
+    opt.textContent = `#${r.id} · ${r.started_at.slice(0,16).replace('T',' ')} · ${score}%`;
+    if (current && r.id === current.id) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('run', sel.value);
+    // Without a server we can't re-render; for now show a hint:
+    alert('To switch runs, run `intel evals dashboard --run-id ' + sel.value + '`');
+  });
+}
+
+// ---- trend chart ----
+(function drawTrend() {
+  const svg = document.getElementById('trend');
+  if (!svg || runs.length === 0) return;
+  const W = svg.clientWidth || 800, H = 180;
+  const pad = {l: 36, r: 16, t: 14, b: 24};
+  const innerW = W - pad.l - pad.r;
+  const innerH = H - pad.t - pad.b;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+  const xFor = i => pad.l + (runs.length === 1 ? innerW/2 : (i / (runs.length - 1)) * innerW);
+  const yFor = s => pad.t + (1 - Math.max(0, Math.min(1, s))) * innerH;
+
+  // gridlines
+  let g = '';
+  for (let v = 0; v <= 1; v += 0.25) {
+    const y = yFor(v);
+    g += `<line class="trend-axis" x1="${pad.l}" x2="${W-pad.r}" y1="${y}" y2="${y}"/>`;
+    g += `<text class="trend-label" x="4" y="${y+3}">${(v*100).toFixed(0)}%</text>`;
+  }
+  // line + points
+  const pts = runs.map((r, i) => `${xFor(i)},${yFor(r.headline_score)}`).join(' ');
+  g += `<polyline class="trend-line" points="${pts}"/>`;
+  runs.forEach((r, i) => {
+    const cls = (current && r.id === current.id) ? 'trend-pt current' : 'trend-pt';
+    g += `<circle class="${cls}" cx="${xFor(i)}" cy="${yFor(r.headline_score)}" r="5">
+            <title>Run #${r.id} · ${(r.headline_score*100).toFixed(1)}% · ${r.started_at}</title>
+          </circle>`;
+  });
+  if (runs.length > 1) {
+    g += `<text class="trend-label" x="${xFor(0)}" y="${H-6}" text-anchor="start">#${runs[0].id}</text>`;
+    g += `<text class="trend-label" x="${xFor(runs.length-1)}" y="${H-6}" text-anchor="end">#${runs[runs.length-1].id}</text>`;
+  }
+  svg.innerHTML = g;
+})();
+
+// ---- filters + tile rendering ----
+const state = { status: new Set(), category: new Set() };
+const STATUSES = ['PASS','PASS_SLOW','FAIL','ERROR','SKIP'];
+const CATS = ['regression','failure_mode'];
+
+function renderFilters() {
+  const sBar = document.getElementById('filter-status');
+  const cBar = document.getElementById('filter-category');
+  if (!sBar || !cBar) return;
+  sBar.innerHTML = '<span class="label">status</span>' +
+    STATUSES.map(s => {
+      const active = state.status.has(s) ? ' active' : '';
+      return `<span class="chip${active}" data-s="${s}">${s.toLowerCase()}</span>`;
+    }).join('');
+  cBar.innerHTML = '<span class="label">type</span>' +
+    CATS.map(c => {
+      const active = state.category.has(c) ? ' active' : '';
+      const label = c === 'failure_mode' ? 'failure mode' : c;
+      return `<span class="chip${active}" data-c="${c}">${label}</span>`;
+    }).join('');
+  sBar.querySelectorAll('.chip').forEach(el => el.addEventListener('click', () => {
+    const v = el.dataset.s;
+    state.status.has(v) ? state.status.delete(v) : state.status.add(v);
+    renderFilters(); renderTiles();
+  }));
+  cBar.querySelectorAll('.chip').forEach(el => el.addEventListener('click', () => {
+    const v = el.dataset.c;
+    state.category.has(v) ? state.category.delete(v) : state.category.add(v);
+    renderFilters(); renderTiles();
+  }));
+}
+
+let activeTaskId = tasks.length ? tasks[0].task_id : null;
+
+function renderTiles() {
+  const grid = document.getElementById('tasks-grid');
+  if (!grid) return;
+  const filtered = tasks.filter(t =>
+    (state.status.size === 0 || state.status.has(t.status)) &&
+    (state.category.size === 0 || state.category.has(t.category))
+  );
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty">No tasks match current filters.</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(t => {
+    const active = (t.task_id === activeTaskId) ? ' active' : '';
+    return `
+      <div class="task-tile ${t.status}${active}" data-id="${t.task_id}">
+        <div><span class="id">${t.task_id}</span></div>
+        <div><span class="status">${t.status}</span></div>
+        <div class="title">${escapeHtml(t.title)}</div>
+        <div class="meta-row">${t.elapsed_ms}ms · ${t.category.replace('_',' ')}</div>
+      </div>`;
+  }).join('');
+  grid.querySelectorAll('.task-tile').forEach(el => {
+    el.addEventListener('click', () => {
+      activeTaskId = el.dataset.id;
+      renderTiles();
+      renderDrill();
+    });
+  });
+}
+
+function renderDrill() {
+  const box = document.getElementById('drill');
+  if (!box) return;
+  const t = tasks.find(x => x.task_id === activeTaskId);
+  if (!t) { box.innerHTML = '<div class="empty">Click a task tile to inspect.</div>'; return; }
+  let h = `<h3>${escapeHtml(t.task_id)} · ${escapeHtml(t.title)}</h3>`;
+  h += `<div class="subtitle">${t.category.replace('_',' ')} · ${t.status} · ${t.elapsed_ms}ms`;
+  if (t.skipped_reason) h += ` · skipped: ${escapeHtml(t.skipped_reason)}`;
+  h += `</div>`;
+
+  if (t.graders && t.graders.length) {
+    h += `<table class="graders-table"><thead><tr><th>grader</th><th>verdict</th><th>detail</th></tr></thead><tbody>`;
+    t.graders.forEach(g => {
+      const cls = g.passed ? 'pass' : 'fail';
+      const speed = g.is_speed ? '<span class="speed">SPEED</span>' : '';
+      h += `<tr><td>${escapeHtml(g.name)}${speed}</td>` +
+           `<td class="${cls}">${g.passed ? 'PASS' : 'FAIL'}</td>` +
+           `<td>${escapeHtml(g.detail || '')}</td></tr>`;
+    });
+    h += `</tbody></table>`;
+  }
+
+  if (t.error) {
+    h += `<h4 style="margin-top:18px;">Error</h4><pre class="err">${escapeHtml(t.error)}</pre>`;
+  }
+
+  if (t.output !== null && t.output !== undefined) {
+    h += `<h4 style="margin-top:18px;">Output</h4>`;
+    const pretty = typeof t.output === 'string' ? t.output : JSON.stringify(t.output, null, 2);
+    h += `<pre class="output">${escapeHtml(pretty)}</pre>`;
+  }
+
+  // LLM calls for this task
+  const myCalls = calls.filter(c => c.task_id === t.task_id);
+  if (myCalls.length) {
+    h += `<h4 style="margin-top:18px;">LLM calls (${myCalls.length})</h4>`;
+    h += `<table class="graders-table"><thead><tr><th>call site</th><th>model</th><th>in</th><th>out</th><th>latency</th><th>cost</th></tr></thead><tbody>`;
+    myCalls.forEach(c => {
+      const cost = estimateCost(c);
+      h += `<tr><td>${escapeHtml(c.call_site)}</td><td>${escapeHtml(c.model)}</td>` +
+           `<td>${c.input_tokens}</td><td>${c.output_tokens}</td>` +
+           `<td>${c.latency_ms}ms</td><td>$${cost.toFixed(4)}</td></tr>`;
+    });
+    h += `</tbody></table>`;
+  }
+
+  box.innerHTML = h;
+}
+
+function estimateCost(c) {
+  const p = pricing[c.model] || pricing._default;
+  return c.input_tokens * p.in / 1e6 +
+         c.output_tokens * p.out / 1e6 +
+         (c.cache_read_tokens||0) * p.cache_read / 1e6 +
+         (c.cache_creation_tokens||0) * p.cache_write / 1e6;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ---- cost summary ----
+(function renderCostSummary() {
+  const box = document.getElementById('cost-summary');
+  if (!box) return;
+  if (!calls.length) {
+    box.innerHTML = '<div class="empty">No LLM call telemetry yet — Phase 1 wires the client wrapper that records this.</div>';
+    return;
+  }
+  const bySite = {};
+  calls.forEach(c => {
+    const k = c.call_site;
+    if (!bySite[k]) bySite[k] = {n:0, in:0, out:0, cost:0, models:new Set()};
+    bySite[k].n++; bySite[k].in += c.input_tokens; bySite[k].out += c.output_tokens;
+    bySite[k].cost += estimateCost(c); bySite[k].models.add(c.model);
+  });
+  const rows = Object.entries(bySite).sort((a,b) => b[1].cost - a[1].cost);
+  let h = `<div class="cost-grid">
+    <div class="h">call site</div><div class="h num">calls</div><div class="h num">in tok</div><div class="h num">out tok</div><div class="h num">$ est</div>`;
+  let tot = {n:0, in:0, out:0, cost:0};
+  rows.forEach(([site, v]) => {
+    h += `<div class="cell">${escapeHtml(site)} <small style="color:#94a3b8">(${[...v.models].join(',')})</small></div>` +
+         `<div class="cell num">${v.n}</div><div class="cell num">${v.in.toLocaleString()}</div>` +
+         `<div class="cell num">${v.out.toLocaleString()}</div><div class="cell num">$${v.cost.toFixed(4)}</div>`;
+    tot.n += v.n; tot.in += v.in; tot.out += v.out; tot.cost += v.cost;
+  });
+  h += `<div class="cell cost-total">TOTAL</div><div class="cell num cost-total">${tot.n}</div>
+        <div class="cell num cost-total">${tot.in.toLocaleString()}</div>
+        <div class="cell num cost-total">${tot.out.toLocaleString()}</div>
+        <div class="cell num cost-total">$${tot.cost.toFixed(4)}</div></div>`;
+  box.innerHTML = h;
+})();
+
+renderFilters();
+renderTiles();
+renderDrill();
+</script>
+</body></html>
