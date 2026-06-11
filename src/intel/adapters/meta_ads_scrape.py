@@ -158,11 +158,15 @@ def _extract_cards(page: Page, *, max_cards: int) -> list[dict[str, Any]]:
                                 .filter(o => o.src && o.src.startsWith('http'));
                             const videos = Array.from(node.querySelectorAll('video'))
                                 .map(v => v.src || (v.querySelector('source') && v.querySelector('source').src)).filter(Boolean);
+                            // Video poster frames — these are the thumbnails for video ads.
+                            // Without them, all video ads show "no thumbnail" in the dashboard.
+                            const posters = Array.from(node.querySelectorAll('video[poster]'))
+                                .map(v => v.poster).filter(p => p && p.startsWith('http'));
                             const buttons = Array.from(node.querySelectorAll('a, [role="button"], button'))
                                 .map(b => (b.innerText || '').trim()).filter(Boolean);
                             const links = Array.from(node.querySelectorAll('a[href]'))
                                 .map(a => a.href).filter(h => h && !h.includes('facebook.com/ads/library'));
-                            return { text: t, imgs: imgs, videos: videos, buttons: buttons, links: links };
+                            return { text: t, imgs: imgs, videos: videos, posters: posters, buttons: buttons, links: links };
                         }
                     }
                     return null;
@@ -268,6 +272,13 @@ def _parse_card(d: dict[str, Any]) -> dict[str, Any] | None:
             w, h = img.get("w") or 0, img.get("h") or 0
             if "fbcdn.net" in src and min(w, h) >= 200:
                 creative_imgs.append(src)
+
+    # Video poster frames — added at the end so explicit images win. Video ads
+    # have no `<img>` for the creative; the poster IS the thumbnail. No dim
+    # filter (posters arrive without naturalWidth metadata in the eval result).
+    for poster in d.get("posters") or []:
+        if isinstance(poster, str) and "fbcdn.net" in poster and poster not in creative_imgs:
+            creative_imgs.append(poster)
 
     return {
         "ad_archive_id": archive_id,
