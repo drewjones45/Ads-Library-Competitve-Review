@@ -516,6 +516,158 @@ def _validate_image_body(body: bytes, content_type: str) -> bool:
     return any(head.startswith(magic) for magic in _IMAGE_MAGIC)
 
 
+def _settle_page_for_capture(page, *, scroll_iterations: int) -> None:
+    """Drive a loaded Playwright page so a full-page screenshot captures the
+    real content: scroll to the bottom (kick IntersectionObserver lazy-loaders),
+    force-load any placeholder images, wait for network settle, scroll back to
+    the top. Shared by the homepage and landing-page capture paths."""
+    # Scroll-to-bottom loop until scrollHeight stabilizes — kicks intersection
+    # observers so lazy-loaded panels render. Most furniture themes use
+    # IntersectionObserver to swap a placeholder GIF for the real image only
+    # when the element enters the viewport.
+    last_h = 0
+    stable = 0
+    for _ in range(scroll_iterations):
+        h = page.evaluate("document.body.scrollHeight")
+        if h == last_h:
+            stable += 1
+            if stable >= 2:
+                break
+        else:
+            stable = 0
+            last_h = h
+        page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
+        page.wait_for_timeout(500)
+
+    # Force-load any images still using a placeholder src. Intersection-observer
+    # patterns won't fire for elements that never entered the viewport (e.g.,
+    # display:none modals or images on tabs we never clicked). Walk every img
+    # and promote data-src / srcset into src; mark loading=eager so the browser
+    # actually fetches them.
+    page.evaluate(
+        """() => {
+            const isPlaceholder = (s) => !s || s.startsWith('data:')
+                || s.includes('placeholder') || s.includes('blank.gif')
+                || s.includes('spacer.gif');
+            for (const img of document.querySelectorAll('img')) {
+                img.loading = 'eager';
+                const lazy = img.dataset.src || img.dataset.lazySrc
+                          || img.dataset.original || '';
+                if (lazy && isPlaceholder(img.src)) {
+                    img.src = lazy;
+                }
+                if (img.srcset && isPlaceholder(img.src)) {
+                    const last = img.srcset.split(',').map(s => s.trim()).pop();
+                    if (last) img.src = last.split(' ')[0];
+                }
+            }
+        }"""
+    )
+
+    # Wait for the forced-load images to actually fetch, then settle + scroll
+    # back to top so the full-page screenshot starts at the hero.
+    try:
+        page.wait_for_load_state("networkidle", timeout=8_000)
+    except Exception:
+        page.wait_for_timeout(2_000)
+    page.evaluate("window.scrollTo(0, 0)")
+    page.wait_for_timeout(400)
+
+
+def scrape_landing_page(
+    url: str,
+    *,
+    out_dir: Path,
+    headless: bool = True,
+    scroll_iterations: int = 10,
+) -> ScrapedPage:
+    """Capture a whole-page stitched screenshot of an ad's landing page.
+
+    Screenshot-only twin of scrape_homepage — no per-<img> extraction. Writes
+    `out_dir/landing.png` at a STABLE path (re-runs overwrite, so the creative
+    dedups to one row per URL). Returns a ScrapedPage with `screenshot_path`
+    set, or `error` set on a captcha wall / goto failure / 5xx (caller skips
+    those — never persists a captcha page as the landing screenshot).
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError as e:
+        raise FileNotFoundError(
+            "playwright not installed — run `pip install -e '.[browser]' && playwright install chromium`"
+        ) from e
+
+    page_key = _domain_slug(url)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=headless, args=STEALTH_ARGS)
+        context = browser.new_context(
+            user_agent=USER_AGENT,
+            viewport={"width": 1440, "height": 900},
+            locale="en-US",
+        )
+        try:
+            page = context.new_page()
+            try:
+                return _capture_landing_screenshot(
+                    page, url, page_key=page_key, out_dir=out_dir,
+                    scroll_iterations=scroll_iterations,
+                )
+            finally:
+                page.close()
+        finally:
+            context.close()
+            browser.close()
+
+
+def _capture_landing_screenshot(
+    page, url: str, *, page_key: str, out_dir: Path, scroll_iterations: int,
+) -> ScrapedPage:
+    """Navigate to a landing page and stitched-screenshot it (no image extraction)."""
+    def _err(msg: str) -> ScrapedPage:
+        return ScrapedPage(
+            page_key=page_key, url=url, title=None, hero_text=None,
+            visible_text="", image_urls=[], image_local_paths=[],
+            subpage_links=[], screenshot_path=None, html_path=None, error=msg,
+        )
+
+    try:
+        resp = page.goto(url, wait_until="domcontentloaded", timeout=45_000)
+    except Exception as e:
+        log.warning("landing goto failed for %s: %s", url, e)
+        return _err(f"goto failed: {type(e).__name__}: {e}")
+
+    status = resp.status if resp is not None else 0
+    if status and status >= 500:
+        log.warning("landing page returned %s for %s — no retry", status, url)
+        return _err(f"http_{status}")
+
+    # Let SPA frameworks hydrate, then bail cleanly on an anti-bot wall.
+    page.wait_for_timeout(2_000)
+    blocker = _detect_captcha_block(page)
+    if blocker:
+        log.warning("landing %s: blocked by '%s' anti-bot wall — skipping", page_key, blocker)
+        return _err(f"captcha_wall:{blocker}")
+
+    _settle_page_for_capture(page, scroll_iterations=scroll_iterations)
+
+    title = (page.title() or "").strip() or None
+    screenshot_path = out_dir / "landing.png"
+    stitched_ok = _capture_stitched_screenshot(page, output_path=screenshot_path)
+    if not stitched_ok:
+        try:
+            page.screenshot(path=str(screenshot_path), full_page=True, timeout=30_000)
+        except Exception as e:
+            log.warning("landing screenshot failed for %s: %s", url, e)
+            return _err(f"screenshot failed: {type(e).__name__}: {e}")
+
+    return ScrapedPage(
+        page_key=page_key, url=url, title=title, hero_text=None,
+        visible_text="", image_urls=[], image_local_paths=[],
+        subpage_links=[], screenshot_path=str(screenshot_path), html_path=None,
+    )
+
+
 def scrape_homepage(
     url: str,
     *,
@@ -649,57 +801,9 @@ def _capture_homepage(
         }
         return sp
 
-    # Scroll-to-bottom loop until scrollHeight stabilizes — kicks intersection
-    # observers so lazy-loaded panels render. Most furniture themes use
-    # IntersectionObserver to swap a placeholder GIF for the real image only
-    # when the element enters the viewport.
-    last_h = 0
-    stable = 0
-    for _ in range(scroll_iterations):
-        h = page.evaluate("document.body.scrollHeight")
-        if h == last_h:
-            stable += 1
-            if stable >= 2:
-                break
-        else:
-            stable = 0
-            last_h = h
-        page.evaluate("window.scrollBy(0, document.body.scrollHeight)")
-        page.wait_for_timeout(500)
-
-    # Force-load any images still using a placeholder src. Intersection-observer
-    # patterns won't fire for elements that never entered the viewport (e.g.,
-    # display:none modals or images on tabs we never clicked). Walk every img
-    # and promote data-src / srcset into src; mark loading=eager so the browser
-    # actually fetches them.
-    page.evaluate(
-        """() => {
-            const isPlaceholder = (s) => !s || s.startsWith('data:')
-                || s.includes('placeholder') || s.includes('blank.gif')
-                || s.includes('spacer.gif');
-            for (const img of document.querySelectorAll('img')) {
-                img.loading = 'eager';
-                const lazy = img.dataset.src || img.dataset.lazySrc
-                          || img.dataset.original || '';
-                if (lazy && isPlaceholder(img.src)) {
-                    img.src = lazy;
-                }
-                if (img.srcset && isPlaceholder(img.src)) {
-                    const last = img.srcset.split(',').map(s => s.trim()).pop();
-                    if (last) img.src = last.split(' ')[0];
-                }
-            }
-        }"""
-    )
-
-    # Wait for the forced-load images to actually fetch, then settle + scroll
-    # back to top so the full-page screenshot starts at the hero.
-    try:
-        page.wait_for_load_state("networkidle", timeout=8_000)
-    except Exception:
-        page.wait_for_timeout(2_000)
-    page.evaluate("window.scrollTo(0, 0)")
-    page.wait_for_timeout(400)
+    # Scroll the page, force-load lazy images, settle, and return to the top so
+    # the full-page screenshot starts at the hero.
+    _settle_page_for_capture(page, scroll_iterations=scroll_iterations)
 
     title = (page.title() or "").strip() or None
     try:
@@ -822,57 +926,14 @@ def _capture_homepage(
         except Exception as e:
             log.warning("hero crop failed for %s: %s", url, e)
 
-    # Download images with CDN-aware headers + magic-byte validation +
-    # per-scrape phash dedup (kills slider duplicates without an extra round trip).
+    # Individual page-image extraction was intentionally removed: the per-<img>
+    # downloads were noisy (site chrome leaking in, broken/irrelevant crops) and
+    # nothing downstream consumes them anymore. The artifacts we keep are the
+    # whole-page stitched screenshot (above) and the hero crop that drives the
+    # site-content analysis. `candidates` is still computed above purely for the
+    # `chrome_dropped` diagnostic.
     image_urls: list[str] = []
     image_local_paths: list[str] = []
-    seen_phash: set[str] = set()
-    download_errors: dict[str, int] = {}
-
-    for idx, cand in enumerate(candidates[:max_images]):
-        img_url = cand["src"]
-        try:
-            r = request_context.get(
-                img_url,
-                headers={
-                    "Referer": url,
-                    "Accept": "image/avif,image/webp,image/png,image/*,*/*;q=0.8",
-                    "User-Agent": USER_AGENT,
-                },
-                timeout=15_000,
-            )
-        except Exception as e:
-            download_errors[type(e).__name__] = download_errors.get(type(e).__name__, 0) + 1
-            continue
-        if not r.ok:
-            download_errors[f"http_{r.status}"] = download_errors.get(f"http_{r.status}", 0) + 1
-            continue
-        body = r.body()
-        ct = (r.headers.get("content-type") or "").lower()
-        if not _validate_image_body(body, ct):
-            download_errors["invalid_image"] = download_errors.get("invalid_image", 0) + 1
-            continue
-        phash = _phash_from_bytes(body)
-        if phash and phash in seen_phash:
-            download_errors["phash_dup"] = download_errors.get("phash_dup", 0) + 1
-            continue
-        if phash:
-            seen_phash.add(phash)
-        ext = ".png" if "png" in ct else ".webp" if "webp" in ct else ".gif" if "gif" in ct else ".jpg"
-        out_path = page_asset_dir / f"image_{idx:02d}{ext}"
-        try:
-            out_path.write_bytes(body)
-        except Exception as e:
-            log.warning("write failed for %s: %s", out_path, e)
-            continue
-        image_urls.append(img_url)
-        image_local_paths.append(str(out_path))
-
-    if download_errors:
-        log.info(
-            "homepage %s: download outcomes — %s",
-            page_key, ", ".join(f"{k}={v}" for k, v in sorted(download_errors.items())),
-        )
 
     # The runner consumes parsed for offer extraction + diff; mirror prior shape
     # so the existing offer extractor and diff logic keep working unchanged.

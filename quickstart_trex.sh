@@ -49,7 +49,7 @@ red()    { printf "\033[31m%s\033[0m\n" "$*"; }
 rule()   { printf "\033[2m%s\033[0m\n" "────────────────────────────────────────────────────────────"; }
 
 # ---- preflight ----
-bold "[1/8] preflight (TREX deployment)"
+bold "[1/9] preflight (TREX deployment)"
 rule
 if [[ ! -x ".venv/bin/intel" ]]; then
   red "  ✗ .venv/bin/intel not found. Run:"
@@ -88,12 +88,12 @@ green "  ✓ writing reports to: $REPORTS/"
 echo
 
 # ---- 2. init ----
-bold "[2/8] init db (trex.db)"; rule
+bold "[2/9] init db (trex.db)"; rule
 .venv/bin/intel init
 echo
 
 # ---- 3. ingest ----
-bold "[3/8] ingest"; rule
+bold "[3/9] ingest"; rule
 if [[ $SKIP_INGEST -eq 1 ]]; then
   yellow "  skipped (--skip-ingest)"
 else
@@ -101,8 +101,19 @@ else
 fi
 echo
 
-# ---- 4. analyze creatives ----
-bold "[4/8] vision-analyze creatives"; rule
+# ---- 4. capture landing pages ----
+# Screenshot the on-brand pages ads send traffic to (needs ad link_urls from
+# ingest above). The next step then analyzes these alongside ad creatives.
+bold "[4/9] capture landing pages"; rule
+if [[ $SKIP_INGEST -eq 1 ]]; then
+  yellow "  skipped (--skip-ingest)"
+else
+  .venv/bin/intel capture-landing-pages 2>&1 | tee "$REPORTS/landing_capture.log"
+fi
+echo
+
+# ---- 5. analyze creatives ----
+bold "[5/9] vision-analyze creatives"; rule
 if [[ $HAS_ANTHROPIC -eq 1 ]]; then
   .venv/bin/intel analyze-creatives 2>&1 | tee "$REPORTS/creative_analysis.log"
 else
@@ -111,7 +122,7 @@ fi
 echo
 
 # ---- 5. per-brand readouts ----
-bold "[5/8] per-brand creative readouts"; rule
+bold "[6/9] per-brand creative readouts"; rule
 mkdir -p "$REPORTS/by-brand"
 .venv/bin/python - "$REPORTS/by-brand" "$DAYS" <<'PY'
 import os, sys, subprocess, sqlite3, pathlib
@@ -130,12 +141,12 @@ PY
 echo
 
 # ---- 6. cross-set comparison ----
-bold "[6/8] cross-set comparison"; rule
+bold "[7/9] cross-set comparison"; rule
 .venv/bin/intel creative-comparison --days "$DAYS" --save "$REPORTS/creative_comparison.md"
 echo
 
 # ---- 7. briefing ----
-bold "[7/8] briefing"; rule
+bold "[8/9] briefing"; rule
 BRIEF="$REPORTS/briefing.md"
 if [[ $HAS_ANTHROPIC -eq 1 ]]; then
   green "  using LLM-synthesized briefing"
@@ -160,7 +171,7 @@ PY
 echo
 
 # ---- 8. HTML dashboard ----
-bold "[8/8] HTML dashboard"; rule
+bold "[9/9] HTML dashboard"; rule
 .venv/bin/intel dashboard --out "$REPORTS/dashboard" --days "$DAYS"
 echo
 

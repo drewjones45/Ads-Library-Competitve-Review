@@ -35,6 +35,11 @@ from .creative_readout import (
 )
 
 
+# Page-level screenshot asset types — surfaced in their own dashboard sections
+# (homepage lane, landing-pages section), not the ad-creative gallery/tallies.
+EXCLUDED_GALLERY_TYPES = {"homepage_image", "landing_page_image"}
+
+
 # ----- helpers --------------------------------------------------------------
 
 def _esc(s: Any) -> str:
@@ -193,6 +198,12 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         keep = set(brand_filter)
         all_recs = [r for r in all_recs if r.competitor_id in keep]
     ad_recs = [r for r in all_recs if (r.ad_id or 0) > 0]
+    # Page-level assets (whole-page screenshots) don't follow the ad-creative
+    # taxonomy and have their own dashboard homes (homepage lane, landing-pages
+    # section), so keep them out of the "Browse all creatives" gallery and the
+    # brand-vs-brand tallies. Cross-set/distinctiveness/whitespace already
+    # exclude them via `ad_recs` (ad_id NULL).
+    gallery_recs = [r for r in all_recs if r.asset_type not in EXCLUDED_GALLERY_TYPES]
 
     # Cross-set views: ad creatives only.
     by_comp: dict[str, list] = {}
@@ -321,6 +332,49 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             }
         landing_by_brand[cid] = aggregate_landing_pages(enriched, brand_host)
 
+    # Landing-page screenshots (captured by `intel capture-landing-pages`): join
+    # each to its destination URL + analysis so the "where ads send traffic"
+    # rows can show the screenshot + a one-line read. The clean_url lives in the
+    # screenshot's `landing_meta.json` sidecar (creatives has no url column).
+    landing_screens_by_brand: dict[str, dict[str, dict]] = {}
+    for cid in [b["id"] for b in brands]:
+        rows = conn.execute(
+            "SELECT asset_path, analysis_json FROM creatives "
+            "WHERE competitor_id=? AND asset_type='landing_page_image'",
+            (cid,),
+        ).fetchall()
+        by_url: dict[str, dict] = {}
+        for r in rows:
+            sidecar = Path(r["asset_path"]).parent / "landing_meta.json"
+            try:
+                meta = json.loads(sidecar.read_text())
+            except Exception:
+                continue
+            clean_url = meta.get("clean_url")
+            if not clean_url:
+                continue
+            try:
+                analysis = json.loads(r["analysis_json"]) if r["analysis_json"] else {}
+            except Exception:
+                analysis = {}
+            by_url[clean_url] = {
+                "asset_path": r["asset_path"],
+                "analyzed": bool(r["analysis_json"]),
+                "summary": analysis.get("summary_one_line"),
+                "analysis": analysis,
+            }
+        if by_url:
+            landing_screens_by_brand[cid] = by_url
+            # Enrich the aggregated top_url rows in place so both v1 and v2
+            # renderers get the screenshot + analysis with no extra params.
+            for section in (landing_by_brand.get(cid, {}).get("by_section") or []):
+                for tu in section.get("top_urls") or []:
+                    hit = by_url.get(tu.get("clean_url"))
+                    if hit:
+                        tu["screenshot_path"] = hit["asset_path"]
+                        tu["summary"] = hit["summary"]
+                        tu["analysis"] = hit["analysis"]
+
     # Brand-store data per brand: most recent landing screenshot + last 24 analyzed
     # brand-store image creatives. Empty dict for brands without an amazon store.
     brand_store_by_brand: dict[str, dict] = {}
@@ -376,9 +430,10 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             "creatives": bs_creatives,
         }
 
-    # Homepage data per brand: latest screenshot + latest hero promo +
-    # most-recent analyzed homepage creatives. Empty dict for brands with
-    # no website-source activity yet.
+    # Homepage data per brand: latest whole-page screenshot + latest hero promo
+    # (Site Content Analysis). Individual homepage page-images are no longer
+    # collected — only the single whole-page screenshot is surfaced. Empty dict
+    # for brands with no website-source activity yet.
     homepage_by_brand: dict[str, dict] = {}
     for cid in [b["id"] for b in brands]:
         latest_obs = conn.execute(
@@ -396,17 +451,10 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             "ORDER BY observed_at DESC LIMIT 1",
             (cid,),
         ).fetchone()
-        hp_creatives_rows = conn.execute(
-            "SELECT id, asset_path, analysis_json, analyzed_at FROM creatives "
-            "WHERE competitor_id=? AND asset_type='homepage_image' "
-            "ORDER BY id DESC LIMIT 24",
-            (cid,),
-        ).fetchall()
-        if not latest_obs and not latest_promo and not hp_creatives_rows:
+        if not latest_obs and not latest_promo:
             continue
         screenshot_path = None
         hero_image_path = None
-        image_count_total = 0
         blocked = False
         block_vendor: str | None = None
         if latest_obs and latest_obs["parsed_json"]:
@@ -417,23 +465,8 @@ def _collect(conn: sqlite3.Connection, *, days: int,
                 if not blocked:
                     screenshot_path = parsed.get("screenshot_path")
                     hero_image_path = parsed.get("hero_image_path")
-                    image_count_total = parsed.get("image_count", 0)
             except Exception:
                 pass
-        hp_creatives = []
-        analyzed_count = 0
-        for r in hp_creatives_rows:
-            try:
-                analysis = json.loads(r["analysis_json"]) if r["analysis_json"] else {}
-            except Exception:
-                analysis = {}
-            if r["analyzed_at"]:
-                analyzed_count += 1
-            hp_creatives.append({
-                "asset_path": r["asset_path"],
-                "summary": analysis.get("summary_one_line"),
-                "analyzed_at": r["analyzed_at"],
-            })
         promo_dict = None
         if latest_promo:
             promo_dict = dict(latest_promo)
@@ -455,9 +488,6 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             "latest_observed_at": latest_obs["observed_at"] if latest_obs else None,
             "screenshot_path": screenshot_path,
             "hero_image_path": hero_image_path,
-            "image_count_total": image_count_total,
-            "analyzed_count": analyzed_count,
-            "creatives": hp_creatives,
             "latest_promo": promo_dict,
             "blocked": blocked,
             "block_vendor": block_vendor,
@@ -471,7 +501,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
 
     # --- payloads for client-side features (filter, brand-vs-brand, delta view) ---
     creatives_index: list[dict] = []
-    for rec in all_recs:
+    for rec in gallery_recs:
         a = rec.analysis
         # Derive a 'layoutFlags' list from the brand-store-ish booleans so they
         # can be filtered as chips alongside other arrays.
@@ -557,7 +587,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
     # (distinctiveness, whitespace) still use `comp_tallies` (ad_recs only) to
     # keep their "paid-ad signal" semantics intact.
     all_by_comp_for_bvb: dict[str, list] = {}
-    for rec in all_recs:
+    for rec in gallery_recs:
         all_by_comp_for_bvb.setdefault(rec.competitor_id, []).append(rec)
     bvb_comp_tallies = {cid: _tally(recs) for cid, recs in all_by_comp_for_bvb.items()}
 
@@ -606,6 +636,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         "recent_ads": recent_ads,
         "top_ads": top_ads,
         "landing_by_brand": landing_by_brand,
+        "landing_screens_by_brand": landing_screens_by_brand,
         "brand_store_by_brand": brand_store_by_brand,
         "homepage_by_brand": homepage_by_brand,
         "latest_briefing": dict(latest_briefing) if latest_briefing else None,
@@ -1475,7 +1506,47 @@ def _render_distinctiveness(data: dict) -> str:
     return "".join(rows)
 
 
-def _render_landing_pages_section(data: dict) -> str:
+def _render_landing_screenshot(tu: dict, dashboard_dir: Path) -> str:
+    """Thumbnail + one-line read + expandable analysis for a captured landing
+    page, shown beneath its destination URL in the landing-pages table."""
+    rel = _relpath(Path(tu["screenshot_path"]), dashboard_dir)
+    a = tu.get("analysis") or {}
+    parts = [
+        f'<a class="landing-tile" href="{rel}" target="_blank" '
+        f'title="landing page — click to open full"><img src="{rel}" alt="landing page"></a>'
+    ]
+    summary = _esc(tu.get("summary") or "")
+    if summary:
+        parts.append(f'<div class="muted" style="margin-top:6px;font-style:italic">{summary}</div>')
+    rows = []
+    for label, key in [("Page intent", "page_intent"), ("Primary CTA", "primary_cta"),
+                       ("Offer", "offer"), ("Message match", "message_match")]:
+        v = a.get(key)
+        if v:
+            rows.append(f'<div style="margin:3px 0"><span style="color:#777">{label}:</span> {_esc(v)}</div>')
+    for label, key in [("Trust", "trust_signals"), ("Friction", "friction_points")]:
+        items = a.get(key) or []
+        if items:
+            rows.append(f'<div style="margin:3px 0"><span style="color:#777">{label}:</span> {_esc(", ".join(items[:4]))}</div>')
+
+    def _ww(label, key, color):
+        items = a.get(key) or []
+        if not items:
+            return ""
+        lis = "".join(f"<li>{_esc(x)}</li>" for x in items[:3])
+        return (f'<div style="margin-top:6px"><span style="font-weight:600;color:{color}">{label}</span>'
+                f'<ul style="margin:2px 0 0 16px;padding:0">{lis}</ul></div>')
+    detail = "".join(rows) + _ww("What works", "what_works", "#1e7e34") + _ww("What it misses", "what_misses", "#c8242b")
+    if detail:
+        parts.append(
+            f'<details style="margin-top:6px"><summary style="cursor:pointer;color:#2a5fb0;'
+            f'font-size:11px">Landing-page analysis</summary>'
+            f'<div style="margin-top:6px;font-size:11px;line-height:1.5">{detail}</div></details>'
+        )
+    return f'<div style="margin-top:8px">{"".join(parts)}</div>'
+
+
+def _render_landing_pages_section(data: dict, dashboard_dir: Path) -> str:
     """Per-brand 'where ads send traffic' breakdown — stacked horizontal bar +
     drill-down table. The Count/Popularity toggle hot-swaps section widths in
     JS using data attributes set on each <rect>. Server-side default is Count
@@ -1575,10 +1646,13 @@ def _render_landing_pages_section(data: dict) -> str:
             flagged_cls = " flagged" if sec in ("template_unfilled", "off_brand_tracker", "off_brand_short", "off_brand_other") else ""
             top_urls = s.get("top_urls") or []
             top_url_html = ""
+            screenshot_html = ""
             if top_urls:
                 tu = top_urls[0]
                 href = _esc(tu.get("clean_url") or "")
                 top_url_html = f'<a href="{href}" target="_blank" rel="noopener">{href}</a>'
+                if tu.get("screenshot_path"):
+                    screenshot_html = _render_landing_screenshot(tu, dashboard_dir)
             elif s.get("example_raw_urls"):
                 # Template-unfilled URLs have no clean_url — show the raw form.
                 ex = _esc(s["example_raw_urls"][0])[:140]
@@ -1592,7 +1666,7 @@ def _render_landing_pages_section(data: dict) -> str:
                 f'<td class="num" data-count-share="{s["ad_share"]:.4f}" '
                 f'data-pop-share="{s["popularity_share"]:.4f}">'
                 f'{s["ad_share"]:.0%}</td>'
-                f'<td class="url">{top_url_html}</td>'
+                f'<td class="url">{top_url_html}{screenshot_html}</td>'
                 f'</tr>'
             )
         table_html = f"""
@@ -1762,22 +1836,6 @@ def _render_homepage_block(hp_data: dict | None, dashboard_dir: Path) -> str:
             f'title="homepage landing — click to open full"><img src="{rel}" '
             f'alt="homepage landing"></a>'
         )
-    creatives = hp_data.get("creatives") or []
-    cre_html_parts = []
-    for cre in creatives[:12]:
-        rel = _relpath(Path(cre["asset_path"]), dashboard_dir)
-        cap = _esc((cre.get("summary") or "")[:80])
-        cre_html_parts.append(
-            f'<div class="bs-thumb"><img src="{rel}" loading="lazy" alt="homepage image">'
-            f'<div class="muted" style="font-size:11px">{cap}</div></div>'
-        )
-    cre_html = (
-        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));'
-        f'gap:10px;margin-top:12px">{"".join(cre_html_parts)}</div>'
-    ) if cre_html_parts else (
-        '<p class="muted">Images captured but not yet analyzed. Run '
-        '<code>intel analyze-creatives</code>.</p>'
-    )
     observed = hp_data.get("latest_observed_at") or "—"
 
     # Site Content Analysis card — surfaces the structured homepage_promos record
@@ -1945,16 +2003,9 @@ def _render_homepage_block(hp_data: dict | None, dashboard_dir: Path) -> str:
       {promo_html}
       <div class="stats" style="margin-bottom:12px">
         <div class="stat" style="border-left-color:#2da44e">
-          <div class="label">Images captured</div><div class="value">{hp_data.get('image_count_total', 0)}</div></div>
-        <div class="stat" style="border-left-color:#2da44e">
-          <div class="label">Analyzed</div><div class="value">{hp_data.get('analyzed_count', 0)}/{len(creatives)}</div></div>
-        <div class="stat" style="border-left-color:#2da44e">
           <div class="label">Last captured</div><div class="value" style="font-size:14px">{_esc(observed[:16].replace('T', ' '))}</div></div>
       </div>
-      <div style="display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start">
-        <div>{screenshot_html}</div>
-        <div>{cre_html}</div>
-      </div>
+      <div>{screenshot_html}</div>
     </div>
     """
 
@@ -2367,7 +2418,7 @@ def build_dashboard(
     <section id="landing-pages">
       <h2>Where ads send traffic</h2>
       <p class="muted">Per-brand breakdown of ad <code>link_url</code> destinations. Sections in <span style="color:#a93226">red</span> / <span style="color:#e08e00">orange</span> are flagged findings, not traffic worth applauding — measurement redirects (DoubleClick), Dynamic Creative templates that never resolved, or opaque short-links.</p>
-      {_render_landing_pages_section(data)}
+      {_render_landing_pages_section(data, out_dir)}
     </section>
     """)
 

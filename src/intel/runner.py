@@ -155,36 +155,10 @@ def ingest_one(competitor: Competitor, source_idx: int, settings: Settings | Non
                 except Exception as e:
                     audit(conn, actor="enrichment", action="offer_extract_failed", details={"err": str(e)})
 
-            # Persist homepage creatives (Playwright captures + downloaded images).
-            # Runs on every observation regardless of `changed`: a brand-new run
-            # has no prior, and on re-scrapes upsert_creative is idempotent on
-            # asset_path so already-known files don't re-insert.
-            pages = result.extras.get("pages", [])
-            creative_inserts = 0
-            for sp in pages:
-                for asset_path_str in sp.image_local_paths:
-                    phash = _safe_phash(asset_path_str)
-                    _, inserted = upsert_creative(
-                        conn,
-                        ad_id=None,
-                        asset_type="homepage_image",
-                        asset_path=asset_path_str,
-                        phash=phash,
-                        competitor_id=competitor.id,
-                    )
-                    if inserted:
-                        creative_inserts += 1
-            if pages:
-                audit(
-                    conn,
-                    actor="enrichment",
-                    action="homepage_creatives_upserted",
-                    details={
-                        "pages_captured": len(pages),
-                        "creatives_inserted": creative_inserts,
-                        "total_image_paths": sum(len(p.image_local_paths) for p in pages),
-                    },
-                )
+            # Note: individual homepage page-images are no longer persisted as
+            # creatives. The whole-page screenshot (in the observation's parsed
+            # JSON) and the hero crop below are the kept website artifacts; the
+            # noisy per-<img> grid was removed from both capture and dashboard.
 
             # Structured hero/banner promo extraction (Phase H2). Runs every
             # observation; the hero-hash cache skips the LLM call when the

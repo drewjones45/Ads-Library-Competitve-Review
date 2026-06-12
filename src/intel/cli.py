@@ -446,6 +446,179 @@ def landing_pages_cmd(competitor_id: str | None, top_n: int) -> None:
             console.print("[yellow]no brands with link_urls found.[/yellow]")
 
 
+# On-brand landing sections worth screenshotting. Excludes trackers, short-links,
+# unfilled Dynamic-Creative templates, and unknown/off-brand destinations — those
+# either redirect, don't resolve, or aren't the brand's own pages.
+_SAFE_LANDING_SECTIONS = {
+    "homepage", "product_browse", "product_detail", "samples",
+    "quote_lead", "where_to_buy", "inspiration_content", "brand_story",
+}
+
+
+@cli.command("capture-landing-pages")
+@click.option("--competitor", "competitor_id", default=None,
+              help="single brand id; default: all brands with link_urls")
+@click.option("--limit-per-brand", default=8, type=int,
+              help="max distinct landing pages to screenshot per brand (default 8)")
+@click.option("--days", default=90, type=int,
+              help="only consider ads seen within this many days (default 90)")
+@click.option("--delay", default=2.0, type=float,
+              help="seconds to wait between page captures (default 2.0)")
+@click.option("--headed", is_flag=True, help="run Playwright headed (debug anti-bot)")
+def capture_landing_pages_cmd(competitor_id: str | None, limit_per_brand: int,
+                              days: int, delay: float, headed: bool) -> None:
+    """Screenshot the on-brand landing pages that ads send traffic to.
+
+    Enumerates each brand's real on-brand destination URLs (from ad link_urls,
+    classified by the landing-section taxonomy), captures one whole-page
+    screenshot per URL, and stores it as a `landing_page_image` creative with a
+    sidecar recording its URL + section. Run `intel analyze-creatives` afterward
+    to attach the dedicated landing-page analysis. Idempotent: stable per-URL
+    paths mean re-runs refresh in place rather than piling up rows.
+    """
+    import time
+    from datetime import datetime as _dt, timedelta, timezone as _tz
+
+    from .adapters.website import _domain_slug, scrape_landing_page
+    from .analysis.creative import perceptual_hash
+    from .analysis.landing import (
+        aggregate_landing_pages,
+        brand_host_for,
+        classify_url,
+        detect_brand_host,
+        parse_url,
+    )
+    from .config import get_competitor
+    from .storage import asset_path, popularity_score, upsert_creative
+
+    since = (_dt.now(_tz.utc) - timedelta(days=days)).isoformat()
+
+    with connect() as conn:
+        if competitor_id:
+            brand_rows = conn.execute(
+                "SELECT id, name FROM competitors WHERE id=?", (competitor_id,),
+            ).fetchall()
+            if not brand_rows:
+                console.print(f"[red]unknown competitor id:[/red] {competitor_id}")
+                sys.exit(2)
+        else:
+            brand_rows = conn.execute(
+                "SELECT id, name FROM competitors ORDER BY priority DESC, name"
+            ).fetchall()
+
+        summary = Table(show_header=True, header_style="bold", box=None)
+        summary.add_column("Brand", style="cyan")
+        summary.add_column("Selected", justify="right")
+        summary.add_column("Captured", justify="right", style="green")
+        summary.add_column("Blocked/err", justify="right", style="yellow")
+
+        for br in brand_rows:
+            cid = br["id"]
+            comp = get_competitor(cid)
+            brand_host = brand_host_for(comp) if comp else ""
+            max_rank_row = conn.execute(
+                "SELECT MAX(serp_position_rank) FROM ads WHERE competitor_id=? "
+                "AND serp_position_rank IS NOT NULL", (cid,),
+            ).fetchone()
+            max_rank = (max_rank_row[0] or 0) if max_rank_row else 0
+            ad_rows = conn.execute(
+                "SELECT id, ad_archive_id, link_url, serp_position_rank, "
+                "start_date, last_seen, active FROM ads "
+                "WHERE competitor_id=? AND link_url IS NOT NULL AND last_seen >= ?",
+                (cid, since),
+            ).fetchall()
+            if not ad_rows:
+                continue
+            if not brand_host:
+                brand_host = detect_brand_host([r["link_url"] for r in ad_rows])
+            enriched = []
+            for r in ad_rows:
+                parsed = parse_url(r["link_url"])
+                bucket = classify_url(parsed, brand_host)
+                score = popularity_score(
+                    r["serp_position_rank"], r["start_date"], r["last_seen"],
+                    r["active"] or 0, max_rank,
+                )
+                enriched.append({
+                    "id": r["id"], "ad_archive_id": r["ad_archive_id"],
+                    "link_url": r["link_url"], "section": bucket,
+                    "popularity_score": score, **parsed,
+                })
+            agg = aggregate_landing_pages(enriched, brand_host)
+
+            # Flatten the top destination URLs across safe on-brand sections,
+            # dedup by clean_url (keep the higher ad_count), rank, and cap.
+            by_url: dict[str, dict] = {}
+            for s in agg.get("by_section", []):
+                if s["section"] not in _SAFE_LANDING_SECTIONS:
+                    continue
+                for tu in s.get("top_urls") or []:
+                    cu = tu.get("clean_url")
+                    if not cu:
+                        continue
+                    prev = by_url.get(cu)
+                    if prev is None or tu["ad_count"] > prev["ad_count"]:
+                        by_url[cu] = {
+                            "clean_url": cu,
+                            "section": s["section"],
+                            "ad_count": tu["ad_count"],
+                            "ad_archive_ids": tu.get("ad_archive_ids") or [],
+                        }
+            selected = sorted(by_url.values(), key=lambda d: d["ad_count"], reverse=True)[:limit_per_brand]
+            if not selected:
+                continue
+
+            captured = 0
+            blocked = 0
+            for item in selected:
+                cu = item["clean_url"]
+                out_dir = asset_path("creative", cid, "landing", _domain_slug(cu))
+                try:
+                    sp = scrape_landing_page(cu, out_dir=out_dir, headless=not headed)
+                except FileNotFoundError as e:
+                    console.print(f"[red]{e}[/red]")
+                    sys.exit(2)
+                except Exception as e:
+                    console.print(f"  [yellow]capture crashed[/yellow] {cu}: {e}")
+                    blocked += 1
+                    continue
+                if sp.error or not sp.screenshot_path:
+                    console.print(f"  [yellow]skip[/yellow] {cu} ({sp.error or 'no screenshot'})")
+                    blocked += 1
+                    time.sleep(delay)
+                    continue
+                # Sidecar: links the screenshot back to its URL + section so the
+                # analyzer and dashboard can join on clean_url (no DB url column).
+                sidecar = Path(sp.screenshot_path).parent / "landing_meta.json"
+                sidecar.write_text(json.dumps({
+                    "clean_url": cu,
+                    "section": item["section"],
+                    "ad_count": item["ad_count"],
+                    "ad_archive_ids": item["ad_archive_ids"][:3],
+                    "captured_at": _dt.now(_tz.utc).isoformat(timespec="seconds"),
+                }), encoding="utf-8")
+                try:
+                    phash = perceptual_hash(Path(sp.screenshot_path))
+                except Exception:
+                    phash = None
+                upsert_creative(
+                    conn,
+                    ad_id=None,
+                    asset_type="landing_page_image",
+                    asset_path=sp.screenshot_path,
+                    phash=phash,
+                    competitor_id=cid,
+                )
+                captured += 1
+                console.print(f"  [green]captured[/green] [{item['section']}] {cu}")
+                time.sleep(delay)
+
+            summary.add_row(br["name"], str(len(selected)), str(captured), str(blocked))
+
+        console.print(summary)
+        console.print("[dim]next:[/dim] intel analyze-creatives  [dim](analyzes the new landing screenshots)[/dim]")
+
+
 @cli.command("cluster-hooks")
 @click.option("--competitor", "competitor_id", default=None)
 @click.option("--limit", default=50, type=int)

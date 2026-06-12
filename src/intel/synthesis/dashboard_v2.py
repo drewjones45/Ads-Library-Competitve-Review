@@ -1411,7 +1411,50 @@ def _render_distinctiveness_v2(data: dict) -> str:
     return "".join(rows)
 
 
-def _render_landing_pages_section_v2(data: dict) -> str:
+def _render_landing_screenshot_v2(tu: dict, dashboard_dir: Path) -> str:
+    """Thumbnail + one-line read + expandable analysis for a captured landing
+    page (v2, theme-var styled — reuses the homepage card's detail classes)."""
+    rel = _relpath(Path(tu["screenshot_path"]), dashboard_dir)
+    a = tu.get("analysis") or {}
+    parts = [
+        f'<a class="landing-tile" href="{rel}" target="_blank" '
+        f'title="landing page — click to open full"><img src="{rel}" alt="landing page"></a>'
+    ]
+    summary = _esc(tu.get("summary") or "")
+    if summary:
+        parts.append(f'<div class="muted" style="margin-top:6px;font-style:italic">{summary}</div>')
+    rows = []
+    for label, key in [("Page intent", "page_intent"), ("Primary CTA", "primary_cta"),
+                       ("Offer", "offer"), ("Message match", "message_match")]:
+        v = a.get(key)
+        if v:
+            rows.append(f'<div class="critique-row"><span class="k">{_esc(label)}</span>'
+                        f'<span class="v">{_esc(v)}</span></div>')
+    for label, key in [("Trust", "trust_signals"), ("Friction", "friction_points")]:
+        items = a.get(key) or []
+        if items:
+            rows.append(f'<div class="critique-row"><span class="k">{_esc(label)}</span>'
+                        f'<span class="v">{_esc(", ".join(items[:4]))}</span></div>')
+
+    def _ww(label, key, cls):
+        items = a.get(key) or []
+        if not items:
+            return ""
+        lis = "".join(f"<li>{_esc(x)}</li>" for x in items[:3])
+        return f'<div><div class="ww-head {cls}">{label}</div><ul>{lis}</ul></div>'
+    works = _ww("What works", "what_works", "works")
+    misses = _ww("What it misses", "what_misses", "misses")
+    ww = f'<div class="ww-grid">{works}{misses}</div>' if (works or misses) else ""
+    body = "".join(rows)
+    if body or ww:
+        parts.append(
+            f'<details class="hp-details"><summary>Landing-page analysis</summary>'
+            f'<div class="hp-details-body">{body}{ww}</div></details>'
+        )
+    return f'<div style="margin-top:8px">{"".join(parts)}</div>'
+
+
+def _render_landing_pages_section_v2(data: dict, dashboard_dir: Path) -> str:
     """Per-brand 'where ads send traffic' breakdown — stacked horizontal bar +
     drill-down table. The Count/Popularity toggle hot-swaps section widths in
     JS using data attributes set on each <rect>; server-side default is Count
@@ -1505,10 +1548,13 @@ def _render_landing_pages_section_v2(data: dict) -> str:
             flagged_cls = " flagged" if sec in ("template_unfilled", "off_brand_tracker", "off_brand_short", "off_brand_other") else ""
             top_urls = s.get("top_urls") or []
             top_url_html = ""
+            screenshot_html = ""
             if top_urls:
                 tu = top_urls[0]
                 href = _esc(tu.get("clean_url") or "")
                 top_url_html = f'<a href="{href}" target="_blank" rel="noopener">{href}</a>'
+                if tu.get("screenshot_path"):
+                    screenshot_html = _render_landing_screenshot_v2(tu, dashboard_dir)
             elif s.get("example_raw_urls"):
                 # Template-unfilled URLs have no clean_url — show the raw form.
                 ex = _esc(s["example_raw_urls"][0])[:140]
@@ -1522,7 +1568,7 @@ def _render_landing_pages_section_v2(data: dict) -> str:
                 f'<td class="num" data-count-share="{s["ad_share"]:.4f}" '
                 f'data-pop-share="{s["popularity_share"]:.4f}">'
                 f'{s["ad_share"]:.0%}</td>'
-                f'<td class="url">{top_url_html}</td>'
+                f'<td class="url">{top_url_html}{screenshot_html}</td>'
                 f'</tr>'
             )
         table_html = f"""
@@ -1676,21 +1722,6 @@ def _render_homepage_block_v2(hp_data: dict | None, dashboard_dir: Path) -> str:
             f'title="homepage landing — click to open full"><img src="{rel}" '
             f'alt="homepage landing"></a>'
         )
-    creatives = hp_data.get("creatives") or []
-    cre_html_parts = []
-    for cre in creatives[:12]:
-        rel = _relpath(Path(cre["asset_path"]), dashboard_dir)
-        cap = _esc((cre.get("summary") or "")[:80])
-        cre_html_parts.append(
-            f'<div class="bs-thumb"><img src="{rel}" loading="lazy" alt="homepage image">'
-            f'<div class="muted">{cap}</div></div>'
-        )
-    cre_html = (
-        f'<div class="thumb-grid">{"".join(cre_html_parts)}</div>'
-    ) if cre_html_parts else (
-        '<p class="muted">Images captured but not yet analyzed. Run '
-        '<code>intel analyze-creatives</code>.</p>'
-    )
     observed = hp_data.get("latest_observed_at") or "—"
 
     # Site Content Analysis card — surfaces the structured homepage_promos record
@@ -1827,14 +1858,9 @@ def _render_homepage_block_v2(hp_data: dict | None, dashboard_dir: Path) -> str:
       </div>
       {promo_html}
       <div class="stats">
-        {_stat("Images captured", hp_data.get('image_count_total', 0))}
-        {_stat("Analyzed", f"{hp_data.get('analyzed_count', 0)}/{len(creatives)}")}
         {_stat("Last captured", _esc(observed[:16].replace('T', ' ')), small=True)}
       </div>
-      <div class="two-col">
-        <div>{screenshot_html}</div>
-        <div>{cre_html}</div>
-      </div>
+      <div>{screenshot_html}</div>
     </div>
     """
 
@@ -2130,7 +2156,7 @@ def build_dashboard_v2(
     <section id="landing-pages">
       <h2>Where ads send traffic</h2>
       <p class="muted">Per-brand breakdown of ad <code>link_url</code> destinations. Sections in <span class="flag-red">red</span> / <span class="flag-orange">orange</span> are flagged findings, not traffic worth applauding — measurement redirects (DoubleClick), Dynamic Creative templates that never resolved, or opaque short-links.</p>
-      {_render_landing_pages_section_v2(data)}
+      {_render_landing_pages_section_v2(data, out_dir)}
     </section>
     """)
 

@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .creative import analyze_creative_image
+from .landing_analysis import analyze_landing_page
 from .video import analyze_creative_video
 from ..config import load_settings
 from ..storage import audit, connect, utcnow
@@ -50,6 +51,7 @@ _ASSET_TYPE_TO_CONTEXT = {
     "amazon_store_hero": "brand_store_hero",
     "website_screenshot": "website",
     "homepage_image": "website",
+    "landing_page_image": "landing_page",
 }
 
 
@@ -194,6 +196,24 @@ def analyze_pending(
                         })
                         continue
                     result = analyze_creative_video(sidecar, model=model)
+                elif asset_type == "landing_page_image":
+                    # Landing pages get a dedicated page-level analysis (offer,
+                    # CTA, page intent, trust signals, what works/misses) rather
+                    # than the ad-creative taxonomy. The URL + classified section
+                    # live in a sidecar written at capture time.
+                    sidecar = path.parent / "landing_meta.json"
+                    meta = {}
+                    if sidecar.exists():
+                        try:
+                            meta = json.loads(sidecar.read_text())
+                        except Exception:
+                            meta = {}
+                    result = analyze_landing_page(
+                        path,
+                        url=meta.get("clean_url") or meta.get("url") or "",
+                        section=meta.get("section"),
+                        model=model,
+                    )
                 else:
                     result = analyze_creative_image(path, model=model, context=context)
                 if "error" in result:
