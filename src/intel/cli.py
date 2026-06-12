@@ -33,7 +33,8 @@ from .runner import ingest_all, ingest_competitor
 from .storage import connect, init_db, upsert_competitor
 from .synthesis.briefing import MissingApiKey, generate_briefing
 from .synthesis.creative_readout import cross_set_comparison, per_brand_readout
-from .synthesis.dashboard import build_dashboard
+from .synthesis.dashboard import DEFAULT_PRODUCT, build_dashboard
+from .synthesis.dashboard_v2 import DEFAULT_PRODUCT_V2, build_dashboard_v2
 from .synthesis.whitespace import detect_whitespace
 
 console = Console()
@@ -331,6 +332,120 @@ def creative_comparison_cmd(days: int, save: str | None) -> None:
         console.print(f"\n[green]wrote[/green] {save}")
 
 
+@cli.command("landing-pages")
+@click.option("--competitor", "competitor_id", default=None,
+              help="single brand id; default: all brands with link_urls")
+@click.option("--top-n", default=3, type=int,
+              help="how many top destinations per section to show (default 3)")
+def landing_pages_cmd(competitor_id: str | None, top_n: int) -> None:
+    """Where each brand's ads are sending traffic — per-section breakdown.
+
+    Snapshot view: each ad's link_url is bucketed by what it *is* (product
+    browse, samples, quote/lead, where-to-buy, off-brand-tracker, etc.).
+    Useful as a one-shot inspection without rendering the full dashboard.
+    """
+    from .analysis.landing import (
+        SECTION_LABELS,
+        aggregate_landing_pages,
+        brand_host_for,
+        classify_url,
+        detect_brand_host,
+        parse_url,
+    )
+    from .config import get_competitor
+    from .storage import popularity_score
+
+    with connect() as conn:
+        if competitor_id:
+            brand_rows = conn.execute(
+                "SELECT id, name FROM competitors WHERE id=?", (competitor_id,),
+            ).fetchall()
+            if not brand_rows:
+                console.print(f"[red]unknown competitor id:[/red] {competitor_id}")
+                sys.exit(2)
+        else:
+            brand_rows = conn.execute(
+                "SELECT id, name FROM competitors ORDER BY priority DESC, name"
+            ).fetchall()
+
+        any_rendered = False
+        for br in brand_rows:
+            cid = br["id"]
+            comp = get_competitor(cid)
+            brand_host = brand_host_for(comp) if comp else ""
+            max_rank_row = conn.execute(
+                "SELECT MAX(serp_position_rank) FROM ads WHERE competitor_id=? "
+                "AND serp_position_rank IS NOT NULL", (cid,),
+            ).fetchone()
+            max_rank = (max_rank_row[0] or 0) if max_rank_row else 0
+            ad_rows = conn.execute(
+                "SELECT id, ad_archive_id, link_url, serp_position_rank, "
+                "start_date, last_seen, active FROM ads "
+                "WHERE competitor_id=? AND link_url IS NOT NULL", (cid,),
+            ).fetchall()
+            if not ad_rows:
+                if competitor_id:
+                    console.print(f"[yellow]no link_urls for[/yellow] {cid}")
+                continue
+            if not brand_host:
+                brand_host = detect_brand_host([r["link_url"] for r in ad_rows])
+            enriched = []
+            for r in ad_rows:
+                parsed = parse_url(r["link_url"])
+                bucket = classify_url(parsed, brand_host)
+                score = popularity_score(
+                    r["serp_position_rank"], r["start_date"], r["last_seen"],
+                    r["active"] or 0, max_rank,
+                )
+                enriched.append({
+                    "id": r["id"], "ad_archive_id": r["ad_archive_id"],
+                    "link_url": r["link_url"], "section": bucket,
+                    "popularity_score": score, **parsed,
+                })
+            agg = aggregate_landing_pages(enriched, brand_host)
+            if not agg.get("by_section"):
+                continue
+            any_rendered = True
+
+            header = (
+                f"\n[bold]{br['name']}[/bold]  "
+                f"[dim]{agg['with_link']} of {agg['total_ads']} ads · "
+                f"{agg['on_brand_share']:.0%} on-brand · host={brand_host or '?'}[/dim]"
+            )
+            console.print(header)
+
+            tbl = Table(show_header=True, header_style="bold", box=None, pad_edge=False)
+            tbl.add_column("Section", style="cyan", no_wrap=True)
+            tbl.add_column("Ads", justify="right", style="white")
+            tbl.add_column("Share", justify="right", style="white")
+            tbl.add_column("Pop. share", justify="right", style="dim")
+            tbl.add_column("Top destination(s)", overflow="fold")
+            for s in agg["by_section"]:
+                sec = s["section"]
+                label = SECTION_LABELS.get(sec, sec)
+                top_dests = []
+                for tu in (s.get("top_urls") or [])[:top_n]:
+                    cu = tu.get("clean_url") or ""
+                    if cu:
+                        top_dests.append(f"{cu} [dim]({tu['ad_count']})[/dim]")
+                if not top_dests and s.get("example_raw_urls"):
+                    top_dests = [
+                        f"[dim italic]{u[:90]}[/dim italic]"
+                        for u in s["example_raw_urls"][:top_n]
+                    ]
+                tbl.add_row(
+                    label,
+                    str(s["ad_count"]),
+                    f"{s['ad_share']:.0%}",
+                    f"{s['popularity_share']:.0%}",
+                    "\n".join(top_dests) or "—",
+                )
+            console.print(tbl)
+
+        if not any_rendered:
+            console.print("[yellow]no brands with link_urls found.[/yellow]")
+
+
 @cli.command("cluster-hooks")
 @click.option("--competitor", "competitor_id", default=None)
 @click.option("--limit", default=50, type=int)
@@ -410,18 +525,51 @@ def briefings(limit: int) -> None:
 
 @cli.command()
 @click.option("--out", default=None, type=click.Path(),
-              help="output dir; default reports/<UTC-date>/dashboard")
+              help="output dir; default reports/<UTC-date>/dashboard (or dashboard-v2 with --v2)")
 @click.option("--days", default=30, type=int)
 @click.option("--org-name", default="Horizon Commerce", help="organization label in header eyebrow")
-@click.option("--product-name", default="Creative & Competitive Intelligence",
-              help="product/page title shown as h1")
+@click.option("--product-name", default=None,
+              help='product/page title; default "Creative & Competitive Intelligence" '
+                   '(v1) or "Intelligence" (v2 — brands as "Horizon Commerce Intelligence")')
+@click.option("--v2", "use_v2", is_flag=True,
+              help="render the redesigned dark-mode dashboard (with light-mode toggle); v1 stays the default")
+@click.option("--only", "only", multiple=True, metavar="BRAND_ID",
+              help="restrict the dashboard to these competitor ids (repeatable). "
+                   "Mutually combinable with --exclude.")
+@click.option("--exclude", "exclude", multiple=True, metavar="BRAND_ID",
+              help="drop these competitor ids from the dashboard (repeatable), "
+                   "e.g. --exclude revlon to keep a control brand out of the main set.")
 @click.option("--open-after", is_flag=True, help="open the dashboard in your default browser after build")
-def dashboard(out: str | None, days: int, org_name: str, product_name: str, open_after: bool) -> None:
+def dashboard(out: str | None, days: int, org_name: str, product_name: str | None,
+              use_v2: bool, only: tuple[str, ...], exclude: tuple[str, ...],
+              open_after: bool) -> None:
     """Render a static HTML dashboard from the current DB + creatives."""
     from datetime import datetime as _dt
     if out is None:
-        out = f"reports/{_dt.utcnow().date().isoformat()}/dashboard"
-    result = build_dashboard(out, days=days, org_name=org_name, product_name=product_name)
+        out = f"reports/{_dt.utcnow().date().isoformat()}/{'dashboard-v2' if use_v2 else 'dashboard'}"
+    if product_name is None:
+        product_name = DEFAULT_PRODUCT_V2 if use_v2 else DEFAULT_PRODUCT
+
+    # Resolve --only / --exclude into a concrete allow-list of competitor ids.
+    # None = all brands (default). --only sets the base set; --exclude removes
+    # from it (or from all brands when --only is absent).
+    brand_ids: set[str] | None = None
+    if only or exclude:
+        with connect() as conn:
+            all_ids = {r["id"] for r in conn.execute("SELECT id FROM competitors")}
+        unknown = (set(only) | set(exclude)) - all_ids
+        if unknown:
+            console.print(f"[yellow]warning:[/yellow] unknown competitor id(s): "
+                          f"{', '.join(sorted(unknown))}. Known: {', '.join(sorted(all_ids))}")
+        brand_ids = (set(only) & all_ids) if only else set(all_ids)
+        brand_ids -= set(exclude)
+        if not brand_ids:
+            console.print("[red]no brands left after --only/--exclude — nothing to render[/red]")
+            raise SystemExit(1)
+
+    builder = build_dashboard_v2 if use_v2 else build_dashboard
+    result = builder(out, days=days, org_name=org_name, product_name=product_name,
+                     brand_ids=brand_ids)
     console.print(f"[green]wrote[/green] {result['path']}  "
                   f"({result['n_brands']} brands · {result['n_analyzed']} analyzed creatives · "
                   f"{result['size_bytes']//1024} KB)")

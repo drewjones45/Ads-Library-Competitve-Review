@@ -5,7 +5,7 @@ Design system: dark backdrop + chartreuse accent, magazine-grade hero typography
 eyebrow-labeled sections, inline brand/data highlighting, SVG charts + curated
 reference board with base64 thumbnails.
 
-Per the adology-brand-marketing-mode skill: captions are hand-written strategic
+Per the brand-marketing-mode methodology: captions are hand-written strategic
 interpretations, not data summaries.
 
 Usage:
@@ -42,7 +42,7 @@ from strategy_visual_data import DEPLOYMENTS
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from intel.storage import popularity_score  # noqa: E402
 
-# Shared accent — Adology design system, consistent across deployments
+# Shared accent — house design system, consistent across deployments
 ACCENT = "#d4f057"   # chartreuse
 ACCENT_DIM = "#9ab33d"
 BG = "#0a0a0a"
@@ -517,6 +517,186 @@ def reference_board(conn, d):
 
 
 # =============== site content deep-dive ===============
+
+def landing_page_insights(conn, d):
+    """Per-brand 'where ads send traffic' section — stacked horizontal SVG bar
+    + top-5 sections drilldown + flagged-section callouts. Reuses the shared
+    classifier from intel.analysis.landing so the strategy report and the
+    dashboard always agree."""
+    from intel.analysis.landing import (
+        SECTION_CALLOUTS,
+        SECTION_LABELS,
+        SECTION_PALETTE,
+        aggregate_landing_pages,
+        brand_host_for,
+        classify_url,
+        detect_brand_host,
+        parse_url,
+    )
+    from intel.config import get_competitor
+
+    labels = d["brand_labels"]
+    brand_order = d["brand_order"]
+    subject = d["subject_brand"]
+
+    # Per-brand aggregation — same shape as dashboard._collect builds.
+    landing_by_brand: dict = {}
+    for cid in brand_order:
+        if cid not in labels:
+            continue
+        comp = get_competitor(cid)
+        brand_host = brand_host_for(comp) if comp else ""
+        max_rank_row = conn.execute(
+            "SELECT MAX(serp_position_rank) FROM ads WHERE competitor_id=? "
+            "AND serp_position_rank IS NOT NULL", (cid,),
+        ).fetchone()
+        max_rank = (max_rank_row[0] or 0) if max_rank_row else 0
+        rows = conn.execute(
+            "SELECT id, ad_archive_id, link_url, serp_position_rank, "
+            "start_date, last_seen, active FROM ads "
+            "WHERE competitor_id=? AND link_url IS NOT NULL", (cid,),
+        ).fetchall()
+        if not rows:
+            continue
+        # When the YAML competitor config isn't loaded for this deployment
+        # (e.g. INTEL_COMPETITORS_FILE points at a different brand-set), fall
+        # back to deriving the canonical brand host from the corpus itself.
+        if not brand_host:
+            brand_host = detect_brand_host([r["link_url"] for r in rows])
+        enriched = []
+        for r in rows:
+            parsed = parse_url(r["link_url"])
+            bucket = classify_url(parsed, brand_host)
+            score = popularity_score(
+                r["serp_position_rank"], r["start_date"], r["last_seen"],
+                r["active"] or 0, max_rank,
+            )
+            enriched.append({
+                "id": r["id"], "ad_archive_id": r["ad_archive_id"],
+                "link_url": r["link_url"], "section": bucket,
+                "popularity_score": score, **parsed,
+            })
+        agg = aggregate_landing_pages(enriched, brand_host)
+        if agg.get("by_section"):
+            landing_by_brand[cid] = agg
+
+    if not landing_by_brand:
+        return ""
+
+    def _render_callout(text: str) -> str:
+        # Convert `code` markdown spans (single backticks) → <code> tags;
+        # escape everything else. Markdown lib doesn't get to touch this
+        # because we render directly into HTML at the strategy-report layer.
+        parts = text.split("`")
+        out = ""
+        for i, p in enumerate(parts):
+            if i % 2 == 1:
+                out += f'<code>{_html.escape(p)}</code>'
+            else:
+                out += _html.escape(p)
+        return out
+
+    cards = []
+    for cid in brand_order:
+        if cid not in landing_by_brand:
+            continue
+        payload = landing_by_brand[cid]
+        by_section = payload["by_section"]
+        is_subject = (cid == subject)
+
+        # Stacked horizontal SVG bar — ad_share only (the strategy report is a
+        # static editorial doc, no toggle). Same palette as the dashboard.
+        chart_w = 560
+        bar_h = 22
+        rects = []
+        x = 0.0
+        for s in by_section:
+            sec = s["section"]
+            color = SECTION_PALETTE.get(sec, "#9a9a9a")
+            w = s["ad_share"] * chart_w
+            label_text = SECTION_LABELS.get(sec, sec)
+            rects.append(
+                f'<rect x="{x:.1f}" y="0" width="{w:.1f}" height="{bar_h}" fill="{color}">'
+                f'<title>{_html.escape(label_text)} — {s["ad_count"]} ads '
+                f'({s["ad_share"]:.0%} of links · {s["popularity_share"]:.0%} pop-weighted)</title>'
+                f'</rect>'
+            )
+            x += w
+        bar_svg = (
+            f'<svg class="lp-bar" viewBox="0 0 {chart_w} {bar_h}" '
+            f'preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" '
+            f'aria-label="landing-section breakdown for {_html.escape(labels[cid])}">'
+            f'{"".join(rects)}</svg>'
+        )
+
+        # Top-5 destinations table.
+        top_rows = []
+        for s in by_section[:5]:
+            sec = s["section"]
+            color = SECTION_PALETTE.get(sec, "#9a9a9a")
+            label_text = SECTION_LABELS.get(sec, sec)
+            top_url_html = "—"
+            if s.get("top_urls"):
+                cu = s["top_urls"][0].get("clean_url") or ""
+                if cu:
+                    top_url_html = f'<code>{_html.escape(cu)}</code>'
+            elif s.get("example_raw_urls"):
+                ex = s["example_raw_urls"][0][:90]
+                top_url_html = f'<code class="lp-raw">{_html.escape(ex)}</code>'
+            top_rows.append(
+                f'<tr>'
+                f'<td><span class="lp-swatch" style="background:{color}"></span>'
+                f'{_html.escape(label_text)}</td>'
+                f'<td class="num">{s["ad_count"]}</td>'
+                f'<td class="num">{s["ad_share"]:.0%}</td>'
+                f'<td class="num">{s["popularity_share"]:.0%}</td>'
+                f'<td class="lp-url">{top_url_html}</td>'
+                f'</tr>'
+            )
+
+        # Findings callouts for flagged buckets that actually have ads.
+        findings = []
+        for s in by_section:
+            sec = s["section"]
+            if sec in SECTION_CALLOUTS and s["ad_count"] > 0:
+                findings.append(
+                    f'<li><strong>{s["ad_count"]} ads</strong> in '
+                    f'<em>{_html.escape(SECTION_LABELS.get(sec, sec))}</em> — '
+                    f'{_render_callout(SECTION_CALLOUTS[sec])}</li>'
+                )
+        findings_html = (
+            f'<div class="lp-findings"><div class="lp-section-label">Flags worth raising</div>'
+            f'<ul>{"".join(findings)}</ul></div>'
+        ) if findings else ""
+
+        subject_class = ' lp-subject' if is_subject else ''
+        cards.append(f'''
+        <article class="lp-card{subject_class}">
+          <header class="lp-card-head">
+            <div class="lp-brand">{_html.escape(labels[cid])}</div>
+            <div class="lp-stats">{payload["with_link"]} of {payload["total_ads"]} ads · {payload["on_brand_share"]:.0%} on-brand</div>
+          </header>
+          {bar_svg}
+          <table class="lp-table">
+            <thead>
+              <tr><th>Section</th><th class="num">Ads</th>
+                  <th class="num">Share</th><th class="num">Pop. share</th>
+                  <th>Top destination</th></tr>
+            </thead>
+            <tbody>{"".join(top_rows)}</tbody>
+          </table>
+          {findings_html}
+        </article>''')
+
+    if not cards:
+        return ""
+    return f'''<section class="landing-pages-section">
+      <div class="eyebrow">Where the spend lands</div>
+      <h2 class="board-title">Where each brand's ads are sending buyers</h2>
+      <p class="lp-intro">Every ad in the corpus carries a destination URL. Bucketed by what that URL actually <em>is</em> — product browse, samples, quote/lead, where-to-buy locator, brand story — this is a snapshot of where the paid social spend points. Off-brand redirects (DoubleClick measurement hops, dealer-network subdomains, opaque short-links) are surfaced honestly, not normalized away; they obscure the "true" landing distribution for any brand running heavy tracking. Dynamic Creative templates that never resolved (<code>{{site_source_name}}</code>, <code>{{ad.id}}</code>) get their own flagged bucket: a campaign-ops bug worth raising with the agency, not noise to discard. <strong>Snapshot of where ads point, not a flow analysis</strong> — no conversion or bounce signal here.</p>
+      <div class="lp-grid">{"".join(cards)}</div>
+    </section>'''
+
 
 def site_content_section(conn, d):
     """Dedicated section: per-brand homepage site-content cards using
@@ -1516,6 +1696,144 @@ section.site-content-section .board-title {{
 .sc-limitations li {{ margin: 8px 0; }}
 .sc-limitations strong {{ color: var(--ink); font-weight: 600; }}
 
+/* ---- landing pages "where the spend lands" ---- */
+.landing-pages-section {{
+  margin: 64px 0 48px;
+}}
+.lp-intro {{
+  font-family: "Charter", Georgia, serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-dim);
+  max-width: 780px;
+  margin: 12px 0 28px;
+}}
+.lp-intro code {{
+  background: rgba(212, 240, 87, 0.08);
+  color: var(--accent);
+  font-size: 12px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}}
+.lp-intro strong {{
+  color: var(--ink); font-weight: 600;
+}}
+.lp-grid {{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}}
+.lp-card {{
+  background: {BG_CARD};
+  border: 1px solid {BG_CARD_BORDER};
+  border-radius: 6px;
+  padding: 22px 24px;
+}}
+.lp-card.lp-subject {{
+  border-color: {ACCENT};
+  box-shadow: 0 0 0 1px rgba(212, 240, 87, 0.2);
+}}
+.lp-card-head {{
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 16px; margin-bottom: 14px;
+}}
+.lp-card-head .lp-brand {{
+  font-family: Inter, sans-serif; font-weight: 700; font-size: 16px;
+  color: var(--ink); letter-spacing: 0.2px;
+}}
+.lp-card.lp-subject .lp-card-head .lp-brand {{ color: {ACCENT}; }}
+.lp-card-head .lp-stats {{
+  font-family: Inter, sans-serif; font-size: 12px;
+  color: var(--ink-muted); font-variant-numeric: tabular-nums;
+}}
+.lp-bar {{
+  width: 100%; height: 22px;
+  background: #1f1f1f; border-radius: 3px;
+  overflow: hidden; display: block;
+}}
+.lp-table {{
+  width: 100%; border-collapse: collapse;
+  margin-top: 14px;
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  color: var(--ink-dim);
+}}
+.lp-table th {{
+  text-align: left; padding: 6px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  border-bottom: 1px solid {BG_CARD_BORDER};
+}}
+.lp-table th.num {{ text-align: right; }}
+.lp-table td {{
+  padding: 8px;
+  border-bottom: 1px solid #1f1f1f;
+  vertical-align: top;
+}}
+.lp-table tr:last-child td {{ border-bottom: none; }}
+.lp-table td.num {{
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}}
+.lp-table td.lp-url code {{
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--accent);
+  font-size: 11.5px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  word-break: break-all;
+}}
+.lp-table td.lp-url code.lp-raw {{
+  color: #e08e00;
+  background: rgba(224, 142, 0, 0.06);
+}}
+.lp-swatch {{
+  display: inline-block;
+  width: 9px; height: 9px;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-right: 8px;
+}}
+.lp-findings {{
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: rgba(255, 100, 100, 0.04);
+  border-left: 3px solid rgba(255, 100, 100, 0.5);
+  border-radius: 0 4px 4px 0;
+}}
+.lp-findings .lp-section-label {{
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #e85b3a;
+  margin-bottom: 8px;
+}}
+.lp-findings ul {{
+  margin: 0; padding: 0 0 0 18px;
+  font-family: "Charter", Georgia, serif;
+  font-size: 13.5px;
+  color: var(--ink-dim);
+  line-height: 1.55;
+}}
+.lp-findings li {{ margin: 6px 0; }}
+.lp-findings strong {{ color: var(--ink); font-weight: 600; }}
+.lp-findings em {{ color: var(--ink); font-style: normal; font-weight: 500; }}
+.lp-findings code {{
+  background: rgba(212, 240, 87, 0.08);
+  color: var(--accent);
+  font-size: 12px;
+  padding: 0 5px;
+  border-radius: 2px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}}
+
 /* ---- methodology footer ---- */
 .brief > p:last-child > em {{
   display: block;
@@ -1577,6 +1895,7 @@ def render(deployment_key, md_text, brand_label, date):
         appeal = chart_appeal_split(conn, d)
         refboard = reference_board(conn, d)
         sitecontent = site_content_section(conn, d)
+        landing = landing_page_insights(conn, d)
         topcreatives = top_creatives_by_reach(conn, d)
     finally:
         conn.close()
@@ -1605,10 +1924,16 @@ def render(deployment_key, md_text, brand_label, date):
     # Apply inline highlighting (brand names + curated phrases)
     html_body = apply_inline_highlights(html_body, d["brand_labels"], d.get("highlight_phrases", []))
 
-    # Site Content Deep-Dive + Top served ads + Reference board before methodology footer
+    # Site Content Deep-Dive → Landing pages ("where the spend lands") →
+    # Top served ads → Reference board, before the methodology footer.
+    # The landing-pages section sits between site content and top creatives
+    # so the narrative reads: "what the brand says on its site → where ads
+    # point on that site → which creatives are doing the work".
     extras = ""
     if sitecontent:
         extras += sitecontent
+    if landing:
+        extras += landing
     if topcreatives:
         extras += topcreatives
     if refboard:

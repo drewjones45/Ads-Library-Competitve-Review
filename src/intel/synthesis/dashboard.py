@@ -17,7 +17,13 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-from ..config import DATA_DIR
+from ..analysis.landing import (
+    aggregate_landing_pages,
+    brand_host_for,
+    classify_url,
+    parse_url,
+)
+from ..config import DATA_DIR, get_competitor
 from ..storage import connect, popularity_score
 from .creative_readout import (
     _LIST_ATTRS,
@@ -105,14 +111,35 @@ def _meta_ad_url(ad_archive_id: str | None) -> str:
 
 # ----- data collection ------------------------------------------------------
 
-def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
-    """Pull every shape of data the dashboard needs in one pass."""
+def _collect(conn: sqlite3.Connection, *, days: int,
+             brand_ids: set[str] | None = None) -> dict[str, Any]:
+    """Pull every shape of data the dashboard needs in one pass.
+
+    brand_ids, when given, restricts the dashboard to that allow-list of
+    competitor ids — used to split a deployment into separate dashboards (e.g.
+    keep a control brand out of the main set and give it its own page). None
+    means every competitor in the db (the default, unchanged behavior).
+    """
     since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+
+    # Optional brand allow-list. Sorted for stable SQL params; applied to the
+    # competitors query plus every global (non-per-brand) pull below so the
+    # whole dashboard is scoped. Per-brand loops iterate `brands` and so are
+    # scoped automatically.
+    brand_filter = sorted(brand_ids) if brand_ids else None
 
     # Brand summary
     brands = []
+    brand_where = ""
+    brand_where_params: list = []
+    if brand_filter:
+        placeholders = ",".join("?" for _ in brand_filter)
+        brand_where = f" WHERE id IN ({placeholders})"
+        brand_where_params = list(brand_filter)
     for r in conn.execute(
-        "SELECT id, name, vertical, priority FROM competitors ORDER BY priority DESC, name"
+        f"SELECT id, name, vertical, priority FROM competitors{brand_where} "
+        "ORDER BY priority DESC, name",
+        brand_where_params,
     ).fetchall():
         cid = r["id"]
         ads_total = conn.execute("SELECT COUNT(*) c FROM ads WHERE competitor_id=?", (cid,)).fetchone()["c"]
@@ -162,6 +189,9 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
     #     unfiltered "Browse all creatives" gallery, where the Source filter
     #     chip lets the user toggle between contexts.
     all_recs = pull_analyzed_creatives()
+    if brand_filter:
+        keep = set(brand_filter)
+        all_recs = [r for r in all_recs if r.competitor_id in keep]
     ad_recs = [r for r in all_recs if (r.ad_id or 0) > 0]
 
     # Cross-set views: ad creatives only.
@@ -242,6 +272,54 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
             scored.append(d)
         scored.sort(key=lambda d: d["popularity_score"], reverse=True)
         top_ads[cid] = scored[:12]
+
+    # Landing-page distribution per brand — "where do this brand's ads send
+    # traffic?" Reuses popularity_score (rank × duration × active bonus) as the
+    # per-section weight so the "By popularity" toggle in the dashboard can hot-
+    # swap section widths against the unweighted ad-count view. The classifier
+    # buckets template_unfilled and off_brand_tracker count as findings, not
+    # noise — surface them so the campaign-ops bugs they represent stay visible.
+    # `ad_landing_by_id` is a side-table used a few blocks below to enrich
+    # creatives_index with utm/section fields per ad-linked creative.
+    landing_by_brand: dict[str, dict] = {}
+    ad_landing_by_id: dict[int, dict] = {}
+    for cid in [b["id"] for b in brands]:
+        comp = get_competitor(cid)
+        brand_host = brand_host_for(comp) if comp else ""
+        rows = conn.execute(
+            "SELECT a.id, a.ad_archive_id, a.link_url, a.serp_position_rank, "
+            "a.start_date, a.last_seen, a.active "
+            "FROM ads a WHERE a.competitor_id=? AND a.link_url IS NOT NULL",
+            (cid,),
+        ).fetchall()
+        max_rank_row = conn.execute(
+            "SELECT MAX(serp_position_rank) FROM ads WHERE competitor_id=? "
+            "AND serp_position_rank IS NOT NULL",
+            (cid,),
+        ).fetchone()
+        brand_max_rank = (max_rank_row[0] or 0) if max_rank_row else 0
+        enriched: list[dict] = []
+        for r in rows:
+            parsed = parse_url(r["link_url"])
+            bucket = classify_url(parsed, brand_host)
+            score = popularity_score(
+                r["serp_position_rank"], r["start_date"], r["last_seen"],
+                r["active"] or 0, brand_max_rank,
+            )
+            enriched.append({
+                "id": r["id"],
+                "ad_archive_id": r["ad_archive_id"],
+                "link_url": r["link_url"],
+                "section": bucket,
+                "popularity_score": score,
+                **parsed,
+            })
+            ad_landing_by_id[r["id"]] = {
+                "section": bucket,
+                "utm": parsed["utm"],
+                "clean_url": parsed["clean_url"],
+            }
+        landing_by_brand[cid] = aggregate_landing_pages(enriched, brand_host)
 
     # Brand-store data per brand: most recent landing screenshot + last 24 analyzed
     # brand-store image creatives. Empty dict for brands without an amazon store.
@@ -404,6 +482,8 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
         if a.get("category_nav_visible"):       layout_flags.append("category_nav")
 
         vmeta = a.get("video_meta") or {}
+        landing_info = ad_landing_by_id.get(rec.ad_id or 0) or {}
+        utm_info = landing_info.get("utm") or {}
         creatives_index.append({
             "id": rec.ad_id,
             "comp": rec.competitor_id,
@@ -413,6 +493,12 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
             "assetType": rec.asset_type or "image",
             "videoDurationSec": vmeta.get("duration_sec"),
             "metaAdUrl": _meta_ad_url(rec.ad_archive_id),
+            "landingSection": landing_info.get("section"),
+            "landingCleanUrl": landing_info.get("clean_url"),
+            "utmSource": utm_info.get("utm_source"),
+            "utmMedium": utm_info.get("utm_medium"),
+            "utmCampaign": utm_info.get("utm_campaign"),
+            "utmContent": utm_info.get("utm_content"),
             "firstSeen": rec.first_seen,
             "summary": a.get("summary_one_line"),
             "photo": a.get("photography_style"),
@@ -445,11 +531,15 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
     # Wider ad index (for delta view) — past 60 days, lightweight columns only.
     wide_since = (datetime.now(timezone.utc) - timedelta(days=60)).isoformat()
     ads_index = []
-    for r in conn.execute(
-        "SELECT competitor_id, ad_archive_id, first_seen, body_text, cta_type, link_url "
-        "FROM ads WHERE first_seen >= ? ORDER BY first_seen DESC LIMIT 2000",
-        (wide_since,),
-    ).fetchall():
+    ads_q = ("SELECT competitor_id, ad_archive_id, first_seen, body_text, cta_type, link_url "
+             "FROM ads WHERE first_seen >= ?")
+    ads_params: list = [wide_since]
+    if brand_filter:
+        placeholders = ",".join("?" for _ in brand_filter)
+        ads_q += f" AND competitor_id IN ({placeholders})"
+        ads_params += list(brand_filter)
+    ads_q += " ORDER BY first_seen DESC LIMIT 2000"
+    for r in conn.execute(ads_q, ads_params).fetchall():
         ads_index.append({
             "comp": r["competitor_id"],
             "adId": r["ad_archive_id"],
@@ -515,6 +605,7 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
         "whitespace": whitespace,
         "recent_ads": recent_ads,
         "top_ads": top_ads,
+        "landing_by_brand": landing_by_brand,
         "brand_store_by_brand": brand_store_by_brand,
         "homepage_by_brand": homepage_by_brand,
         "latest_briefing": dict(latest_briefing) if latest_briefing else None,
@@ -646,6 +737,48 @@ tr.set-row td { background: #1f2c4a !important; color: white; font-weight: 600; 
 .ws-brand { font-family: ui-monospace,Menlo,Consolas,monospace; font-weight: 600;
             font-size: 13px; margin-bottom: 4px; }
 .ws-item { font-size: 12px; margin-left: 12px; }
+
+/* Landing pages — "where ads send traffic" */
+.lp-toolbar { display: flex; align-items: center; gap: 12px; margin: 4px 0 14px;
+              font-size: 12px; color: #666; }
+.lp-toolbar .lp-mode { display: inline-flex; gap: 0; border: 1px solid #cfd5dd;
+              border-radius: 6px; overflow: hidden; }
+.lp-toolbar .lp-mode label { padding: 5px 11px; cursor: pointer;
+              background: #f7f8fa; color: #444; transition: background .12s ease; }
+.lp-toolbar .lp-mode label:hover { background: #eef0f3; }
+.lp-toolbar .lp-mode label:has(input:checked) { background: #1f2c4a; color: #fff; }
+.lp-toolbar .lp-mode input { position: absolute; opacity: 0; pointer-events: none; }
+.lp-brand-card { border: 1px solid #e6e8ec; border-radius: 6px; padding: 14px 16px;
+              margin: 10px 0 16px; background: #fff; }
+.lp-brand-card.empty { background: #fafafa; color: #888; font-style: italic; }
+.lp-brand-head { display: flex; align-items: baseline; justify-content: space-between;
+              gap: 14px; margin-bottom: 10px; }
+.lp-brand-head .lp-brand { font-weight: 600; font-size: 14px; color: #1c1c1c; }
+.lp-brand-head .lp-stats { color: #777; font-size: 12px; font-variant-numeric: tabular-nums; }
+.lp-bar { width: 100%; height: 22px; background: #f0f1f4; border-radius: 4px;
+              overflow: hidden; display: block; }
+.lp-bar rect { transition: width .25s ease, x .25s ease; }
+.lp-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 8px;
+              font-size: 11px; color: #555; }
+.lp-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.lp-legend-swatch { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.lp-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12px; }
+.lp-table th { text-align: left; color: #666; font-weight: 600; font-size: 11px;
+              text-transform: uppercase; letter-spacing: 0.4px; padding: 5px 6px;
+              border-bottom: 1px solid #e6e8ec; }
+.lp-table th.num { text-align: right; }
+.lp-table td { padding: 6px; border-bottom: 1px solid #f1f2f4; vertical-align: top; }
+.lp-table td.num { text-align: right; font-variant-numeric: tabular-nums; color: #444; }
+.lp-table td.url { font-family: ui-monospace,Menlo,Consolas,monospace; font-size: 11px;
+              color: #2a5fb0; word-break: break-all; max-width: 320px; }
+.lp-table tr.flagged td.section { color: #a93226; font-weight: 600; }
+.lp-section-pill { display: inline-block; width: 8px; height: 8px; border-radius: 2px;
+              vertical-align: middle; margin-right: 6px; }
+.lp-findings { margin-top: 10px; padding: 9px 12px; background: #fff8e6;
+              border-left: 3px solid #e08e00; border-radius: 0 4px 4px 0;
+              font-size: 12px; color: #5a3e00; }
+.lp-findings.danger { background: #fdf4f4; border-left-color: #d9534f; color: #6a1f1c; }
+.lp-findings code { background: rgba(0,0,0,0.05); padding: 0 4px; border-radius: 2px; }
 
 /* Ads list */
 .ad { display: grid; grid-template-columns: 90px 1fr 110px; gap: 12px; padding: 10px 0;
@@ -857,6 +990,9 @@ const filterState = {
   productInUse: new Set(), productGrouping: new Set(),
   certifications: new Set(), awards: new Set(), layoutFlags: new Set(),
   assetType: new Set(),
+  // Landing-page filters (parsed from ad link_url at collect time):
+  landingSection: new Set(), utmCampaign: new Set(),
+  utmSource: new Set(), utmMedium: new Set(),
 };
 
 function matchesFilters(c) {
@@ -954,6 +1090,13 @@ function buildFilterDropdowns() {
     {key: 'valueProps', label: 'Value props', getter: c => c.valueProps || []},
     {key: 'certifications', label: 'Certifications', getter: c => c.certifications || []},
     {key: 'awards', label: 'Awards / rankings', getter: c => c.awards || []},
+    // Landing-page filters — parsed from each ad's link_url at collect time.
+    // utmCampaign strings can be huge ("trex | +25mi | meta | ..."), so the
+    // dropdown label truncates to 40 chars; the underlying value stays full.
+    {key: 'landingSection', label: 'Landing section', getter: c => c.landingSection ? [c.landingSection] : []},
+    {key: 'utmCampaign', label: 'UTM campaign', getter: c => c.utmCampaign ? [c.utmCampaign] : []},
+    {key: 'utmSource', label: 'UTM source', getter: c => c.utmSource ? [c.utmSource] : []},
+    {key: 'utmMedium', label: 'UTM medium', getter: c => c.utmMedium ? [c.utmMedium] : []},
   ];
 
   const populated = groups.map(g => {
@@ -974,13 +1117,18 @@ function buildFilterDropdowns() {
           <span class="muted" style="font-size:11px">${g.items.length} option(s)</span>
           <button type="button" class="group-clear" disabled>Clear</button>
         </div>
-        ${g.items.map(([v, n]) => `
-          <label>
+        ${g.items.map(([v, n]) => {
+          // Truncate display label for noisy fields like utmCampaign — the
+          // underlying data-val keeps the full string for matching.
+          const display = (g.key === 'utmCampaign' && String(v).length > 40)
+            ? String(v).slice(0, 37) + '…' : String(v);
+          return `
+          <label title="${escapeHTML(v)}">
             <input type="checkbox" data-grp="${g.key}" data-val="${escapeHTML(v)}">
-            <span class="name">${escapeHTML(v)}</span>
+            <span class="name">${escapeHTML(display)}</span>
             <span class="count">${n}</span>
-          </label>
-        `).join('')}
+          </label>`;
+        }).join('')}
       </div>
     </div>
   `).join('');
@@ -1141,6 +1289,32 @@ document.querySelectorAll('input[name="bvb-mode"]').forEach(r =>
 );
 renderBvb();
 
+// ---- LANDING-PAGES: count/popularity toggle ----
+// Each <rect> in the lp-bar SVG carries data-count-x / -w and data-pop-x / -w
+// attributes populated server-side; the toggle just swaps which pair is read.
+// Same for table-row share cells — data-count-share / -pop-share both present,
+// the active one is shown.
+function applyLandingPagesMode(mode) {
+  const useCount = (mode !== 'popularity');
+  document.querySelectorAll('.lp-bar rect').forEach(rect => {
+    const x = useCount ? rect.dataset.countX : rect.dataset.popX;
+    const w = useCount ? rect.dataset.countW : rect.dataset.popW;
+    if (x !== undefined) rect.setAttribute('x', x);
+    if (w !== undefined) rect.setAttribute('width', w);
+  });
+  document.querySelectorAll('.lp-table tbody tr').forEach(tr => {
+    const cell = tr.querySelector('td[data-count-share]');
+    if (!cell) return;
+    const s = parseFloat(useCount ? cell.dataset.countShare : cell.dataset.popShare) || 0;
+    cell.textContent = Math.round(s * 100) + '%';
+  });
+  const hdr = document.querySelector('.lp-share-header');
+  if (hdr) hdr.textContent = useCount ? 'Share' : 'Pop. share';
+}
+document.querySelectorAll('input[name="lp-mode"]').forEach(r =>
+  r.addEventListener('change', e => applyLandingPagesMode(e.target.value))
+);
+
 // ---- DELTA VIEW: new since X ----
 function renderDelta() {
   const dateInput = document.getElementById('delta-date');
@@ -1299,6 +1473,166 @@ def _render_distinctiveness(data: dict) -> str:
     if not rows:
         return '<p class="muted">No strong distinctiveness signals yet — need more analyzed creatives.</p>'
     return "".join(rows)
+
+
+def _render_landing_pages_section(data: dict) -> str:
+    """Per-brand 'where ads send traffic' breakdown — stacked horizontal bar +
+    drill-down table. The Count/Popularity toggle hot-swaps section widths in
+    JS using data attributes set on each <rect>. Server-side default is Count
+    mode (visible widths reflect ad_share). See aggregate_landing_pages for the
+    upstream shape; SECTION_PALETTE / SECTION_LABELS / SECTION_CALLOUTS for the
+    display tables."""
+    from ..analysis.landing import SECTION_CALLOUTS, SECTION_LABELS, SECTION_PALETTE
+    landing_by_brand = data.get("landing_by_brand") or {}
+    if not landing_by_brand:
+        return '<p class="muted">No ad link_urls collected yet — run ingest.</p>'
+
+    # Toolbar: count/popularity radios. Legend is per-brand (sections vary),
+    # but the toolbar lives at the section level.
+    toolbar = """
+    <div class="lp-toolbar">
+      <span>Weight bars by</span>
+      <span class="lp-mode">
+        <label><input type="radio" name="lp-mode" value="count" checked>
+          <span>Ad count</span></label>
+        <label><input type="radio" name="lp-mode" value="popularity">
+          <span>Popularity-weighted</span></label>
+      </span>
+      <span class="muted">Popularity = SERP rank × duration × active bonus per ad. Same intra-brand caveats as other ranked views.</span>
+    </div>
+    """
+
+    blocks = [toolbar]
+    for brand in data["brands"]:
+        cid = brand["id"]
+        payload = landing_by_brand.get(cid) or {}
+        total = payload.get("total_ads", 0)
+        with_link = payload.get("with_link", 0)
+        on_brand_share = payload.get("on_brand_share", 0.0)
+        by_section = payload.get("by_section") or []
+
+        head = (
+            f'<div class="lp-brand-head">'
+            f'<div class="lp-brand">{_esc(brand["name"])}</div>'
+            f'<div class="lp-stats">{with_link} of {total} ads · '
+            f'{on_brand_share:.0%} on-brand'
+            f'</div></div>'
+        )
+
+        if not by_section:
+            blocks.append(
+                f'<div class="lp-brand-card empty">{head}'
+                f'<div class="muted">no link_urls captured in this window — '
+                f'either no paid ads or a scraper coverage gap.</div></div>'
+            )
+            continue
+
+        # SVG stacked horizontal bar. Both shares baked into data attrs so the
+        # JS toggle can swap widths without re-rendering. Initial x/width use
+        # ad_share (count mode).
+        viewbox_w = 1000
+        rects = []
+        legend_items = []
+        x_count = 0.0
+        x_pop = 0.0
+        for s in by_section:
+            sec = s["section"]
+            color = SECTION_PALETTE.get(sec, "#9a9a9a")
+            label = SECTION_LABELS.get(sec, sec)
+            count_w = s["ad_share"] * viewbox_w
+            pop_w = s["popularity_share"] * viewbox_w
+            rects.append(
+                f'<rect data-section="{_esc(sec)}" '
+                f'data-count-x="{x_count:.2f}" data-count-w="{count_w:.2f}" '
+                f'data-pop-x="{x_pop:.2f}" data-pop-w="{pop_w:.2f}" '
+                f'x="{x_count:.2f}" y="0" width="{count_w:.2f}" height="22" '
+                f'fill="{color}">'
+                f'<title>{_esc(label)} — {s["ad_count"]} ads '
+                f'({s["ad_share"]:.0%} of links · {s["popularity_share"]:.0%} pop-weighted)</title>'
+                f'</rect>'
+            )
+            legend_items.append(
+                f'<span class="lp-legend-item">'
+                f'<span class="lp-legend-swatch" style="background:{color}"></span>'
+                f'{_esc(label)}</span>'
+            )
+            x_count += count_w
+            x_pop += pop_w
+        bar_svg = (
+            f'<svg class="lp-bar" viewBox="0 0 {viewbox_w} 22" '
+            f'preserveAspectRatio="none" aria-label="landing section breakdown">'
+            f'{"".join(rects)}</svg>'
+        )
+        legend_html = f'<div class="lp-legend">{"".join(legend_items)}</div>'
+
+        # Drill-down table — one row per section, matching bar order. Show the
+        # top destination URL for each section.
+        rows_html = []
+        for s in by_section:
+            sec = s["section"]
+            color = SECTION_PALETTE.get(sec, "#9a9a9a")
+            label = SECTION_LABELS.get(sec, sec)
+            flagged_cls = " flagged" if sec in ("template_unfilled", "off_brand_tracker", "off_brand_short", "off_brand_other") else ""
+            top_urls = s.get("top_urls") or []
+            top_url_html = ""
+            if top_urls:
+                tu = top_urls[0]
+                href = _esc(tu.get("clean_url") or "")
+                top_url_html = f'<a href="{href}" target="_blank" rel="noopener">{href}</a>'
+            elif s.get("example_raw_urls"):
+                # Template-unfilled URLs have no clean_url — show the raw form.
+                ex = _esc(s["example_raw_urls"][0])[:140]
+                top_url_html = f'<span class="muted">{ex}</span>'
+            rows_html.append(
+                f'<tr class="lp-row{flagged_cls}" data-section="{_esc(sec)}">'
+                f'<td class="section">'
+                f'<span class="lp-section-pill" style="background:{color}"></span>'
+                f'{_esc(label)}</td>'
+                f'<td class="num">{s["ad_count"]}</td>'
+                f'<td class="num" data-count-share="{s["ad_share"]:.4f}" '
+                f'data-pop-share="{s["popularity_share"]:.4f}">'
+                f'{s["ad_share"]:.0%}</td>'
+                f'<td class="url">{top_url_html}</td>'
+                f'</tr>'
+            )
+        table_html = f"""
+        <table class="lp-table">
+          <thead>
+            <tr><th>Section</th><th class="num">Ads</th>
+                <th class="num lp-share-header">Share</th>
+                <th>Top destination</th></tr>
+          </thead>
+          <tbody>{''.join(rows_html)}</tbody>
+        </table>
+        """
+
+        # Flagged findings callouts — one per flagged section with ads.
+        findings_html = ""
+        for s in by_section:
+            sec = s["section"]
+            if sec in SECTION_CALLOUTS and s["ad_count"] > 0:
+                cls = " danger" if sec.startswith("off_brand") else ""
+                callout = SECTION_CALLOUTS[sec]
+                # Translate `code` markdown into <code> tags.
+                callout_html = callout.replace("`", "@@CODE@@")
+                parts = callout_html.split("@@CODE@@")
+                rendered = parts[0]
+                for i, part in enumerate(parts[1:], start=1):
+                    rendered += (f"<code>{_esc(part)}</code>" if i % 2 == 1 else _esc(part))
+                findings_html += (
+                    f'<div class="lp-findings{cls}">'
+                    f'<strong>{s["ad_count"]} ads</strong> in '
+                    f'<em>{_esc(SECTION_LABELS.get(sec, sec))}</em> — {rendered}'
+                    f'</div>'
+                )
+
+        blocks.append(
+            f'<div class="lp-brand-card" data-brand="{_esc(cid)}">'
+            f'{head}{bar_svg}{legend_html}{table_html}{findings_html}'
+            f'</div>'
+        )
+
+    return "".join(blocks)
 
 
 def _render_whitespace(data: dict) -> str:
@@ -1928,12 +2262,16 @@ def build_dashboard(
     days: int = 30,
     org_name: str = DEFAULT_ORG,
     product_name: str = DEFAULT_PRODUCT,
+    brand_ids: set[str] | None = None,
 ) -> dict[str, Any]:
-    """Generate the dashboard at out_dir/index.html. Returns summary metadata."""
+    """Generate the dashboard at out_dir/index.html. Returns summary metadata.
+
+    brand_ids restricts the dashboard to an allow-list of competitor ids (see
+    _collect); None renders every competitor."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
-        data = _collect(conn, days=days)
+        data = _collect(conn, days=days, brand_ids=brand_ids)
 
     sections_html = []
 
@@ -2024,6 +2362,15 @@ def build_dashboard(
     </section>
     """)
 
+    # Landing pages — "where ads send traffic"
+    sections_html.append(f"""
+    <section id="landing-pages">
+      <h2>Where ads send traffic</h2>
+      <p class="muted">Per-brand breakdown of ad <code>link_url</code> destinations. Sections in <span style="color:#a93226">red</span> / <span style="color:#e08e00">orange</span> are flagged findings, not traffic worth applauding — measurement redirects (DoubleClick), Dynamic Creative templates that never resolved, or opaque short-links.</p>
+      {_render_landing_pages_section(data)}
+    </section>
+    """)
+
     # ---- NEW: filterable all-brand gallery ----
     sections_html.append("""
     <section id="browse">
@@ -2068,6 +2415,7 @@ def build_dashboard(
             ('Brand vs Brand', '#bvb'),
             ('Distinctiveness', '#distinctiveness'),
             ('Whitespace', '#whitespace'),
+            ('Where ads send traffic', '#landing-pages'),
             ('Browse all creatives', '#browse'),
         ]),
         ('Brands', [(brand["name"], f"#brand-{brand['id']}") for brand in data["brands"]]),

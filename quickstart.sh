@@ -172,8 +172,11 @@ fi
 echo
 
 # ---- 8. HTML dashboard ----
+# Bob's competitive set excludes the Revlon control brand; Revlon gets its own
+# dashboard under reports/revlon/<date>/ so it never muddies the furniture set.
 bold "[8/8] HTML dashboard"; rule
-.venv/bin/intel dashboard --out "$REPORTS/dashboard" --days "$DAYS"
+.venv/bin/intel dashboard --out "$REPORTS/dashboard" --days "$DAYS" --exclude revlon
+.venv/bin/intel dashboard --out "reports/revlon/${DATE}/dashboard" --days "$DAYS" --only revlon
 echo
 
 # ---- summary ----
@@ -182,7 +185,8 @@ echo "outputs:"
 find "$REPORTS" -maxdepth 2 -type f | sort | sed 's/^/  /'
 echo
 green "view a report:"
-echo "    open $REPORTS/dashboard/index.html        ← single-page HTML dashboard"
+echo "    open $REPORTS/dashboard/index.html        ← single-page HTML dashboard (excl. Revlon)"
+echo "    open reports/revlon/${DATE}/dashboard/index.html  ← Revlon (control) — separate set"
 echo "    open $REPORTS/creative_comparison.md"
 echo "    open $REPORTS/by-brand/bobs.md"
 echo "    open $REPORTS/briefing.md"

@@ -7,7 +7,7 @@ For each deployment, define:
   - a strategic caption (written here, NOT pulled from the ad's adDescription)
   - a positioning quadrant (axis labels + per-brand x/y coordinates 0-1)
 
-Per the adology-brand-marketing-mode skill: captions should explain WHY each
+Per the brand-marketing-mode methodology: captions should explain WHY each
 reference is here strategically, not summarize what the ad already says.
 
 Charts pull live aggregate data from the deployment's db; reference-board
@@ -31,7 +31,7 @@ DEPLOYMENTS = {
         },
         "brand_order": ["bobs", "raymour_flanigan", "wayfair", "ashley", "american_freight",
                          "rooms_to_go", "value_city", "revlon"],
-        "header_eyebrow": "Adology · Brand Marketing Mode",
+        "header_eyebrow": "Horizon Commerce · Brand Marketing Mode",
         "header_meta": "Strategy Brief · Confidential",
         "hero": {
             "lead_in": "The opportunity is",
@@ -122,7 +122,7 @@ DEPLOYMENTS = {
             "deckorators": "Deckorators",
         },
         "brand_order": ["trex", "timbertech", "deckorators", "fiberon"],
-        "header_eyebrow": "Adology · Brand Marketing Mode",
+        "header_eyebrow": "Horizon Commerce · Brand Marketing Mode",
         "header_meta": "Strategy Brief · Confidential",
         "hero": {
             "lead_in": "The opportunity is",

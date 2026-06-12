@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Horizon Commerce Intelligence — 2026-06-12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+(function () {
+  var t = 'dark';
+  try {
+    var s = localStorage.getItem('intelDashTheme');
+    if (s === 'light' || s === 'dark') t = s;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
+<style>
+/* ===== THEME TOKENS ===== */
+:root {
+  --radius-card: 10px; --radius-ctl: 8px; --radius-chip: 6px; --radius-pill: 999px;
+  --topbar-h: 56px; --sidebar-w: 232px;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, Menlo, Consolas, monospace;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-page: #0a0e17;
+  --bg-card: #111a2b;
+  --bg-elev: #18223a;
+  --bg-inset: #0d1422;
+  --border-1: #1f2a40;
+  --border-2: #2d3c5e;
+  --text-1: #e9eef9;
+  --text-2: #9aa8c7;
+  --text-3: #627192;
+  --accent: #548af7;
+  --accent-strong: #2f6bdf;
+  --accent-soft: rgba(84,138,247,0.14);
+  --accent-contrast: #ffffff;
+  --pos: #30c184;  --pos-soft: rgba(48,193,132,0.13);
+  --neg: #e5484d;  --neg-soft: rgba(229,72,77,0.13);
+  --warn: #f5a623; --warn-soft: rgba(245,166,35,0.12);
+  --amazon: #ffa033;   --amazon-soft: rgba(255,160,51,0.10);
+  --homepage: #34c97b; --homepage-soft: rgba(52,201,123,0.10);
+  --heat-lo: #101827; --heat-hi: #3f74e0; --heat-hi-text: #ffffff;
+  --chart-bar: #4d76c9; --chart-line: #9db9f0;
+  --pri-high: #e5484d; --pri-med: #f5a623; --pri-low: #627192;
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-pop: 0 8px 24px rgba(0,0,0,0.55);
+  --scrim: rgba(2,6,16,0.88);
+  --topbar-bg: rgba(10,14,23,0.92);
+  --sec-homepage: #8b97a8;
+  --sec-product-browse: #46b369;
+  --sec-product-detail: #2f9e57;
+  --sec-samples: #cf9050;
+  --sec-quote-lead: #bd7a40;
+  --sec-where-to-buy: #548af7;
+  --sec-inspiration-content: #9d7bd8;
+  --sec-brand-story: #b388d9;
+  --sec-template-unfilled: #f5a623;
+  --sec-off-brand-tracker: #f06a65;
+  --sec-off-brand-short: #e25549;
+  --sec-off-brand-other: #c94436;
+  --sec-unknown: #7d8794;
+}
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg-page: #f4f6fb;
+  --bg-card: #ffffff;
+  --bg-elev: #eef2f9;
+  --bg-inset: #f7f9fd;
+  --border-1: #e2e8f2;
+  --border-2: #c6d2e6;
+  --text-1: #18233a;
+  --text-2: #4f5f7e;
+  --text-3: #8290ab;
+  --accent: #2f6bdf;
+  --accent-strong: #2456b8;
+  --accent-soft: rgba(47,107,223,0.10);
+  --accent-contrast: #ffffff;
+  --pos: #178a50;  --pos-soft: rgba(23,138,80,0.10);
+  --neg: #d4333f;  --neg-soft: rgba(212,51,63,0.10);
+  --warn: #b96e00; --warn-soft: rgba(224,142,0,0.12);
+  --amazon: #e88a00;   --amazon-soft: rgba(232,138,0,0.10);
+  --homepage: #2da44e; --homepage-soft: rgba(45,164,78,0.10);
+  --heat-lo: #eef1f7; --heat-hi: #2a5fb0; --heat-hi-text: #ffffff;
+  --chart-bar: #3d6cc4; --chart-line: #6f97e8;
+  --pri-high: #d9534f; --pri-med: #f0ad4e; --pri-low: #8290ab;
+  --shadow-1: 0 1px 2px rgba(16,24,40,0.06);
+  --shadow-pop: 0 8px 24px rgba(16,24,40,0.14);
+  --scrim: rgba(15,23,42,0.80);
+  --topbar-bg: rgba(244,246,251,0.92);
+  --sec-homepage: #6c757d;
+  --sec-product-browse: #2a6c3a;
+  --sec-product-detail: #1e7e34;
+  --sec-samples: #7a4a1c;
+  --sec-quote-lead: #a06030;
+  --sec-where-to-buy: #2a5fb0;
+  --sec-inspiration-content: #5e3a8a;
+  --sec-brand-story: #854a99;
+  --sec-template-unfilled: #e08e00;
+  --sec-off-brand-tracker: #d9534f;
+  --sec-off-brand-short: #c0392b;
+  --sec-off-brand-other: #a93226;
+  --sec-unknown: #9a9a9a;
+}
+/* ===== END THEME TOKENS ===== */
+
+* { box-sizing: border-box; }
+body { font: 14px/1.5 var(--font-ui); margin: 0; color: var(--text-1);
+       background: var(--bg-page); -webkit-font-smoothing: antialiased;
+       accent-color: var(--accent); }
+code { font-family: var(--font-mono); }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Top app bar */
+.topbar { position: fixed; top: 0; left: 0; right: 0; height: var(--topbar-h); z-index: 60;
+          display: flex; align-items: center; gap: 18px; padding: 0 20px;
+          background: var(--topbar-bg); backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border-bottom: 1px solid var(--border-1); }
+.topbar-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.logo-mark { width: 28px; height: 28px; border-radius: 8px; flex: 0 0 auto;
+             background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+             display: flex; align-items: center; justify-content: center;
+             color: var(--accent-contrast); font-weight: 800; font-size: 13px; }
+.topbar-title { line-height: 1.2; min-width: 0; }
+.topbar-title .org { font-size: 13.5px; font-weight: 700; color: var(--text-1); white-space: nowrap; }
+.topbar-title .product { font-size: 10.5px; color: var(--text-3); white-space: nowrap;
+                         overflow: hidden; text-overflow: ellipsis; }
+.topbar-nav { position: absolute; left: 50%; transform: translateX(-50%);
+              display: flex; gap: 4px; background: var(--bg-inset);
+              border: 1px solid var(--border-1); border-radius: var(--radius-pill); padding: 3px; }
+.topbar-nav a { color: var(--text-2); text-decoration: none; font-size: 12.5px; font-weight: 600;
+                padding: 5px 14px; border-radius: var(--radius-pill); white-space: nowrap;
+                transition: color .15s ease, background .15s ease; }
+.topbar-nav a:hover { color: var(--text-1); }
+.topbar-nav a.active { background: var(--accent-soft); color: var(--accent); }
+.topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.topbar-meta { font-size: 11px; color: var(--text-3); white-space: nowrap; }
+#theme-toggle { background: var(--bg-inset); border: 1px solid var(--border-1);
+                border-radius: var(--radius-pill); width: 34px; height: 34px; flex: 0 0 auto;
+                display: flex; align-items: center; justify-content: center; cursor: pointer;
+                color: var(--text-2); transition: color .15s ease, border-color .15s ease; }
+#theme-toggle:hover { color: var(--text-1); border-color: var(--border-2); }
+#theme-toggle svg { width: 16px; height: 16px; display: block; }
+html[data-theme="dark"] #theme-toggle .icon-moon { display: none; }
+html[data-theme="light"] #theme-toggle .icon-sun { display: none; }
+
+/* Left sidebar */
+nav.sidebar { position: fixed; left: 0; top: var(--topbar-h); bottom: 0; width: var(--sidebar-w);
+              padding: 14px 12px 28px; overflow-y: auto; z-index: 40;
+              background: var(--bg-page); border-right: 1px solid var(--border-1); }
+nav.sidebar .nav-group { padding: 0 10px; font-size: 10px; letter-spacing: 1.3px;
+                         text-transform: uppercase; color: var(--text-3); font-weight: 700;
+                         margin: 18px 0 6px; }
+nav.sidebar a { display: block; color: var(--text-2); text-decoration: none; font-size: 13px;
+                padding: 6px 10px; border-radius: 7px; margin: 1px 0;
+                overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+                transition: color .12s ease, background .12s ease; }
+nav.sidebar a:hover { color: var(--text-1); background: var(--bg-elev); }
+nav.sidebar a.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+main { margin-left: var(--sidebar-w); padding: calc(var(--topbar-h) + 18px) 28px 90px;
+       max-width: 1340px; }
+section { margin: 26px 0; background: var(--bg-card); border: 1px solid var(--border-1);
+          border-radius: var(--radius-card); padding: 22px 26px; box-shadow: var(--shadow-1);
+          scroll-margin-top: calc(var(--topbar-h) + 14px); }
+section h2 { margin: 0 0 6px; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+section h2 .muted { font-weight: 400; font-size: 13px; }
+section > p.muted { margin: 0 0 16px; color: var(--text-2); font-size: 12.5px; }
+section h3 { margin: 24px 0 10px; font-size: 11px; text-transform: uppercase;
+             color: var(--text-3); letter-spacing: 1px; font-weight: 700; }
+.muted { color: var(--text-3); font-size: 12px; }
+[hidden] { display: none !important; }
+.flag-red { color: var(--neg); font-weight: 600; }
+.flag-orange { color: var(--warn); font-weight: 600; }
+
+/* KPI stat cards */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { background: var(--bg-elev); border: 1px solid var(--border-1);
+        border-radius: var(--radius-ctl); padding: 14px 16px; min-width: 0; }
+.stat .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+               color: var(--text-3); font-weight: 600; }
+.stat .value { font-size: 26px; font-weight: 700; color: var(--text-1); margin-top: 6px;
+               line-height: 1.15; font-variant-numeric: tabular-nums;
+               display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stat .value.sm { font-size: 14px; font-weight: 600; }
+.stat-chip { font-size: 11px; font-weight: 700; padding: 2px 7px;
+             border-radius: var(--radius-chip); letter-spacing: 0.3px; }
+.stat-chip.up { background: var(--pos-soft); color: var(--pos); }
+.stat-chip.neutral { background: var(--bg-inset); color: var(--text-3); }
+
+/* Brand cards */
+.brand-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.brand-card { background: var(--bg-elev); border: 1px solid var(--border-1);
+              border-radius: var(--radius-ctl); padding: 14px 16px;
+              transition: border-color .15s ease; }
+.brand-card:hover { border-color: var(--accent); }
+.brand-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.brand-card a { color: var(--accent); text-decoration: none; font-weight: 700; font-size: 14.5px; }
+.brand-card .vertical { font-size: 10px; color: var(--text-3); text-transform: uppercase;
+                        letter-spacing: 0.5px; white-space: nowrap; }
+.pri-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+           margin-right: 6px; vertical-align: 0; }
+.pri-dot.pri-high { background: var(--pri-high); }
+.pri-dot.pri-medium { background: var(--pri-med); }
+.pri-dot.pri-low { background: var(--pri-low); }
+.brand-card dl { display: grid; grid-template-columns: auto auto; gap: 4px 12px;
+                 margin: 12px 0 0; font-size: 12px; }
+.brand-card dt { color: var(--text-3); }
+.brand-card dd { margin: 0; font-weight: 600; color: var(--text-2); text-align: right;
+                 font-variant-numeric: tabular-nums; }
+
+/* Tables (heatmaps + shared chrome) */
+table { border-collapse: collapse; width: 100%; margin: 8px 0 18px; font-size: 12px; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border-1); }
+th { background: var(--bg-elev); color: var(--text-2); font-weight: 600; font-size: 10.5px;
+     text-transform: uppercase; letter-spacing: 0.7px; }
+th code { text-transform: none; letter-spacing: 0; font-size: 11px; }
+td.heat { text-align: center; font-variant-numeric: tabular-nums; color: var(--text-1);
+          background: var(--heat-lo);
+          background: color-mix(in srgb, var(--heat-hi) calc(var(--share, 0) * 1%), var(--heat-lo)); }
+td.heat.hi { color: var(--heat-hi-text); }
+td.brand-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-2);
+                 background: var(--bg-inset); }
+tr.set-row td { background: var(--bg-elev); color: var(--text-1); font-weight: 700;
+                border-top: 2px solid var(--border-2); }
+
+/* Distinctiveness */
+.distinct-row { display: grid; grid-template-columns: 130px 150px 1fr 90px; gap: 10px;
+                padding: 9px 12px; margin: 4px 0; border-radius: var(--radius-chip);
+                background: var(--bg-elev); font-size: 12px; align-items: center; }
+.distinct-row code { color: var(--text-1); }
+.delta { color: var(--accent); background: var(--accent-soft); padding: 2px 8px;
+         border-radius: var(--radius-pill); font-weight: 700; text-align: center;
+         font-variant-numeric: tabular-nums; }
+
+/* Creative gallery */
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;
+           margin-top: 12px; }
+.creative { border: 1px solid var(--border-1); border-radius: var(--radius-ctl); overflow: hidden;
+            background: var(--bg-elev); display: flex; flex-direction: column;
+            transition: border-color .15s ease; }
+.creative:hover { border-color: var(--border-2); }
+.creative img { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--bg-inset);
+                cursor: zoom-in; display: block; }
+.creative .body { padding: 9px 11px; font-size: 11px; }
+.creative .summary { color: var(--text-2); line-height: 1.4; margin-bottom: 4px; }
+.creative .tags { margin-top: 6px; }
+.tag { display: inline-block; background: var(--accent-soft); color: var(--accent); font-size: 10px;
+       font-weight: 600; padding: 2px 7px; border-radius: var(--radius-chip); margin: 2px 3px 0 0; }
+.tag.kf { background: var(--warn-soft); color: var(--warn); }
+.tag.prod { background: var(--pos-soft); color: var(--pos); }
+
+/* Brand-store / homepage thumbnails. The img inside lacks any intrinsic
+   constraint, so without these rules natural-resolution product photos
+   (often 1500+ px) blow past their grid cell. Force a 140px crop. */
+.thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+              gap: 10px; margin-top: 12px; }
+.bs-thumb { overflow: hidden; border-radius: var(--radius-chip); background: var(--bg-inset);
+            border: 1px solid var(--border-1); min-width: 0; }
+.bs-thumb img { display: block; width: 100%; height: 140px; object-fit: cover;
+                background: var(--bg-inset); cursor: zoom-in; }
+.bs-thumb .muted { padding: 4px 6px; line-height: 1.3; max-height: 34px;
+                   overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
+/* Stitched full-page captures can be 5000+ px tall — show a fixed-size
+   preview tile that's click-through to the full image. */
+.landing-tile { display: block; width: 280px; max-width: 100%; height: 360px;
+                overflow: hidden; border: 1px solid var(--border-1);
+                border-radius: var(--radius-ctl); background: var(--bg-inset); position: relative; }
+.landing-tile img { width: 100%; height: auto; display: block; transition: transform .3s ease; }
+.landing-tile:hover img { transform: translateY(-8px); }
+.landing-tile::after { content: 'click to open full page'; position: absolute;
+                       bottom: 0; left: 0; right: 0; background: var(--scrim);
+                       color: var(--accent-contrast); font-size: 11px; padding: 4px 8px;
+                       text-align: center; opacity: 0; transition: opacity .15s ease; }
+.landing-tile:hover::after { opacity: 1; }
+.lane-hp img, .lane-bs img { max-width: 100%; }
+.two-col { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start; }
+
+/* Whitespace */
+.ws { margin: 8px 0; padding: 11px 14px; border-left: 3px solid var(--neg);
+      background: var(--neg-soft); border-radius: 0 var(--radius-chip) var(--radius-chip) 0; }
+.ws-brand { font-family: var(--font-mono); font-weight: 700; font-size: 13px;
+            margin-bottom: 4px; color: var(--text-1); }
+.ws-item { font-size: 12px; margin-left: 12px; color: var(--text-2); }
+
+/* Landing pages — "where ads send traffic" */
+.lp-toolbar { display: flex; align-items: center; gap: 12px; margin: 4px 0 14px;
+              font-size: 12px; color: var(--text-3); flex-wrap: wrap; }
+.lp-mode { display: inline-flex; gap: 0; border: 1px solid var(--border-1);
+           border-radius: var(--radius-pill); overflow: hidden; background: var(--bg-inset);
+           padding: 2px; }
+.lp-mode label { padding: 4px 12px; cursor: pointer; color: var(--text-2); font-weight: 600;
+                 border-radius: var(--radius-pill); transition: color .12s ease, background .12s ease; }
+.lp-mode label:hover { color: var(--text-1); }
+.lp-mode label:has(input:checked) { background: var(--accent); color: var(--accent-contrast); }
+.lp-mode input { position: absolute; opacity: 0; pointer-events: none; }
+.lp-brand-card { border: 1px solid var(--border-1); border-radius: var(--radius-ctl);
+                 padding: 16px 18px; margin: 10px 0 16px; background: var(--bg-elev); }
+.lp-brand-card.empty { background: var(--bg-inset); color: var(--text-3); font-style: italic; }
+.lp-brand-head { display: flex; align-items: baseline; justify-content: space-between;
+                 gap: 14px; margin-bottom: 10px; }
+.lp-brand-head .lp-brand { font-weight: 700; font-size: 14px; color: var(--text-1); }
+.lp-brand-head .lp-stats { color: var(--text-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.lp-bar { width: 100%; height: 22px; background: var(--bg-inset);
+          border-radius: var(--radius-chip); overflow: hidden; display: block; }
+.lp-bar rect { transition: width .25s ease, x .25s ease; }
+.lp-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 8px;
+             font-size: 11px; color: var(--text-2); }
+.lp-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.lp-legend-swatch { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.lp-table { width: 100%; border-collapse: collapse; margin: 12px 0 0; font-size: 12px; }
+.lp-table th.num, .lp-table td.num { text-align: right; }
+.lp-table td { padding: 7px 10px; border-bottom: 1px solid var(--border-1); vertical-align: top; }
+.lp-table td.num { font-variant-numeric: tabular-nums; color: var(--text-2); }
+.lp-table td.url { font-family: var(--font-mono); font-size: 11px; word-break: break-all;
+                   max-width: 340px; }
+.lp-table td.url a { color: var(--accent); text-decoration: none; }
+.lp-table td.url a:hover { text-decoration: underline; }
+.lp-table tr.flagged td.section { color: var(--neg); font-weight: 600; }
+.lp-section-pill { display: inline-block; width: 9px; height: 9px; border-radius: 2px;
+                   vertical-align: middle; margin-right: 7px; }
+.lp-findings { margin-top: 10px; padding: 10px 13px; background: var(--warn-soft);
+               border-left: 3px solid var(--warn);
+               border-radius: 0 var(--radius-chip) var(--radius-chip) 0;
+               font-size: 12px; color: var(--text-2); }
+.lp-findings strong { color: var(--text-1); }
+.lp-findings em { color: var(--warn); font-style: normal; font-weight: 600; }
+.lp-findings.danger { background: var(--neg-soft); border-left-color: var(--neg); }
+.lp-findings.danger em { color: var(--neg); }
+.lp-findings code { background: var(--bg-inset); padding: 0 4px; border-radius: 3px; }
+
+/* Landing-section palette hooks. SVG segments take fill from the theme vars;
+   legend swatches + table pills take background from the same vars. */
+.lp-seg--homepage { fill: var(--sec-homepage); }            .sec-bg--homepage { background: var(--sec-homepage); }
+.lp-seg--product-browse { fill: var(--sec-product-browse); } .sec-bg--product-browse { background: var(--sec-product-browse); }
+.lp-seg--product-detail { fill: var(--sec-product-detail); } .sec-bg--product-detail { background: var(--sec-product-detail); }
+.lp-seg--samples { fill: var(--sec-samples); }               .sec-bg--samples { background: var(--sec-samples); }
+.lp-seg--quote-lead { fill: var(--sec-quote-lead); }         .sec-bg--quote-lead { background: var(--sec-quote-lead); }
+.lp-seg--where-to-buy { fill: var(--sec-where-to-buy); }     .sec-bg--where-to-buy { background: var(--sec-where-to-buy); }
+.lp-seg--inspiration-content { fill: var(--sec-inspiration-content); } .sec-bg--inspiration-content { background: var(--sec-inspiration-content); }
+.lp-seg--brand-story { fill: var(--sec-brand-story); }       .sec-bg--brand-story { background: var(--sec-brand-story); }
+.lp-seg--template-unfilled { fill: var(--sec-template-unfilled); } .sec-bg--template-unfilled { background: var(--sec-template-unfilled); }
+.lp-seg--off-brand-tracker { fill: var(--sec-off-brand-tracker); } .sec-bg--off-brand-tracker { background: var(--sec-off-brand-tracker); }
+.lp-seg--off-brand-short { fill: var(--sec-off-brand-short); } .sec-bg--off-brand-short { background: var(--sec-off-brand-short); }
+.lp-seg--off-brand-other { fill: var(--sec-off-brand-other); } .sec-bg--off-brand-other { background: var(--sec-off-brand-other); }
+.lp-seg--unknown { fill: var(--sec-unknown); }               .sec-bg--unknown { background: var(--sec-unknown); }
+
+/* Ads list */
+.ad { display: grid; grid-template-columns: 90px 1fr 110px; gap: 12px; padding: 10px 0;
+      border-bottom: 1px solid var(--border-1); font-size: 12px; align-items: start; }
+.ad .id { font-family: var(--font-mono); color: var(--text-3); }
+.ad .body { color: var(--text-2); }
+.ad .cta { text-align: right; font-weight: 600; color: var(--text-2); }
+.ad .cta a { color: var(--accent); text-decoration: none; }
+.ad .cta a:hover { text-decoration: underline; }
+
+/* Briefing */
+.briefing { white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: var(--text-2);
+            background: var(--bg-inset); border: 1px solid var(--border-1);
+            border-radius: var(--radius-ctl); padding: 16px 18px; overflow-x: auto; }
+
+/* Lightbox */
+#lightbox { display: none; position: fixed; inset: 0; background: var(--scrim); z-index: 100;
+            align-items: center; justify-content: center; cursor: zoom-out; }
+#lightbox.open { display: flex; }
+#lightbox img, #lightbox video { max-width: 92%; max-height: 92%; box-shadow: var(--shadow-pop);
+                                 border-radius: 6px; }
+#lightbox .meta-cta { position: absolute; bottom: 24px; right: 24px; background: var(--accent-strong);
+                      color: var(--accent-contrast); padding: 10px 16px;
+                      border-radius: var(--radius-ctl); font-size: 13px; font-weight: 600;
+                      text-decoration: none; cursor: pointer; }
+#lightbox .meta-cta:hover { background: var(--accent); }
+
+/* Video thumbnail treatment — applied everywhere a creative renders. The
+   wrapper element must have data-asset-type="video" or "video_evicted". */
+.thumb-wrap { position: relative; display: block; }
+.thumb-wrap[data-asset-type="video"]::after,
+.thumb-wrap[data-asset-type="video_evicted"]::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><circle cx='30' cy='30' r='26' fill='rgba(0,0,0,0.55)'/><polygon points='24,18 24,42 44,30' fill='white'/></svg>");
+  background-repeat: no-repeat; background-position: center; background-size: 36px 36px;
+}
+.thumb-wrap .dur-chip {
+  position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,0.75);
+  color: rgba(255,255,255,0.96); font-size: 10px; font-weight: 700; padding: 1px 5px;
+  border-radius: 2px; letter-spacing: 0.3px; pointer-events: none;
+}
+
+/* Filter UI — dropdown style */
+.filter-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;
+              margin: 10px 0 16px; }
+.filter-dropdown { position: relative; }
+.filter-dropdown > button { width: 100%; background: var(--bg-inset); border: 1px solid var(--border-1);
+                            border-radius: var(--radius-ctl); padding: 8px 26px 8px 12px;
+                            font-size: 12px; text-align: left; cursor: pointer; color: var(--text-1);
+                            position: relative; transition: border-color .12s ease;
+                            font-family: inherit; }
+.filter-dropdown > button:hover { border-color: var(--border-2); }
+.filter-dropdown.open > button { border-color: var(--accent); background: var(--bg-elev); }
+.filter-dropdown > button .label { font-weight: 600; color: var(--text-2); font-size: 10.5px;
+                                   text-transform: uppercase; letter-spacing: 0.6px; }
+.filter-dropdown > button .badge { background: var(--accent); color: var(--accent-contrast);
+                                   border-radius: var(--radius-pill); padding: 1px 7px;
+                                   font-size: 10px; margin-left: 6px; font-weight: 700; }
+.filter-dropdown > button::after { content: '▾'; position: absolute; right: 10px; top: 50%;
+                                   transform: translateY(-50%); font-size: 10px; color: var(--text-3); }
+.filter-dropdown.open > button::after { transform: translateY(-50%) rotate(180deg);
+                                        color: var(--accent); }
+.filter-menu { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+               background: var(--bg-elev); border: 1px solid var(--border-2);
+               border-radius: var(--radius-ctl); padding: 6px 0; box-shadow: var(--shadow-pop);
+               z-index: 50; max-height: 320px; overflow-y: auto; min-width: 200px; }
+.filter-dropdown.open .filter-menu { display: block; }
+.filter-menu .menu-head { display: flex; justify-content: space-between; align-items: center;
+                          padding: 4px 12px 6px; border-bottom: 1px solid var(--border-1);
+                          margin-bottom: 4px; }
+.filter-menu .menu-head .group-clear { background: none; border: none; color: var(--accent);
+                                       cursor: pointer; font-size: 11px; padding: 0;
+                                       font-family: inherit; }
+.filter-menu .menu-head .group-clear:hover { text-decoration: underline; }
+.filter-menu .menu-head .group-clear:disabled { color: var(--text-3); cursor: default;
+                                                text-decoration: none; }
+.filter-menu label { display: flex; align-items: center; gap: 8px; padding: 5px 12px;
+                     font-size: 12px; cursor: pointer; user-select: none; color: var(--text-2); }
+.filter-menu label:hover { background: var(--bg-inset); color: var(--text-1); }
+.filter-menu label input { margin: 0; cursor: pointer; }
+.filter-menu label .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filter-menu label .count { color: var(--text-3); font-size: 10px;
+                            font-variant-numeric: tabular-nums; }
+.filter-status { font-size: 12px; color: var(--text-2); padding: 6px 0; margin-bottom: 8px;
+                 display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.filter-status button { background: var(--bg-inset); border: 1px solid var(--border-1);
+                        border-radius: var(--radius-chip); padding: 5px 12px; font-size: 11px;
+                        cursor: pointer; color: var(--text-2); font-family: inherit;
+                        transition: color .12s ease, border-color .12s ease; }
+.filter-status button:hover { border-color: var(--border-2); color: var(--text-1); }
+
+/* Brand-vs-brand */
+.bvb-controls { display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; margin: 12px 0 18px;
+                align-items: end; }
+.bvb-controls label { display: block; font-size: 10.5px; color: var(--text-3);
+                      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px;
+                      font-weight: 700; }
+.bvb-controls select { width: 100%; padding: 8px 10px; font-size: 13px;
+                       border: 1px solid var(--border-1); border-radius: var(--radius-ctl);
+                       background: var(--bg-inset); color: var(--text-1); font-family: inherit; }
+.bvb-mode-radios { display: flex; gap: 12px; padding-bottom: 7px; }
+.bvb-mode-radios label { display: flex; gap: 5px; align-items: center; cursor: pointer;
+                         text-transform: none; letter-spacing: 0; font-size: 12.5px;
+                         font-weight: 500; margin: 0; color: var(--text-2); }
+.bvb-split { display: grid; grid-template-columns: 1fr 60px 1fr; gap: 14px; align-items: start; }
+.bvb-col { background: var(--bg-elev); border: 1px solid var(--border-1);
+           border-radius: var(--radius-ctl); padding: 16px; }
+.bvb-col h3 { margin: 0 0 12px; font-size: 14px; color: var(--text-1); text-transform: none;
+              letter-spacing: 0; }
+.bvb-row { display: grid; grid-template-columns: 170px 1fr 44px; gap: 10px; font-size: 12px;
+           padding: 3px 0; align-items: center; }
+.bvb-row .val { background: var(--accent-soft); color: var(--accent); padding: 1px 6px;
+                border-radius: var(--radius-chip); font-size: 11px; text-align: center;
+                min-width: 36px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bvb-row .lab { font-family: var(--font-mono); font-size: 11px; color: var(--text-2);
+                min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bvb-track { background: var(--bg-inset); height: 8px; border-radius: 4px; overflow: hidden; }
+.bvb-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+.bvb-vs { font-size: 12px; color: var(--text-3); text-align: center; padding-top: 40px;
+          font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.bvb-attr-block { margin-bottom: 14px; }
+.bvb-attr-block h4 { margin: 0 0 6px; font-size: 10.5px; text-transform: uppercase;
+                     color: var(--text-3); letter-spacing: 0.8px; }
+
+/* Delta view */
+.delta-controls { display: flex; gap: 16px; align-items: center; margin: 10px 0 16px;
+                  flex-wrap: wrap; }
+.delta-controls label { font-size: 12px; color: var(--text-2); }
+.delta-controls input[type=date] { padding: 7px 10px; font-size: 13px;
+                                   border: 1px solid var(--border-1);
+                                   border-radius: var(--radius-ctl); background: var(--bg-inset);
+                                   color: var(--text-1); font-family: inherit; margin-left: 8px; }
+.delta-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+               gap: 12px; margin-bottom: 16px; }
+.delta-brand-bar { display: grid; grid-template-columns: 160px 1fr 50px; gap: 10px;
+                   padding: 5px 0; font-size: 12px; align-items: center; }
+.delta-brand-bar code { color: var(--text-2); }
+.delta-brand-bar .bar { height: 12px; background: var(--bg-inset); border-radius: 6px;
+                        overflow: hidden; }
+.delta-brand-bar .bar > div { height: 100%; border-radius: 6px;
+                              background: linear-gradient(90deg, var(--accent-strong), var(--accent)); }
+.delta-brand-bar .n { text-align: right; font-weight: 700; font-family: var(--font-mono);
+                      color: var(--text-1); }
+
+/* Most-served snapshot strip */
+.ms-head { font-size: 10.5px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase;
+           color: var(--text-3); margin-bottom: 12px; }
+.ms-head .muted { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.ms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.ms-card { background: var(--bg-elev); border: 1px solid var(--border-1);
+           border-radius: var(--radius-ctl); padding: 10px 12px; display: flex;
+           flex-direction: column; gap: 6px; text-decoration: none; color: var(--text-1);
+           min-width: 0; transition: border-color .15s ease; }
+.ms-card:hover { border-color: var(--accent); }
+.ms-card.empty { background: var(--bg-inset); }
+.ms-name { font-size: 10.5px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
+           color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ms-thumb { width: 100%; aspect-ratio: 1.4/1; object-fit: cover; border-radius: 5px;
+            background: var(--bg-inset); display: block; }
+.ms-ph { background: var(--bg-inset); color: var(--text-3); aspect-ratio: 1.4/1; border-radius: 5px;
+         display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.ms-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.ms-note { font-size: 10px; }
+
+/* Chips (rank / days / active state) */
+.chip { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; padding: 2px 7px;
+        border-radius: var(--radius-chip); display: inline-block; }
+.chip--rank { background: var(--pos-soft); color: var(--pos); }
+.chip--days { background: var(--accent-soft); color: var(--accent); }
+.chip--active { background: var(--pos-soft); color: var(--pos); }
+.chip--inactive { background: var(--neg-soft); color: var(--neg); }
+.chip--neutral { background: var(--bg-inset); color: var(--text-3); }
+
+/* Per-brand lanes (Meta / Homepage / Brand Store) */
+.lane { margin-top: 28px; background: var(--bg-inset); border: 1px solid var(--border-1);
+        border-left: 3px solid var(--accent); border-radius: var(--radius-ctl);
+        padding: 18px 20px; }
+.lane-meta { border-left-color: var(--accent); }
+.lane-hp { border-left-color: var(--homepage); }
+.lane-bs { border-left-color: var(--amazon); }
+.lane-hp-blocked { border-left-color: var(--neg); }
+.lane .stats { margin-bottom: 14px; }
+.lane-label { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.lane-label h3 { margin: 0; font-size: 16px; text-transform: none; letter-spacing: 0;
+                 color: var(--text-1); font-weight: 700; }
+.lane-badge { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+              padding: 3px 8px; border-radius: 4px; }
+.lane-badge--meta { background: var(--accent-soft); color: var(--accent); }
+.lane-badge--amazon { background: var(--amazon-soft); color: var(--amazon); }
+.lane-badge--website { background: var(--homepage-soft); color: var(--homepage); }
+.lane-badge--blocked { background: var(--neg-soft); color: var(--neg); }
+.lane h4 { margin: 18px 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+           color: var(--text-3); font-weight: 700; }
+.lane h4 .muted { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 11px; }
+
+/* Top-served ads panel */
+.ts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.ts-card { background: var(--bg-card); border: 1px solid var(--border-1);
+           border-radius: var(--radius-ctl); padding: 10px; display: flex; flex-direction: column;
+           gap: 8px; }
+.ts-thumb { width: 100%; aspect-ratio: 1.4/1; object-fit: cover; border-radius: 5px;
+            background: var(--bg-inset); display: block; }
+.ts-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.ts-body { font-size: 12.5px; line-height: 1.4; color: var(--text-2); flex: 1; }
+.ts-cta { font-size: 11px; color: var(--text-3); }
+.ts-cta a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.ts-id { font-size: 10px; color: var(--text-3); font-family: var(--font-mono); }
+
+/* Homepage site-content analysis card */
+.hp-card { background: var(--bg-card); border: 1px solid var(--border-1);
+           border-radius: var(--radius-ctl); padding: 18px 22px; margin-bottom: 14px; }
+.hp-card-head { display: flex; align-items: center; justify-content: space-between;
+                margin-bottom: 10px; gap: 10px; }
+.micro-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px;
+               font-weight: 700; color: var(--text-3); }
+.cache-note { color: var(--text-3); font-size: 11px; font-weight: 400; text-transform: none;
+              letter-spacing: 0; }
+.conf-pill { background: var(--pos-soft); color: var(--pos); font-size: 10px; font-weight: 700;
+             padding: 2px 7px; border-radius: var(--radius-chip); letter-spacing: 0.5px;
+             white-space: nowrap; }
+.hp-oneliner { background: var(--homepage-soft); color: var(--homepage); font-style: italic;
+               padding: 14px 18px; border-radius: var(--radius-chip); margin-bottom: 14px;
+               line-height: 1.5; font-size: 14px; }
+.offer-badge { display: inline-block; background: var(--warn-soft); color: var(--warn);
+               padding: 4px 10px; border-radius: var(--radius-chip); font-weight: 600;
+               font-size: 12px; margin-bottom: 8px; }
+.hp-headline { font-size: 17px; font-weight: 700; color: var(--text-1); line-height: 1.3; }
+.hp-subhead { margin-top: 3px; font-size: 13.5px; line-height: 1.45; color: var(--text-2); }
+.hp-cta-row { margin-top: 8px; }
+.cta-code { background: var(--accent-soft); color: var(--accent); padding: 3px 8px;
+            border-radius: 4px; font-weight: 600; display: inline-block; margin-top: 4px; }
+.cta-chip { background: var(--bg-inset); color: var(--text-2); padding: 2px 7px; border-radius: 4px;
+            border: 1px solid var(--border-1); font-size: 11px; margin: 0 5px 5px 0;
+            display: inline-block; }
+.stance-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+.stance-tag { background: var(--bg-elev); color: var(--text-1); font-size: 11px; font-weight: 600;
+              padding: 3px 9px; border-radius: var(--radius-chip);
+              border: 1px solid var(--border-1); }
+.stance-tag .k { color: var(--text-3); font-weight: 500; }
+.hp-divider { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-1); }
+.hp-divider .micro-label { display: block; margin-bottom: 6px; }
+.hp-positioning { font-size: 13.5px; line-height: 1.55; color: var(--text-2); }
+.hp-details { margin-top: 10px; }
+.hp-details summary { cursor: pointer; font-size: 10.5px; text-transform: uppercase;
+                      letter-spacing: 1px; font-weight: 700; color: var(--text-2); }
+.hp-details-body { margin-top: 10px; }
+.critique-row { display: grid; grid-template-columns: 130px 1fr; gap: 10px; padding: 6px 0;
+                border-bottom: 1px solid var(--border-1); font-size: 13px; line-height: 1.5; }
+.critique-row .k { font-weight: 600; color: var(--text-1); }
+.critique-row .v { color: var(--text-2); }
+.notable { margin-top: 8px; }
+.notable-head { font-weight: 600; color: var(--text-1); font-size: 13px; }
+.notable ul { margin: 4px 0 0 18px; padding: 0; font-size: 13px; color: var(--text-2); }
+.notable li { margin: 4px 0; }
+.ww-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ww-head { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;
+           margin-bottom: 6px; }
+.ww-head.works { color: var(--pos); }
+.ww-head.misses { color: var(--neg); }
+.ww-grid ul { margin: 0 0 0 16px; padding: 0; font-size: 13px; color: var(--text-2);
+              line-height: 1.5; }
+.ww-grid li { margin: 5px 0; }
+.hp-exp { margin-top: 6px; font-size: 12px; }
+.hp-notes { font-size: 13px; color: var(--text-2); line-height: 1.55; }
+.hp-notes strong { color: var(--text-1); }
+.hp-attempt { font-size: 12px; margin-top: 8px; }
+.mitigation { margin-top: 10px; font-size: 12px; }
+.mitigation summary { cursor: pointer; color: var(--text-2); }
+.mitigation ul { margin: 8px 0 0 18px; padding: 0; color: var(--text-2); line-height: 1.55; }
+
+/* Responsive guards */
+@media (max-width: 1180px) { .topbar-meta { display: none; } }
+@media (max-width: 1100px) { .topbar-nav { display: none; } }
+@media (max-width: 980px) {
+  nav.sidebar { display: none; }
+  main { margin-left: 0; }
+  .bvb-split { grid-template-columns: 1fr; }
+  .bvb-vs { padding: 6px 0; }
+  .two-col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-mark">H</div>
+    <div class="topbar-title">
+      <div class="org">Horizon Commerce</div>
+      <div class="product">Intelligence</div>
+    </div>
+  </div>
+  <nav class="topbar-nav">
+    <a href="#overview">Overview</a>
+    <a href="#delta">What's new</a>
+    <a href="#browse">Browse</a>
+    <a href="#briefing">Briefing</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="topbar-meta">Generated 2026-06-12T13:32:32+00:00 · last 30d · 1 brands</div>
+    <button id="theme-toggle" type="button" aria-label="Toggle light / dark theme"
+            aria-pressed="false" title="Toggle light / dark theme"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  </div>
+</div>
+
+<nav class="sidebar"><a href="#overview">Overview</a><div class="nav-group">Analysis</div><a href="#delta">What&#x27;s new</a><a href="#comparison">Comparison</a><a href="#bvb">Brand vs Brand</a><a href="#distinctiveness">Distinctiveness</a><a href="#whitespace">Whitespace</a><a href="#landing-pages">Where ads send traffic</a><a href="#browse">Browse all creatives</a><div class="nav-group">Brands</div><a href="#brand-revlon">Revlon</a><div class="nav-group">Reporting</div><a href="#briefing">Latest briefing</a></nav>
+<main>
+
+    <section id="most-served" class="ms-section">
+      <div class="ms-head">Most-served snapshot
+        <span class="muted"> — each brand's top-scoring ad by popularity proxy (SERP rank × run duration, intra-brand only)</span>
+      </div>
+      <div class="ms-grid">
+            <a href="#brand-revlon" class="ms-card empty">
+              <div class="ms-name">Revlon</div>
+              <div class="ms-ph">—</div>
+              <div class="muted ms-note">no ranked ads</div>
+            </a>
+            </div>
+    </section>
+    
+
+    <section id="overview">
+      <h2>Overview</h2>
+      
+    <div class="stats">
+      <div class="stat"><div class="label">Brands tracked</div><div class="value">1</div></div>
+      <div class="stat"><div class="label">Ads (total)</div><div class="value">0</div></div>
+      <div class="stat"><div class="label">Active ads</div><div class="value">0</div></div>
+      <div class="stat"><div class="label">Creatives stored</div><div class="value">0</div></div>
+      <div class="stat"><div class="label">Creatives analyzed</div><div class="value">0</div></div>
+      <div class="stat"><div class="label">New ads (30d)</div><div class="value">0</div></div>
+    </div>
+    
+      <h3>Brands</h3>
+      <div class="brand-grid">
+        <div class="brand-card">
+          <div class="brand-card-head">
+            <a href="#brand-revlon">Revlon</a>
+            <span class="vertical"><span class="pri-dot pri-low"
+                  title="priority low"></span>beauty</span>
+          </div>
+          <dl>
+            <dt>Ads (total / active)</dt><dd>0 / 0</dd>
+            <dt>New in 30d</dt><dd>0</dd>
+            <dt>Creatives (analyzed)</dt><dd>0 (0)</dd>
+            <dt>Top CTA</dt><dd>—</dd>
+          </dl>
+        </div>
+        </div>
+    </section>
+    
+    <section id="delta">
+      <h2>What's new since…</h2>
+      <p class="muted">Filters ads and analyzed creatives whose first_seen date is on or after the picked date. Default: 7 days ago.</p>
+      <div class="delta-controls">
+        <label>Show ads first seen on or after:
+          <input type="date" id="delta-date" value="2026-06-05">
+        </label>
+      </div>
+      <div class="delta-stats stats" id="delta-stats"></div>
+      <h3>New ads by brand</h3>
+      <div id="delta-brand-list"></div>
+      <h3>New creatives (first 24)</h3>
+      <div class="gallery" id="delta-gallery"></div>
+    </section>
+    
+    <section id="comparison">
+      <h2>Cross-competitor creative comparison</h2>
+      <p class="muted">0 analyzed creatives. Cell color = share of brand's creatives with that attribute value (darker = higher).</p>
+      
+    </section>
+    
+    <section id="bvb">
+      <h2>Brand vs Brand</h2>
+      <p class="muted">Pick any two brands to see their attribute distributions side by side. Bars show % of each brand's analyzed creatives with that value.</p>
+      <div class="bvb-controls">
+        <div><label>Brand A</label><select id="bvb-a"></select></div>
+        <div><label>Brand B</label><select id="bvb-b"></select></div>
+        <div class="bvb-mode">
+          <label>Weight</label>
+          <div class="bvb-mode-radios">
+            <label><input type="radio" name="bvb-mode" value="count" checked> By count</label>
+            <label><input type="radio" name="bvb-mode" value="popularity"> By popularity <span class="muted">(Meta ads only)</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="bvb-split">
+        <div class="bvb-col" id="bvb-left"></div>
+        <div class="bvb-vs">vs</div>
+        <div class="bvb-col" id="bvb-right"></div>
+      </div>
+    </section>
+    
+    <section id="distinctiveness">
+      <h2>Distinctiveness — where each brand over-indexes vs the set</h2>
+      <p class="muted">No strong distinctiveness signals yet — need more analyzed creatives.</p>
+    </section>
+    
+    <section id="whitespace">
+      <h2>Whitespace — what each brand is NOT using that the set is</h2>
+      <p class="muted">No whitespace gaps detected yet.</p>
+    </section>
+    
+    <section id="landing-pages">
+      <h2>Where ads send traffic</h2>
+      <p class="muted">Per-brand breakdown of ad <code>link_url</code> destinations. Sections in <span class="flag-red">red</span> / <span class="flag-orange">orange</span> are flagged findings, not traffic worth applauding — measurement redirects (DoubleClick), Dynamic Creative templates that never resolved, or opaque short-links.</p>
+      
+    <div class="lp-toolbar">
+      <span>Weight bars by</span>
+      <span class="lp-mode">
+        <label><input type="radio" name="lp-mode" value="count" checked>
+          <span>Ad count</span></label>
+        <label><input type="radio" name="lp-mode" value="popularity">
+          <span>Popularity-weighted</span></label>
+      </span>
+      <span class="muted">Popularity = SERP rank × duration × active bonus per ad. Same intra-brand caveats as other ranked views.</span>
+    </div>
+    <div class="lp-brand-card empty"><div class="lp-brand-head"><div class="lp-brand">Revlon</div><div class="lp-stats">0 of 0 ads · 0% on-brand</div></div><div class="muted">no link_urls captured in this window — either no paid ads or a scraper coverage gap.</div></div>
+    </section>
+    
+    <section id="browse">
+      <h2>Browse all creatives</h2>
+      <p class="muted">Open a dropdown to select values. Multiple values within a group are OR; across groups are AND.</p>
+      <div class="filter-bar" id="filter-bar"></div>
+      <div class="filter-status">
+        <span id="filter-status-count"></span>
+        <button id="clear-filters">Clear all filters</button>
+      </div>
+      <div class="gallery" id="filter-gallery-grid"></div>
+    </section>
+    
+    <section id="brand-revlon">
+      <h2>Revlon <span class="muted">— beauty · priority low</span></h2>
+
+      <div class="lane lane-meta">
+        <div class="lane-label">
+          <span class="lane-badge lane-badge--meta">Meta</span>
+          <h3>Ads Library</h3>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="label">Active ads</div><div class="value">0</div></div>
+          <div class="stat"><div class="label">New in window</div><div class="value">0</div></div>
+          <div class="stat"><div class="label">Ad creatives analyzed</div><div class="value">0/0</div></div>
+          <div class="stat"><div class="label">Top CTA</div><div class="value sm">—</div></div>
+        </div>
+        <h4>Top served ads
+          <span class="muted"> — ranked by Meta's "most served" sort × run duration (intra-brand only, proxy not raw impressions)</span>
+        </h4>
+        <p class="muted">No served-rank data yet. Re-run <code>intel ingest</code> to populate.</p>
+        <h4>Creative gallery</h4>
+        <p class="muted">No analyzed creatives. Run <code>intel analyze-creatives --competitor revlon</code>.</p>
+        <h4>Recent ads (last 30 days)</h4>
+        <p class="muted">No ads in window.</p>
+      </div>
+
+      
+      
+    <div class="lane lane-bs">
+      <div class="lane-label">
+        <span class="lane-badge lane-badge--amazon">Amazon</span>
+        <h3>Brand Store</h3>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="label">Pages captured</div><div class="value">3</div></div>
+        <div class="stat"><div class="label">Images captured</div><div class="value">35</div></div>
+        <div class="stat"><div class="label">Analyzed</div><div class="value">18/24</div></div>
+        <div class="stat"><div class="label">Last captured</div><div class="value sm">2026-06-11 16:45</div></div>
+      </div>
+      <div class="two-col">
+        <div><a class="landing-tile" href="../../../../data/raw/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/20260611T164517Z/landing.png" target="_blank" title="brand store landing — click to open full"><img src="../../../../data/raw/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/20260611T164517Z/landing.png" alt="brand store landing"></a></div>
+        <div><div class="thumb-grid"><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_03.jpg" loading="lazy" alt="brand store image"><div class="muted"></div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_00.jpg" loading="lazy" alt="brand store image"><div class="muted"></div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_03.jpg" loading="lazy" alt="brand store image"><div class="muted"></div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_00.jpg" loading="lazy" alt="brand store image"><div class="muted"></div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_04.jpg" loading="lazy" alt="brand store image"><div class="muted"></div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_00.jpg" loading="lazy" alt="brand store image"><div class="muted"></div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_10.jpg" loading="lazy" alt="brand store image"><div class="muted">Revlon ColorStay Multi-Planet eyeliner in rose/pink — pencil with mauve swatch s</div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_09.jpg" loading="lazy" alt="brand store image"><div class="muted">Revlon ColorStay Multi-Planet eyeliner in slate gray — pencil with metallic gray</div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_08.jpg" loading="lazy" alt="brand store image"><div class="muted">Revlon ColorStay Multi-Planet eyeliner in olive/khaki — pencil with green-bronze</div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_07.jpg" loading="lazy" alt="brand store image"><div class="muted">Revlon ColorStay Multi-Planet eyeliner in taupe/cocoa — pencil with smoky swatch</div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_06.jpg" loading="lazy" alt="brand store image"><div class="muted">Revlon ColorStay Multi-Planet eyeliner pencil in brown — with smoky swatch behin</div></div><div class="bs-thumb"><img src="../../../../data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_05.jpg" loading="lazy" alt="brand store image"><div class="muted">Revlon ColorStay Micro Liquid Liner in &#x27;What the Fudge&#x27; brown — 24H waterproof c</div></div></div></div>
+      </div>
+    </div>
+    
+    </section>
+    
+    <section id="briefing">
+      <h2>Latest briefing</h2>
+      
+    <div class="muted">Competitive Briefing — 2026-06-01 to 2026-06-08 — generated 2026-06-09T03:40:06+00:00 (briefing id 10)</div>
+    <pre class="briefing"># Competitive Briefing — 2026-06-01 to 2026-06-08
+
+&gt; Caveat on dating: every ad in the corpus has `first_seen = 2026-06-02`, which is the system&#x27;s initial observation date, not a confirmed launch date. Read this window as a baseline snapshot of what&#x27;s live in each competitor&#x27;s Meta library, with deltas only on site/homepage signals (inferred).
+
+## TL;DR
+- **Rooms To Go&#x27;s Meta library is being polluted by impersonator pages.** All 50 captured &quot;Rooms To Go&quot; ads were actually authored by `Novels Lover` and `New world publications` running werewolf-romance copy — there is zero authentic RTG paid creative in the window. Brand-safety/IP issue worth flagging upstream.
+- **No competitor in the set is running a named, dated promo this week.** Offers list is empty across all 7 brands; only Bob&#x27;s has a structured homepage promo, and it&#x27;s an evergreen price-point (&quot;$799 Treasured queen firm mattress&quot;) with no expiration or urgency cues.
+- **American Freight is still running &quot;Make Every Tax Dollar Count&quot; / refund copy in June** (e.g., ad `968496585643196`, `2945278862349156`) — a stale tax-season hook well past its natural window. Opportunity to out-position on freshness.
+- **Wayfair is leaning hard into creator/UGC + app downloads**, not price. ~10 of the visible Wayfair ads are creator-tagged (`@wayfaircreators`, `#WayfairElevate`) and 5 push the app with &quot;Use App&quot; CTA (e.g., `3807605292703161`, `1469696164849361`) — a structural channel bet none of the brick-and-mortar competitors are mirroring.
+- **Ashley is the only competitor with explicit financing-led creative** (&quot;No Interest For 60 Months&quot;, &quot;$249 / $399 Hot Buys&quot; in ads `1750563672965299`, `1770583667652502`) — but the copy still references &quot;Memorial Day,&quot; meaning it&#x27;s now lagging the calendar.
+
+## What changed by competitor
+
+**Bob&#x27;s Discount Furniture (subject).** Homepage hero is locked on &quot;Top-rated AND affordable / Treasured boxed queen firm mattress $799&quot; with a &quot;Shop all mattresses&quot; CTA — no expiration, no urgency (homepage_promo observed 2026-06-04). Paid Meta is heavy on creator/editorial partnerships (Apartment Therapy, House Beautiful, Perkins On Parkway, The Iron Victorian, Maya Prosser, Kelly Family — ads `1003475825357477`, `831898666645342`, `2404607406670504`, `987854856917211`, `26640462725625345`, `1519890566468728`) plus three new-store openings being actively promoted: University City (`2053917525539916`), Spartanburg (`1670780951062396`), Pineville opening June 8th (`1474046854740071`) and Greenville (`2045287253059971`). Price anchors used in copy: sectionals/seating from $499 (`1342504074525431`), dining sets from $599 (`1002956615494711`).
+
+**Ashley Furniture.** Only 13 ads captured and most are generic brand spots authored by a &quot;Ashley&quot; CTA-as-page artifact. The two ads doing real work are `1750563672965299` (&quot;Mattress Hot Buys Starting At Just $399 / No Interest For 60 Months / Free Upgrade&quot;) and `1770583667652502` (&quot;Hot Buys Starting At Just $249 / No Interest For 60 Months&quot;). Both still anchor on &quot;Memorial Day Sale,&quot; which is calendar-stale by 1–2 weeks (inferred). Otherwise the tone is &quot;global best-seller&quot; / &quot;viral sectional&quot; brand-building.
+
+**Rooms To Go.** Effectively no authentic activity. All 50 Meta ads in the page-name slot are from `Novels Lover` (26) and `New world publications` (24) running long-form fiction copy unrelated to furniture — these are almost certainly scraper false-positives or impersonation/affiliate spoofs (inferred). One site change observed on 2026-06-04 (hero_image_path + visible_text changed), but with no homepage_promo extracted we can&#x27;t characterize the new hero. Treat RTG as &quot;dark&quot; this week.
+
+**Raymour &amp; Flanigan.** Highest-volume legitimate advertiser in the set with 50 distinct ads and the broadest message mix: in-store floor-model clearance (`1466326641754605`, `4409417832658504`, `27217206327877212`), 3-day delivery / white-glove speed claims (`838528262647566`, `1522343732705296`), Purple mattress co-branding (`801636909698080`, `1894053431236230`), Memorial Day mattress carryover (`2641709012910177`), an &quot;80 years&quot; trust anchor (`971777778918289`, `1596250674809897`), and a Somerville showroom grand-opening push (`933155179623551`, `3612897382195683`). Two site changes observed 2026-06-04 (hero swap).
+
+**Value City Furniture.** Zero new Meta ads in window. Homepage hero text is the corporate parent&#x27;s (&quot;Home - American Signature Inc.&quot;) — likely a scrape miss rather than a real change (inferred). No material activity to act on.
+
+**American Freight.** Only 7 ads, 6 of which are duplicates of the same &quot;Make Every Tax Dollar Count / 100% Free Layaway / Same-day delivery&quot; message (`968496585643196`, `27559001327022684`, `2945278862349156`, `4173935446157325`, `1227532469595682`) plus a single &quot;$50 down / PINK TAGS&quot; Altoona store-specific ad (`2541300159644487`). The financing/layaway angle is on-brand; the tax-refund framing in June is off. Homepage screenshot did change 2026-06-04 (6 fields incl. hero_image_path).
+
+**Wayfair.** 50 ads, but the strategy is unmistakable: (a) creator partnerships with &quot;@... with Wayfair&quot; framing (`1997303367800071`, `1747972719500065`, `1603706310901729`, `2133909337400242`) and `#WayfairElevate` / `#WayfairCreator` tagging, (b) app-install push using product-detail hooks like All-Clad cookware (`3807605292703161`, `1469696164849361`, `26517171811312095`), (c) &quot;Wayfair Verified&quot; trust messaging (`1520951576697884`, `940192022029019`, `1457045912754573`), and (d) &quot;Free shipping on orders $35+&quot; as the only consistent offer hook (`1105248095100175`, `818089577821995`). One outdoor &quot;up to 50% OFF&quot; callout (`988867120189943`, `1737595677594468`) and one stale &quot;Up to 70% off in app through Apr. 6&quot; (`35307772348868800`) — note the April expiration still live is a competitor housekeeping miss.
+
+## Patterns across the set
+
+The dominant pattern is **absence of dated, urgent promotional offers**. Across 7 furniture brands, the `offers` list is empty for every single one and only Bob&#x27;s has a structured homepage promo — and even Bob&#x27;s has `expiration: null` and zero urgency cues. The category is in a between-tentpoles lull (post-Memorial Day, pre-July 4 — inferred) and most brands are coasting on either evergreen &quot;everyday low prices&quot; copy (Bob&#x27;s, American Freight), brand-equity / quality claims (Ashley &quot;global best-seller,&quot; Raymour &quot;80 years,&quot; Wayfair &quot;Verified&quot;), or carryover Memorial Day creative that should have been swapped out (Ashley `1750563672965299`, `1770583667652502`; Raymour `2641709012910177`).
+
+The second pattern is a **format split between brick-and-mortar and pure-play**. The store-based competitors (Bob&#x27;s, Ashley, Raymour, American Freight, Value City) are all using paid social to drive store visits, financing, and clearance/floor-model urgency. Wayfair is the only competitor running a true digital-native playbook — creator network at scale, app-install funnel, free-shipping threshold as the offer. Bob&#x27;s is the only brick-and-mortar competitor partially mirroring the creator playbook (Apartment Therapy, House Beautiful, plus ~6 individual influencer collabs), which is a defensible mid-position. Price anchors in copy cluster at three brackets: ~$249–$399 entry mattress (Ashley), ~$499–$599 seating/dining (Bob&#x27;s), ~$799 mid mattress (Bob&#x27;s homepage).
+
+## Whitespace / opportunities
+
+- **Dated, summer-specific tentpole.** No one in the set is running a Father&#x27;s Day or July 4th-anchored promo yet. Hypothesis: a 7–10 day &quot;Father&#x27;s Day / Summer Kickoff&quot; event with a hard end-date will outperform the evergreen &quot;everyday low prices&quot; tone Bob&#x27;s and 3 competitors are running.
+- **Outdoor / patio at a real price point.** Only Wayfair (`988867120189943`, `1737595677594468`, `1337385678309989`) and Raymour (`4387227978260395`, `1477504247455240`, `1656976245857460`, `1353171700007500`) are pushing outdoor — and Wayfair&#x27;s discount claim (&quot;up to 50%&quot;) is generic. Hypothesis: a specific patio-set price-point ad (e.g., &quot;5-piece patio set, $X&quot;) will own a bracket nobody is anchoring.
+- **Speed-of-delivery as the lead message.** Raymour owns &quot;3 days or less&quot; / &quot;same-day pickup&quot; (`838528262647566`, `1466326641754605`, `2731813830538786`); Bob&#x27;s mentions &quot;ready to ship&quot; once (`1371414068156686`) but doesn&#x27;t lead with it. Hypothesis: a Bob&#x27;s &quot;in your home this week&quot; creative will steal share from Raymour in overlapping DMAs.
+- **Financing offer with a specific dollar payment.** Ashley uses &quot;No Interest for 60 Months&quot; abstractly; American Freight uses &quot;$50 down&quot; once. No one is running &quot;$X/month for Y months on a complete room&quot; — a concrete monthly payment for a full living room or bedroom set is whitespace.
+- **TikTok-native vertical creator content.** Wayfair&#x27;s creator program is Meta-skewed in the captured set; nobody has a visible TikTok shop / TikTok-Live presence in the corpus. Hypothesis: a Bob&#x27;s TikTok creator series tied to the new-store openings (Pineville, Spartanburg, University City) will outperform paid Meta CPMs on local awareness.
+- **Bilingual / Spanish-language creative at scale.** Bob&#x27;s has exactly one Spanish ad (`1677421256790549`); no other competitor in the set has any visible Spanish creative. Hypothesis: scaling Spanish-language variants in TX/FL/Northeast Hispanic DMAs is an under-contested audience.
+
+## Recommended actions (next 7 days)
+
+1. **[low effort] Meta — swap Bob&#x27;s homepage hero and matching prospecting ad set into a dated Father&#x27;s Day / Summer Kickoff offer with a real end-date.** Every competitor is running evergreen copy; a hard end-date will earn CTR lift on its own. Replace the `$799 Treasured` static hero for the duration of the event.
+2. **[low effort] Brand protection — file Meta Ad Library impersonation reports against `Novels Lover` and `New world publications`** for the ads currently appearing under the Rooms To Go page-name slot (e.g., `808376498798264`, `850313524264915`, `736223172882197`). Same playbook should be run defensively on the Bob&#x27;s page name.
+3. **[med] Meta video — launch a &quot;your home this week&quot; speed-of-delivery creative** featuring the in-stock / ready-to-ship pieces already referenced in `1371414068156686` and `1342504074525431`. Target Raymour &amp; Flanigan&#x27;s NE/Mid-Atlantic DMAs where they are leaning on &quot;3 days or less&quot; (`838528262647566`).
+4. **[med] Meta + local — geo-fence the four new-store openings (Pineville June 8, Spartanburg, University City, Greenville)** with a dedicated creative set and a grand-opening offer (e.g., &quot;$100 off your first $599 purchase, Pineville only, through June 21&quot;). The existing store-opening ads (`1474046854740071`, `2053917525539916`, `1670780951062396`, `2045287253059971`) are awareness-only — add a conversion hook.
+5. **[high] Creator program expansion — stand up a Bob&#x27;s TikTok creator pilot (5–8 mid-tier home creators)** mirroring Wayfair&#x27;s Meta playbook but in a channel where no competitor in the set is currently visible. Tie the briefs to the $499 sectional and $599 dining price points already in paid creative so the funnel ladders.</pre>
+    
+    </section>
+    
+</main>
+<div id="lightbox"><img src="" alt=""></div>
+<script id="intel-data" type="application/json">{"client_creatives": [{"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_01.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:09:13+00:00", "summary": "Revlon brand-store hero banner \u2014 Live Boldly tagline with lip and face product smears on pink.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "balanced", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["lip gloss", "foundation", "lipstick", "highlighter"], "features": ["brand_logo", "product_close_up", "multi_product_collage"], "valueProps": ["aesthetic", "inclusivity"], "seasonal": [], "colors": ["#f3c8d2", "#d12027", "#c97a82", "#b06f4f", "#a16d63"], "ratio": "16:9", "bgColor": "pink", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store_hero", "productGrouping": "collection", "scene": "Lip and face product smears artistically arranged on soft pink backdrop", "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": ["hero_banner"]}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_02.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:09:13+00:00", "summary": "Revlon wordmark logo only \u2014 brand-store chrome element.", "photo": "text_only", "prod": "polished_brand", "emphasis": "balanced", "hook": "unknown", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": [], "features": ["brand_logo", "text_only_card"], "valueProps": [], "seasonal": [], "colors": ["#ffffff", "#9f1f24"], "ratio": "4:5", "bgColor": "white", "modelGender": "not_visible", "productInUse": "n/a", "context": "brand_store", "productGrouping": "n/a", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_03.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:09:13+00:00", "summary": "Brand-store engagement CTA banner inviting shoppers to follow the Revlon store.", "photo": "text_only", "prod": "polished_brand", "emphasis": "balanced", "hook": "unknown", "appeal": "rational", "logo": false, "logoBrand": null, "products": [], "features": ["text_only_card", "cta_button_in_image"], "valueProps": ["convenience"], "seasonal": [], "colors": ["#ffffff", "#d12027", "#2a2a2a"], "ratio": "16:9", "bgColor": "white", "modelGender": "not_visible", "productInUse": "n/a", "context": "brand_store", "productGrouping": "n/a", "scene": null, "modelDemo": null, "ctaText": "FOLLOW THE STORE", "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_05.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:09:13+00:00", "summary": "Revlon Oil-Absorbing Roller \u2014 package + product shot for a single oil-control skincare item.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "problem_solution", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["oil-absorbing roller", "skincare tool"], "features": ["brand_logo", "product_close_up"], "valueProps": ["efficacy", "convenience"], "seasonal": [], "colors": ["#ffffff", "#0c0c0c", "#d12027", "#b89072"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_06.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:10:39+00:00", "summary": "Revlon Skin Reviving On-The-Go red facial roller \u2014 package + product on white.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "problem_solution", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["facial roller", "skincare tool"], "features": ["brand_logo", "product_close_up"], "valueProps": ["efficacy", "convenience"], "seasonal": [], "colors": ["#ffffff", "#d12027", "#f4b4b8"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_07.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:10:39+00:00", "summary": "Revlon Facial Roller refill kit \u2014 packaging with two replacement roller balls (stone + steel).", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "demo", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["facial roller refill", "skincare accessory"], "features": ["brand_logo", "product_close_up"], "valueProps": ["convenience"], "seasonal": [], "colors": ["#ffffff", "#d12027", "#c8c8c8"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_08.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:10:39+00:00", "summary": "Revlon Face Defuzzer Smooth & Perfect \u2014 packaged razor plus two color variants on white.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "problem_solution", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["face razor", "dermaplaning tool"], "features": ["brand_logo", "product_close_up", "multi_product_collage"], "valueProps": ["efficacy"], "seasonal": [], "colors": ["#ffffff", "#d12027", "#c95d6f"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "collection", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_09.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:10:39+00:00", "summary": "Revlon Extra Curl Lash Curler \u2014 red-grip metal eyelash curler in retail packaging.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "demo", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["eyelash curler"], "features": ["brand_logo", "product_close_up"], "valueProps": ["efficacy", "aesthetic"], "seasonal": [], "colors": ["#ffffff", "#d12027", "#1a1a1a"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_10.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:10:39+00:00", "summary": "Revlon Comfort + Control plier-style lash curler \u2014 easy squeeze ergonomic design.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "problem_solution", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["eyelash curler", "comfort grip beauty tool"], "features": ["brand_logo", "product_close_up"], "valueProps": ["convenience", "efficacy"], "seasonal": [], "colors": ["#ffffff", "#d12027", "#1a1a1a"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_11.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:10:39+00:00", "summary": "Standalone chrome lash curler \u2014 clean studio packshot, no copy or branding overlay.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "rational", "logo": false, "logoBrand": null, "products": ["eyelash curler"], "features": ["product_close_up"], "valueProps": [], "seasonal": [], "colors": ["#ffffff", "#c0c0c0", "#1a1a1a"], "ratio": "4:5", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_12.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:12:01+00:00", "summary": "Revlon Comfort + Control Slant Tweezer \u2014 ergonomic wide-grip tweezer with retail packaging.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "problem_solution", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["tweezer", "slant tweezer"], "features": ["brand_logo", "product_close_up"], "valueProps": ["convenience", "efficacy"], "seasonal": [], "colors": ["#ffffff", "#1a1a1a", "#d12027"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_13.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:12:01+00:00", "summary": "Revlon manicure essentials kit \u2014 travel pouch with nail file, scissors, clipper, and pusher.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "demo", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["manicure kit", "nail file", "cuticle pusher", "nail clipper", "travel pouch"], "features": ["brand_logo", "multi_product_collage", "product_close_up"], "valueProps": ["convenience"], "seasonal": [], "colors": ["#ffffff", "#1a1a1a", "#d12027"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "collection", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_14.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:12:01+00:00", "summary": "Revlon Full Jaw Cuticle Nipper \u2014 stainless steel professional-grade nail tool.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "problem_solution", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["cuticle nipper", "nail tool"], "features": ["brand_logo", "product_close_up"], "valueProps": ["efficacy"], "seasonal": [], "colors": ["#ffffff", "#c0c0c0", "#d12027"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_15.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:12:01+00:00", "summary": "Revlon Designer Series Lash Curler \u2014 gold-tone premium eyelash curler in retail packaging.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["eyelash curler", "designer series tool"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic", "efficacy"], "seasonal": [], "colors": ["#ffffff", "#bfa37a", "#d12027"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_16.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:12:01+00:00", "summary": "Revlon Brow Shaping Scissors & Brush \u2014 gold-handle grooming pair from Designer Series.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "demo", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["brow scissors", "brow brush", "brow grooming set"], "features": ["brand_logo", "multi_product_collage", "product_close_up"], "valueProps": ["efficacy", "aesthetic"], "seasonal": [], "colors": ["#ffffff", "#c8a779", "#d12027"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "collection", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/364D28DB-26D7-4785-A6FF-69BDCB675CEA/image_17.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:12:01+00:00", "summary": "Revlon brand-purpose banner \u2014 Live Boldly manifesto on sparkly pink, sets brand tone.", "photo": "text_only", "prod": "polished_brand", "emphasis": "balanced", "hook": "founder_story", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": [], "features": ["brand_logo", "text_only_card"], "valueProps": ["inclusivity", "aesthetic"], "seasonal": [], "colors": ["#f3c8d2", "#1a1a1a", "#d12027"], "ratio": "16:9", "bgColor": "pink", "modelGender": "not_visible", "productInUse": "n/a", "context": "brand_store", "productGrouping": "n/a", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_01.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:14:20+00:00", "summary": "Sub-page hero banner \u2014 REVLON wordmark on bold signature red background.", "photo": "text_only", "prod": "polished_brand", "emphasis": "balanced", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": [], "features": ["brand_logo", "text_only_card"], "valueProps": [], "seasonal": [], "colors": ["#d12027", "#ffffff"], "ratio": "16:9", "bgColor": "red", "modelGender": "not_visible", "productInUse": "n/a", "context": "brand_store_hero", "productGrouping": "n/a", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": ["hero_banner"]}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_02.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:09:13+00:00", "summary": "Revlon wordmark logo only \u2014 brand-store chrome element.", "photo": "text_only", "prod": "polished_brand", "emphasis": "balanced", "hook": "unknown", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": [], "features": ["brand_logo", "text_only_card"], "valueProps": [], "seasonal": [], "colors": ["#ffffff", "#9f1f24"], "ratio": "4:5", "bgColor": "white", "modelGender": "not_visible", "productInUse": "n/a", "context": "brand_store", "productGrouping": "n/a", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_04.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:14:20+00:00", "summary": "Revlon Super Lustrous Glimmer lip gloss in champagne/gold \u2014 tube with swatch swirl behind.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["lip gloss", "Super Lustrous Glimmer lip gloss"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic", "novelty"], "seasonal": [], "colors": ["#ffffff", "#d4a25e", "#c8a06a", "#c0c0c0"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_05.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:14:20+00:00", "summary": "Revlon Super Lustrous Glimmer lip gloss in rose/bronze shimmer \u2014 tube with swatch.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["lip gloss", "Super Lustrous Glimmer lip gloss"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic", "novelty"], "seasonal": [], "colors": ["#ffffff", "#c97a82", "#d0a496", "#b06f4f"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_06.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:14:20+00:00", "summary": "Revlon Super Lustrous Glimmer lip gloss in pink shimmer \u2014 tube with bright pink swatch.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["lip gloss", "Super Lustrous Glimmer lip gloss"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic", "novelty"], "seasonal": [], "colors": ["#ffffff", "#e679a8", "#d63878", "#d4a25e"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_07.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:14:20+00:00", "summary": "Revlon Super Lustrous The Gloss in clear \u2014 minimalist tube on white background.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["lip gloss", "Super Lustrous The Gloss clear"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic"], "seasonal": [], "colors": ["#ffffff", "#1a1a1a", "#e0e0e0"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_08.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:14:20+00:00", "summary": "Revlon Super Lustrous The Gloss in pink shimmer \u2014 tube with pink swatch swirl.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["lip gloss", "Super Lustrous The Gloss"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic"], "seasonal": [], "colors": ["#ffffff", "#f3c8d2", "#cc8c95", "#1a1a1a"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_09.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:16:03+00:00", "summary": "Revlon Super Lustrous The Gloss in pastel pink \u2014 tube with light pink swatch swirl.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["lip gloss", "Super Lustrous The Gloss"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic"], "seasonal": [], "colors": ["#ffffff", "#f3c8d2", "#e89bb4", "#1a1a1a"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_10.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:16:03+00:00", "summary": "Revlon Super Lustrous The Gloss in metallic pink shimmer \u2014 tube with shimmery pink swatch.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["lip gloss", "Super Lustrous The Gloss"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic", "novelty"], "seasonal": [], "colors": ["#ffffff", "#e679a8", "#c0c0c0", "#1a1a1a"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/0312D484-5763-4009-A822-5B9DD988420A/image_11.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:16:03+00:00", "summary": "Revlon Super Lustrous The Gloss in coral red \u2014 tube with bold red swatch swirl.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["lip gloss", "Super Lustrous The Gloss"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic"], "seasonal": [], "colors": ["#ffffff", "#d62734", "#e76055", "#1a1a1a"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_01.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:14:20+00:00", "summary": "Sub-page hero banner \u2014 REVLON wordmark on bold signature red background.", "photo": "text_only", "prod": "polished_brand", "emphasis": "balanced", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": [], "features": ["brand_logo", "text_only_card"], "valueProps": [], "seasonal": [], "colors": ["#d12027", "#ffffff"], "ratio": "16:9", "bgColor": "red", "modelGender": "not_visible", "productInUse": "n/a", "context": "brand_store_hero", "productGrouping": "n/a", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": ["hero_banner"]}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_02.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:09:13+00:00", "summary": "Revlon wordmark logo only \u2014 brand-store chrome element.", "photo": "text_only", "prod": "polished_brand", "emphasis": "balanced", "hook": "unknown", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": [], "features": ["brand_logo", "text_only_card"], "valueProps": [], "seasonal": [], "colors": ["#ffffff", "#9f1f24"], "ratio": "4:5", "bgColor": "white", "modelGender": "not_visible", "productInUse": "n/a", "context": "brand_store", "productGrouping": "n/a", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_04.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:16:03+00:00", "summary": "Revlon ColorStay Micro Easy Precision Liquid Liner in Blackout \u2014 24H waterproof claim.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "problem_solution", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["liquid eyeliner", "ColorStay Micro Easy Precision Liquid Liner"], "features": ["brand_logo", "product_close_up"], "valueProps": ["efficacy", "convenience"], "seasonal": [], "colors": ["#ffffff", "#1a1a1a", "#d12027"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_05.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:16:03+00:00", "summary": "Revlon ColorStay Micro Liquid Liner in 'What the Fudge' brown \u2014 24H waterproof claim.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "problem_solution", "appeal": "rational", "logo": true, "logoBrand": "Revlon", "products": ["liquid eyeliner", "ColorStay Micro Easy Precision Liquid Liner"], "features": ["brand_logo", "product_close_up"], "valueProps": ["efficacy", "convenience"], "seasonal": [], "colors": ["#ffffff", "#5b3624", "#a8845c", "#d12027"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_06.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:16:03+00:00", "summary": "Revlon ColorStay Multi-Planet eyeliner pencil in brown \u2014 with smoky swatch behind.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["eyeliner pencil", "ColorStay Multi-Planet eyeliner"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic"], "seasonal": [], "colors": ["#ffffff", "#5b3624", "#3d2820", "#1a1a1a"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_07.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:17:48+00:00", "summary": "Revlon ColorStay Multi-Planet eyeliner in taupe/cocoa \u2014 pencil with smoky swatch swirl.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["eyeliner pencil", "ColorStay Multi-Planet eyeliner"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic"], "seasonal": [], "colors": ["#ffffff", "#a8845c", "#7a604a", "#1a1a1a"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_08.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:17:48+00:00", "summary": "Revlon ColorStay Multi-Planet eyeliner in olive/khaki \u2014 pencil with green-bronze swatch.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["eyeliner pencil", "ColorStay Multi-Planet eyeliner"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic", "novelty"], "seasonal": [], "colors": ["#ffffff", "#8a7e4f", "#6b6238", "#1a1a1a"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_09.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:17:48+00:00", "summary": "Revlon ColorStay Multi-Planet eyeliner in slate gray \u2014 pencil with metallic gray swatch.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["eyeliner pencil", "ColorStay Multi-Planet eyeliner"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic"], "seasonal": [], "colors": ["#ffffff", "#3e4654", "#5e6772", "#1a1a1a"], "ratio": "1:1", "bgColor": "gray", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}, {"id": 0, "comp": "revlon", "compName": "Revlon", "adId": "", "imgPath": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/creative/revlon/amazon_brand_store/03446F9B-9F49-42DA-B776-8F1989AA0713/image_10.jpg", "assetType": "amazon_store_image", "videoDurationSec": null, "metaAdUrl": "", "landingSection": null, "landingCleanUrl": null, "utmSource": null, "utmMedium": null, "utmCampaign": null, "utmContent": null, "firstSeen": "2026-06-04T03:17:48+00:00", "summary": "Revlon ColorStay Multi-Planet eyeliner in rose/pink \u2014 pencil with mauve swatch swirl.", "photo": "studio_product_only", "prod": "polished_brand", "emphasis": "product_forward", "hook": "aesthetic", "appeal": "emotional", "logo": true, "logoBrand": "Revlon", "products": ["eyeliner pencil", "ColorStay Multi-Planet eyeliner"], "features": ["brand_logo", "product_close_up"], "valueProps": ["aesthetic", "novelty"], "seasonal": [], "colors": ["#ffffff", "#c4756b", "#a05a52", "#1a1a1a"], "ratio": "1:1", "bgColor": "white", "modelGender": "not_visible", "productInUse": "displayed_only", "context": "brand_store", "productGrouping": "single", "scene": null, "modelDemo": null, "ctaText": null, "certifications": [], "awards": [], "layoutFlags": []}], "client_ads": [], "client_tallies": {"revlon": {"n": 35, "scalar": {"photography_style": {"studio_product_only": 28, "text_only": 7}, "production_style": {"polished_brand": 35}, "product_emphasis": {"balanced": 8, "product_forward": 27}, "hook_style": {"aesthetic": 18, "unknown": 4, "problem_solution": 8, "demo": 4, "founder_story": 1}, "emotional_vs_rational": {"emotional": 18, "rational": 17}, "aspect_ratio_guess": {"16:9": 5, "4:5": 4, "1:1": 26}, "background_color": {"pink": 2, "white": 30, "red": 2, "gray": 1}, "model_gender": {"not_visible": 35}, "product_in_use": {"displayed_only": 28, "n/a": 7}, "creative_context": {"brand_store_hero": 3, "brand_store": 32}, "product_grouping": {"collection": 4, "n/a": 7, "single": 24}}, "boolean": {"logo_visible": {"true": 33, "false": 2}, "before_after_present": {"false": 35}, "hero_banner_present": {"true": 3, "false": 32}, "category_nav_visible": {"false": 35}, "shoppable_imagery": {"false": 35}, "text_overlay.present": {"true": 34, "false": 1}, "urgency_cues.present": {"false": 35}, "casting.people_visible": {"false": 35}}, "listed": {"products_visible": {"lip gloss": 9, "foundation": 1, "lipstick": 1, "highlighter": 1, "oil-absorbing roller": 1, "skincare tool": 2, "facial roller": 1, "facial roller refill": 1, "skincare accessory": 1, "face razor": 1, "dermaplaning tool": 1, "eyelash curler": 4, "comfort grip beauty tool": 1, "tweezer": 1, "slant tweezer": 1, "manicure kit": 1, "nail file": 1, "cuticle pusher": 1, "nail clipper": 1, "travel pouch": 1, "cuticle nipper": 1, "nail tool": 1, "designer series tool": 1, "brow scissors": 1, "brow brush": 1, "brow grooming set": 1, "super lustrous glimmer lip gloss": 3, "super lustrous the gloss clear": 1, "super lustrous the gloss": 4, "liquid eyeliner": 2, "colorstay micro easy precision liquid liner": 2, "eyeliner pencil": 5, "colorstay multi-planet eyeliner": 5}, "key_features": {"brand_logo": 33, "product_close_up": 28, "multi_product_collage": 4, "text_only_card": 7, "cta_button_in_image": 1}, "value_props": {"aesthetic": 18, "inclusivity": 2, "convenience": 9, "efficacy": 11, "novelty": 6}}}}, "client_tallies_weighted": {"revlon": {"n": 0, "scalar": {}, "boolean": {}, "listed": {}}}, "client_set_tally": {"n": 0, "scalar": {}, "boolean": {}, "listed": {}}, "brands_meta": {"revlon": "Revlon"}, "window_days": 30}</script>
+<script>
+// ---- theme toggle (dark default; persisted; pre-paint script in <head>) ----
+(function setupThemeToggle() {
+  const btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  btn.setAttribute('aria-pressed',
+    document.documentElement.getAttribute('data-theme') === 'light' ? 'true' : 'false');
+  btn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    btn.setAttribute('aria-pressed', next === 'light' ? 'true' : 'false');
+    try { localStorage.setItem('intelDashTheme', next); } catch (e) {}
+  });
+})();
+
+// ---- shared: read embedded JSON data ----
+const DATA = JSON.parse(document.getElementById('intel-data').textContent);
+const dashboardBase = location.pathname.replace(/\/[^/]*$/, '/');
+function relativize(absPath) {
+  // The Python side embeds absolute fs paths; convert to relative for file:// browsing.
+  // Strip the repo root prefix that's common to dashboard dir and image dir.
+  const segs = location.pathname.split('/');
+  // walk up to 'reports/<date>/dashboard' → repo root is 3 levels above this file
+  const upToRepoRoot = segs.slice(0, -4).join('/') + '/';
+  if (absPath.startsWith(upToRepoRoot)) {
+    const rel = absPath.slice(upToRepoRoot.length);
+    return '../../../' + rel;
+  }
+  return absPath;
+}
+
+// ---- lightbox ----
+// Branches on data-asset-type. For 'video' creatives we know the mp4 exists
+// locally — render an inline <video controls>. For 'video_evicted' (mp4
+// deleted by the popularity prune) we show the first frame plus a "Watch on
+// Meta Ad Library" CTA so the user can still see the ad in motion.
+function _openLightbox({assetType, assetPath, thumbPath, metaUrl, adId}) {
+  const lb = document.getElementById('lightbox');
+  lb.innerHTML = '';
+  if (assetType === 'video' && assetPath && assetPath.endsWith('.mp4')) {
+    const v = document.createElement('video');
+    v.src = assetPath;
+    v.controls = true;
+    v.autoplay = true;
+    v.playsInline = true;
+    v.poster = thumbPath || '';
+    lb.appendChild(v);
+  } else {
+    const img = document.createElement('img');
+    img.src = thumbPath || assetPath;
+    img.alt = adId ? `ad ${adId}` : '';
+    lb.appendChild(img);
+    if ((assetType === 'video' || assetType === 'video_evicted') && metaUrl) {
+      const a = document.createElement('a');
+      a.className = 'meta-cta';
+      a.href = metaUrl;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = 'Watch on Meta Ad Library →';
+      lb.appendChild(a);
+    }
+  }
+  lb.classList.add('open');
+}
+
+function bindLightbox(scope) {
+  // Two click surfaces: legacy `.creative img` (image-only fallback) and the
+  // new `.creative-link` wrapper which carries data-asset-* attributes.
+  (scope || document).querySelectorAll('.creative-link').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      _openLightbox({
+        assetType: link.getAttribute('data-asset-type'),
+        assetPath: relativize(link.getAttribute('data-asset-path')),
+        thumbPath: relativize(link.getAttribute('data-thumb-path')),
+        metaUrl: link.getAttribute('data-meta-url'),
+        adId: link.getAttribute('data-ad-id'),
+      });
+    });
+  });
+  (scope || document).querySelectorAll('.creative > img').forEach(img => {
+    // Plain images (no wrapper) — keep simple behavior.
+    img.addEventListener('click', () => {
+      _openLightbox({assetType: 'image', assetPath: null, thumbPath: img.src});
+    });
+  });
+}
+bindLightbox(document);
+document.getElementById('lightbox').addEventListener('click', e => {
+  // Click on the backdrop OR the close edge — but not on the controls / CTA.
+  if (e.target.id === 'lightbox') {
+    e.currentTarget.classList.remove('open');
+    e.currentTarget.innerHTML = '';
+  }
+});
+
+// ---- FILTER GALLERY ----
+// Active filters: {group: Set(values)}. AND across groups, OR within a group.
+const filterState = {
+  comp: new Set(), photo: new Set(), prod: new Set(), emphasis: new Set(),
+  hook: new Set(), appeal: new Set(), features: new Set(), products: new Set(),
+  valueProps: new Set(),
+  // Phase A1 extended taxonomy filters:
+  context: new Set(), bgColor: new Set(), modelGender: new Set(),
+  productInUse: new Set(), productGrouping: new Set(),
+  certifications: new Set(), awards: new Set(), layoutFlags: new Set(),
+  assetType: new Set(),
+  // Landing-page filters (parsed from ad link_url at collect time):
+  landingSection: new Set(), utmCampaign: new Set(),
+  utmSource: new Set(), utmMedium: new Set(),
+};
+
+function matchesFilters(c) {
+  for (const [grp, set] of Object.entries(filterState)) {
+    if (set.size === 0) continue;
+    let val = c[grp];
+    if (Array.isArray(val)) {
+      // any-of match for list fields
+      if (![...set].some(v => val.includes(v))) return false;
+    } else {
+      if (!set.has(val)) return false;
+    }
+  }
+  return true;
+}
+
+// Format seconds → 'M:SS' (small helper used in both the gallery + delta view).
+function _fmtDur(sec) {
+  if (!sec) return '';
+  const s = Math.round(sec);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+// For video creatives, the thumbnail must be a static image — pick the first
+// frame in the asset's directory. Mp4 paths follow the convention
+// `.../{ad_id}/video.mp4`; the first frame is `.../{ad_id}/frame_00_t*.jpg`.
+function _thumbForCreative(c) {
+  if ((c.assetType === 'video' || c.assetType === 'video_evicted')
+      && c.imgPath && c.imgPath.endsWith('.mp4')) {
+    // We don't know the exact frame timestamp from the client; the simplest
+    // approach is to swap `video.mp4` → `frame_00_t00000.jpg`. Padding is
+    // fixed-width in process_video (idx:02d, ms:05d) so this works for the
+    // canonical first frame. If extraction shifted the leading frame, the
+    // dashboard falls back to the imgPath (which is the mp4 — browsers
+    // show a play-icon placeholder).
+    return c.imgPath.replace(/video\.mp4$/, 'frame_00_t00000.jpg');
+  }
+  return c.imgPath;
+}
+
+function renderFilterGallery() {
+  const container = document.getElementById('filter-gallery-grid');
+  if (!container) return;
+  const matched = DATA.client_creatives.filter(matchesFilters);
+  container.innerHTML = matched.map(c => {
+    const thumb = _thumbForCreative(c);
+    const dur = _fmtDur(c.videoDurationSec);
+    const at = c.assetType || 'image';
+    return `
+    <div class="creative" data-comp="${c.comp}">
+      <a class="thumb-wrap creative-link" data-asset-type="${at}"
+         data-asset-path="${c.imgPath}"
+         data-thumb-path="${thumb}"
+         data-meta-url="${c.metaAdUrl || ''}"
+         data-ad-id="${c.adId}" style="display:block">
+        <img src="${relativize(thumb)}" loading="lazy" alt="${c.adId}">
+        ${dur ? `<span class="dur-chip">${dur}</span>` : ''}
+      </a>
+      <div class="body">
+        <div class="summary">${escapeHTML(c.summary || '(no summary)')}</div>
+        <div class="muted"><code>${escapeHTML(c.comp)}</code> · ad <code>${c.adId}</code></div>
+        <div class="tags">
+          ${c.photo ? `<span class="tag">${c.photo}</span>` : ''}
+          ${c.hook ? `<span class="tag">${c.hook}</span>` : ''}
+          ${(c.products || []).slice(0,2).map(p => `<span class="tag prod">${escapeHTML(p)}</span>`).join('')}
+          ${(c.features || []).slice(0,3).map(f => `<span class="tag kf">${escapeHTML(f)}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;}).join('');
+  document.getElementById('filter-status-count').textContent =
+    `${matched.length} of ${DATA.client_creatives.length} creatives`;
+  bindLightbox(container);
+}
+
+function buildFilterDropdowns() {
+  const root = document.getElementById('filter-bar');
+  if (!root) return;
+  const groups = [
+    {key: 'comp', label: 'Brand', getter: c => [c.comp]},
+    {key: 'assetType', label: 'Asset type', getter: c => c.assetType ? [c.assetType] : []},
+    {key: 'context', label: 'Source', getter: c => c.context ? [c.context] : []},
+    {key: 'photo', label: 'Photography', getter: c => c.photo ? [c.photo] : []},
+    {key: 'prod', label: 'Production', getter: c => c.prod ? [c.prod] : []},
+    {key: 'emphasis', label: 'Emphasis', getter: c => c.emphasis ? [c.emphasis] : []},
+    {key: 'hook', label: 'Hook style', getter: c => c.hook ? [c.hook] : []},
+    {key: 'appeal', label: 'Appeal', getter: c => c.appeal ? [c.appeal] : []},
+    {key: 'bgColor', label: 'Background color', getter: c => c.bgColor ? [c.bgColor] : []},
+    {key: 'modelGender', label: 'Model gender', getter: c => c.modelGender ? [c.modelGender] : []},
+    {key: 'productInUse', label: 'Product in use', getter: c => c.productInUse ? [c.productInUse] : []},
+    {key: 'productGrouping', label: 'Product grouping', getter: c => c.productGrouping ? [c.productGrouping] : []},
+    {key: 'features', label: 'Key features', getter: c => c.features || []},
+    {key: 'layoutFlags', label: 'Layout flags', getter: c => c.layoutFlags || []},
+    {key: 'products', label: 'Products', getter: c => c.products || []},
+    {key: 'valueProps', label: 'Value props', getter: c => c.valueProps || []},
+    {key: 'certifications', label: 'Certifications', getter: c => c.certifications || []},
+    {key: 'awards', label: 'Awards / rankings', getter: c => c.awards || []},
+    // Landing-page filters — parsed from each ad's link_url at collect time.
+    // utmCampaign strings can be huge ("trex | +25mi | meta | ..."), so the
+    // dropdown label truncates to 40 chars; the underlying value stays full.
+    {key: 'landingSection', label: 'Landing section', getter: c => c.landingSection ? [c.landingSection] : []},
+    {key: 'utmCampaign', label: 'UTM campaign', getter: c => c.utmCampaign ? [c.utmCampaign] : []},
+    {key: 'utmSource', label: 'UTM source', getter: c => c.utmSource ? [c.utmSource] : []},
+    {key: 'utmMedium', label: 'UTM medium', getter: c => c.utmMedium ? [c.utmMedium] : []},
+  ];
+
+  const populated = groups.map(g => {
+    const counts = new Map();
+    DATA.client_creatives.forEach(c => g.getter(c).forEach(v => {
+      if (v !== null && v !== undefined && v !== '') counts.set(v, (counts.get(v) || 0) + 1);
+    }));
+    return {...g, items: [...counts.entries()].sort((a, b) => b[1] - a[1])};
+  }).filter(g => g.items.length > 0);
+
+  root.innerHTML = populated.map(g => `
+    <div class="filter-dropdown" data-grp="${g.key}">
+      <button type="button" aria-haspopup="true" aria-expanded="false">
+        <span class="label">${escapeHTML(g.label)}</span><span class="badge" hidden>0</span>
+      </button>
+      <div class="filter-menu" role="menu">
+        <div class="menu-head">
+          <span class="muted" style="font-size:11px">${g.items.length} option(s)</span>
+          <button type="button" class="group-clear" disabled>Clear</button>
+        </div>
+        ${g.items.map(([v, n]) => {
+          // Truncate display label for noisy fields like utmCampaign — the
+          // underlying data-val keeps the full string for matching.
+          const display = (g.key === 'utmCampaign' && String(v).length > 40)
+            ? String(v).slice(0, 37) + '…' : String(v);
+          return `
+          <label title="${escapeHTML(v)}">
+            <input type="checkbox" data-grp="${g.key}" data-val="${escapeHTML(v)}">
+            <span class="name">${escapeHTML(display)}</span>
+            <span class="count">${n}</span>
+          </label>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // Per-dropdown wiring.
+  root.querySelectorAll('.filter-dropdown').forEach(dd => {
+    const btn = dd.querySelector(':scope > button');
+    const badge = btn.querySelector('.badge');
+    const menu = dd.querySelector('.filter-menu');
+    const clearBtn = menu.querySelector('.group-clear');
+    const grpKey = dd.dataset.grp;
+
+    const refreshBadge = () => {
+      const n = filterState[grpKey].size;
+      if (n > 0) { badge.hidden = false; badge.textContent = n; clearBtn.disabled = false; }
+      else       { badge.hidden = true;                          clearBtn.disabled = true;  }
+    };
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const wasOpen = dd.classList.contains('open');
+      // Close any other open dropdowns first.
+      root.querySelectorAll('.filter-dropdown.open').forEach(other => {
+        other.classList.remove('open');
+        other.querySelector(':scope > button').setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) {
+        dd.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    menu.addEventListener('click', (e) => e.stopPropagation());
+
+    menu.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const set = filterState[grpKey];
+        if (cb.checked) set.add(cb.dataset.val);
+        else            set.delete(cb.dataset.val);
+        refreshBadge();
+        renderFilterGallery();
+      });
+    });
+
+    clearBtn.addEventListener('click', () => {
+      filterState[grpKey].clear();
+      menu.querySelectorAll('input[type=checkbox]:checked').forEach(cb => { cb.checked = false; });
+      refreshBadge();
+      renderFilterGallery();
+    });
+  });
+
+  // Click outside closes all menus.
+  document.addEventListener('click', () => {
+    root.querySelectorAll('.filter-dropdown.open').forEach(dd => {
+      dd.classList.remove('open');
+      dd.querySelector(':scope > button').setAttribute('aria-expanded', 'false');
+    });
+  });
+}
+
+document.getElementById('clear-filters')?.addEventListener('click', () => {
+  for (const k of Object.keys(filterState)) filterState[k].clear();
+  document.querySelectorAll('#filter-bar .filter-dropdown').forEach(dd => {
+    dd.querySelectorAll('input[type=checkbox]:checked').forEach(cb => { cb.checked = false; });
+    const badge = dd.querySelector(':scope > button .badge');
+    if (badge) badge.hidden = true;
+    const clr = dd.querySelector('.group-clear');
+    if (clr) clr.disabled = true;
+  });
+  renderFilterGallery();
+});
+
+buildFilterDropdowns();
+renderFilterGallery();
+
+// ---- BRAND vs BRAND ----
+function populateBrandSelectors() {
+  const sels = ['bvb-a', 'bvb-b'];
+  const brandIds = Object.keys(DATA.client_tallies).sort();
+  const brandLabel = id => (DATA.brands_meta?.[id] || id);
+  for (const id of sels) {
+    const sel = document.getElementById(id);
+    if (!sel) continue;
+    sel.innerHTML = brandIds.map(b => `<option value="${b}">${b}</option>`).join('');
+  }
+  if (brandIds.length >= 2) {
+    document.getElementById('bvb-a').value = brandIds[0];
+    document.getElementById('bvb-b').value = brandIds[1];
+  }
+}
+function topValuesUnion(attr, kind, a, b) {
+  const out = new Map();
+  for (const t of [a, b]) {
+    const c = t[kind][attr] || {};
+    for (const [v, n] of Object.entries(c)) {
+      out.set(v, (out.get(v) || 0) + n);
+    }
+  }
+  return [...out.entries()].sort((x,y) => y[1] - x[1]).slice(0, 6).map(e => e[0]);
+}
+function renderBvbCol(brandId, tally, peerTally) {
+  const attrs = [
+    {key: 'photography_style', label: 'Photography', kind: 'scalar'},
+    {key: 'production_style', label: 'Production', kind: 'scalar'},
+    {key: 'product_emphasis', label: 'Emphasis', kind: 'scalar'},
+    {key: 'hook_style', label: 'Hook', kind: 'scalar'},
+    {key: 'emotional_vs_rational', label: 'Appeal', kind: 'scalar'},
+    {key: 'value_props', label: 'Value props', kind: 'listed'},
+    {key: 'key_features', label: 'Key features', kind: 'listed'},
+    {key: 'products_visible', label: 'Products', kind: 'listed'},
+  ];
+  let html = `<h3>${brandId} <span class="muted">(n=${tally.n})</span></h3>`;
+  for (const a of attrs) {
+    const vals = topValuesUnion(a.key, a.kind, tally, peerTally);
+    if (vals.length === 0) continue;
+    html += `<div class="bvb-attr-block"><h4>${a.label}</h4>`;
+    for (const v of vals) {
+      const c = (tally[a.kind][a.key] || {})[v] || 0;
+      const share = tally.n ? Math.round(100 * c / tally.n) : 0;
+      html += `<div class="bvb-row">
+        <span class="lab">${escapeHTML(v)}</span>
+        <div class="bvb-track">
+          <div class="bvb-fill" style="width:${share}%"></div>
+        </div>
+        <span class="val">${share}%</span>
+      </div>`;
+    }
+    html += '</div>';
+  }
+  return html;
+}
+function renderBvb() {
+  const a = document.getElementById('bvb-a').value;
+  const b = document.getElementById('bvb-b').value;
+  // 'By count' uses all analyzed creatives (Meta + homepage + brand-store).
+  // 'By popularity' weights each Meta-ad creative by its popularity_score and
+  // drops standalone creatives — see _collect for the rationale.
+  const mode = document.querySelector('input[name="bvb-mode"]:checked')?.value || 'count';
+  const src = (mode === 'popularity')
+    ? (DATA.client_tallies_weighted || DATA.client_tallies)
+    : DATA.client_tallies;
+  const tA = src[a], tB = src[b];
+  if (!tA || !tB) {
+    document.getElementById('bvb-left').innerHTML =
+      `<p class="muted">No data for this brand in the selected view.</p>`;
+    document.getElementById('bvb-right').innerHTML = '';
+    return;
+  }
+  document.getElementById('bvb-left').innerHTML = renderBvbCol(a, tA, tB);
+  document.getElementById('bvb-right').innerHTML = renderBvbCol(b, tB, tA);
+}
+populateBrandSelectors();
+document.getElementById('bvb-a')?.addEventListener('change', renderBvb);
+document.getElementById('bvb-b')?.addEventListener('change', renderBvb);
+document.querySelectorAll('input[name="bvb-mode"]').forEach(r =>
+  r.addEventListener('change', renderBvb)
+);
+renderBvb();
+
+// ---- LANDING-PAGES: count/popularity toggle ----
+// Each <rect> in the lp-bar SVG carries data-count-x / -w and data-pop-x / -w
+// attributes populated server-side; the toggle just swaps which pair is read.
+// Same for table-row share cells — data-count-share / -pop-share both present,
+// the active one is shown.
+function applyLandingPagesMode(mode) {
+  const useCount = (mode !== 'popularity');
+  document.querySelectorAll('.lp-bar rect').forEach(rect => {
+    const x = useCount ? rect.dataset.countX : rect.dataset.popX;
+    const w = useCount ? rect.dataset.countW : rect.dataset.popW;
+    if (x !== undefined) rect.setAttribute('x', x);
+    if (w !== undefined) rect.setAttribute('width', w);
+  });
+  document.querySelectorAll('.lp-table tbody tr').forEach(tr => {
+    const cell = tr.querySelector('td[data-count-share]');
+    if (!cell) return;
+    const s = parseFloat(useCount ? cell.dataset.countShare : cell.dataset.popShare) || 0;
+    cell.textContent = Math.round(s * 100) + '%';
+  });
+  const hdr = document.querySelector('.lp-share-header');
+  if (hdr) hdr.textContent = useCount ? 'Share' : 'Pop. share';
+}
+document.querySelectorAll('input[name="lp-mode"]').forEach(r =>
+  r.addEventListener('change', e => applyLandingPagesMode(e.target.value))
+);
+
+// ---- DELTA VIEW: new since X ----
+function renderDelta() {
+  const dateInput = document.getElementById('delta-date');
+  if (!dateInput) return;
+  const since = dateInput.value;  // YYYY-MM-DD
+  const sinceIso = since + 'T00:00:00';
+  const newAds = DATA.client_ads.filter(a => a.firstSeen >= sinceIso);
+  const newCreatives = DATA.client_creatives.filter(c => c.firstSeen >= sinceIso);
+  // counts
+  document.getElementById('delta-stats').innerHTML = `
+    <div class="stat"><div class="label">New ads since ${since}</div><div class="value">${newAds.length}</div></div>
+    <div class="stat"><div class="label">New creatives</div><div class="value">${newCreatives.length}</div></div>
+    <div class="stat"><div class="label">Brands w/ activity</div><div class="value">${new Set(newAds.map(a => a.comp)).size}</div></div>
+  `;
+  // per-brand breakdown bars
+  const perBrand = new Map();
+  for (const a of newAds) perBrand.set(a.comp, (perBrand.get(a.comp) || 0) + 1);
+  const maxN = Math.max(...perBrand.values(), 1);
+  const sorted = [...perBrand.entries()].sort((a,b) => b[1] - a[1]);
+  document.getElementById('delta-brand-list').innerHTML = sorted.map(([cid, n]) => `
+    <div class="delta-brand-bar">
+      <code>${cid}</code>
+      <div class="bar"><div style="width:${Math.round(100*n/maxN)}%"></div></div>
+      <span class="n">${n}</span>
+    </div>
+  `).join('') || '<p class="muted">No activity in window.</p>';
+  // new-creative gallery (capped)
+  const gal = document.getElementById('delta-gallery');
+  gal.innerHTML = newCreatives.slice(0, 24).map(c => `
+    <div class="creative">
+      <img src="${relativize(c.imgPath)}" loading="lazy">
+      <div class="body">
+        <div class="summary">${escapeHTML(c.summary || '')}</div>
+        <div class="muted"><code>${escapeHTML(c.comp)}</code> · ${c.firstSeen.slice(0,10)}</div>
+      </div>
+    </div>
+  `).join('') || '<p class="muted">No new creatives in window.</p>';
+  bindLightbox(gal);
+}
+document.getElementById('delta-date')?.addEventListener('change', renderDelta);
+renderDelta();
+
+// ---- nav active-section highlight ----
+// v2 has two navs (left sidebar + top-bar pills); both are <nav> elements, so
+// one section id can map to multiple links — highlight all of them.
+(function setupNavObserver() {
+  const navLinks = new Map();
+  document.querySelectorAll('nav a[href^="#"]').forEach(a => {
+    const id = a.getAttribute('href').slice(1);
+    if (!navLinks.has(id)) navLinks.set(id, []);
+    navLinks.get(id).push(a);
+  });
+  if (navLinks.size === 0) return;
+  const observer = new IntersectionObserver(entries => {
+    // Pick the section with the largest visible area near the top.
+    let best = null, bestRatio = 0;
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio > bestRatio) {
+        best = e.target.id; bestRatio = e.intersectionRatio;
+      }
+    });
+    if (best && navLinks.has(best)) {
+      document.querySelectorAll('nav a.active').forEach(a => a.classList.remove('active'));
+      navLinks.get(best).forEach(a => a.classList.add('active'));
+    }
+  }, { rootMargin: '-15% 0px -60% 0px', threshold: [0.1, 0.5, 1] });
+  navLinks.forEach((_, id) => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+})();
+
+// ---- helpers ----
+function escapeHTML(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>
