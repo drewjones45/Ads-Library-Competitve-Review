@@ -60,6 +60,49 @@ def _relpath(target: Path, base: Path) -> str:
         return relpath(str(target), str(base))
 
 
+def _format_duration(sec: float | int | None) -> str:
+    """Format seconds → 'M:SS' (or '' on missing/zero)."""
+    if not sec:
+        return ""
+    s = int(round(float(sec)))
+    return f"{s // 60}:{s % 60:02d}"
+
+
+def _thumb_src(asset_path: str | Path, asset_type: str | None, dashboard_dir: Path) -> str:
+    """For video / video_evicted creatives, the "thumbnail" must be an image
+    (browsers can't render an mp4 as a static thumbnail). Pick the first frame
+    file in the same directory; fall back to the asset path if no frame exists
+    or the asset is already a frame."""
+    p = Path(asset_path)
+    if asset_type in ("video", "video_evicted") and p.suffix.lower() == ".mp4":
+        frames = sorted(p.parent.glob("frame_*_t*.jpg"))
+        if frames:
+            return _relpath(frames[0], dashboard_dir)
+    return _relpath(p, dashboard_dir)
+
+
+def _video_meta_for_render(analysis_json: str | dict | None) -> dict:
+    """Extract the video_meta sub-block (or {}) from an analysis JSON blob."""
+    if not analysis_json:
+        return {}
+    if isinstance(analysis_json, str):
+        try:
+            analysis_json = json.loads(analysis_json)
+        except Exception:
+            return {}
+    if not isinstance(analysis_json, dict):
+        return {}
+    return analysis_json.get("video_meta") or {}
+
+
+def _meta_ad_url(ad_archive_id: str | None) -> str:
+    """The Meta Ad Library public URL for an ad — used as the lightbox fallback
+    for video_evicted creatives (no local mp4 to play)."""
+    if not ad_archive_id:
+        return ""
+    return f"https://www.facebook.com/ads/library/?id={ad_archive_id}"
+
+
 # ----- data collection ------------------------------------------------------
 
 def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
@@ -157,14 +200,24 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
             (cid,),
         ).fetchone()
         brand_max_rank = (max_rank_row[0] or 0) if max_rank_row else 0
+        # Per-brand candidate ads with a preferred creative joined in. Prefer a
+        # video creative if one exists (richer; the thumbnail logic picks the
+        # first frame); fall back to the first image creative.
         rows = conn.execute(
             "SELECT a.id, a.ad_archive_id, a.first_seen, a.last_seen, a.start_date, "
             "a.active, a.body_text, a.cta_type, a.link_url, a.page_name, "
             "a.serp_position_rank, "
-            "(SELECT c.asset_path FROM creatives c "
-            "  WHERE c.ad_id=a.id AND c.asset_path IS NOT NULL "
-            "  ORDER BY c.id LIMIT 1) AS thumb_path "
-            "FROM ads a WHERE a.competitor_id=?",
+            "COALESCE(c_video.asset_path, c_img.asset_path) AS thumb_path, "
+            "COALESCE(c_video.asset_type, c_img.asset_type) AS thumb_asset_type, "
+            "COALESCE(c_video.analysis_json, c_img.analysis_json) AS thumb_analysis_json "
+            "FROM ads a "
+            "LEFT JOIN creatives c_video ON c_video.id = ("
+            "  SELECT id FROM creatives WHERE ad_id=a.id "
+            "  AND asset_type IN ('video','video_evicted') ORDER BY id LIMIT 1) "
+            "LEFT JOIN creatives c_img ON c_img.id = ("
+            "  SELECT id FROM creatives WHERE ad_id=a.id "
+            "  AND asset_type='image' ORDER BY id LIMIT 1) "
+            "WHERE a.competitor_id=?",
             (cid,),
         ).fetchall()
         scored = []
@@ -350,12 +403,16 @@ def _collect(conn: sqlite3.Connection, *, days: int) -> dict[str, Any]:
         if a.get("hero_banner_present"):        layout_flags.append("hero_banner")
         if a.get("category_nav_visible"):       layout_flags.append("category_nav")
 
+        vmeta = a.get("video_meta") or {}
         creatives_index.append({
             "id": rec.ad_id,
             "comp": rec.competitor_id,
             "compName": rec.competitor_name,
             "adId": rec.ad_archive_id,
             "imgPath": str(rec.asset_path),  # absolute; relativized in JS at render time
+            "assetType": rec.asset_type or "image",
+            "videoDurationSec": vmeta.get("duration_sec"),
+            "metaAdUrl": _meta_ad_url(rec.ad_archive_id),
             "firstSeen": rec.first_seen,
             "summary": a.get("summary_one_line"),
             "photo": a.get("photography_style"),
@@ -605,7 +662,26 @@ tr.set-row td { background: #1f2c4a !important; color: white; font-weight: 600; 
 #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100;
             align-items: center; justify-content: center; cursor: zoom-out; }
 #lightbox.open { display: flex; }
-#lightbox img { max-width: 92%; max-height: 92%; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+#lightbox img, #lightbox video { max-width: 92%; max-height: 92%; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+#lightbox .meta-cta { position: absolute; bottom: 24px; right: 24px; background: #1f2c4a;
+                      color: white; padding: 10px 16px; border-radius: 6px; font-size: 13px;
+                      font-weight: 600; text-decoration: none; cursor: pointer; }
+#lightbox .meta-cta:hover { background: #2a5fb0; }
+
+/* Video thumbnail treatment — applied everywhere a creative renders. The
+   wrapper element must have data-asset-type="video" or "video_evicted". */
+.thumb-wrap { position: relative; display: block; }
+.thumb-wrap[data-asset-type="video"]::after,
+.thumb-wrap[data-asset-type="video_evicted"]::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><circle cx='30' cy='30' r='26' fill='rgba(0,0,0,0.55)'/><polygon points='24,18 24,42 44,30' fill='white'/></svg>");
+  background-repeat: no-repeat; background-position: center; background-size: 36px 36px;
+}
+.thumb-wrap .dur-chip {
+  position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,0.75);
+  color: white; font-size: 10px; font-weight: 700; padding: 1px 5px;
+  border-radius: 2px; letter-spacing: 0.3px; pointer-events: none;
+}
 
 /* Filter UI — dropdown style */
 .filter-bar { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 8px;
@@ -706,18 +782,68 @@ function relativize(absPath) {
 }
 
 // ---- lightbox ----
+// Branches on data-asset-type. For 'video' creatives we know the mp4 exists
+// locally — render an inline <video controls>. For 'video_evicted' (mp4
+// deleted by the popularity prune) we show the first frame plus a "Watch on
+// Meta Ad Library" CTA so the user can still see the ad in motion.
+function _openLightbox({assetType, assetPath, thumbPath, metaUrl, adId}) {
+  const lb = document.getElementById('lightbox');
+  lb.innerHTML = '';
+  if (assetType === 'video' && assetPath && assetPath.endsWith('.mp4')) {
+    const v = document.createElement('video');
+    v.src = assetPath;
+    v.controls = true;
+    v.autoplay = true;
+    v.playsInline = true;
+    v.poster = thumbPath || '';
+    lb.appendChild(v);
+  } else {
+    const img = document.createElement('img');
+    img.src = thumbPath || assetPath;
+    img.alt = adId ? `ad ${adId}` : '';
+    lb.appendChild(img);
+    if ((assetType === 'video' || assetType === 'video_evicted') && metaUrl) {
+      const a = document.createElement('a');
+      a.className = 'meta-cta';
+      a.href = metaUrl;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = 'Watch on Meta Ad Library →';
+      lb.appendChild(a);
+    }
+  }
+  lb.classList.add('open');
+}
+
 function bindLightbox(scope) {
-  (scope || document).querySelectorAll('.creative img').forEach(img => {
-    img.addEventListener('click', e => {
-      const lb = document.getElementById('lightbox');
-      lb.querySelector('img').src = e.target.src;
-      lb.classList.add('open');
+  // Two click surfaces: legacy `.creative img` (image-only fallback) and the
+  // new `.creative-link` wrapper which carries data-asset-* attributes.
+  (scope || document).querySelectorAll('.creative-link').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      _openLightbox({
+        assetType: link.getAttribute('data-asset-type'),
+        assetPath: relativize(link.getAttribute('data-asset-path')),
+        thumbPath: relativize(link.getAttribute('data-thumb-path')),
+        metaUrl: link.getAttribute('data-meta-url'),
+        adId: link.getAttribute('data-ad-id'),
+      });
+    });
+  });
+  (scope || document).querySelectorAll('.creative > img').forEach(img => {
+    // Plain images (no wrapper) — keep simple behavior.
+    img.addEventListener('click', () => {
+      _openLightbox({assetType: 'image', assetPath: null, thumbPath: img.src});
     });
   });
 }
 bindLightbox(document);
-document.getElementById('lightbox').addEventListener('click', () => {
-  document.getElementById('lightbox').classList.remove('open');
+document.getElementById('lightbox').addEventListener('click', e => {
+  // Click on the backdrop OR the close edge — but not on the controls / CTA.
+  if (e.target.id === 'lightbox') {
+    e.currentTarget.classList.remove('open');
+    e.currentTarget.innerHTML = '';
+  }
 });
 
 // ---- FILTER GALLERY ----
@@ -730,6 +856,7 @@ const filterState = {
   context: new Set(), bgColor: new Set(), modelGender: new Set(),
   productInUse: new Set(), productGrouping: new Set(),
   certifications: new Set(), awards: new Set(), layoutFlags: new Set(),
+  assetType: new Set(),
 };
 
 function matchesFilters(c) {
@@ -746,13 +873,48 @@ function matchesFilters(c) {
   return true;
 }
 
+// Format seconds → 'M:SS' (small helper used in both the gallery + delta view).
+function _fmtDur(sec) {
+  if (!sec) return '';
+  const s = Math.round(sec);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+// For video creatives, the thumbnail must be a static image — pick the first
+// frame in the asset's directory. Mp4 paths follow the convention
+// `.../{ad_id}/video.mp4`; the first frame is `.../{ad_id}/frame_00_t*.jpg`.
+function _thumbForCreative(c) {
+  if ((c.assetType === 'video' || c.assetType === 'video_evicted')
+      && c.imgPath && c.imgPath.endsWith('.mp4')) {
+    // We don't know the exact frame timestamp from the client; the simplest
+    // approach is to swap `video.mp4` → `frame_00_t00000.jpg`. Padding is
+    // fixed-width in process_video (idx:02d, ms:05d) so this works for the
+    // canonical first frame. If extraction shifted the leading frame, the
+    // dashboard falls back to the imgPath (which is the mp4 — browsers
+    // show a play-icon placeholder).
+    return c.imgPath.replace(/video\\.mp4$/, 'frame_00_t00000.jpg');
+  }
+  return c.imgPath;
+}
+
 function renderFilterGallery() {
   const container = document.getElementById('filter-gallery-grid');
   if (!container) return;
   const matched = DATA.client_creatives.filter(matchesFilters);
-  container.innerHTML = matched.map(c => `
+  container.innerHTML = matched.map(c => {
+    const thumb = _thumbForCreative(c);
+    const dur = _fmtDur(c.videoDurationSec);
+    const at = c.assetType || 'image';
+    return `
     <div class="creative" data-comp="${c.comp}">
-      <img src="${relativize(c.imgPath)}" loading="lazy" alt="${c.adId}">
+      <a class="thumb-wrap creative-link" data-asset-type="${at}"
+         data-asset-path="${c.imgPath}"
+         data-thumb-path="${thumb}"
+         data-meta-url="${c.metaAdUrl || ''}"
+         data-ad-id="${c.adId}" style="display:block">
+        <img src="${relativize(thumb)}" loading="lazy" alt="${c.adId}">
+        ${dur ? `<span class="dur-chip">${dur}</span>` : ''}
+      </a>
       <div class="body">
         <div class="summary">${escapeHTML(c.summary || '(no summary)')}</div>
         <div class="muted"><code>${escapeHTML(c.comp)}</code> · ad <code>${c.adId}</code></div>
@@ -764,7 +926,7 @@ function renderFilterGallery() {
         </div>
       </div>
     </div>
-  `).join('');
+  `;}).join('');
   document.getElementById('filter-status-count').textContent =
     `${matched.length} of ${DATA.client_creatives.length} creatives`;
   bindLightbox(container);
@@ -775,6 +937,7 @@ function buildFilterDropdowns() {
   if (!root) return;
   const groups = [
     {key: 'comp', label: 'Brand', getter: c => [c.comp]},
+    {key: 'assetType', label: 'Asset type', getter: c => c.assetType ? [c.assetType] : []},
     {key: 'context', label: 'Source', getter: c => c.context ? [c.context] : []},
     {key: 'photo', label: 'Photography', getter: c => c.photo ? [c.photo] : []},
     {key: 'prod', label: 'Production', getter: c => c.prod ? [c.prod] : []},
@@ -1485,11 +1648,21 @@ def _render_most_served_snapshot(brands: list, top_ads_by_brand: dict, dashboard
             """)
             continue
         thumb_html = ''
+        asset_type = first.get("thumb_asset_type") or "image"
+        vmeta = _video_meta_for_render(first.get("thumb_analysis_json"))
+        dur_chip = (
+            f'<span class="dur-chip">{_format_duration(vmeta.get("duration_sec"))}</span>'
+            if vmeta.get("duration_sec") else ''
+        )
         if first.get("thumb_path"):
-            rel = _relpath(Path(first["thumb_path"]), dashboard_dir)
+            thumb_rel = _thumb_src(first["thumb_path"], asset_type, dashboard_dir)
             thumb_html = (
-                f'<img src="{rel}" loading="lazy" alt="top served ad" '
+                f'<span class="thumb-wrap" data-asset-type="{_esc(asset_type)}" '
+                f'style="display:block">'
+                f'<img src="{thumb_rel}" loading="lazy" alt="top served ad" '
                 f'style="width:100%;aspect-ratio:1.4/1;object-fit:cover;border-radius:3px">'
+                f'{dur_chip}'
+                f'</span>'
             )
         else:
             thumb_html = (
@@ -1577,12 +1750,28 @@ def _render_top_served_panel(top_ads: list, dashboard_dir: Path) -> str:
                  'font-weight:700;letter-spacing:0.5px;padding:2px 7px;border-radius:3px">INACTIVE</span>'
         )
         thumb_html = ''
+        asset_type = ad.get("thumb_asset_type") or "image"
+        vmeta = _video_meta_for_render(ad.get("thumb_analysis_json"))
+        dur_chip = (
+            f'<span class="dur-chip">{_format_duration(vmeta.get("duration_sec"))}</span>'
+            if vmeta.get("duration_sec") else ''
+        )
         if ad.get("thumb_path"):
-            rel = _relpath(Path(ad["thumb_path"]), dashboard_dir)
+            thumb_rel = _thumb_src(ad["thumb_path"], asset_type, dashboard_dir)
+            asset_rel = _relpath(Path(ad["thumb_path"]), dashboard_dir)
+            mau = _meta_ad_url(ad.get("ad_archive_id"))
             thumb_html = (
-                f'<img src="{rel}" loading="lazy" alt="ad {_esc(ad["ad_archive_id"])}" '
+                f'<a class="thumb-wrap creative-link" data-asset-type="{_esc(asset_type)}" '
+                f'data-asset-path="{_esc(asset_rel)}" '
+                f'data-thumb-path="{_esc(thumb_rel)}" '
+                f'data-meta-url="{_esc(mau)}" '
+                f'data-ad-id="{_esc(ad["ad_archive_id"])}" '
+                f'style="display:block">'
+                f'<img src="{thumb_rel}" loading="lazy" alt="ad {_esc(ad["ad_archive_id"])}" '
                 f'style="width:100%;aspect-ratio:1.4/1;object-fit:cover;border-radius:3px;'
                 f'background:#f0f2f5">'
+                f'{dur_chip}'
+                f'</a>'
             )
         cta_html = (
             f'<a href="{_esc(link)}" target="_blank" '
@@ -1614,7 +1803,15 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
     gallery_items = []
     for rec in recs[:36]:
         a = rec.analysis
-        img_rel = _relpath(Path(rec.asset_path), dashboard_dir)
+        asset_type = rec.asset_type or "image"
+        asset_rel = _relpath(Path(rec.asset_path), dashboard_dir)
+        thumb_rel = _thumb_src(rec.asset_path, asset_type, dashboard_dir)
+        vmeta = a.get("video_meta") or {}
+        dur_chip = (
+            f'<span class="dur-chip">{_format_duration(vmeta.get("duration_sec"))}</span>'
+            if vmeta.get("duration_sec") else ''
+        )
+        mau = _meta_ad_url(rec.ad_archive_id)
         summary = _esc(a.get("summary_one_line") or "")
         tags_html = []
         ps = a.get("photography_style")
@@ -1629,7 +1826,15 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
             tags_html.append(f'<span class="tag kf">{_esc(f)}</span>')
         gallery_items.append(f"""
         <div class="creative">
-          <img src="{img_rel}" loading="lazy" alt="ad {rec.ad_archive_id}">
+          <span class="thumb-wrap creative-link" data-asset-type="{_esc(asset_type)}"
+                data-asset-path="{_esc(asset_rel)}"
+                data-thumb-path="{_esc(thumb_rel)}"
+                data-meta-url="{_esc(mau)}"
+                data-ad-id="{_esc(rec.ad_archive_id)}"
+                style="display:block">
+            <img src="{thumb_rel}" loading="lazy" alt="ad {rec.ad_archive_id}">
+            {dur_chip}
+          </span>
           <div class="body">
             <div class="summary">{summary}</div>
             <div class="muted">ad <code>{_esc(rec.ad_archive_id)}</code></div>

@@ -220,6 +220,7 @@ def ingest_one(competitor: Competitor, source_idx: int, settings: Settings | Non
         if source.type == "meta_ads":
             ads = result.extras.get("ads", [])
             creative_inserts = 0
+            video_inserts = 0
             for ad in ads:
                 ad_row_id, is_new = upsert_ad(conn, competitor.id, ad)
                 if is_new and ad.get("ad_archive_id"):
@@ -236,6 +237,32 @@ def ingest_one(competitor: Competitor, source_idx: int, settings: Settings | Non
                     )
                     if inserted:
                         creative_inserts += 1
+                # Persist the video creative row (mp4) — frames + transcript live
+                # alongside in `data/creative/{comp}/{archive_id}/`. The analyzer
+                # picks them up via the sidecar. phash is the first frame's
+                # (better dedup signal than mp4 bytes).
+                if ad.get("local_video_path"):
+                    vmeta = ad.get("video_meta") or {}
+                    first_frame = (vmeta.get("frames") or [{}])[0].get("path")
+                    phash = _safe_phash(first_frame) if first_frame else None
+                    _, inserted = upsert_creative(
+                        conn,
+                        ad_id=ad_row_id,
+                        asset_type="video",
+                        asset_path=ad["local_video_path"],
+                        phash=phash,
+                    )
+                    if inserted:
+                        video_inserts += 1
+            # mp4 retention sweep — keep mp4 only for top-N by popularity. Frames
+            # + transcripts are KEPT for all videos (analyzer inputs).
+            try:
+                from .storage import prune_videos
+                evicted = prune_videos(conn, competitor.id, keep_n=12)
+            except Exception as e:
+                evicted = 0
+                audit(conn, actor="enrichment", action="video_prune_failed",
+                      details={"err": str(e), "competitor": competitor.id})
             audit(
                 conn,
                 actor="enrichment",
@@ -244,6 +271,8 @@ def ingest_one(competitor: Competitor, source_idx: int, settings: Settings | Non
                     "total": len(ads),
                     "new": len(report.new_ads),
                     "creatives_inserted": creative_inserts,
+                    "video_creatives_inserted": video_inserts,
+                    "videos_evicted_from_top12": evicted,
                 },
             )
 

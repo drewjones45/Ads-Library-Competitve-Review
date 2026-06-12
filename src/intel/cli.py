@@ -57,6 +57,23 @@ def status() -> None:
         "META_AD_LIBRARY_ACCESS_TOKEN",
         "set" if os.environ.get("META_AD_LIBRARY_ACCESS_TOKEN") else "[yellow]missing[/yellow]",
     )
+    # Whisper API key — optional, gates voice-over transcription on video ads.
+    has_whisper = bool(os.environ.get("OPENAI_API_KEY") or os.environ.get("INTEL_WHISPER_API_KEY"))
+    t.add_row(
+        "OPENAI_API_KEY / INTEL_WHISPER_API_KEY",
+        "set (video voice-over transcription on)" if has_whisper
+        else "[yellow]unset — video analysis runs visual-only[/yellow]",
+    )
+    # ffmpeg / ffprobe — required for video analysis pipeline.
+    try:
+        from .analysis.video import check_ffmpeg
+        ok, detail = check_ffmpeg()
+        t.add_row(
+            "ffmpeg/ffprobe",
+            f"[green]found[/green] · {detail}" if ok else f"[red]{detail}[/red]",
+        )
+    except Exception as e:
+        t.add_row("ffmpeg/ffprobe", f"[red]check failed: {e}[/red]")
     if DB_PATH.exists():
         with connect() as conn:
             for tbl in ["competitors", "sources", "observations", "ads", "creatives", "offers", "briefings", "audit_log"]:
@@ -218,6 +235,71 @@ def analyze_creatives_cmd(
             console.print(f"  - {e}")
         if len(report.errors) > 5:
             console.print(f"  …+{len(report.errors)-5} more")
+
+
+@cli.command("prune-videos")
+@click.option("--competitor", "competitor_id", default=None, help="single competitor; else all brands")
+@click.option("--keep-n", default=12, type=int, help="number of top-popularity videos to keep mp4s for, per brand")
+def prune_videos_cmd(competitor_id: str | None, keep_n: int) -> None:
+    """Delete mp4 files for video ads outside the top-N most-popular per brand.
+
+    Frames + transcripts + analysis_json are KEPT — only the bulky mp4 is evicted.
+    The dashboard renders evicted videos with first-frame + "Watch on Meta Ad
+    Library" click-out instead of inline <video> playback.
+
+    Run automatically at the end of every `intel ingest` for meta_ads sources;
+    expose this command for manual reruns (e.g., after lowering keep-N).
+    """
+    from .storage import prune_videos, connect
+    with connect() as conn:
+        if competitor_id:
+            comps = [competitor_id]
+        else:
+            comps = [r["id"] for r in conn.execute("SELECT id FROM competitors").fetchall()]
+        total = 0
+        for cid in comps:
+            evicted = prune_videos(conn, cid, keep_n=keep_n)
+            total += evicted
+            if evicted:
+                console.print(f"  {cid}: evicted {evicted} mp4(s)")
+        console.print(f"[green]total evicted: {total}[/green]")
+
+
+@cli.command("reanalyze-videos")
+@click.option("--competitor", "competitor_id", default=None, help="single competitor; else all brands")
+@click.option("--limit", default=50, type=int, help="cap on model calls")
+def reanalyze_videos_cmd(competitor_id: str | None, limit: int) -> None:
+    """Force the video analyzer to re-run on every video creative (regardless of
+    whether it was already analyzed). Useful when the video schema/prompt
+    changes — the existing analyses are stale but the frames + transcript are
+    fine to reuse.
+
+    Image creatives are NOT touched (use --force-reanalyze on `analyze-creatives`
+    for that case).
+    """
+    from .storage import connect
+    from .analysis.creative_batch import analyze_pending
+    with connect() as conn:
+        # Reset analyzed_at for video creatives so they show up in _pending again.
+        q = (
+            "UPDATE creatives SET analyzed_at=NULL WHERE asset_type IN ('video','video_evicted')"
+        )
+        params: tuple = ()
+        if competitor_id:
+            q += (
+                " AND id IN (SELECT cr.id FROM creatives cr "
+                "JOIN ads a ON a.id=cr.ad_id WHERE a.competitor_id = ?)"
+            )
+            params = (competitor_id,)
+        cur = conn.execute(q, params)
+        console.print(f"reset analyzed_at on {cur.rowcount} video creative(s)")
+    report = analyze_pending(
+        competitor_id=competitor_id,
+        limit=limit,
+        dedupe_by_phash=False,  # bypass dedup so every video gets fresh analysis
+        force_reanalyze=False,
+    )
+    console.print(str(report))
 
 
 @cli.command("creative-readout")

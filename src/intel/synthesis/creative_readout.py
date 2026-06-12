@@ -78,6 +78,8 @@ class CreativeRecord:
     start_date: str | None = None
     last_seen: str | None = None
     active: int = 0
+    # Asset type drives the dashboard's video-vs-image rendering branch.
+    asset_type: str = "image"
 
 
 @dataclass
@@ -121,7 +123,7 @@ def pull_analyzed_creatives(
         "       comp.name AS comp_name, a.id AS ad_id, "
         "       COALESCE(a.ad_archive_id, '') AS ad_archive_id, "
         "       COALESCE(a.first_seen, cr.analyzed_at) AS first_seen, "
-        "       cr.asset_path, cr.analyzed_at, cr.analysis_json, "
+        "       cr.asset_path, cr.analyzed_at, cr.analysis_json, cr.asset_type, "
         "       a.serp_position_rank, a.start_date, a.last_seen, a.active "
         "FROM creatives cr "
         "LEFT JOIN ads a ON a.id = cr.ad_id "
@@ -158,6 +160,7 @@ def pull_analyzed_creatives(
             start_date=r["start_date"],
             last_seen=r["last_seen"],
             active=r["active"] or 0,
+            asset_type=r["asset_type"] or "image",
         ))
     return out
 

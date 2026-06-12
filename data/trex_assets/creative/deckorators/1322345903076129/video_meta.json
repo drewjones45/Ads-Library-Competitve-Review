@@ -1,0 +1,32 @@
+{
+  "duration_sec": 6.01,
+  "width": 356,
+  "height": 640,
+  "has_audio": false,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/trex_assets/creative/deckorators/1322345903076129/frame_00_t01200.jpg",
+      "t_sec": 1.2,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/trex_assets/creative/deckorators/1322345903076129/frame_01_t02400.jpg",
+      "t_sec": 2.4,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/trex_assets/creative/deckorators/1322345903076129/frame_02_t03610.jpg",
+      "t_sec": 3.61,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/trex_assets/creative/deckorators/1322345903076129/frame_03_t04810.jpg",
+      "t_sec": 4.81,
+      "idx": 3
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-06-12T00:32:18+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/trex_assets/creative/deckorators/1322345903076129/video.mp4"
+}

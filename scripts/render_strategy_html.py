@@ -286,6 +286,41 @@ def chart_quadrant(conn, d):
 
 # =============== reference board ===============
 
+def _renderable_thumb_path(asset_path, asset_type):
+    """For video creatives, the asset_path is an mp4 — useless for HTML
+    embedding. Resolve the first extracted frame in the same directory; fall
+    back to the asset_path if no frames exist (lets evicted/legacy rows still
+    render their first-frame paths)."""
+    if not asset_path:
+        return None
+    p = Path(asset_path)
+    if (asset_type in ("video", "video_evicted")) and p.suffix.lower() == ".mp4":
+        try:
+            frames = sorted(p.parent.glob("frame_*_t*.jpg"))
+            if frames:
+                return str(frames[0])
+        except Exception:
+            pass
+    return str(p)
+
+
+def _video_duration_chip(analysis_json):
+    """Return an HTML chip with formatted duration for video creatives, or ''."""
+    if not analysis_json:
+        return ""
+    try:
+        if isinstance(analysis_json, str):
+            analysis_json = json.loads(analysis_json)
+    except Exception:
+        return ""
+    vm = analysis_json.get("video_meta") or {}
+    sec = vm.get("duration_sec")
+    if not sec:
+        return ""
+    s = int(round(float(sec)))
+    return f'<span class="dur-chip">{s // 60}:{s % 60:02d}</span>'
+
+
 def _b64_image(path, max_width=None, max_height=None):
     p = Path(path)
     if not p.exists(): return None
@@ -327,13 +362,22 @@ def top_creatives_by_reach(conn, d):
             (cid,),
         ).fetchone()
         max_rank = (max_rank_row[0] or 0) if max_rank_row else 0
+        # Prefer a video creative's asset_path when one exists (we swap to the
+        # first frame below); fall back to the first image creative.
         rows = conn.execute(
             "SELECT a.ad_archive_id, a.serp_position_rank, a.start_date, "
             "a.last_seen, a.active, a.body_text, a.cta_type, "
-            "(SELECT c.asset_path FROM creatives c "
-            "  WHERE c.ad_id=a.id AND c.asset_path IS NOT NULL "
-            "  ORDER BY c.id LIMIT 1) AS thumb_path "
-            "FROM ads a WHERE a.competitor_id=?",
+            "COALESCE(c_video.asset_path, c_img.asset_path) AS thumb_path, "
+            "COALESCE(c_video.asset_type, c_img.asset_type) AS thumb_asset_type, "
+            "COALESCE(c_video.analysis_json, c_img.analysis_json) AS thumb_analysis_json "
+            "FROM ads a "
+            "LEFT JOIN creatives c_video ON c_video.id = ("
+            "  SELECT id FROM creatives WHERE ad_id=a.id "
+            "  AND asset_type IN ('video','video_evicted') ORDER BY id LIMIT 1) "
+            "LEFT JOIN creatives c_img ON c_img.id = ("
+            "  SELECT id FROM creatives WHERE ad_id=a.id "
+            "  AND asset_type='image' ORDER BY id LIMIT 1) "
+            "WHERE a.competitor_id=?",
             (cid,),
         ).fetchall()
         if not rows:
@@ -366,7 +410,13 @@ def top_creatives_by_reach(conn, d):
             continue
         cards = []
         for ad in top:
-            b64 = _b64_image(ad.get("thumb_path"), max_width=400, max_height=400) if ad.get("thumb_path") else ""
+            # Resolve the renderable thumb (first frame for videos, asset_path
+            # for images). The strategy report is a static HTML doc — we
+            # always embed images, never mp4 (would balloon to multi-MB).
+            asset_type = ad.get("thumb_asset_type") or "image"
+            renderable = _renderable_thumb_path(ad.get("thumb_path"), asset_type)
+            b64 = _b64_image(renderable, max_width=400, max_height=400) if renderable else ""
+            dur_chip = _video_duration_chip(ad.get("thumb_analysis_json"))
             img_html = (
                 f'<img src="{b64}" alt="ad {_html.escape(str(ad["ad_archive_id"]))}"/>'
                 if b64
@@ -381,8 +431,11 @@ def top_creatives_by_reach(conn, d):
             cta = ad.get("cta_type") or ""
             cards.append(f"""
             <div class="tcr-card">
-              <a href="https://www.facebook.com/ads/library/?id={_html.escape(str(ad['ad_archive_id']))}" target="_blank" rel="noopener">
+              <a class="thumb-wrap" data-asset-type="{_html.escape(asset_type)}"
+                 href="https://www.facebook.com/ads/library/?id={_html.escape(str(ad['ad_archive_id']))}"
+                 target="_blank" rel="noopener">
                 {img_html}
+                {dur_chip}
               </a>
               <div class="tcr-chips">
                 <span class="tcr-chip tcr-rank">RANK {rank_label}</span>
@@ -417,19 +470,28 @@ def reference_board(conn, d):
         for item in theme["items"]:
             ad_id = item["ad_archive_id"]
             row = conn.execute(
-                "SELECT a.competitor_id, a.page_name, c.asset_path "
+                "SELECT a.competitor_id, a.page_name, c.asset_path, c.asset_type, c.analysis_json "
                 "FROM ads a LEFT JOIN creatives c ON c.ad_id = a.id "
-                "WHERE a.ad_archive_id = ? AND c.asset_path IS NOT NULL LIMIT 1",
+                "WHERE a.ad_archive_id = ? AND c.asset_path IS NOT NULL "
+                # Prefer video creative rows (they carry duration/transcript);
+                # if absent the image row wins.
+                "ORDER BY CASE c.asset_type WHEN 'video' THEN 0 WHEN 'video_evicted' THEN 1 ELSE 2 END "
+                "LIMIT 1",
                 (ad_id,),
             ).fetchone()
             if not row: continue
             cid = item.get("comp_override") or row[0]
-            b64 = _b64_image(row[2])
+            asset_type = row[3] or "image"
+            renderable = _renderable_thumb_path(row[2], asset_type)
+            b64 = _b64_image(renderable)
             if not b64: continue
+            dur_chip = _video_duration_chip(row[4])
             items_html.append(f'''
             <div class="ref-item">
-              <a href="https://www.facebook.com/ads/library/?id={_html.escape(str(ad_id))}" target="_blank" rel="noopener">
+              <a class="thumb-wrap" data-asset-type="{_html.escape(asset_type)}"
+                 href="https://www.facebook.com/ads/library/?id={_html.escape(str(ad_id))}" target="_blank" rel="noopener">
                 <img src="{b64}" alt="ad {_html.escape(str(ad_id))}"/>
+                {dur_chip}
               </a>
               <div class="ref-meta">
                 <span class="ref-brand">{_html.escape(labels.get(cid, cid))}</span>
@@ -986,6 +1048,21 @@ figure.quadrant-chart svg {{ border-radius: 6px 6px 0 0; }}
   border-top: 1px solid var(--bg-card-border);
   border-radius: 0 0 6px 6px;
   line-height: 1.5;
+}}
+
+/* ---- video thumbnail treatment (shared by top-served + reference board) ---- */
+.thumb-wrap {{ position: relative; display: block; }}
+.thumb-wrap[data-asset-type="video"]::after,
+.thumb-wrap[data-asset-type="video_evicted"]::after {{
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><circle cx='30' cy='30' r='26' fill='rgba(0,0,0,0.6)'/><polygon points='24,18 24,42 44,30' fill='%23d4f057'/></svg>");
+  background-repeat: no-repeat; background-position: center; background-size: 36px 36px;
+}}
+.thumb-wrap .dur-chip {{
+  position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.78);
+  color: var(--accent); font-family: "Inter", sans-serif; font-size: 10px;
+  font-weight: 700; padding: 2px 6px; border-radius: 2px; letter-spacing: 0.4px;
+  pointer-events: none;
 }}
 
 /* ---- top served creatives (auto-populated) ---- */

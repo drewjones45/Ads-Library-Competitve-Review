@@ -113,6 +113,7 @@ def scrape_page_ads(
             cards = _extract_cards(page, max_cards=max_cards)
             if download_images:
                 _download_card_images_playwright(cards, asset_dir, context)
+                _process_card_videos_playwright(cards, asset_dir, context)
             return cards
         finally:
             context.close()
@@ -403,3 +404,41 @@ def _download_card_images_playwright(cards: list[dict[str, Any]], asset_dir: Pat
             except Exception as e:
                 log.debug("image download failed %s: %s", u, e)
         card["local_creative_paths"] = paths
+
+
+def _process_card_videos_playwright(cards: list[dict[str, Any]], asset_dir: Path, context) -> None:
+    """Download mp4s + extract frames + (optionally) transcribe audio for every
+    card with `creative_video_urls`. Runs INLINE with the scrape because Meta's
+    fbcdn video URLs expire within hours — defer to later cron = 403 forever.
+
+    On per-video failure, logs and continues. Stamps `card["local_video_path"]`
+    and `card["video_meta"]` so the runner can persist a `creatives` row.
+    """
+    # Import inside the function so the scraper still loads when ffmpeg is
+    # missing — we'll just no-op on video processing in that case.
+    try:
+        from ..analysis.video import process_video, check_ffmpeg
+    except Exception as e:
+        log.debug("video module unavailable: %s", e)
+        return
+    ok, detail = check_ffmpeg()
+    if not ok:
+        log.info("ffmpeg not available (%s); skipping video processing this run", detail)
+        return
+    api = context.request
+    for card in cards:
+        urls = card.get("creative_video_urls") or []
+        if not urls:
+            continue
+        try:
+            sidecar = process_video(
+                api_request_context=api,
+                video_urls=urls,
+                asset_dir=asset_dir,
+                ad_archive_id=card["ad_archive_id"],
+            )
+            if sidecar:
+                card["local_video_path"] = sidecar.get("video_path")
+                card["video_meta"] = sidecar
+        except Exception as e:
+            log.warning("video pipeline failed for ad %s: %s", card.get("ad_archive_id"), e)

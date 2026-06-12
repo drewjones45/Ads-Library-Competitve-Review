@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .creative import analyze_creative_image
+from .video import analyze_creative_video
 from ..config import load_settings
 from ..storage import audit, connect, utcnow
 
@@ -42,6 +43,8 @@ class BatchReport:
 
 _ASSET_TYPE_TO_CONTEXT = {
     "image": "meta_ad",
+    "video": "meta_ad",
+    "video_evicted": "meta_ad",
     "video_thumb": "meta_ad",
     "amazon_store_image": "brand_store",
     "amazon_store_hero": "brand_store_hero",
@@ -85,14 +88,29 @@ def _pending(
     return conn.execute(q, params).fetchall()
 
 
-def _existing_phash_analysis(conn: sqlite3.Connection, phash: str) -> dict | None:
-    """If we've already analyzed an image with this perceptual hash, return its JSON."""
-    row = conn.execute(
-        "SELECT analysis_json FROM creatives "
-        "WHERE phash = ? AND analyzed_at IS NOT NULL AND analysis_json IS NOT NULL "
-        "LIMIT 1",
-        (phash,),
-    ).fetchone()
+def _existing_phash_analysis(conn: sqlite3.Connection, phash: str, asset_type: str) -> dict | None:
+    """If we've already analyzed a creative with this perceptual hash AND the same
+    asset_type, return its JSON. The asset_type match is required because a
+    video's first-frame phash can collide with an unrelated still image's phash,
+    and the two analyses follow different schemas (video has a video_meta block,
+    image does not)."""
+    # 'video_evicted' shares schema with 'video' — both have video_meta — so we
+    # allow cross-reuse between them.
+    if asset_type in ("video", "video_evicted"):
+        types = ("video", "video_evicted")
+        row = conn.execute(
+            "SELECT analysis_json FROM creatives "
+            "WHERE phash = ? AND asset_type IN (?, ?) "
+            "AND analyzed_at IS NOT NULL AND analysis_json IS NOT NULL LIMIT 1",
+            (phash, types[0], types[1]),
+        ).fetchone()
+    else:
+        row = conn.execute(
+            "SELECT analysis_json FROM creatives "
+            "WHERE phash = ? AND asset_type = ? "
+            "AND analyzed_at IS NOT NULL AND analysis_json IS NOT NULL LIMIT 1",
+            (phash, asset_type),
+        ).fetchone()
     if row and row["analysis_json"]:
         try:
             return json.loads(row["analysis_json"])
@@ -156,14 +174,28 @@ def analyze_pending(
             # row gets the new schema applied.
             phash = row["phash"]
             if dedupe_by_phash and phash and not force_reanalyze:
-                prior = _existing_phash_analysis(conn, phash)
+                prior = _existing_phash_analysis(conn, phash, row["asset_type"] or "image")
                 if prior is not None:
                     _store(conn, row["id"], prior, reused=True)
                     report.reused_phash += 1
                     continue
 
             try:
-                result = analyze_creative_image(path, model=model, context=context)
+                asset_type = row["asset_type"]
+                if asset_type in ("video", "video_evicted"):
+                    # Video pipeline: read sidecar next to the mp4 (or first
+                    # frame, for evicted ones) and analyze the frame sequence.
+                    sidecar = path.parent / "video_meta.json"
+                    if not sidecar.exists():
+                        report.failed += 1
+                        report.errors.append({
+                            "creative_id": row["id"], "path": str(path),
+                            "message": f"video sidecar not found at {sidecar}",
+                        })
+                        continue
+                    result = analyze_creative_video(sidecar, model=model)
+                else:
+                    result = analyze_creative_image(path, model=model, context=context)
                 if "error" in result:
                     report.failed += 1
                     report.errors.append({

@@ -561,6 +561,96 @@ def upsert_creative(
     return cur.lastrowid or 0, True
 
 
+def prune_videos(conn: sqlite3.Connection, competitor_id: str, *, keep_n: int = 12) -> int:
+    """Keep mp4 files only for the top-N most-popular ads per brand.
+
+    Frames + transcript + analysis_json are KEPT for all videos — they're the
+    analyzer's inputs, irreversibly small. Only the bulky mp4 is evicted.
+
+    For each evicted video creative:
+      - delete the mp4 from disk
+      - update asset_type from 'video' to 'video_evicted' so the dashboard
+        knows to render first-frame + Meta Ad Library click-out instead of
+        an inline <video> tag
+      - update asset_path to point at the first frame so renderers have
+        something showable
+
+    Returns the number of mp4s evicted.
+    """
+    from pathlib import Path as _Path
+
+    # Pull all video creatives for this brand with their ad's score inputs.
+    rows = conn.execute(
+        "SELECT c.id AS creative_id, c.asset_path, c.asset_type, "
+        "       a.id AS ad_id, a.serp_position_rank, a.start_date, a.last_seen, a.active "
+        "FROM creatives c JOIN ads a ON a.id = c.ad_id "
+        "WHERE a.competitor_id = ? AND c.asset_type IN ('video', 'video_evicted')",
+        (competitor_id,),
+    ).fetchall()
+    if not rows:
+        return 0
+
+    # brand_max_rank from all of the brand's ads (not just video ads).
+    max_rank_row = conn.execute(
+        "SELECT MAX(serp_position_rank) FROM ads "
+        "WHERE competitor_id=? AND serp_position_rank IS NOT NULL",
+        (competitor_id,),
+    ).fetchone()
+    brand_max_rank = (max_rank_row[0] or 0) if max_rank_row else 0
+
+    scored = []
+    for r in rows:
+        score = popularity_score(
+            r["serp_position_rank"], r["start_date"], r["last_seen"],
+            r["active"] or 0, brand_max_rank,
+        )
+        scored.append((score, dict(r)))
+    scored.sort(key=lambda t: t[0], reverse=True)
+    keep_ids = {t[1]["creative_id"] for t in scored[:keep_n]}
+
+    evicted = 0
+    for score, r in scored:
+        cid = r["creative_id"]
+        path = r["asset_path"]
+        is_evicted_already = (r["asset_type"] == "video_evicted")
+        in_top = cid in keep_ids
+        if in_top:
+            # Restore from evicted state if the ad climbed back into the top-N
+            # (rare but possible). We don't re-download — just flag.
+            if is_evicted_already:
+                conn.execute(
+                    "UPDATE creatives SET asset_type='video' WHERE id=?",
+                    (cid,),
+                )
+            continue
+        # Evict: delete the mp4 from disk (if still present), update row.
+        if path and path.endswith(".mp4"):
+            try:
+                _Path(path).unlink(missing_ok=True)
+            except Exception:
+                pass
+            # Find the first frame in the same directory (always kept).
+            first_frame = None
+            try:
+                ad_dir = _Path(path).parent
+                frames = sorted(ad_dir.glob("frame_*_t*.jpg"))
+                if frames:
+                    first_frame = str(frames[0])
+            except Exception:
+                pass
+            conn.execute(
+                "UPDATE creatives SET asset_type='video_evicted', asset_path=? "
+                "WHERE id=?",
+                (first_frame or path, cid),
+            )
+            if not is_evicted_already:
+                evicted += 1
+        elif not is_evicted_already:
+            # asset_path already a frame (was evicted earlier and stamped here).
+            conn.execute("UPDATE creatives SET asset_type='video_evicted' WHERE id=?", (cid,))
+    return evicted
+
+
 def record_offer(conn: sqlite3.Connection, competitor_id: str, offer: dict) -> int:
     cur = conn.execute(
         "INSERT INTO offers(competitor_id, source, source_ref, observed_at, kind, value, threshold, description, starts_on, ends_on) "
