@@ -20,6 +20,7 @@ from pathlib import Path
 
 from .creative import analyze_creative_image
 from .landing_analysis import analyze_landing_page
+from .text_ad_analysis import analyze_text_ad
 from .video import analyze_creative_video
 from ..config import load_settings
 from ..storage import audit, connect, utcnow
@@ -52,6 +53,7 @@ _ASSET_TYPE_TO_CONTEXT = {
     "website_screenshot": "website",
     "homepage_image": "website",
     "landing_page_image": "landing_page",
+    "text_ad": "google_text_ad",
 }
 
 
@@ -214,6 +216,17 @@ def analyze_pending(
                         section=meta.get("section"),
                         model=model,
                     )
+                elif asset_type == "text_ad":
+                    # Google text ad: the asset_path IS the text_ad_meta.json
+                    # sidecar (headlines/descriptions). Pass model=None so the
+                    # analyzer picks the cheap text model — this batch's default
+                    # `model` is the vision model, wrong for a text-only task.
+                    meta = {}
+                    try:
+                        meta = json.loads(path.read_text())
+                    except Exception:
+                        meta = {}
+                    result = analyze_text_ad(meta, model=None)
                 else:
                     result = analyze_creative_image(path, model=model, context=context)
                 if "error" in result:

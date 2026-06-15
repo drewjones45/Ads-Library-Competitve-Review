@@ -1,0 +1,62 @@
+{
+  "duration_sec": 63.4,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/frame_00_t00000.jpg",
+      "t_sec": 0.0,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/frame_01_t07367.jpg",
+      "t_sec": 7.367,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/frame_02_t09200.jpg",
+      "t_sec": 9.2,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/frame_03_t38800.jpg",
+      "t_sec": 38.8,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/frame_04_t40033.jpg",
+      "t_sec": 40.033,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/frame_05_t42467.jpg",
+      "t_sec": 42.467,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/frame_06_t44333.jpg",
+      "t_sec": 44.333,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/frame_07_t48633.jpg",
+      "t_sec": 48.633,
+      "idx": 7
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/frame_08_t53267.jpg",
+      "t_sec": 53.267,
+      "idx": 8
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/frame_09_t61600.jpg",
+      "t_sec": 61.6,
+      "idx": 9
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-06-15T17:51:04+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/1628503718450211/video.mp4"
+}

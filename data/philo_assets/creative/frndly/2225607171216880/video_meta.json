@@ -1,0 +1,32 @@
+{
+  "duration_sec": 17.64,
+  "width": 640,
+  "height": 360,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/frndly/2225607171216880/frame_00_t03530.jpg",
+      "t_sec": 3.53,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/frndly/2225607171216880/frame_01_t07060.jpg",
+      "t_sec": 7.06,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/frndly/2225607171216880/frame_02_t10580.jpg",
+      "t_sec": 10.58,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/frndly/2225607171216880/frame_03_t14110.jpg",
+      "t_sec": 14.11,
+      "idx": 3
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-06-15T17:47:28+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/frndly/2225607171216880/video.mp4"
+}

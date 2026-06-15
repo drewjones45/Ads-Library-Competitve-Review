@@ -712,10 +712,18 @@ def briefings(limit: int) -> None:
 @click.option("--exclude", "exclude", multiple=True, metavar="BRAND_ID",
               help="drop these competitor ids from the dashboard (repeatable), "
                    "e.g. --exclude revlon to keep a control brand out of the main set.")
+@click.option("--platform", "platform", type=click.Choice(["meta", "google", "all"]), default="meta",
+              help="ad platform scope. 'meta' (default) keeps existing reports byte-identical even "
+                   "after Google ads land in the DB; 'all' adds Google (platform filter + Text-ads "
+                   "section + per-platform counts); 'google' = Google only.")
+@click.option("--strategy-doc", "strategy_doc", default=None, metavar="URL",
+              help="relative URL to a strategy-report HTML (e.g. ../strategy/bobs_google_positioning.html). "
+                   "When set, the 'Latest briefing' section links to that report + its sibling .pdf instead "
+                   "of rendering the briefing body.")
 @click.option("--open-after", is_flag=True, help="open the dashboard in your default browser after build")
 def dashboard(out: str | None, days: int, org_name: str, product_name: str | None,
               use_v2: bool, only: tuple[str, ...], exclude: tuple[str, ...],
-              open_after: bool) -> None:
+              open_after: bool, platform: str, strategy_doc: str | None) -> None:
     """Render a static HTML dashboard from the current DB + creatives."""
     from datetime import datetime as _dt
     if out is None:
@@ -740,9 +748,12 @@ def dashboard(out: str | None, days: int, org_name: str, product_name: str | Non
             console.print("[red]no brands left after --only/--exclude — nothing to render[/red]")
             raise SystemExit(1)
 
+    # Map platform → source scope. 'all' = both; 'meta'/'google' = that one.
+    sources = {"meta", "google"} if platform == "all" else {platform}
+
     builder = build_dashboard_v2 if use_v2 else build_dashboard
     result = builder(out, days=days, org_name=org_name, product_name=product_name,
-                     brand_ids=brand_ids)
+                     brand_ids=brand_ids, sources=sources, strategy_doc=strategy_doc)
     console.print(f"[green]wrote[/green] {result['path']}  "
                   f"({result['n_brands']} brands · {result['n_analyzed']} analyzed creatives · "
                   f"{result['size_bytes']//1024} KB)")

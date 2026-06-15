@@ -79,6 +79,7 @@ HAS_META=0
 [[ -n "${META_AD_LIBRARY_ACCESS_TOKEN:-}" ]] && HAS_META=1
 [[ $HAS_ANTHROPIC -eq 1 ]] && green "  ✓ ANTHROPIC_API_KEY set"     || yellow "  ⚠ ANTHROPIC_API_KEY missing — vision + briefing will be limited"
 [[ $HAS_META      -eq 1 ]] && green "  ✓ META_AD_LIBRARY_ACCESS_TOKEN set" || yellow "  ⚠ META token missing — Meta ads sources will fail"
+[[ -n "${SERPAPI_API_KEY:-}" ]] && green "  ✓ SERPAPI_API_KEY set (Google ATC via API)" || yellow "  ⚠ SERPAPI_API_KEY missing — Google ads (if configured) fall back to a Playwright scrape"
 
 # ---- output dir ----
 DATE="$(date -u +%Y-%m-%d)"
@@ -173,6 +174,10 @@ echo
 # ---- 8. HTML dashboard ----
 bold "[9/9] HTML dashboard"; rule
 .venv/bin/intel dashboard --out "$REPORTS/dashboard" --days "$DAYS"
+# Separate "with Google" report set (adds Google ATC ads: platform filter +
+# Text-ads section). The Meta report above is unchanged; lands in with-google/.
+.venv/bin/intel dashboard --platform all --out "$REPORTS/with-google/dashboard"    --days "$DAYS"
+.venv/bin/intel dashboard --platform all --out "$REPORTS/with-google/dashboard-v2" --days "$DAYS" --v2
 echo
 
 # ---- summary ----

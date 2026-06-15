@@ -1,0 +1,57 @@
+{
+  "duration_sec": 22.1,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/philo/824825190702858/frame_00_t00000.jpg",
+      "t_sec": 0.0,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/philo/824825190702858/frame_01_t03700.jpg",
+      "t_sec": 3.7,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/philo/824825190702858/frame_02_t05333.jpg",
+      "t_sec": 5.333,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/philo/824825190702858/frame_03_t06533.jpg",
+      "t_sec": 6.533,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/philo/824825190702858/frame_04_t08200.jpg",
+      "t_sec": 8.2,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/philo/824825190702858/frame_05_t10033.jpg",
+      "t_sec": 10.033,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/philo/824825190702858/frame_06_t10733.jpg",
+      "t_sec": 10.733,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/philo/824825190702858/frame_07_t13200.jpg",
+      "t_sec": 13.2,
+      "idx": 7
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/philo/824825190702858/frame_08_t16867.jpg",
+      "t_sec": 16.867,
+      "idx": 8
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-06-15T17:46:48+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/philo/824825190702858/video.mp4"
+}

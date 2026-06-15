@@ -1,0 +1,33 @@
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+                                Ingestion report                                
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┓
+┃ competitor ┃ source     ┃ ok ┃ changed ┃ sev  ┃ new_ads ┃ offers ┃ summary   ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━┩
+│ philo      │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ philo      │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 200     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ frndly     │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ frndly     │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 85      │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ sling      │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ sling      │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 82      │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ fubo       │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ fubo       │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 36      │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ hulu       │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ hulu       │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 200     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ youtube_tv │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+└────────────┴────────────┴────┴─────────┴──────┴─────────┴────────┴───────────┘

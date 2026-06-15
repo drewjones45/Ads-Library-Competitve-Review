@@ -1,0 +1,32 @@
+{
+  "duration_sec": 50.16,
+  "width": 360,
+  "height": 360,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/970335968827955/frame_00_t10030.jpg",
+      "t_sec": 10.03,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/970335968827955/frame_01_t20060.jpg",
+      "t_sec": 20.06,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/970335968827955/frame_02_t30100.jpg",
+      "t_sec": 30.1,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/970335968827955/frame_03_t40130.jpg",
+      "t_sec": 40.13,
+      "idx": 3
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-06-15T17:50:01+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hulu/970335968827955/video.mp4"
+}

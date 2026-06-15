@@ -48,6 +48,7 @@ CREATE INDEX IF NOT EXISTS idx_obs_source_time ON observations(source_id, observ
 CREATE TABLE IF NOT EXISTS ads (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   competitor_id TEXT NOT NULL REFERENCES competitors(id),
+  source TEXT NOT NULL DEFAULT 'meta',  -- ad platform: 'meta' | 'google'
   ad_archive_id TEXT NOT NULL,
   page_id TEXT,
   page_name TEXT,
@@ -74,7 +75,8 @@ CREATE TABLE IF NOT EXISTS creatives (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   ad_id INTEGER REFERENCES ads(id),                       -- NULL for non-ad assets (brand store, website)
   competitor_id TEXT REFERENCES competitors(id),          -- direct competitor link; redundant when ad_id is set
-  asset_type TEXT NOT NULL,           -- image | video_thumb | amazon_store_image | website_screenshot | ...
+  source TEXT NOT NULL DEFAULT 'meta',                    -- ad platform: 'meta' | 'google'
+  asset_type TEXT NOT NULL,           -- image | video_thumb | amazon_store_image | website_screenshot | text_ad | ...
   asset_path TEXT NOT NULL,           -- local path under data/creative/
   phash TEXT,                         -- perceptual hash for visual dedup
   analysis_json TEXT,                 -- vision-model classification output
@@ -288,6 +290,7 @@ def init_db(db_path: Path | None = None) -> Path:
         conn.executescript(SCHEMA)
         _migrate_creatives_table(conn)
         _migrate_ads_table(conn)
+        _migrate_source_column(conn)
     return p
 
 
@@ -303,6 +306,23 @@ def _migrate_ads_table(conn: sqlite3.Connection) -> None:
         "CREATE INDEX IF NOT EXISTS idx_ads_comp_rank "
         "ON ads(competitor_id, serp_position_rank)"
     )
+
+
+def _migrate_source_column(conn: sqlite3.Connection) -> None:
+    """Add the `source` (ad platform) column to `ads` + `creatives` on
+    pre-existing DBs. The constant DEFAULT 'meta' backfills every existing row,
+    so every ad/creative created before Google support is tagged 'meta' with no
+    data migration. Idempotent: a no-op once applied.
+
+    Must run AFTER _migrate_creatives_table, whose legacy table-rebuild recreates
+    `creatives` without the column — this ALTER adds it back afterward.
+    """
+    for tbl in ("ads", "creatives"):
+        cols = {row[1] for row in conn.execute(f"PRAGMA table_info({tbl})").fetchall()}
+        if cols and "source" not in cols:
+            conn.execute(f"ALTER TABLE {tbl} ADD COLUMN source TEXT NOT NULL DEFAULT 'meta'")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_source ON ads(competitor_id, source)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_creatives_source ON creatives(competitor_id, source)")
 
 
 def _migrate_creatives_table(conn: sqlite3.Connection) -> None:
@@ -406,6 +426,7 @@ def connect(db_path: Path | None = None) -> Iterator[sqlite3.Connection]:
     _migrate_creatives_table(conn)
     _migrate_homepage_promos_table(conn)
     _migrate_ads_table(conn)
+    _migrate_source_column(conn)
     conn.commit()
     try:
         yield conn
@@ -472,12 +493,19 @@ def record_observation(
     return cur.lastrowid or 0
 
 
-def upsert_ad(conn: sqlite3.Connection, competitor_id: str, ad: dict) -> tuple[int, bool]:
+def upsert_ad(
+    conn: sqlite3.Connection, competitor_id: str, ad: dict, *, source: str = "meta"
+) -> tuple[int, bool]:
     """Return (ad_row_id, is_new). `active` is derived from `is_active_inferred`
     (the adapter computes it from delivery stop time, since the API's own active
-    flag is unreliable for US commercial ads)."""
+    flag is unreliable for US commercial ads).
+
+    `source` is the ad platform ('meta' | 'google'); the ad dict's own 'source'
+    key wins when present so adapters can stamp it per-ad. Defaults to 'meta',
+    keeping every existing caller unchanged."""
     archive_id = str(ad["ad_archive_id"])
     active = 1 if ad.get("is_active_inferred", True) else 0
+    src = ad.get("source", source)
     existing = conn.execute(
         "SELECT id, first_seen FROM ads WHERE ad_archive_id=?", (archive_id,)
     ).fetchone()
@@ -487,13 +515,14 @@ def upsert_ad(conn: sqlite3.Connection, competitor_id: str, ad: dict) -> tuple[i
         # serp_position_rank: always overwrite with the freshest scrape, even with NULL
         # (graph-path ads have no rank; leaving NULL is correct).
         conn.execute(
-            "UPDATE ads SET last_seen=?, active=?, end_date=COALESCE(?, end_date), "
+            "UPDATE ads SET last_seen=?, active=?, source=COALESCE(?, source), end_date=COALESCE(?, end_date), "
             "body_text=COALESCE(?, body_text), cta_type=COALESCE(?, cta_type), "
             "link_url=COALESCE(?, link_url), publisher_platforms=COALESCE(?, publisher_platforms), "
             "raw_json=?, serp_position_rank=? WHERE id=?",
             (
                 now,
                 active,
+                ad.get("source"),
                 ad.get("end_date"),
                 ad.get("body_text"),
                 ad.get("cta_type"),
@@ -506,12 +535,13 @@ def upsert_ad(conn: sqlite3.Connection, competitor_id: str, ad: dict) -> tuple[i
         )
         return existing["id"], False
     cur = conn.execute(
-        "INSERT INTO ads(competitor_id, ad_archive_id, page_id, page_name, first_seen, last_seen, "
+        "INSERT INTO ads(competitor_id, source, ad_archive_id, page_id, page_name, first_seen, last_seen, "
         "active, start_date, end_date, body_text, cta_type, link_url, publisher_platforms, raw_json, "
         "serp_position_rank) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (
             competitor_id,
+            src,
             archive_id,
             ad.get("page_id"),
             ad.get("page_name"),
@@ -539,11 +569,13 @@ def upsert_creative(
     phash: str | None = None,
     *,
     competitor_id: str | None = None,
+    source: str = "meta",
 ) -> tuple[int, bool]:
     """Insert a creative asset row. Idempotent on `asset_path` (unique per file
     on disk regardless of whether it came from an ad or a brand store).
     `ad_id` may be None for non-ad assets (brand store, website screenshot);
     in that case `competitor_id` must be provided.
+    `source` is the ad platform ('meta' | 'google'); defaults to 'meta'.
     Returns (row_id, is_new)."""
     if ad_id is None and not competitor_id:
         raise ValueError("upsert_creative needs either ad_id or competitor_id")
@@ -554,9 +586,9 @@ def upsert_creative(
     if existing:
         return existing["id"], False
     cur = conn.execute(
-        "INSERT INTO creatives(ad_id, competitor_id, asset_type, asset_path, phash) "
-        "VALUES (?,?,?,?,?)",
-        (ad_id, competitor_id, asset_type, asset_path, phash),
+        "INSERT INTO creatives(ad_id, competitor_id, source, asset_type, asset_path, phash) "
+        "VALUES (?,?,?,?,?,?)",
+        (ad_id, competitor_id, source, asset_type, asset_path, phash),
     )
     return cur.lastrowid or 0, True
 

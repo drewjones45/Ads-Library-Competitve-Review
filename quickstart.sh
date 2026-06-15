@@ -80,6 +80,7 @@ HAS_META=0
 [[ -n "${META_AD_LIBRARY_ACCESS_TOKEN:-}" ]] && HAS_META=1
 [[ $HAS_ANTHROPIC -eq 1 ]] && green "  ✓ ANTHROPIC_API_KEY set"     || yellow "  ⚠ ANTHROPIC_API_KEY missing — vision + briefing will be limited"
 [[ $HAS_META      -eq 1 ]] && green "  ✓ META_AD_LIBRARY_ACCESS_TOKEN set" || yellow "  ⚠ META token missing — Meta ads sources will fail"
+[[ -n "${SERPAPI_API_KEY:-}" ]] && green "  ✓ SERPAPI_API_KEY set (Google ATC via API)" || yellow "  ⚠ SERPAPI_API_KEY missing — Google ads (if configured) fall back to a Playwright scrape"
 
 # ---- output dir ----
 DATE="$(date -u +%Y-%m-%d)"
@@ -188,6 +189,12 @@ echo
 bold "[9/9] HTML dashboard"; rule
 .venv/bin/intel dashboard --out "$REPORTS/dashboard" --days "$DAYS" --exclude revlon
 .venv/bin/intel dashboard --out "reports/revlon/${DATE}/dashboard" --days "$DAYS" --only revlon
+# Separate "with Google" report set — adds Google ATC ads (in-dashboard platform
+# filter + dedicated Text-ads section). The Meta reports above are unchanged;
+# these land in a distinct with-google/ subfolder so nothing is clobbered. Empty
+# of Google data until a google_ads source is configured in competitors.yaml.
+.venv/bin/intel dashboard --platform all --out "$REPORTS/with-google/dashboard"    --days "$DAYS" --exclude revlon
+.venv/bin/intel dashboard --platform all --out "$REPORTS/with-google/dashboard-v2" --days "$DAYS" --exclude revlon --v2
 echo
 
 # ---- summary ----
@@ -197,6 +204,7 @@ find "$REPORTS" -maxdepth 2 -type f | sort | sed 's/^/  /'
 echo
 green "view a report:"
 echo "    open $REPORTS/dashboard/index.html        ← single-page HTML dashboard (excl. Revlon)"
+echo "    open $REPORTS/with-google/dashboard/index.html    ← with Google ATC ads (platform filter + Text ads)"
 echo "    open reports/revlon/${DATE}/dashboard/index.html  ← Revlon (control) — separate set"
 echo "    open $REPORTS/creative_comparison.md"
 echo "    open $REPORTS/by-brand/bobs.md"

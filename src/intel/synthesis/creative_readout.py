@@ -80,6 +80,8 @@ class CreativeRecord:
     active: int = 0
     # Asset type drives the dashboard's video-vs-image rendering branch.
     asset_type: str = "image"
+    # Ad platform ('meta' | 'google') — lets the dashboard scope/badge by source.
+    source: str = "meta"
 
 
 @dataclass
@@ -109,6 +111,7 @@ def pull_analyzed_creatives(
     *,
     competitor_id: str | None = None,
     window_days: int | None = None,
+    sources: set[str] | None = None,
 ) -> list[CreativeRecord]:
     """Load every analyzed creative. LEFT JOIN ads so standalone (brand-store /
     website) creatives are included alongside paid-ad creatives. The competitor
@@ -124,6 +127,7 @@ def pull_analyzed_creatives(
         "       COALESCE(a.ad_archive_id, '') AS ad_archive_id, "
         "       COALESCE(a.first_seen, cr.analyzed_at) AS first_seen, "
         "       cr.asset_path, cr.analyzed_at, cr.analysis_json, cr.asset_type, "
+        "       COALESCE(a.source, cr.source) AS source, "
         "       a.serp_position_rank, a.start_date, a.last_seen, a.active "
         "FROM creatives cr "
         "LEFT JOIN ads a ON a.id = cr.ad_id "
@@ -138,6 +142,10 @@ def pull_analyzed_creatives(
         since = (datetime.now(timezone.utc) - timedelta(days=window_days)).isoformat()
         q += " AND COALESCE(a.first_seen, cr.analyzed_at) >= ?"
         params.append(since)
+    if sources:
+        placeholders = ",".join("?" * len(sources))
+        q += f" AND COALESCE(a.source, cr.source) IN ({placeholders})"
+        params.extend(sorted(sources))
     with connect() as conn:
         rows = conn.execute(q, params).fetchall()
     out: list[CreativeRecord] = []
@@ -161,6 +169,7 @@ def pull_analyzed_creatives(
             last_seen=r["last_seen"],
             active=r["active"] or 0,
             asset_type=r["asset_type"] or "image",
+            source=r["source"] or "meta",
         ))
     return out
 

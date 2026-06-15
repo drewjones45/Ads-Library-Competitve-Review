@@ -69,12 +69,55 @@ APPEAL_PALETTE = {
     "mixed":     "#9d8189",
 }
 
+PLATFORM_PALETTE = {
+    "meta":   "#4ea8b8",
+    "google": "#d4a14a",
+}
+
+
+# =============== platform scoping helpers ===============
+# A deployment's `platform` key selects which ad platforms its charts/SQL cover:
+#   absent or "meta"  → Meta only (existing bobs/trex deployments — output is
+#                       unchanged once Google ads share the DB)
+#   "google"          → Google only
+#   "all"             → Meta + Google (the new combined deployment)
+
+def _platform_sources(d: dict) -> list[str]:
+    p = d.get("platform", "meta")
+    return ["meta", "google"] if p == "all" else [p]
+
+
+def _src_sql(d: dict, col: str) -> str:
+    """' AND <col> IN (...)' scoping fragment. Values are whitelisted to
+    meta/google, so the literal interpolation is safe (no user free-text)."""
+    srcs = [s for s in _platform_sources(d) if s in ("meta", "google")] or ["meta"]
+    return " AND " + col + " IN (" + ",".join("'" + s + "'" for s in srcs) + ")"
+
+
+def _platform_label(d: dict) -> str:
+    return {"meta": "Meta Ad Library", "google": "Google Ads Transparency Center",
+            "all": "Meta + Google transparency"}.get(d.get("platform", "meta"), "Meta Ad Library")
+
+
+def _ad_library_url(source, ad_archive_id, advertiser_id=None) -> str:
+    """Per-ad transparency-library URL: Meta Ad Library for meta rows, Google
+    Ads Transparency Center for google rows (creative ids stored 'g_'-prefixed)."""
+    aid = str(ad_archive_id or "")
+    if (source or "meta") == "google":
+        cid = aid[2:] if aid.startswith("g_") else aid
+        if advertiser_id:
+            return f"https://adstransparency.google.com/advertiser/{advertiser_id}/creative/{cid}"
+        return f"https://adstransparency.google.com/?region=anywhere&searchTerm={cid}"
+    return f"https://www.facebook.com/ads/library/?id={aid}"
+
 
 # =============== inline SVG charts ===============
 
 def chart_brand_volume(conn: sqlite3.Connection, d: dict) -> str:
     brand_order = d["brand_order"]; labels = d["brand_labels"]; subject = d["subject_brand"]
-    rows = conn.execute("SELECT competitor_id, COUNT(*) FROM ads GROUP BY competitor_id").fetchall()
+    rows = conn.execute(
+        f"SELECT competitor_id, COUNT(*) FROM ads WHERE 1=1{_src_sql(d, 'source')} GROUP BY competitor_id"
+    ).fetchall()
     counts = {r[0]: r[1] for r in rows}
     data = [(cid, counts.get(cid, 0)) for cid in brand_order if cid in labels]
     if not data: return ""
@@ -98,18 +141,18 @@ def chart_brand_volume(conn: sqlite3.Connection, d: dict) -> str:
                      f'font-family="Inter,sans-serif" font-weight="700" fill="{INK}">{n}</text>')
 
     return f'''<figure class="chart">
-      <figcaption class="chart-caption">Total ads observed per brand · Meta Ad Library · 7-day window</figcaption>
+      <figcaption class="chart-caption">Total ads observed per brand · {_platform_label(d)} · 7-day window</figcaption>
       <svg viewBox="0 0 {chart_w} {H}" xmlns="http://www.w3.org/2000/svg">{"".join(parts)}</svg>
     </figure>'''
 
 
-def _attr_distribution(conn, attr, brands):
+def _attr_distribution(conn, attr, brands, d):
     out = {b: Counter() for b in brands}
     rows = conn.execute(
         f"SELECT COALESCE(c.competitor_id, a.competitor_id) AS cid, "
         f"json_extract(c.analysis_json, '$.{attr}') AS val "
         f"FROM creatives c LEFT JOIN ads a ON a.id = c.ad_id "
-        f"WHERE c.analysis_json IS NOT NULL"
+        f"WHERE c.analysis_json IS NOT NULL{_src_sql(d, 'COALESCE(a.source, c.source)')}"
     ).fetchall()
     for cid, val in rows:
         if cid in out and val:
@@ -120,7 +163,7 @@ def _attr_distribution(conn, attr, brands):
 def chart_creative_dna(conn, d):
     labels = d["brand_labels"]; subject = d["subject_brand"]
     brand_order = [b for b in d["brand_order"] if b in labels]
-    dist = _attr_distribution(conn, "photography_style", brand_order)
+    dist = _attr_distribution(conn, "photography_style", brand_order, d)
     brand_order = [b for b in brand_order if sum(dist[b].values()) >= 3]
     if not brand_order: return ""
 
@@ -172,7 +215,7 @@ def chart_creative_dna(conn, d):
 def chart_appeal_split(conn, d):
     labels = d["brand_labels"]; subject = d["subject_brand"]
     brand_order = [b for b in d["brand_order"] if b in labels]
-    dist = _attr_distribution(conn, "emotional_vs_rational", brand_order)
+    dist = _attr_distribution(conn, "emotional_vs_rational", brand_order, d)
     brand_order = [b for b in brand_order if sum(dist[b].values()) >= 3]
     if not brand_order: return ""
 
@@ -214,11 +257,94 @@ def chart_appeal_split(conn, d):
     </figure>'''
 
 
+def chart_platform_volume(conn, d):
+    """Per-brand Meta-vs-Google ad volume. Only meaningful for the combined
+    ('all') deployment; returns '' otherwise."""
+    if d.get("platform") != "all":
+        return ""
+    labels = d["brand_labels"]; subject = d["subject_brand"]
+    brand_order = [b for b in d["brand_order"] if b in labels]
+    rows = conn.execute(
+        "SELECT competitor_id, source, COUNT(*) FROM ads "
+        "WHERE source IN ('meta','google') GROUP BY competitor_id, source"
+    ).fetchall()
+    counts: dict = {}
+    for cid, src, n in rows:
+        counts.setdefault(cid, {})[src] = n
+    data = [(cid, counts.get(cid, {}).get("meta", 0), counts.get(cid, {}).get("google", 0))
+            for cid in brand_order if cid in counts]
+    data = [t for t in data if (t[1] + t[2]) > 0]
+    if not data:
+        return ""
+    max_n = max(m + g for _, m, g in data) or 1
+    row_h = 34; label_w = 180; chart_w = 620
+    bar_w_max = chart_w - label_w - 70
+    H = row_h * len(data) + 60
+    parts = []
+    for i, (cid, m, g) in enumerate(data):
+        y = 20 + i * row_h
+        mw = (m / max_n) * bar_w_max
+        gw = (g / max_n) * bar_w_max
+        lab_color = ACCENT if cid == subject else INK_DIM
+        parts.append(f'<text x="{label_w-12}" y="{y+19}" text-anchor="end" font-size="13" '
+                     f'font-family="Inter,sans-serif" fill="{lab_color}">{labels[cid]}</text>')
+        parts.append(f'<rect x="{label_w}" y="{y+6}" width="{mw:.1f}" height="20" fill="{PLATFORM_PALETTE["meta"]}"/>')
+        parts.append(f'<rect x="{label_w+mw:.1f}" y="{y+6}" width="{gw:.1f}" height="20" fill="{PLATFORM_PALETTE["google"]}"/>')
+        parts.append(f'<text x="{label_w+mw+gw+10:.1f}" y="{y+21}" font-size="12" '
+                     f'font-family="Inter,sans-serif" font-weight="700" fill="{INK}">{m+g}</text>')
+    ly = H - 16
+    leg = (f'<rect x="{label_w}" y="{ly}" width="11" height="11" fill="{PLATFORM_PALETTE["meta"]}"/>'
+           f'<text x="{label_w+16}" y="{ly+9.5}" font-size="11" font-family="Inter,sans-serif" fill="{INK_DIM}">Meta</text>'
+           f'<rect x="{label_w+70}" y="{ly}" width="11" height="11" fill="{PLATFORM_PALETTE["google"]}"/>'
+           f'<text x="{label_w+86}" y="{ly+9.5}" font-size="11" font-family="Inter,sans-serif" fill="{INK_DIM}">Google</text>')
+    return f'''<figure class="chart">
+      <figcaption class="chart-caption">Ad volume by platform · Meta vs Google Transparency Center</figcaption>
+      <svg viewBox="0 0 {chart_w} {H}" xmlns="http://www.w3.org/2000/svg">{"".join(parts)}{leg}</svg>
+    </figure>'''
+
+
+def chart_text_ad_sale(conn, d):
+    """Sale-status mix across Google text ads (from the classified analysis_json).
+    Renders only when Google is in scope and analyzed text ads exist."""
+    if "google" not in _platform_sources(d):
+        return ""
+    rows = conn.execute(
+        "SELECT json_extract(c.analysis_json, '$.sale_status') AS s, COUNT(*) n "
+        "FROM creatives c JOIN ads a ON a.id=c.ad_id "
+        "WHERE c.asset_type='text_ad' AND a.source='google' AND c.analysis_json IS NOT NULL "
+        "GROUP BY s"
+    ).fetchall()
+    dist = {(r[0] or "unclear"): r[1] for r in rows}
+    total = sum(dist.values())
+    if not total:
+        return ""
+    order = [("on_sale", "#d4a14a"), ("no_sale", "#4ea8b8"), ("unclear", "#7a7a7a")]
+    chart_w = 620; bar_w = chart_w - 40; H = 80
+    x = 20.0; parts = []
+    for key, color in order:
+        c = dist.get(key, 0)
+        if not c:
+            continue
+        w = (c / total) * bar_w
+        pct = round(100 * c / total)
+        parts.append(f'<rect x="{x:.1f}" y="22" width="{w:.1f}" height="26" fill="{color}"/>')
+        if w >= 48:
+            parts.append(f'<text x="{x+w/2:.1f}" y="40" text-anchor="middle" font-size="11" '
+                         f'font-family="Inter,sans-serif" font-weight="700" fill="white">{key} {pct}%</text>')
+        x += w
+    return f'''<figure class="chart">
+      <figcaption class="chart-caption">Google text ads — sale-status mix (n={total})</figcaption>
+      <svg viewBox="0 0 {chart_w} {H}" xmlns="http://www.w3.org/2000/svg">{"".join(parts)}</svg>
+    </figure>'''
+
+
 def chart_quadrant(conn, d):
     """2x2 positioning quadrant with brand bubbles, sized by ad volume."""
     q = d.get("quadrant"); labels = d["brand_labels"]; subject = d["subject_brand"]
     if not q: return ""
-    rows = conn.execute("SELECT competitor_id, COUNT(*) FROM ads GROUP BY competitor_id").fetchall()
+    rows = conn.execute(
+        f"SELECT competitor_id, COUNT(*) FROM ads WHERE 1=1{_src_sql(d, 'source')} GROUP BY competitor_id"
+    ).fetchall()
     ads_n = {r[0]: r[1] for r in rows}
 
     W = 620; H = 460
@@ -366,7 +492,7 @@ def top_creatives_by_reach(conn, d):
         # first frame below); fall back to the first image creative.
         rows = conn.execute(
             "SELECT a.ad_archive_id, a.serp_position_rank, a.start_date, "
-            "a.last_seen, a.active, a.body_text, a.cta_type, "
+            "a.last_seen, a.active, a.body_text, a.cta_type, a.source, a.page_id, "
             "COALESCE(c_video.asset_path, c_img.asset_path) AS thumb_path, "
             "COALESCE(c_video.asset_type, c_img.asset_type) AS thumb_asset_type, "
             "COALESCE(c_video.analysis_json, c_img.analysis_json) AS thumb_analysis_json "
@@ -377,7 +503,7 @@ def top_creatives_by_reach(conn, d):
             "LEFT JOIN creatives c_img ON c_img.id = ("
             "  SELECT id FROM creatives WHERE ad_id=a.id "
             "  AND asset_type='image' ORDER BY id LIMIT 1) "
-            "WHERE a.competitor_id=?",
+            f"WHERE a.competitor_id=?{_src_sql(d, 'a.source')}",
             (cid,),
         ).fetchall()
         if not rows:
@@ -432,7 +558,7 @@ def top_creatives_by_reach(conn, d):
             cards.append(f"""
             <div class="tcr-card">
               <a class="thumb-wrap" data-asset-type="{_html.escape(asset_type)}"
-                 href="https://www.facebook.com/ads/library/?id={_html.escape(str(ad['ad_archive_id']))}"
+                 href="{_html.escape(_ad_library_url(ad.get('source'), ad.get('ad_archive_id'), ad.get('page_id')))}"
                  target="_blank" rel="noopener">
                 {img_html}
                 {dur_chip}
@@ -454,10 +580,24 @@ def top_creatives_by_reach(conn, d):
         </section>""")
     if not blocks:
         return ""
+    # Meta deployments keep the exact original wording (byte-identical output);
+    # non-Meta deployments get a platform-aware variant.
+    if d.get("platform", "meta") == "meta":
+        tcr_intro = ("Ranked by Meta Ad Library's \"most-served\" sort × run duration. "
+                     "<strong>Proxy, not raw impressions</strong> — Meta does not expose impression "
+                     "numbers for commercial US advertisers. Intra-brand only; a brand with 200 ads "
+                     "and a brand with 5 ads are not comparable. Auto-populated from the corpus; see "
+                     "Reference Board below for hand-curated picks.")
+    else:
+        tcr_intro = (f"Ranked by {_platform_label(d)}'s \"most-served\" sort × run duration "
+                     "(Google ads carry no served-order rank, so they sort on run duration alone). "
+                     "<strong>Proxy, not raw impressions</strong> — neither Meta nor Google expose "
+                     "impression numbers for commercial US advertisers. Intra-brand only. "
+                     "Auto-populated from the corpus; see Reference Board below for hand-curated picks.")
     return f"""<section class="top-creatives-reach">
       <div class="eyebrow">Top served ads</div>
       <h2 class="board-title">What's actually carrying spend</h2>
-      <p class="tcr-intro">Ranked by Meta Ad Library's "most-served" sort × run duration. <strong>Proxy, not raw impressions</strong> — Meta does not expose impression numbers for commercial US advertisers. Intra-brand only; a brand with 200 ads and a brand with 5 ads are not comparable. Auto-populated from the corpus; see Reference Board below for hand-curated picks.</p>
+      <p class="tcr-intro">{tcr_intro}</p>
       {"".join(blocks)}
     </section>"""
 
@@ -470,7 +610,8 @@ def reference_board(conn, d):
         for item in theme["items"]:
             ad_id = item["ad_archive_id"]
             row = conn.execute(
-                "SELECT a.competitor_id, a.page_name, c.asset_path, c.asset_type, c.analysis_json "
+                "SELECT a.competitor_id, a.page_name, c.asset_path, c.asset_type, c.analysis_json, "
+                "a.source, a.page_id "
                 "FROM ads a LEFT JOIN creatives c ON c.ad_id = a.id "
                 "WHERE a.ad_archive_id = ? AND c.asset_path IS NOT NULL "
                 # Prefer video creative rows (they carry duration/transcript);
@@ -486,10 +627,11 @@ def reference_board(conn, d):
             b64 = _b64_image(renderable)
             if not b64: continue
             dur_chip = _video_duration_chip(row[4])
+            lib_url = _ad_library_url(row[5], ad_id, row[6])
             items_html.append(f'''
             <div class="ref-item">
               <a class="thumb-wrap" data-asset-type="{_html.escape(asset_type)}"
-                 href="https://www.facebook.com/ads/library/?id={_html.escape(str(ad_id))}" target="_blank" rel="noopener">
+                 href="{_html.escape(lib_url)}" target="_blank" rel="noopener">
                 <img src="{b64}" alt="ad {_html.escape(str(ad_id))}"/>
                 {dur_chip}
               </a>
@@ -554,7 +696,7 @@ def landing_page_insights(conn, d):
         rows = conn.execute(
             "SELECT id, ad_archive_id, link_url, serp_position_rank, "
             "start_date, last_seen, active FROM ads "
-            "WHERE competitor_id=? AND link_url IS NOT NULL", (cid,),
+            f"WHERE competitor_id=? AND link_url IS NOT NULL{_src_sql(d, 'source')}", (cid,),
         ).fetchall()
         if not rows:
             continue
@@ -1897,6 +2039,9 @@ def render(deployment_key, md_text, brand_label, date):
         sitecontent = site_content_section(conn, d)
         landing = landing_page_insights(conn, d)
         topcreatives = top_creatives_by_reach(conn, d)
+        # Cross-platform charts — empty string for Meta-only deployments.
+        platform_vol = chart_platform_volume(conn, d)
+        text_ad_sale = chart_text_ad_sale(conn, d)
     finally:
         conn.close()
 
@@ -1930,6 +2075,12 @@ def render(deployment_key, md_text, brand_label, date):
     # so the narrative reads: "what the brand says on its site → where ads
     # point on that site → which creatives are doing the work".
     extras = ""
+    if platform_vol or text_ad_sale:
+        extras += (
+            '<section class="platform-block"><div class="eyebrow">Cross-platform</div>'
+            '<h2 class="board-title">Meta + Google footprint</h2>'
+            f'{platform_vol}{text_ad_sale}</section>'
+        )
     if sitecontent:
         extras += sitecontent
     if landing:
@@ -1980,11 +2131,17 @@ def main():
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--brand", required=True)
     ap.add_argument("--date", required=True)
+    ap.add_argument("--pdf", action="store_true",
+                    help="also render a PDF next to the HTML (headless Chromium via Playwright)")
     args = ap.parse_args()
 
     html = render(args.deployment, args.md.read_text(), args.brand, args.date)
     args.out.write_text(html)
     print(f"wrote {args.out} ({len(html):,} chars)")
+    if args.pdf:
+        from html_to_pdf import html_to_pdf
+        pdf = html_to_pdf(args.out)
+        print(f"wrote {pdf}")
     return 0
 
 

@@ -250,6 +250,68 @@ def ingest_one(competitor: Competitor, source_idx: int, settings: Settings | Non
                 },
             )
 
+        if source.type == "google_ads":
+            ads = result.extras.get("ads", [])
+            from .storage import asset_path
+            image_inserts = 0
+            text_inserts = 0
+            for ad in ads:
+                # source="google" tags the row; upsert_ad also reads ad['source'].
+                ad_row_id, is_new = upsert_ad(conn, competitor.id, ad, source="google")
+                if is_new and ad.get("ad_archive_id"):
+                    report.new_ads.append(ad["ad_archive_id"])
+                fmt = ad.get("ad_format")
+                # Image ads → persist downloaded creatives as asset_type="image"
+                # so the existing vision taxonomy handles them unchanged.
+                for asset_path_str in ad.get("local_creative_paths") or []:
+                    phash = _safe_phash(asset_path_str)
+                    _, inserted = upsert_creative(
+                        conn, ad_id=ad_row_id, asset_type="image",
+                        asset_path=asset_path_str, phash=phash, source="google",
+                    )
+                    if inserted:
+                        image_inserts += 1
+                # Text ads have no image file. Mirror the video/landing sidecar
+                # pattern: write text_ad_meta.json and point a 'text_ad' creative
+                # at it (creatives.asset_path is NOT NULL). The batch analyzer reads
+                # the sidecar and runs the dedicated text-ad classifier.
+                # Text/search ads: SerpApi gives no parsed copy, only a rendered
+                # preview image. Point the text_ad creative's sidecar at that
+                # preview (`preview_image`) so the analyzer reads the headline/
+                # description copy off it (vision). Keyed on format, not on having
+                # headlines, since headlines arrive empty from the API.
+                has_text = bool(ad.get("headlines") or ad.get("descriptions"))
+                if fmt == "text" and (ad.get("text_preview_image") or has_text):
+                    sidecar = asset_path("creative", competitor.id, ad["ad_archive_id"], "text_ad_meta.json")
+                    sidecar.write_text(json.dumps({
+                        "headlines": ad.get("headlines") or [],
+                        "descriptions": ad.get("descriptions") or [],
+                        "preview_image": ad.get("text_preview_image"),
+                        "link_url": ad.get("link_url"),
+                        "advertiser_name": ad.get("page_name"),
+                        "regions": ad.get("regions") or [],
+                        "ad_format": "text",
+                        "first_shown": ad.get("start_date"),
+                        "last_shown": ad.get("end_date"),
+                    }, default=str), encoding="utf-8")
+                    _, inserted = upsert_creative(
+                        conn, ad_id=ad_row_id, asset_type="text_ad",
+                        asset_path=str(sidecar), phash=None, source="google",
+                    )
+                    if inserted:
+                        text_inserts += 1
+            audit(
+                conn,
+                actor="enrichment",
+                action="google_ads_upserted",
+                details={
+                    "total": len(ads),
+                    "new": len(report.new_ads),
+                    "image_creatives_inserted": image_inserts,
+                    "text_ad_creatives_inserted": text_inserts,
+                },
+            )
+
         if source.type == "amazon_brand_store":
             pages = result.extras.get("pages", [])
             creative_inserts = 0

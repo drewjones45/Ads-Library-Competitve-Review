@@ -1,0 +1,18 @@
+  captured  https://mybobs.com/
+  captured  https://mybobs.com/furniture/dining-room/dining-chairs/p/10001010003
+  captured  https://mybobs.com/furniture/living-room/recliners/p/10001362002
+  captured  
+https://mybobs.com/furniture/living-room/ottomans-benches/p/10001155003
+landing mybobs_com__furniture_dining_room_dining_tables_p_10001351003: blocked by 'akamai' anti-bot wall — skipping
+  skip https://mybobs.com/furniture/dining-room/dining-tables/p/10001351003 
+(captcha_wall:akamai)
+landing mybobs_com__small_spaces_c_small_space_dining_room: blocked by 'akamai' anti-bot wall — skipping
+  skip https://mybobs.com/small-spaces/c/small-space-dining-room 
+(captcha_wall:akamai)
+  captured  https://mybobs.com/small-spaces/c/small-space-bedroom
+landing mybobs_com__furniture_dining_room_counter_bar_stools_p_10001351004: blocked by 'akamai' anti-bot wall — skipping
+  skip https://mybobs.com/furniture/dining-room/counter-bar-stools/p/10001351004
+(captcha_wall:akamai)
+ Brand                     Selected  Captured  Blocked/err 
+ Bob's Discount Furniture         8         5            3 
+next: intel analyze-creatives  (analyzes the new landing screenshots)

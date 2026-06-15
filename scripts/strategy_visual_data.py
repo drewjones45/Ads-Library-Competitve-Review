@@ -214,4 +214,55 @@ DEPLOYMENTS = {
             "the brand that's expanding what composite decking can be",
         ],
     },
+    # Combined Meta + Google deployment — the ONLY deployment with platform="all".
+    # Renders a separate Google-inclusive strategy doc (existing bobs/trex docs are
+    # Meta-only and untouched). Charts auto-populate from the corpus; reference_themes
+    # is left empty until a Google ingest exists (its entries key on g_-prefixed
+    # creative ids), then curate like any deployment.
+    "bobs_google": {
+        "db_path": "data/intel.db",
+        "subject_brand": "bobs",
+        "platform": "all",
+        "brand_labels": {
+            "bobs": "Bob's",
+            "ashley": "Ashley",
+            "rooms_to_go": "Rooms To Go",
+            "raymour_flanigan": "Raymour & Flanigan",
+            "value_city": "Value City",
+            "american_freight": "American Freight",
+            "wayfair": "Wayfair",
+        },
+        "brand_order": ["bobs", "raymour_flanigan", "wayfair", "ashley", "american_freight",
+                         "rooms_to_go", "value_city"],
+        "header_eyebrow": "Horizon Commerce · Brand Marketing Mode",
+        "header_meta": "Strategy Brief · Meta + Google · Confidential",
+        "hero": {
+            "lead_in": "The opportunity is",
+            "italic": "one story across two platforms",
+            "subtitle": "A cross-platform read for Bob's Discount Furniture — Meta paid social plus Google Ads Transparency Center (search/text + display image ads). Where each brand shows up, what their Google text ads actually promise, and whether the message holds across channels.",
+        },
+        "quadrant": {
+            "title": "Where each brand sits in the category",
+            "x_axis": ("Value tier", "Premium positioning"),
+            "y_axis": ("Store-driven", "Digital-native"),
+            "brands": {
+                "bobs":              (0.42, 0.55),
+                "ashley":            (0.30, 0.22),
+                "raymour_flanigan":  (0.62, 0.28),
+                "wayfair":           (0.45, 0.92),
+                "american_freight":  (0.12, 0.20),
+                "value_city":        (0.22, 0.18),
+                "rooms_to_go":       (0.38, 0.18),
+            },
+        },
+        "quadrant_caption": "Bob's bridges store-driven retail and digital-native marketing; the cross-platform view tests whether that position holds on Google search + display as well as on Meta.",
+        "reference_themes": [],
+        "highlight_phrases": [
+            "Top-rated AND affordable",
+            "the warm modern American furniture brand",
+            "$499 sectionals",
+            "$599 dining sets",
+            "Memorial Day",
+        ],
+    },
 }

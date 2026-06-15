@@ -27,6 +27,18 @@ competitors:
         country: US
         cadence: daily
         method: scrape
+      # Google Ads Transparency Center (image + text ads). advertiser_id is the AR…
+      # segment from adstransparency.google.com/advertiser/AR…  (resolved by domain
+      # search via SerpApi). Google ads only appear in the with-Google reports
+      # (intel dashboard --platform all + the bobs_google strategy deployment); the
+      # Meta reports stay unchanged. method: auto uses SerpApi when SERPAPI_API_KEY
+      # is set, else a Playwright scrape of the ATC.
+      - type: google_ads
+        advertiser_id: "AR14894637894638501889"   # Bob's Discount Furniture LLC
+        page_name: Bob's Discount Furniture
+        country: US
+        cadence: daily
+        method: auto
 
   - id: ashley
     name: Ashley Furniture
@@ -43,6 +55,12 @@ competitors:
         country: US
         cadence: daily
         method: scrape
+      - type: google_ads
+        advertiser_id: "AR08780307608645926913"   # Ashley Global Retail, LLC.
+        page_name: Ashley
+        country: US
+        cadence: daily
+        method: auto
 
   - id: rooms_to_go
     name: Rooms To Go
@@ -61,6 +79,12 @@ competitors:
         page_name: Rooms To Go
         country: US
         cadence: daily
+      - type: google_ads
+        advertiser_id: "AR12321955507991478273"   # Roomstogo.com, Inc.
+        page_name: Rooms To Go
+        country: US
+        cadence: daily
+        method: auto
 
   - id: raymour_flanigan
     name: Raymour & Flanigan
@@ -77,6 +101,12 @@ competitors:
         country: US
         cadence: daily
         method: scrape
+      - type: google_ads
+        advertiser_id: "AR08655614743718920193"   # Raymour's Furniture Company Inc
+        page_name: Raymour & Flanigan
+        country: US
+        cadence: daily
+        method: auto
 
   - id: value_city
     name: Value City Furniture
@@ -93,6 +123,12 @@ competitors:
         country: US
         cadence: daily
         method: scrape
+      - type: google_ads
+        advertiser_id: "AR07754119404849201153"   # American Signature Inc (Value City)
+        page_name: Value City Furniture
+        country: US
+        cadence: daily
+        method: auto
 
   - id: american_freight
     name: American Freight
@@ -109,6 +145,12 @@ competitors:
         country: US
         cadence: daily
         method: scrape
+      - type: google_ads
+        advertiser_id: "AR12998302132854587393"   # AF Newco I LLC (American Freight)
+        page_name: American Freight
+        country: US
+        cadence: daily
+        method: auto
 
   - id: wayfair
     name: Wayfair
@@ -125,6 +167,12 @@ competitors:
         country: US
         cadence: daily
         method: scrape
+      - type: google_ads
+        advertiser_id: "AR10428471965269360641"   # Wayfair LLC
+        page_name: Wayfair
+        country: US
+        cadence: daily
+        method: auto
 
   # ---- smoke-test brand for the Amazon Brand Store adapter (Phase B1/B2). ----
   # Revlon isn't in the furniture set; it's here purely to exercise the adapter

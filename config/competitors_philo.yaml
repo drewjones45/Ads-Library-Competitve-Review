@@ -1,0 +1,130 @@
+# Source registry for the Philo streaming competitive set.
+#
+# Philo positioning: budget "skinny bundle" live-TV + on-demand streamer
+# (~$28/mo, 70+ entertainment & lifestyle channels, NO sports/news). Subject
+# brand of this deployment.
+#
+# Competitive set chosen as Philo's nearest live-TV streaming rivals across the
+# price/feature spectrum:
+#   - Frndly TV     — closest direct comp: budget, family/lifestyle, no sports
+#   - Sling TV      — value-tier skinny bundle, adds sports/news tiers
+#   - Fubo          — sports-first live-TV bundle (premium)
+#   - Hulu + Live TV — full live-TV bundle + SVOD library (premium)
+#   - YouTube TV    — full live-TV bundle, market leader (premium)
+#
+# -----------------------------------------------------------------------------
+# Meta page_id resolution results (resolved + VERIFIED via ads_library_search
+# MCP on 2026-06-15; followed the playbook in competitors_trex.yaml):
+#   philo      → 160083100857719  VERIFIED (403 ads, page_name "Philo")
+#   sling      → 1639268889632976 VERIFIED (page_name "Sling TV"; FIFA 2026 /
+#                live-news creative). NOTE: a hyphenated impostor page
+#                "Sling-TV" (860331323822227) runs scam "no download required"
+#                creative — do NOT use it.
+#   fubo       → 679262275469242  VERIFIED (604 ads, page_name "Fubo";
+#                heavy FIFA World Cup / Telemundo Spanish-language creative)
+#   hulu       → 6500552187       VERIFIED (page_name "Hulu"; "Stream Hulu +
+#                Live TV" + show-promo creative)
+#   frndly     → 389792694979812  VERIFIED (98 ads, page_name "Frndly TV")
+#   youtube_tv → none. YouTube TV is an Alphabet/Google product and does not
+#                run direct brand-page ads in the Meta Ad Library (keyword
+#                searches return only resellers/spam). Same "fails gracefully"
+#                bucket as Fiberon in the decking set — meta_ads source omitted;
+#                website source only.
+#
+# Google Ads Transparency Center: omitted for now. SerpApi's ATC engine requires
+# an explicit advertiser_id (AR…) and offers no name/domain search, so each
+# brand's AR-id must be resolved manually from adstransparency.google.com before
+# a google_ads source can be added here. Tracked as a follow-up.
+
+competitors:
+  - id: philo
+    name: Philo
+    vertical: streaming
+    priority: high            # subject brand
+    sources:
+      - type: website
+        url: https://www.philo.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "160083100857719"        # Philo — VERIFIED via ads_library_search MCP
+        page_name: Philo
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: frndly
+    name: Frndly TV
+    vertical: streaming
+    priority: high            # closest direct comp (budget, no sports)
+    sources:
+      - type: website
+        url: https://www.frndlytv.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "389792694979812"        # Frndly TV — VERIFIED via ads_library_search MCP
+        page_name: Frndly TV
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: sling
+    name: Sling TV
+    vertical: streaming
+    priority: high
+    sources:
+      - type: website
+        url: https://www.sling.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "1639268889632976"       # Sling TV — VERIFIED via ads_library_search MCP
+        page_name: Sling TV
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: fubo
+    name: Fubo
+    vertical: streaming
+    priority: medium          # sports-first, different wedge than Philo
+    sources:
+      - type: website
+        url: https://www.fubo.tv
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "679262275469242"        # Fubo — VERIFIED via ads_library_search MCP
+        page_name: Fubo
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: hulu
+    name: Hulu + Live TV
+    vertical: streaming
+    priority: medium          # premium bundle, same live-TV wallet
+    sources:
+      - type: website
+        url: https://www.hulu.com/live-tv
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "6500552187"             # Hulu — VERIFIED via ads_library_search MCP
+        page_name: Hulu
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: youtube_tv
+    name: YouTube TV
+    vertical: streaming
+    priority: medium          # market leader, premium full bundle
+    sources:
+      - type: website
+        url: https://tv.youtube.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      # NO meta_ads source: YouTube TV (Alphabet/Google) does not run direct
+      # brand-page ads in the Meta Ad Library. See header note.

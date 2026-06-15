@@ -35,9 +35,11 @@ from .creative_readout import (
 )
 
 
-# Page-level screenshot asset types — surfaced in their own dashboard sections
-# (homepage lane, landing-pages section), not the ad-creative gallery/tallies.
-EXCLUDED_GALLERY_TYPES = {"homepage_image", "landing_page_image"}
+# Asset types surfaced in their own dashboard sections rather than the
+# ad-creative gallery/tallies: page-level screenshots (homepage lane,
+# landing-pages section) and Google text ads (dedicated Text-ads lane — they
+# have no image and lack the visual taxonomy fields, so they'd pollute heatmaps).
+EXCLUDED_GALLERY_TYPES = {"homepage_image", "landing_page_image", "text_ad"}
 
 
 # ----- helpers --------------------------------------------------------------
@@ -117,15 +119,34 @@ def _meta_ad_url(ad_archive_id: str | None) -> str:
 # ----- data collection ------------------------------------------------------
 
 def _collect(conn: sqlite3.Connection, *, days: int,
-             brand_ids: set[str] | None = None) -> dict[str, Any]:
+             brand_ids: set[str] | None = None,
+             sources: set[str] | None = None) -> dict[str, Any]:
     """Pull every shape of data the dashboard needs in one pass.
 
     brand_ids, when given, restricts the dashboard to that allow-list of
     competitor ids — used to split a deployment into separate dashboards (e.g.
     keep a control brand out of the main set and give it its own page). None
     means every competitor in the db (the default, unchanged behavior).
+
+    sources, when given, scopes ads/creatives to those ad platforms
+    ('meta'/'google'). The existing Meta reports pass {"meta"} so they stay
+    byte-identical once Google ads share the DB; the with-Google report passes
+    {"meta","google"}. None means all platforms (back-compat for direct callers).
     """
     since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+
+    # Platform (ad source) scope. Values are whitelisted to a fixed set, so the
+    # literal SQL fragments below are safe (no user free-text). src_ads scopes
+    # queries on `ads` (unaliased); src_a scopes those joining `ads a`.
+    src_filter = sorted(s for s in (sources or set()) if s in ("meta", "google")) or None
+    google_in_scope = (src_filter is None) or ("google" in src_filter)
+
+    def _src_clause(col: str) -> str:
+        if not src_filter:
+            return ""
+        return " AND " + col + " IN (" + ",".join("'" + s + "'" for s in src_filter) + ")"
+    src_ads = _src_clause("source")
+    src_a = _src_clause("a.source")
 
     # Optional brand allow-list. Sorted for stable SQL params; applied to the
     # competitors query plus every global (non-per-brand) pull below so the
@@ -147,27 +168,39 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         brand_where_params,
     ).fetchall():
         cid = r["id"]
-        ads_total = conn.execute("SELECT COUNT(*) c FROM ads WHERE competitor_id=?", (cid,)).fetchone()["c"]
-        ads_active = conn.execute("SELECT COUNT(*) c FROM ads WHERE competitor_id=? AND active=1", (cid,)).fetchone()["c"]
+        ads_total = conn.execute(
+            f"SELECT COUNT(*) c FROM ads WHERE competitor_id=?{src_ads}", (cid,)
+        ).fetchone()["c"]
+        ads_active = conn.execute(
+            f"SELECT COUNT(*) c FROM ads WHERE competitor_id=? AND active=1{src_ads}", (cid,)
+        ).fetchone()["c"]
+        # Per-platform ad totals (NOT source-scoped — the true counts, used for the
+        # overview Meta-vs-Google stat and to gate the Google-only UI).
+        ads_meta = conn.execute(
+            "SELECT COUNT(*) c FROM ads WHERE competitor_id=? AND source='meta'", (cid,)
+        ).fetchone()["c"]
+        ads_google = conn.execute(
+            "SELECT COUNT(*) c FROM ads WHERE competitor_id=? AND source='google'", (cid,)
+        ).fetchone()["c"]
         # Counts the brand's PAID AD creatives only (excludes brand-store assets,
         # which get their own counts in the brand-store sub-section). Paid ads
         # are creatives where ad_id IS NOT NULL.
         creatives_total = conn.execute(
             "SELECT COUNT(*) c FROM creatives cr JOIN ads a ON a.id=cr.ad_id "
-            "WHERE a.competitor_id=?",
+            f"WHERE a.competitor_id=?{src_a}",
             (cid,),
         ).fetchone()["c"]
         creatives_analyzed = conn.execute(
             "SELECT COUNT(*) c FROM creatives cr JOIN ads a ON a.id=cr.ad_id "
-            "WHERE a.competitor_id=? AND cr.analyzed_at IS NOT NULL",
+            f"WHERE a.competitor_id=? AND cr.analyzed_at IS NOT NULL{src_a}",
             (cid,),
         ).fetchone()["c"]
         new_ads = conn.execute(
-            "SELECT COUNT(*) c FROM ads WHERE competitor_id=? AND first_seen >= ?",
+            f"SELECT COUNT(*) c FROM ads WHERE competitor_id=? AND first_seen >= ?{src_ads}",
             (cid, since),
         ).fetchone()["c"]
         top_cta = conn.execute(
-            "SELECT cta_type, COUNT(*) n FROM ads WHERE competitor_id=? AND cta_type IS NOT NULL "
+            f"SELECT cta_type, COUNT(*) n FROM ads WHERE competitor_id=? AND cta_type IS NOT NULL{src_ads} "
             "GROUP BY cta_type ORDER BY n DESC LIMIT 1",
             (cid,),
         ).fetchone()
@@ -178,6 +211,8 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             "priority": r["priority"],
             "ads_total": ads_total,
             "ads_active": ads_active,
+            "ads_meta": ads_meta,
+            "ads_google": ads_google,
             "creatives_total": creatives_total,
             "creatives_analyzed": creatives_analyzed,
             "new_ads": new_ads,
@@ -193,11 +228,16 @@ def _collect(conn: sqlite3.Connection, *, days: int,
     #   - all_recs : everything analyzed (ads + brand-store). Used only for the
     #     unfiltered "Browse all creatives" gallery, where the Source filter
     #     chip lets the user toggle between contexts.
-    all_recs = pull_analyzed_creatives()
+    all_recs = pull_analyzed_creatives(sources=sources)
     if brand_filter:
         keep = set(brand_filter)
         all_recs = [r for r in all_recs if r.competitor_id in keep]
-    ad_recs = [r for r in all_recs if (r.ad_id or 0) > 0]
+    # Paid-ad creatives, minus non-taxonomy page assets. text_ad has an ad_id
+    # (so ad_id>0 alone wouldn't drop it) but points at a JSON sidecar, not an
+    # image, and lacks the visual taxonomy — excluding it keeps the per-brand
+    # gallery and cross-set heatmaps image/video-only. (homepage/landing assets
+    # are ad_id NULL, already excluded.)
+    ad_recs = [r for r in all_recs if (r.ad_id or 0) > 0 and r.asset_type not in EXCLUDED_GALLERY_TYPES]
     # Page-level assets (whole-page screenshots) don't follow the ad-creative
     # taxonomy and have their own dashboard homes (homepage lane, landing-pages
     # section), so keep them out of the "Browse all creatives" gallery and the
@@ -219,7 +259,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
     for cid in [b["id"] for b in brands]:
         rows = conn.execute(
             "SELECT ad_archive_id, first_seen, body_text, cta_type, link_url, page_name "
-            "FROM ads WHERE competitor_id=? AND first_seen >= ? "
+            f"FROM ads WHERE competitor_id=? AND first_seen >= ?{src_ads} "
             "ORDER BY first_seen DESC LIMIT 50",
             (cid, since),
         ).fetchall()
@@ -258,7 +298,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             "LEFT JOIN creatives c_img ON c_img.id = ("
             "  SELECT id FROM creatives WHERE ad_id=a.id "
             "  AND asset_type='image' ORDER BY id LIMIT 1) "
-            "WHERE a.competitor_id=?",
+            f"WHERE a.competitor_id=?{src_a}",
             (cid,),
         ).fetchall()
         scored = []
@@ -300,7 +340,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         rows = conn.execute(
             "SELECT a.id, a.ad_archive_id, a.link_url, a.serp_position_rank, "
             "a.start_date, a.last_seen, a.active "
-            "FROM ads a WHERE a.competitor_id=? AND a.link_url IS NOT NULL",
+            f"FROM ads a WHERE a.competitor_id=? AND a.link_url IS NOT NULL{src_a}",
             (cid,),
         ).fetchall()
         max_rank_row = conn.execute(
@@ -493,6 +533,55 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             "block_vendor": block_vendor,
         }
 
+    # Google text ads (asset_type='text_ad') get a dedicated per-brand "Text ads"
+    # lane — no image, just classified headlines + descriptions. Built ONLY when
+    # google is in scope, so the Meta-only builds emit no Text-ads lane and stay
+    # byte-identical. Prefers the classified analysis_json, falling back to the
+    # raw text_ad_meta.json sidecar for any not-yet-analyzed ad.
+    text_ads_by_brand: dict[str, list] = {}
+    if google_in_scope:
+        for cid in [b["id"] for b in brands]:
+            rows = conn.execute(
+                "SELECT cr.asset_path, cr.analysis_json, cr.analyzed_at, "
+                "a.ad_archive_id, a.link_url, a.start_date, a.last_seen, a.page_name "
+                "FROM creatives cr JOIN ads a ON a.id=cr.ad_id "
+                "WHERE a.competitor_id=? AND cr.asset_type='text_ad' AND a.source='google' "
+                "ORDER BY a.last_seen DESC LIMIT 60",
+                (cid,),
+            ).fetchall()
+            items = []
+            for r in rows:
+                try:
+                    analysis = json.loads(r["analysis_json"]) if r["analysis_json"] else {}
+                except Exception:
+                    analysis = {}
+                meta = {}
+                try:
+                    meta = json.loads(Path(r["asset_path"]).read_text())
+                except Exception:
+                    pass
+                headlines = analysis.get("headlines") or [{"text": h} for h in (meta.get("headlines") or [])]
+                descriptions = analysis.get("descriptions") or [{"text": d} for d in (meta.get("descriptions") or [])]
+                items.append({
+                    "ad_archive_id": r["ad_archive_id"],
+                    "link_url": r["link_url"],
+                    "start_date": r["start_date"],
+                    "last_seen": r["last_seen"],
+                    "headlines": headlines,
+                    "descriptions": descriptions,
+                    "sale_status": analysis.get("sale_status"),
+                    "offer_kind": analysis.get("offer_kind"),
+                    "offer_value": analysis.get("offer_value"),
+                    "hook_style": analysis.get("hook_style"),
+                    "emotional_vs_rational": analysis.get("emotional_vs_rational"),
+                    "value_props": analysis.get("value_props") or [],
+                    "primary_cta": analysis.get("primary_cta"),
+                    "summary": analysis.get("summary_one_line"),
+                    "analyzed": bool(r["analyzed_at"]),
+                })
+            if items:
+                text_ads_by_brand[cid] = items
+
     # Latest briefing
     latest_briefing = conn.execute(
         "SELECT id, title, body_md, created_at FROM briefings "
@@ -521,8 +610,10 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             "adId": rec.ad_archive_id,
             "imgPath": str(rec.asset_path),  # absolute; relativized in JS at render time
             "assetType": rec.asset_type or "image",
+            "platform": rec.source,
             "videoDurationSec": vmeta.get("duration_sec"),
-            "metaAdUrl": _meta_ad_url(rec.ad_archive_id),
+            # No Meta Ad Library link for Google creatives (it would be wrong).
+            "metaAdUrl": _meta_ad_url(rec.ad_archive_id) if rec.source != "google" else "",
             "landingSection": landing_info.get("section"),
             "landingCleanUrl": landing_info.get("clean_url"),
             "utmSource": utm_info.get("utm_source"),
@@ -568,6 +659,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         placeholders = ",".join("?" for _ in brand_filter)
         ads_q += f" AND competitor_id IN ({placeholders})"
         ads_params += list(brand_filter)
+    ads_q += src_ads
     ads_q += " ORDER BY first_seen DESC LIMIT 2000"
     for r in conn.execute(ads_q, ads_params).fetchall():
         ads_index.append({
@@ -639,6 +731,8 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         "landing_screens_by_brand": landing_screens_by_brand,
         "brand_store_by_brand": brand_store_by_brand,
         "homepage_by_brand": homepage_by_brand,
+        "text_ads_by_brand": text_ads_by_brand,
+        "google_in_scope": google_in_scope,
         "latest_briefing": dict(latest_briefing) if latest_briefing else None,
         # client-side payloads
         "client_creatives": creatives_index,
@@ -812,15 +906,24 @@ tr.set-row td { background: #1f2c4a !important; color: white; font-weight: 600; 
 .lp-findings code { background: rgba(0,0,0,0.05); padding: 0 4px; border-radius: 2px; }
 
 /* Ads list */
-.ad { display: grid; grid-template-columns: 90px 1fr 110px; gap: 12px; padding: 10px 0;
+.ad { display: grid; grid-template-columns: 116px 1fr 110px; gap: 12px; padding: 10px 0;
       border-bottom: 1px solid #eef0f3; font-size: 12px; align-items: start; }
-.ad .id { font-family: ui-monospace,Menlo,Consolas,monospace; color: #666; }
-.ad .body { color: #1c1c1c; }
+.ad .id { font-family: ui-monospace,Menlo,Consolas,monospace; color: #666; min-width: 0;
+          overflow-wrap: anywhere; word-break: break-all; font-size: 11px; line-height: 1.5; }
+.ad .body { color: #1c1c1c; min-width: 0; overflow-wrap: anywhere; }
 .ad .cta { color: #2a5fb0; font-weight: 600; text-align: right; }
 
 /* Briefing */
 .briefing { white-space: pre-wrap; font-size: 13px; line-height: 1.6; }
 .briefing h1,.briefing h2,.briefing h3 { font-weight: 600; }
+/* Strategy-report link (replaces briefing when --strategy-doc is set) */
+.strategy-cta { padding: 2px 0 4px; }
+.strategy-links { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.strategy-btn { display: inline-block; padding: 10px 18px; border-radius: 6px; background: #2a5fb0;
+                color: #fff; font-weight: 600; font-size: 13px; text-decoration: none; }
+.strategy-btn:hover { background: #244f96; }
+.strategy-btn.ghost { background: transparent; color: #2a5fb0; border: 1px solid #2a5fb0; }
+.strategy-btn.ghost:hover { background: #f0f4fb; }
 
 /* Lightbox */
 #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100;
@@ -1020,7 +1123,7 @@ const filterState = {
   context: new Set(), bgColor: new Set(), modelGender: new Set(),
   productInUse: new Set(), productGrouping: new Set(),
   certifications: new Set(), awards: new Set(), layoutFlags: new Set(),
-  assetType: new Set(),
+  assetType: new Set(), platform: new Set(),
   // Landing-page filters (parsed from ad link_url at collect time):
   landingSection: new Set(), utmCampaign: new Set(),
   utmSource: new Set(), utmMedium: new Set(),
@@ -1086,6 +1189,7 @@ function renderFilterGallery() {
         <div class="summary">${escapeHTML(c.summary || '(no summary)')}</div>
         <div class="muted"><code>${escapeHTML(c.comp)}</code> · ad <code>${c.adId}</code></div>
         <div class="tags">
+          ${DATA.google_in_scope && c.platform ? `<span class="tag">${escapeHTML(c.platform)}</span>` : ''}
           ${c.photo ? `<span class="tag">${c.photo}</span>` : ''}
           ${c.hook ? `<span class="tag">${c.hook}</span>` : ''}
           ${(c.products || []).slice(0,2).map(p => `<span class="tag prod">${escapeHTML(p)}</span>`).join('')}
@@ -1104,6 +1208,9 @@ function buildFilterDropdowns() {
   if (!root) return;
   const groups = [
     {key: 'comp', label: 'Brand', getter: c => [c.comp]},
+    // Platform (Meta/Google) filter — only present in the with-Google report;
+    // the Meta-only build sets google_in_scope=false so it never renders.
+    ...(DATA.google_in_scope ? [{key: 'platform', label: 'Platform', getter: c => c.platform ? [c.platform] : []}] : []),
     {key: 'assetType', label: 'Asset type', getter: c => c.assetType ? [c.assetType] : []},
     {key: 'context', label: 'Source', getter: c => c.context ? [c.context] : []},
     {key: 'photo', label: 'Photography', getter: c => c.photo ? [c.photo] : []},
@@ -2180,10 +2287,73 @@ def _render_top_served_panel(top_ads: list, dashboard_dir: Path) -> str:
     )
 
 
+def _render_text_ads_panel(text_ads: list, dashboard_dir: Path) -> str:
+    """Per-brand Google text-ads cards: headlines (Titles) and descriptions
+    (Body copy) with per-component classification chips + an ad-level rollup.
+    Text ads have no image — this is their dedicated home."""
+    if not text_ads:
+        return ""
+    cards = []
+    for t in text_ads[:24]:
+        h_rows = []
+        for h in (t.get("headlines") or [])[:15]:
+            if not isinstance(h, dict):
+                h = {"text": h}
+            chips = []
+            if h.get("intent"):
+                chips.append(f'<span class="tag">{_esc(h["intent"])}</span>')
+            if h.get("sale_status") and h["sale_status"] not in (None, "no_sale", "unclear"):
+                chips.append(f'<span class="tag kf">{_esc(h["sale_status"])}</span>')
+            if h.get("urgency"):
+                chips.append('<span class="tag kf">urgency</span>')
+            h_rows.append(f'<li>{_esc(h.get("text", ""))} {"".join(chips)}</li>')
+        d_rows = []
+        for d in (t.get("descriptions") or [])[:6]:
+            if not isinstance(d, dict):
+                d = {"text": d}
+            chips = []
+            if d.get("copy_lean") and d["copy_lean"] != "none":
+                chips.append(f'<span class="tag">{_esc(d["copy_lean"])}</span>')
+            for vp in (d.get("value_props") or [])[:3]:
+                chips.append(f'<span class="tag prod">{_esc(vp)}</span>')
+            if d.get("urgency"):
+                chips.append('<span class="tag kf">urgency</span>')
+            d_rows.append(f'<li>{_esc(d.get("text", ""))} {"".join(chips)}</li>')
+        rollup = []
+        for label, val in [("sale", t.get("sale_status")), ("offer", t.get("offer_kind")),
+                           ("hook", t.get("hook_style")), ("appeal", t.get("emotional_vs_rational"))]:
+            if val and val not in ("none", "no_sale", "unclear"):
+                rollup.append(f'<span class="tag">{_esc(label)}: {_esc(val)}</span>')
+        if t.get("offer_value"):
+            rollup.append(f'<span class="tag kf">{_esc(t["offer_value"])}</span>')
+        link = t.get("link_url")
+        link_html = f' · <a href="{_esc(link)}" target="_blank">landing</a>' if link else ""
+        unanalyzed = "" if t.get("analyzed") else ' <span class="muted">(unanalyzed)</span>'
+        cards.append(f"""
+        <div class="ad" style="display:block;padding:12px 14px;margin-bottom:10px;border:1px solid #e3e3e3;border-radius:6px;background:white">
+          <div class="summary" style="font-weight:600;margin-bottom:6px">{_esc(t.get("summary") or "(text ad)")}{unanalyzed}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div>
+              <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Titles</div>
+              <ul style="margin:0;padding-left:16px;font-size:12px">{"".join(h_rows) or '<li class="muted">—</li>'}</ul>
+            </div>
+            <div>
+              <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Body copy</div>
+              <ul style="margin:0;padding-left:16px;font-size:12px">{"".join(d_rows) or '<li class="muted">—</li>'}</ul>
+            </div>
+          </div>
+          <div class="tags" style="margin-top:8px">{"".join(rollup)}</div>
+          <div class="muted" style="margin-top:4px">ad <code>{_esc(t.get("ad_archive_id"))}</code>{link_html}</div>
+        </div>
+        """)
+    return "".join(cards)
+
+
 def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_dir: Path,
                            bs_data: dict | None = None,
                            hp_data: dict | None = None,
-                           top_ads: list | None = None) -> str:
+                           top_ads: list | None = None,
+                           text_ads: list | None = None) -> str:
     # Creative gallery
     gallery_items = []
     for rec in recs[:36]:
@@ -2199,6 +2369,8 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
         mau = _meta_ad_url(rec.ad_archive_id)
         summary = _esc(a.get("summary_one_line") or "")
         tags_html = []
+        if getattr(rec, "source", "meta") == "google":
+            tags_html.append('<span class="tag">google</span>')
         ps = a.get("photography_style")
         if ps:
             tags_html.append(f'<span class="tag">{_esc(ps)}</span>')
@@ -2255,6 +2427,26 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
     brand_store_html = _render_brand_store_block(bs_data, dashboard_dir)
     homepage_html = _render_homepage_block(hp_data, dashboard_dir)
     top_served_html = _render_top_served_panel(top_ads or [], dashboard_dir)
+    # Google text-ads lane — only rendered when this brand has Google text ads
+    # (so the Meta-only report shows no Google lane at all).
+    text_ads_panel = _render_text_ads_panel(text_ads or [], dashboard_dir)
+    google_lane_html = ""
+    if text_ads_panel:
+        google_lane_html = f"""
+      <div class="lane lane-google" style="background:#fdf8ef;border-left:4px solid #e0992a;
+                                            border-radius:6px;padding:18px 20px;margin-top:18px">
+        <div class="lane-label" style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <span style="background:#e0992a;color:white;font-size:10px;font-weight:600;letter-spacing:1px;
+                       text-transform:uppercase;padding:3px 8px;border-radius:3px">Google</span>
+          <h3 style="margin:0;font-size:18px">Text ads</h3>
+          <span class="muted" style="font-size:11px">Transparency Center · classified by title vs. body copy</span>
+        </div>
+        <div class="stats" style="margin-bottom:14px">
+          <div class="stat"><div class="label">Google ads</div><div class="value">{brand.get('ads_google', 0)}</div></div>
+          <div class="stat"><div class="label">Text ads shown</div><div class="value">{len(text_ads or [])}</div></div>
+        </div>
+        {text_ads_panel}
+      </div>"""
     return f"""
     <section id="brand-{_esc(brand['id'])}">
       <h2>{_esc(brand['name'])} <span class="muted">— {_esc(brand['vertical'])} · priority {_esc(pri)}</span></h2>
@@ -2284,7 +2476,7 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
         <h4 style="margin:18px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#555">Recent ads (last {{days}} days)</h4>
         {ads_html}
       </div>
-
+      {google_lane_html}
       {homepage_html}
       {brand_store_html}
     </section>
@@ -2303,6 +2495,21 @@ def _render_briefing(data: dict) -> str:
     """
 
 
+def _render_strategy_link(strategy_doc: str) -> str:
+    """When a --strategy-doc URL is supplied, the 'Latest briefing' section is
+    replaced by a link to that standalone strategy report (+ its sibling PDF)."""
+    pdf = (strategy_doc[:-5] + ".pdf") if strategy_doc.lower().endswith(".html") else (strategy_doc + ".pdf")
+    return f"""
+    <div class="strategy-cta">
+      <p class="muted">The full strategist's read for this set — positioning, competitive tone, and the whitespace worth moving on — is a standalone report.</p>
+      <div class="strategy-links">
+        <a class="strategy-btn" href="{_esc(strategy_doc)}" target="_blank" rel="noopener">Open strategy report &rarr;</a>
+        <a class="strategy-btn ghost" href="{_esc(pdf)}" target="_blank" rel="noopener">Download PDF</a>
+      </div>
+    </div>
+    """
+
+
 DEFAULT_ORG = "Horizon Commerce"
 DEFAULT_PRODUCT = "Creative & Competitive Intelligence"
 
@@ -2314,15 +2521,21 @@ def build_dashboard(
     org_name: str = DEFAULT_ORG,
     product_name: str = DEFAULT_PRODUCT,
     brand_ids: set[str] | None = None,
+    sources: set[str] | None = None,
+    strategy_doc: str | None = None,
 ) -> dict[str, Any]:
     """Generate the dashboard at out_dir/index.html. Returns summary metadata.
 
     brand_ids restricts the dashboard to an allow-list of competitor ids (see
-    _collect); None renders every competitor."""
+    _collect); None renders every competitor. sources scopes ad platforms
+    (e.g. {"meta"} for the unchanged Meta report, {"meta","google"} for the
+    with-Google report); None means all platforms. strategy_doc, when set to a
+    (relative) URL, replaces the 'Latest briefing' section with a link to that
+    standalone strategy report + its PDF."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
-        data = _collect(conn, days=days, brand_ids=brand_ids)
+        data = _collect(conn, days=days, brand_ids=brand_ids, sources=sources)
 
     sections_html = []
 
@@ -2445,12 +2658,22 @@ def build_dashboard(
         hp_data = data["homepage_by_brand"].get(brand["id"])
         sections_html.append(
             _render_brand_section(brand, recs, recent, out_dir,
-                                   bs_data=bs_data, hp_data=hp_data, top_ads=top)
+                                   bs_data=bs_data, hp_data=hp_data, top_ads=top,
+                                   text_ads=data["text_ads_by_brand"].get(brand["id"], []))
             .replace("{days}", str(days))
         )
 
-    # Briefing
-    sections_html.append(f"""
+    # Reporting: a strategy-report link (when --strategy-doc is set) replaces the
+    # latest-briefing body; otherwise the briefing renders as before.
+    if strategy_doc:
+        sections_html.append(f"""
+    <section id="briefing">
+      <h2>Strategy report</h2>
+      {_render_strategy_link(strategy_doc)}
+    </section>
+    """)
+    else:
+        sections_html.append(f"""
     <section id="briefing">
       <h2>Latest briefing</h2>
       {_render_briefing(data)}
@@ -2470,7 +2693,7 @@ def build_dashboard(
             ('Browse all creatives', '#browse'),
         ]),
         ('Brands', [(brand["name"], f"#brand-{brand['id']}") for brand in data["brands"]]),
-        ('Reporting', [('Latest briefing', '#briefing')]),
+        ('Reporting', [('Strategy report' if strategy_doc else 'Latest briefing', '#briefing')]),
     ]
     nav_html_parts = [
         f'<div class="nav-org">'
@@ -2492,6 +2715,7 @@ def build_dashboard(
         "client_ads": data["client_ads"],
         "client_tallies": data["client_tallies"],
         "client_set_tally": data["client_set_tally"],
+        "google_in_scope": data["google_in_scope"],
         "brands_meta": brands_meta,
         "window_days": days,
     }

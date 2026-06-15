@@ -43,6 +43,19 @@ STEALTH_ARGS = [
     "--disable-features=IsolateOrigins,site-per-process",
 ]
 
+# Emulate a New York City visitor so geo-gated offers/pricing render as a
+# NYC shopper would see them. Sets the browser Geolocation API position +
+# timezone + Accept-Language; spread into every new_context() below. Note this
+# does NOT change the egress IP — sites that geo-target purely by IP still see
+# this machine's location.
+NYC_GEO_CONTEXT = {
+    "geolocation": {"latitude": 40.7128, "longitude": -74.0060, "accuracy": 50},
+    "permissions": ["geolocation"],
+    "timezone_id": "America/New_York",
+    "locale": "en-US",
+    "extra_http_headers": {"Accept-Language": "en-US,en;q=0.9"},
+}
+
 # Regions on a marketing page that disproportionately carry on-site offers.
 OFFER_SELECTORS = [
     "[class*='banner' i]",
@@ -604,7 +617,7 @@ def scrape_landing_page(
         context = browser.new_context(
             user_agent=USER_AGENT,
             viewport={"width": 1440, "height": 900},
-            locale="en-US",
+            **NYC_GEO_CONTEXT,
         )
         try:
             page = context.new_page()
@@ -700,7 +713,7 @@ def scrape_homepage(
         context = browser.new_context(
             user_agent=USER_AGENT,
             viewport={"width": 1440, "height": 900},
-            locale="en-US",
+            **NYC_GEO_CONTEXT,
         )
         try:
             page = context.new_page()

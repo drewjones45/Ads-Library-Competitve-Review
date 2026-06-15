@@ -87,6 +87,7 @@ html[data-theme="dark"] {
   --warn: #f5a623; --warn-soft: rgba(245,166,35,0.12);
   --amazon: #ffa033;   --amazon-soft: rgba(255,160,51,0.10);
   --homepage: #34c97b; --homepage-soft: rgba(52,201,123,0.10);
+  --google: #a78bfa;   --google-soft: rgba(167,139,250,0.12);
   --heat-lo: #101827; --heat-hi: #3f74e0; --heat-hi-text: #ffffff;
   --chart-bar: #4d76c9; --chart-line: #9db9f0;
   --pri-high: #e5484d; --pri-med: #f5a623; --pri-low: #627192;
@@ -128,6 +129,7 @@ html[data-theme="light"] {
   --warn: #b96e00; --warn-soft: rgba(224,142,0,0.12);
   --amazon: #e88a00;   --amazon-soft: rgba(232,138,0,0.10);
   --homepage: #2da44e; --homepage-soft: rgba(45,164,78,0.10);
+  --google: #7c3aed;   --google-soft: rgba(124,58,237,0.10);
   --heat-lo: #eef1f7; --heat-hi: #2a5fb0; --heat-hi-text: #ffffff;
   --chart-bar: #3d6cc4; --chart-line: #6f97e8;
   --pri-high: #d9534f; --pri-med: #f0ad4e; --pri-low: #8290ab;
@@ -395,10 +397,11 @@ tr.set-row td { background: var(--bg-elev); color: var(--text-1); font-weight: 7
 .lp-seg--unknown { fill: var(--sec-unknown); }               .sec-bg--unknown { background: var(--sec-unknown); }
 
 /* Ads list */
-.ad { display: grid; grid-template-columns: 90px 1fr 110px; gap: 12px; padding: 10px 0;
+.ad { display: grid; grid-template-columns: 116px 1fr 110px; gap: 12px; padding: 10px 0;
       border-bottom: 1px solid var(--border-1); font-size: 12px; align-items: start; }
-.ad .id { font-family: var(--font-mono); color: var(--text-3); }
-.ad .body { color: var(--text-2); }
+.ad .id { font-family: var(--font-mono); color: var(--text-3); min-width: 0;
+          overflow-wrap: anywhere; word-break: break-all; font-size: 11px; line-height: 1.5; }
+.ad .body { color: var(--text-2); min-width: 0; overflow-wrap: anywhere; }
 .ad .cta { text-align: right; font-weight: 600; color: var(--text-2); }
 .ad .cta a { color: var(--accent); text-decoration: none; }
 .ad .cta a:hover { text-decoration: underline; }
@@ -407,6 +410,15 @@ tr.set-row td { background: var(--bg-elev); color: var(--text-1); font-weight: 7
 .briefing { white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: var(--text-2);
             background: var(--bg-inset); border: 1px solid var(--border-1);
             border-radius: var(--radius-ctl); padding: 16px 18px; overflow-x: auto; }
+/* Strategy-report link (replaces briefing when --strategy-doc is set) */
+.strategy-cta { padding: 2px 0 4px; }
+.strategy-links { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.strategy-btn { display: inline-block; padding: 10px 18px; border-radius: var(--radius-ctl);
+                background: var(--accent); color: #fff; font-weight: 600; font-size: 13px;
+                text-decoration: none; }
+.strategy-btn:hover { filter: brightness(1.08); }
+.strategy-btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+.strategy-btn.ghost:hover { background: var(--accent-soft); filter: none; }
 
 /* Lightbox */
 #lightbox { display: none; position: fixed; inset: 0; background: var(--scrim); z-index: 100;
@@ -573,6 +585,7 @@ tr.set-row td { background: var(--bg-elev); color: var(--text-1); font-weight: 7
 .lane-meta { border-left-color: var(--accent); }
 .lane-hp { border-left-color: var(--homepage); }
 .lane-bs { border-left-color: var(--amazon); }
+.lane-google { border-left-color: var(--google); }
 .lane-hp-blocked { border-left-color: var(--neg); }
 .lane .stats { margin-bottom: 14px; }
 .lane-label { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
@@ -584,9 +597,21 @@ tr.set-row td { background: var(--bg-elev); color: var(--text-1); font-weight: 7
 .lane-badge--amazon { background: var(--amazon-soft); color: var(--amazon); }
 .lane-badge--website { background: var(--homepage-soft); color: var(--homepage); }
 .lane-badge--blocked { background: var(--neg-soft); color: var(--neg); }
+.lane-badge--google { background: var(--google-soft); color: var(--google); }
 .lane h4 { margin: 18px 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
            color: var(--text-3); font-weight: 700; }
 .lane h4 .muted { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 11px; }
+
+/* Google text-ads panel */
+.ta-grid { display: flex; flex-direction: column; gap: 10px; }
+.ta-card { background: var(--bg-card); border: 1px solid var(--border-1);
+           border-radius: var(--radius-ctl); padding: 12px 14px; }
+.ta-summary { font-weight: 700; color: var(--text-1); margin-bottom: 8px; font-size: 13px; }
+.ta-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.ta-coltitle { font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+               color: var(--text-3); font-weight: 700; margin-bottom: 4px; }
+.ta-list { margin: 0; padding-left: 16px; font-size: 12px; color: var(--text-2); line-height: 1.5; }
+.ta-list li { margin: 3px 0; }
 
 /* Top-served ads panel */
 .ts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
@@ -782,7 +807,7 @@ const filterState = {
   context: new Set(), bgColor: new Set(), modelGender: new Set(),
   productInUse: new Set(), productGrouping: new Set(),
   certifications: new Set(), awards: new Set(), layoutFlags: new Set(),
-  assetType: new Set(),
+  assetType: new Set(), platform: new Set(),
   // Landing-page filters (parsed from ad link_url at collect time):
   landingSection: new Set(), utmCampaign: new Set(),
   utmSource: new Set(), utmMedium: new Set(),
@@ -848,6 +873,7 @@ function renderFilterGallery() {
         <div class="summary">${escapeHTML(c.summary || '(no summary)')}</div>
         <div class="muted"><code>${escapeHTML(c.comp)}</code> · ad <code>${c.adId}</code></div>
         <div class="tags">
+          ${DATA.google_in_scope && c.platform ? `<span class="tag">${escapeHTML(c.platform)}</span>` : ''}
           ${c.photo ? `<span class="tag">${c.photo}</span>` : ''}
           ${c.hook ? `<span class="tag">${c.hook}</span>` : ''}
           ${(c.products || []).slice(0,2).map(p => `<span class="tag prod">${escapeHTML(p)}</span>`).join('')}
@@ -866,6 +892,9 @@ function buildFilterDropdowns() {
   if (!root) return;
   const groups = [
     {key: 'comp', label: 'Brand', getter: c => [c.comp]},
+    // Platform (Meta/Google) filter — only in the with-Google report
+    // (google_in_scope=false in the Meta build, so it never renders).
+    ...(DATA.google_in_scope ? [{key: 'platform', label: 'Platform', getter: c => c.platform ? [c.platform] : []}] : []),
     {key: 'assetType', label: 'Asset type', getter: c => c.assetType ? [c.assetType] : []},
     {key: 'context', label: 'Source', getter: c => c.context ? [c.context] : []},
     {key: 'photo', label: 'Photography', getter: c => c.photo ? [c.photo] : []},
@@ -1225,8 +1254,9 @@ _MOON_SVG = (
 
 
 def _render_top_bar(org_name: str, product_name: str, generated_at: str,
-                    days: int, n_brands: int) -> str:
+                    days: int, n_brands: int, strategy_doc: str | None = None) -> str:
     initial = (org_name or "I").strip()[:1].upper()
+    report_label = "Strategy" if strategy_doc else "Briefing"
     return f"""
 <div class="topbar">
   <div class="topbar-left">
@@ -1240,7 +1270,7 @@ def _render_top_bar(org_name: str, product_name: str, generated_at: str,
     <a href="#overview">Overview</a>
     <a href="#delta">What's new</a>
     <a href="#browse">Browse</a>
-    <a href="#briefing">Briefing</a>
+    <a href="#briefing">{report_label}</a>
   </nav>
   <div class="topbar-right">
     <div class="topbar-meta">Generated {_esc(generated_at)} · last {days}d · {n_brands} brands</div>
@@ -1923,11 +1953,73 @@ def _render_top_served_panel_v2(top_ads: list, dashboard_dir: Path) -> str:
     return f'<div class="ts-grid">{"".join(cards)}</div>'
 
 
+def _render_text_ads_panel_v2(text_ads: list, dashboard_dir: Path) -> str:
+    """v2 Google text-ads cards — headlines (Titles) and descriptions (Body copy)
+    with per-component classification chips + an ad-level rollup. Themed with
+    var() tokens / existing classes only (no hardcoded color)."""
+    if not text_ads:
+        return ""
+    cards = []
+    for t in text_ads[:24]:
+        h_rows = []
+        for h in (t.get("headlines") or [])[:15]:
+            if not isinstance(h, dict):
+                h = {"text": h}
+            chips = []
+            if h.get("intent"):
+                chips.append(f'<span class="tag">{_esc(h["intent"])}</span>')
+            if h.get("sale_status") and h["sale_status"] not in (None, "no_sale", "unclear"):
+                chips.append(f'<span class="tag kf">{_esc(h["sale_status"])}</span>')
+            if h.get("urgency"):
+                chips.append('<span class="tag kf">urgency</span>')
+            h_rows.append(f'<li>{_esc(h.get("text", ""))} {"".join(chips)}</li>')
+        d_rows = []
+        for d in (t.get("descriptions") or [])[:6]:
+            if not isinstance(d, dict):
+                d = {"text": d}
+            chips = []
+            if d.get("copy_lean") and d["copy_lean"] != "none":
+                chips.append(f'<span class="tag">{_esc(d["copy_lean"])}</span>')
+            for vp in (d.get("value_props") or [])[:3]:
+                chips.append(f'<span class="tag prod">{_esc(vp)}</span>')
+            if d.get("urgency"):
+                chips.append('<span class="tag kf">urgency</span>')
+            d_rows.append(f'<li>{_esc(d.get("text", ""))} {"".join(chips)}</li>')
+        rollup = []
+        for label, val in [("sale", t.get("sale_status")), ("offer", t.get("offer_kind")),
+                           ("hook", t.get("hook_style")), ("appeal", t.get("emotional_vs_rational"))]:
+            if val and val not in ("none", "no_sale", "unclear"):
+                rollup.append(f'<span class="tag">{_esc(label)}: {_esc(val)}</span>')
+        if t.get("offer_value"):
+            rollup.append(f'<span class="tag kf">{_esc(t["offer_value"])}</span>')
+        link = t.get("link_url")
+        link_html = f' · <a href="{_esc(link)}" target="_blank">landing</a>' if link else ""
+        unanalyzed = "" if t.get("analyzed") else ' <span class="muted">(unanalyzed)</span>'
+        cards.append(f"""
+        <div class="ta-card">
+          <div class="ta-summary">{_esc(t.get("summary") or "(text ad)")}{unanalyzed}</div>
+          <div class="ta-cols">
+            <div>
+              <div class="ta-coltitle">Titles</div>
+              <ul class="ta-list">{"".join(h_rows) or '<li class="muted">—</li>'}</ul>
+            </div>
+            <div>
+              <div class="ta-coltitle">Body copy</div>
+              <ul class="ta-list">{"".join(d_rows) or '<li class="muted">—</li>'}</ul>
+            </div>
+          </div>
+          <div class="tags">{"".join(rollup)}</div>
+          <div class="muted">ad <code>{_esc(t.get("ad_archive_id"))}</code>{link_html}</div>
+        </div>""")
+    return f'<div class="ta-grid">{"".join(cards)}</div>'
+
+
 def _render_brand_section_v2(brand: dict, recs: list, recent_ads: list,
                              dashboard_dir: Path, *, days: int,
                              bs_data: dict | None = None,
                              hp_data: dict | None = None,
-                             top_ads: list | None = None) -> str:
+                             top_ads: list | None = None,
+                             text_ads: list | None = None) -> str:
     # Creative gallery
     gallery_items = []
     for rec in recs[:36]:
@@ -1943,6 +2035,8 @@ def _render_brand_section_v2(brand: dict, recs: list, recent_ads: list,
         mau = _meta_ad_url(rec.ad_archive_id)
         summary = _esc(a.get("summary_one_line") or "")
         tags_html = []
+        if getattr(rec, "source", "meta") == "google":
+            tags_html.append('<span class="tag">google</span>')
         ps = a.get("photography_style")
         if ps:
             tags_html.append(f'<span class="tag">{_esc(ps)}</span>')
@@ -2000,6 +2094,23 @@ def _render_brand_section_v2(brand: dict, recs: list, recent_ads: list,
     brand_store_html = _render_brand_store_block_v2(bs_data, dashboard_dir)
     homepage_html = _render_homepage_block_v2(hp_data, dashboard_dir)
     top_served_html = _render_top_served_panel_v2(top_ads or [], dashboard_dir)
+    # Google text-ads lane — only when this brand has Google text ads.
+    text_ads_panel = _render_text_ads_panel_v2(text_ads or [], dashboard_dir)
+    google_lane_html = ""
+    if text_ads_panel:
+        google_lane_html = f"""
+      <div class="lane lane-google">
+        <div class="lane-label">
+          <span class="lane-badge lane-badge--google">Google</span>
+          <h3>Text ads</h3>
+          <span class="muted">Transparency Center · classified by title vs. body copy</span>
+        </div>
+        <div class="stats">
+          {_stat("Google ads", brand.get('ads_google', 0))}
+          {_stat("Text ads shown", len(text_ads or []))}
+        </div>
+        {text_ads_panel}
+      </div>"""
     return f"""
     <section id="brand-{_esc(brand['id'])}">
       <h2>{_esc(brand['name'])} <span class="muted">— {_esc(brand['vertical'])} · priority {_esc(pri)}</span></h2>
@@ -2024,7 +2135,7 @@ def _render_brand_section_v2(brand: dict, recs: list, recent_ads: list,
         <h4>Recent ads (last {days} days)</h4>
         {ads_html}
       </div>
-
+      {google_lane_html}
       {homepage_html}
       {brand_store_html}
     </section>
@@ -2043,6 +2154,21 @@ def _render_briefing_v2(data: dict) -> str:
     """
 
 
+def _render_strategy_link_v2(strategy_doc: str) -> str:
+    """When --strategy-doc is set, the 'Latest briefing' section links to that
+    standalone strategy report (+ its sibling PDF) instead of the briefing body."""
+    pdf = (strategy_doc[:-5] + ".pdf") if strategy_doc.lower().endswith(".html") else (strategy_doc + ".pdf")
+    return f"""
+    <div class="strategy-cta">
+      <p class="muted">The full strategist's read for this set — positioning, competitive tone, and the whitespace worth moving on — is a standalone report.</p>
+      <div class="strategy-links">
+        <a class="strategy-btn" href="{_esc(strategy_doc)}" target="_blank" rel="noopener">Open strategy report &rarr;</a>
+        <a class="strategy-btn ghost" href="{_esc(pdf)}" target="_blank" rel="noopener">Download PDF</a>
+      </div>
+    </div>
+    """
+
+
 # ----- page assembly ----------------------------------------------------------
 
 def build_dashboard_v2(
@@ -2052,6 +2178,8 @@ def build_dashboard_v2(
     org_name: str = DEFAULT_ORG,
     product_name: str = DEFAULT_PRODUCT_V2,
     brand_ids: set[str] | None = None,
+    sources: set[str] | None = None,
+    strategy_doc: str | None = None,
 ) -> dict[str, Any]:
     """Generate the v2 dashboard at out_dir/index.html. Returns summary metadata.
 
@@ -2060,11 +2188,13 @@ def build_dashboard_v2(
     tallies, which v1 collects but forgets to embed).
 
     brand_ids restricts the dashboard to an allow-list of competitor ids (see
-    dashboard._collect); None renders every competitor."""
+    dashboard._collect); None renders every competitor. sources scopes ad
+    platforms ({"meta"} for the unchanged Meta report, {"meta","google"} for
+    the with-Google report); None means all platforms."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
-        data = _collect(conn, days=days, brand_ids=brand_ids)
+        data = _collect(conn, days=days, brand_ids=brand_ids, sources=sources)
 
     sections_html = []
 
@@ -2183,11 +2313,20 @@ def build_dashboard_v2(
         hp_data = data["homepage_by_brand"].get(brand["id"])
         sections_html.append(
             _render_brand_section_v2(brand, recs, recent, out_dir, days=days,
-                                     bs_data=bs_data, hp_data=hp_data, top_ads=top)
+                                     bs_data=bs_data, hp_data=hp_data, top_ads=top,
+                                     text_ads=data["text_ads_by_brand"].get(brand["id"], []))
         )
 
-    # Briefing
-    sections_html.append(f"""
+    # Reporting: --strategy-doc link replaces the latest-briefing body when set.
+    if strategy_doc:
+        sections_html.append(f"""
+    <section id="briefing">
+      <h2>Strategy report</h2>
+      {_render_strategy_link_v2(strategy_doc)}
+    </section>
+    """)
+    else:
+        sections_html.append(f"""
     <section id="briefing">
       <h2>Latest briefing</h2>
       {_render_briefing_v2(data)}
@@ -2207,11 +2346,11 @@ def build_dashboard_v2(
             ('Browse all creatives', '#browse'),
         ]),
         ('Brands', [(brand["name"], f"#brand-{brand['id']}") for brand in data["brands"]]),
-        ('Reporting', [('Latest briefing', '#briefing')]),
+        ('Reporting', [('Strategy report' if strategy_doc else 'Latest briefing', '#briefing')]),
     ]
     sidebar_html = _render_sidebar(nav_groups)
     topbar_html = _render_top_bar(org_name, product_name, data["generated_at"],
-                                  days, len(data["brands"]))
+                                  days, len(data["brands"]), strategy_doc=strategy_doc)
 
     # ---- embedded JSON payload for client-side features ----
     # Includes client_tallies_weighted (v1 collects it but omits it from the
@@ -2223,6 +2362,7 @@ def build_dashboard_v2(
         "client_tallies": data["client_tallies"],
         "client_tallies_weighted": data["client_tallies_weighted"],
         "client_set_tally": data["client_set_tally"],
+        "google_in_scope": data["google_in_scope"],
         "brands_meta": brands_meta,
         "window_days": days,
     }
