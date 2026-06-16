@@ -31,10 +31,13 @@
 #                bucket as Fiberon in the decking set — meta_ads source omitted;
 #                website source only.
 #
-# Google Ads Transparency Center: omitted for now. SerpApi's ATC engine requires
-# an explicit advertiser_id (AR…) and offers no name/domain search, so each
-# brand's AR-id must be resolved manually from adstransparency.google.com before
-# a google_ads source can be added here. Tracked as a follow-up.
+# Google Ads Transparency Center: ENABLED for Philo only (2026-06-16). The user
+# primarily cares about Philo's Google Ads data, not the competitors', so only
+# the subject brand carries a google_ads source. SerpApi's ATC engine offers no
+# name search (text="Philo" → empty), but a domain query (text="philo.com")
+# returns the advertiser; Philo's AR-id resolved + VERIFIED that way:
+#   philo → AR13265893387262754817  ("Philo, Inc.", target_domain philo.com)
+# Other brands' AR-ids remain unresolved and intentionally omitted.
 
 competitors:
   - id: philo
@@ -52,6 +55,12 @@ competitors:
         country: US
         cadence: daily
         method: scrape
+      - type: google_ads
+        advertiser_id: "AR13265893387262754817"   # Philo, Inc. — resolved via SerpApi domain search (text=philo.com)
+        page_name: Philo
+        country: US                                # mapped to geo code 2840 on the SerpApi path
+        cadence: daily
+        method: api
 
   - id: frndly
     name: Frndly TV
