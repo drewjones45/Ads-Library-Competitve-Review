@@ -1,0 +1,28 @@
+# Netlify configuration for the competitive-intelligence dashboards.
+#
+# IMPORTANT: the site is built LOCALLY, not in Netlify CI. The dashboards pull
+# from data/*_assets/ (gitignored, ~hundreds of MB) which is not in the repo, so
+# a Git-connected CI build cannot regenerate them. Build here, deploy the folder:
+#
+#     python3 scripts/build_site.py        # produces dist/
+#     netlify deploy --dir dist --prod     # or drag-drop dist/ at app.netlify.com
+#
+# (See NETLIFY.md.) `publish` is declared so `netlify deploy` and drag-drop both
+# know dist/ is the site root. The build `command` is a safety net for the case
+# where you DO build on a machine that has the data — it is a no-op-ish rebuild.
+
+[build]
+  publish = "dist"
+  command = "python3 scripts/build_site.py"
+
+# Long-cache the immutable creative assets; keep HTML revalidating so a redeploy
+# is picked up immediately.
+[[headers]]
+  for = "/*/*/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

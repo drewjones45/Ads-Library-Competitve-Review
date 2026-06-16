@@ -11,3 +11,6 @@ data/raw/
 .pytest_cache/
 dist/
 build/
+
+# Local Netlify folder
+.netlify
