@@ -15,6 +15,15 @@
   publish = "dist"
   command = "python3 scripts/build_site.py"
 
+[build.environment]
+  # Exclude the captured competitor assets from secret scanning. Everything under
+  # data/ is scraped third-party content (competitor websites + ad creatives) and
+  # local SQLite DBs — not our secrets (those live in the gitignored .env). The
+  # scanner trips on third-party public keys embedded in captured landing.html,
+  # e.g. trex.com's own referrer-restricted Google Maps key (`data-prop-googleapikey`).
+  # The deployed dist/ contains only referenced image assets, never raw HTML.
+  SECRETS_SCAN_OMIT_PATHS = "data/**"
+
 # Long-cache the immutable creative assets; keep HTML revalidating so a redeploy
 # is picked up immediately.
 [[headers]]
