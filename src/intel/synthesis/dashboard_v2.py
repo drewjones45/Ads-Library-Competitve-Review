@@ -31,9 +31,11 @@ from .dashboard import (
     DEFAULT_ORG,
     _collect,
     _esc,
+    _fmt_metric,
     _format_duration,
     _meta_ad_url,
     _relpath,
+    _render_tv_spots_panel,
     _thumb_src,
     _video_meta_for_render,
 )
@@ -88,6 +90,7 @@ html[data-theme="dark"] {
   --amazon: #ffa033;   --amazon-soft: rgba(255,160,51,0.10);
   --homepage: #34c97b; --homepage-soft: rgba(52,201,123,0.10);
   --google: #a78bfa;   --google-soft: rgba(167,139,250,0.12);
+  --tv: #e879b9;       --tv-soft: rgba(232,121,185,0.12);
   --heat-lo: #101827; --heat-hi: #3f74e0; --heat-hi-text: #ffffff;
   --chart-bar: #4d76c9; --chart-line: #9db9f0;
   --pri-high: #e5484d; --pri-med: #f5a623; --pri-low: #627192;
@@ -130,6 +133,7 @@ html[data-theme="light"] {
   --amazon: #e88a00;   --amazon-soft: rgba(232,138,0,0.10);
   --homepage: #2da44e; --homepage-soft: rgba(45,164,78,0.10);
   --google: #7c3aed;   --google-soft: rgba(124,58,237,0.10);
+  --tv: #c0398a;       --tv-soft: rgba(192,57,138,0.10);
   --heat-lo: #eef1f7; --heat-hi: #2a5fb0; --heat-hi-text: #ffffff;
   --chart-bar: #3d6cc4; --chart-line: #6f97e8;
   --pri-high: #d9534f; --pri-med: #f0ad4e; --pri-low: #8290ab;
@@ -586,6 +590,7 @@ tr.set-row td { background: var(--bg-elev); color: var(--text-1); font-weight: 7
 .lane-hp { border-left-color: var(--homepage); }
 .lane-bs { border-left-color: var(--amazon); }
 .lane-google { border-left-color: var(--google); }
+.lane-tv { border-left-color: var(--tv); }
 .lane-hp-blocked { border-left-color: var(--neg); }
 .lane .stats { margin-bottom: 14px; }
 .lane-label { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
@@ -598,6 +603,7 @@ tr.set-row td { background: var(--bg-elev); color: var(--text-1); font-weight: 7
 .lane-badge--website { background: var(--homepage-soft); color: var(--homepage); }
 .lane-badge--blocked { background: var(--neg-soft); color: var(--neg); }
 .lane-badge--google { background: var(--google-soft); color: var(--google); }
+.lane-badge--tv { background: var(--tv-soft); color: var(--tv); }
 .lane h4 { margin: 18px 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
            color: var(--text-3); font-weight: 700; }
 .lane h4 .muted { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 11px; }
@@ -2019,7 +2025,9 @@ def _render_brand_section_v2(brand: dict, recs: list, recent_ads: list,
                              bs_data: dict | None = None,
                              hp_data: dict | None = None,
                              top_ads: list | None = None,
-                             text_ads: list | None = None) -> str:
+                             text_ads: list | None = None,
+                             tv_ads: list | None = None,
+                             tv_metrics: dict | None = None) -> str:
     # Creative gallery
     gallery_items = []
     for rec in recs[:36]:
@@ -2111,6 +2119,26 @@ def _render_brand_section_v2(brand: dict, recs: list, recent_ads: list,
         </div>
         {text_ads_panel}
       </div>"""
+    tv_spots_panel = _render_tv_spots_panel(tv_ads or [], dashboard_dir)
+    tv_lane_html = ""
+    if tv_spots_panel:
+        m = tv_metrics or {}
+        spend_rank = ('#' + str(m['spend_rank'])) if m.get('spend_rank') is not None else _fmt_metric(None)
+        tv_lane_html = f"""
+      <div class="lane lane-tv">
+        <div class="lane-label">
+          <span class="lane-badge lane-badge--tv">TV</span>
+          <h3>TV ads</h3>
+          <span class="muted">iSpot.tv · national linear + streaming spots</span>
+        </div>
+        <div class="stats">
+          {_stat("TV spots shown", len(tv_ads or []))}
+          {_stat("National airings", _fmt_metric(m.get('national_airings')))}
+          {_stat("Total creatives", _fmt_metric(m.get('total_creatives')))}
+          {_stat("Spend rank", spend_rank, small=True)}
+        </div>
+        {tv_spots_panel}
+      </div>"""
     return f"""
     <section id="brand-{_esc(brand['id'])}">
       <h2>{_esc(brand['name'])} <span class="muted">— {_esc(brand['vertical'])} · priority {_esc(pri)}</span></h2>
@@ -2136,6 +2164,7 @@ def _render_brand_section_v2(brand: dict, recs: list, recent_ads: list,
         {ads_html}
       </div>
       {google_lane_html}
+      {tv_lane_html}
       {homepage_html}
       {brand_store_html}
     </section>
@@ -2314,7 +2343,9 @@ def build_dashboard_v2(
         sections_html.append(
             _render_brand_section_v2(brand, recs, recent, out_dir, days=days,
                                      bs_data=bs_data, hp_data=hp_data, top_ads=top,
-                                     text_ads=data["text_ads_by_brand"].get(brand["id"], []))
+                                     text_ads=data["text_ads_by_brand"].get(brand["id"], []),
+                                     tv_ads=data["tv_ads_by_brand"].get(brand["id"], []),
+                                     tv_metrics=data["tv_metrics_by_brand"].get(brand["id"], {}))
         )
 
     # Reporting: --strategy-doc link replaces the latest-briefing body when set.

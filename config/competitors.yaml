@@ -39,6 +39,17 @@ competitors:
         country: US
         cadence: daily
         method: auto
+      # iSpot.tv national-TV spots. ispot_brand_id is the id from
+      # ispot.tv/brands/<id>/<slug>. TV ads only appear in the with-TV / --platform
+      # all reports; Meta + Google reports stay unchanged. method: auto scrapes the
+      # public brand page (creative + airings + ranks; spend/impressions are
+      # API-only) and uses ISPOT_API_KEY when set.
+      - type: tv_ads
+        ispot_brand_id: "Zzc"            # Bob's Discount Furniture
+        page_name: Bob's Discount Furniture
+        country: US
+        cadence: daily
+        method: auto
 
   - id: ashley
     name: Ashley Furniture
@@ -58,6 +69,16 @@ competitors:
       - type: google_ads
         advertiser_id: "AR08780307608645926913"   # Ashley Global Retail, LLC.
         page_name: Ashley
+        country: US
+        cadence: daily
+        method: auto
+      # NOTE: brand 73T currently serves a marketing "hub" page with no
+      # scrapeable spot grid, so the public-scrape path returns 0 spots (logged
+      # as a warning, not an error). Populates once an ISPOT_API_KEY is set, or
+      # swap in an alternate iSpot brand id that grids its commercials.
+      - type: tv_ads
+        ispot_brand_id: "73T"            # Ashley HomeStore
+        page_name: Ashley HomeStore
         country: US
         cadence: daily
         method: auto
@@ -85,6 +106,12 @@ competitors:
         country: US
         cadence: daily
         method: auto
+      - type: tv_ads
+        ispot_brand_id: "A2a"            # Rooms to Go
+        page_name: Rooms to Go
+        country: US
+        cadence: daily
+        method: auto
 
   - id: raymour_flanigan
     name: Raymour & Flanigan
@@ -107,6 +134,15 @@ competitors:
         country: US
         cadence: daily
         method: auto
+      # NOTE: brand Zz_ serves a hub page with no scrapeable spot grid today
+      # (see the Ashley note above) — 0 spots via scrape until the iSpot API is
+      # configured or an alternate gridding brand id is found.
+      - type: tv_ads
+        ispot_brand_id: "Zz_"            # Raymour & Flanigan Furniture
+        page_name: Raymour & Flanigan Furniture
+        country: US
+        cadence: daily
+        method: auto
 
   - id: value_city
     name: Value City Furniture
@@ -125,6 +161,12 @@ competitors:
         method: scrape
       - type: google_ads
         advertiser_id: "AR07754119404849201153"   # American Signature Inc (Value City)
+        page_name: Value City Furniture
+        country: US
+        cadence: daily
+        method: auto
+      - type: tv_ads
+        ispot_brand_id: "ZFn"            # Value City Furniture
         page_name: Value City Furniture
         country: US
         cadence: daily
@@ -151,6 +193,12 @@ competitors:
         country: US
         cadence: daily
         method: auto
+      - type: tv_ads
+        ispot_brand_id: "ZPc"            # American Freight
+        page_name: American Freight
+        country: US
+        cadence: daily
+        method: auto
 
   - id: wayfair
     name: Wayfair
@@ -169,6 +217,12 @@ competitors:
         method: scrape
       - type: google_ads
         advertiser_id: "AR10428471965269360641"   # Wayfair LLC
+        page_name: Wayfair
+        country: US
+        cadence: daily
+        method: auto
+      - type: tv_ads
+        ispot_brand_id: "Id3"            # Wayfair
         page_name: Wayfair
         country: US
         cadence: daily

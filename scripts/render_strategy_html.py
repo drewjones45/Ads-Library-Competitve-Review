@@ -84,13 +84,13 @@ PLATFORM_PALETTE = {
 
 def _platform_sources(d: dict) -> list[str]:
     p = d.get("platform", "meta")
-    return ["meta", "google"] if p == "all" else [p]
+    return ["meta", "google", "tv"] if p == "all" else [p]
 
 
 def _src_sql(d: dict, col: str) -> str:
     """' AND <col> IN (...)' scoping fragment. Values are whitelisted to
-    meta/google, so the literal interpolation is safe (no user free-text)."""
-    srcs = [s for s in _platform_sources(d) if s in ("meta", "google")] or ["meta"]
+    meta/google/tv, so the literal interpolation is safe (no user free-text)."""
+    srcs = [s for s in _platform_sources(d) if s in ("meta", "google", "tv")] or ["meta"]
     return " AND " + col + " IN (" + ",".join("'" + s + "'" for s in srcs) + ")"
 
 

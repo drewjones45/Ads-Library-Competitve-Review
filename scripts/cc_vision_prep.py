@@ -44,6 +44,7 @@ ASSET_TYPE_TO_CONTEXT = {
     "homepage_image": "website",
     "landing_page_image": "landing_page",
     "text_ad": "google_text_ad",
+    "tv_spot": "tv_ad",
 }
 
 

@@ -189,12 +189,12 @@ echo
 bold "[9/9] HTML dashboard"; rule
 .venv/bin/intel dashboard --out "$REPORTS/dashboard" --days "$DAYS" --exclude revlon
 .venv/bin/intel dashboard --out "reports/revlon/${DATE}/dashboard" --days "$DAYS" --only revlon
-# Separate "with Google" report set — adds Google ATC ads (in-dashboard platform
-# filter + dedicated Text-ads section). The Meta reports above are unchanged;
-# these land in a distinct with-google/ subfolder so nothing is clobbered. Empty
-# of Google data until a google_ads source is configured in competitors.yaml.
-.venv/bin/intel dashboard --platform all --out "$REPORTS/with-google/dashboard"    --days "$DAYS" --exclude revlon
-.venv/bin/intel dashboard --platform all --out "$REPORTS/with-google/dashboard-v2" --days "$DAYS" --exclude revlon --v2
+# Separate "all platforms" report set — adds Google ATC ads (Text-ads lane) AND
+# iSpot TV spots (TV-ads lane) on top of Meta. The Meta reports above are
+# unchanged; these land in a distinct with-tv/ subfolder so nothing is clobbered.
+# Lanes are empty for any brand without a google_ads / tv_ads source configured.
+.venv/bin/intel dashboard --platform all --out "$REPORTS/with-tv/dashboard"    --days "$DAYS" --exclude revlon
+.venv/bin/intel dashboard --platform all --out "$REPORTS/with-tv/dashboard-v2" --days "$DAYS" --exclude revlon --v2
 echo
 
 # ---- summary ----
@@ -204,7 +204,7 @@ find "$REPORTS" -maxdepth 2 -type f | sort | sed 's/^/  /'
 echo
 green "view a report:"
 echo "    open $REPORTS/dashboard/index.html        ← single-page HTML dashboard (excl. Revlon)"
-echo "    open $REPORTS/with-google/dashboard/index.html    ← with Google ATC ads (platform filter + Text ads)"
+echo "    open $REPORTS/with-tv/dashboard/index.html        ← all platforms (Meta + Google Text ads + iSpot TV ads)"
 echo "    open reports/revlon/${DATE}/dashboard/index.html  ← Revlon (control) — separate set"
 echo "    open $REPORTS/creative_comparison.md"
 echo "    open $REPORTS/by-brand/bobs.md"

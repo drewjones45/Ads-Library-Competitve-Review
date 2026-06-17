@@ -138,8 +138,9 @@ def _collect(conn: sqlite3.Connection, *, days: int,
     # Platform (ad source) scope. Values are whitelisted to a fixed set, so the
     # literal SQL fragments below are safe (no user free-text). src_ads scopes
     # queries on `ads` (unaliased); src_a scopes those joining `ads a`.
-    src_filter = sorted(s for s in (sources or set()) if s in ("meta", "google")) or None
+    src_filter = sorted(s for s in (sources or set()) if s in ("meta", "google", "tv")) or None
     google_in_scope = (src_filter is None) or ("google" in src_filter)
+    tv_in_scope = (src_filter is None) or ("tv" in src_filter)
 
     def _src_clause(col: str) -> str:
         if not src_filter:
@@ -182,6 +183,9 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         ads_google = conn.execute(
             "SELECT COUNT(*) c FROM ads WHERE competitor_id=? AND source='google'", (cid,)
         ).fetchone()["c"]
+        ads_tv = conn.execute(
+            "SELECT COUNT(*) c FROM ads WHERE competitor_id=? AND source='tv'", (cid,)
+        ).fetchone()["c"]
         # Counts the brand's PAID AD creatives only (excludes brand-store assets,
         # which get their own counts in the brand-store sub-section). Paid ads
         # are creatives where ad_id IS NOT NULL.
@@ -213,6 +217,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             "ads_active": ads_active,
             "ads_meta": ads_meta,
             "ads_google": ads_google,
+            "ads_tv": ads_tv,
             "creatives_total": creatives_total,
             "creatives_analyzed": creatives_analyzed,
             "new_ads": new_ads,
@@ -582,6 +587,52 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             if items:
                 text_ads_by_brand[cid] = items
 
+    # iSpot TV spots (asset_type='tv_spot') get a dedicated per-brand "TV ads"
+    # lane: the spot thumbnail + (when analyzed) creative classification, plus a
+    # brand-level media-weight scorecard. Built ONLY when tv is in scope, so
+    # Meta/Google builds emit no TV lane and stay byte-identical. The per-ad and
+    # brand metrics ride in the ad's raw_json (written by the runner).
+    tv_ads_by_brand: dict[str, list] = {}
+    tv_metrics_by_brand: dict[str, dict] = {}
+    if tv_in_scope:
+        for cid in [b["id"] for b in brands]:
+            rows = conn.execute(
+                "SELECT cr.asset_path, cr.analysis_json, cr.analyzed_at, "
+                "a.ad_archive_id, a.link_url, a.first_seen, a.last_seen, a.raw_json "
+                "FROM creatives cr JOIN ads a ON a.id=cr.ad_id "
+                "WHERE a.competitor_id=? AND cr.asset_type='tv_spot' AND a.source='tv' "
+                "ORDER BY a.last_seen DESC LIMIT 60",
+                (cid,),
+            ).fetchall()
+            items = []
+            for r in rows:
+                try:
+                    analysis = json.loads(r["analysis_json"]) if r["analysis_json"] else {}
+                except Exception:
+                    analysis = {}
+                try:
+                    raw = json.loads(r["raw_json"]) if r["raw_json"] else {}
+                except Exception:
+                    raw = {}
+                if not tv_metrics_by_brand.get(cid) and raw.get("brand_metrics"):
+                    tv_metrics_by_brand[cid] = raw["brand_metrics"]
+                items.append({
+                    "ad_archive_id": r["ad_archive_id"],
+                    "asset_path": r["asset_path"],
+                    "ispot_url": raw.get("ispot_url") or r["link_url"],
+                    "video_url": raw.get("video_url"),
+                    "title": raw.get("title"),
+                    "first_seen": r["first_seen"],
+                    "last_seen": r["last_seen"],
+                    "summary": analysis.get("summary_one_line") or raw.get("title"),
+                    "hook_style": analysis.get("hook_style"),
+                    "products": analysis.get("products_visible") or [],
+                    "key_features": analysis.get("key_features") or [],
+                    "analyzed": bool(r["analyzed_at"]),
+                })
+            if items:
+                tv_ads_by_brand[cid] = items
+
     # Latest briefing
     latest_briefing = conn.execute(
         "SELECT id, title, body_md, created_at FROM briefings "
@@ -733,6 +784,9 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         "homepage_by_brand": homepage_by_brand,
         "text_ads_by_brand": text_ads_by_brand,
         "google_in_scope": google_in_scope,
+        "tv_ads_by_brand": tv_ads_by_brand,
+        "tv_metrics_by_brand": tv_metrics_by_brand,
+        "tv_in_scope": tv_in_scope,
         "latest_briefing": dict(latest_briefing) if latest_briefing else None,
         # client-side payloads
         "client_creatives": creatives_index,
@@ -2349,11 +2403,69 @@ def _render_text_ads_panel(text_ads: list, dashboard_dir: Path) -> str:
     return "".join(cards)
 
 
+def _fmt_metric(v) -> str:
+    """Format a brand-level TV metric, or 'API only' when iSpot masks it for
+    anonymous scraping (the value comes through as None)."""
+    if v is None:
+        return '<span class="muted" style="font-size:12px">API only</span>'
+    if isinstance(v, float):
+        return f"{v:,.2f}"
+    return f"{v:,}"
+
+
+def _render_tv_spots_panel(tv_ads: list, dashboard_dir: Path) -> str:
+    """Per-brand iSpot TV-spot cards: spot thumbnail (links to iSpot), title,
+    and — once analyzed — creative classification chips. The full mp4 is linked
+    when captured. Per-ad spend/airings are iSpot-API-only; brand-level media
+    weight is shown in the lane header."""
+    if not tv_ads:
+        return ""
+    cards = []
+    for t in tv_ads[:24]:
+        thumb_rel = _thumb_src(t.get("asset_path"), "image", dashboard_dir) if t.get("asset_path") else ""
+        ispot = t.get("ispot_url")
+        chips = []
+        if t.get("hook_style"):
+            chips.append(f'<span class="tag">{_esc(t["hook_style"])}</span>')
+        for p in (t.get("products") or [])[:2]:
+            chips.append(f'<span class="tag prod">{_esc(p)}</span>')
+        for f in (t.get("key_features") or [])[:3]:
+            chips.append(f'<span class="tag kf">{_esc(f)}</span>')
+        unanalyzed = "" if t.get("analyzed") else ' <span class="muted">(unanalyzed)</span>'
+        img_html = (
+            f'<img src="{thumb_rel}" loading="lazy" alt="TV spot {_esc(t.get("ad_archive_id"))}" '
+            f'style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;background:#eee">'
+            if thumb_rel else ""
+        )
+        if ispot:
+            img_html = f'<a href="{_esc(ispot)}" target="_blank">{img_html}</a>'
+        vid = t.get("video_url")
+        links = []
+        if ispot:
+            links.append(f'<a href="{_esc(ispot)}" target="_blank">iSpot</a>')
+        if vid:
+            links.append(f'<a href="{_esc(vid)}" target="_blank">video</a>')
+        links_html = (" · " + " · ".join(links)) if links else ""
+        cards.append(f"""
+        <div class="creative" style="border:1px solid #e3e3e3;border-radius:6px;overflow:hidden;background:white">
+          {img_html}
+          <div class="body" style="padding:8px 10px">
+            <div class="summary" style="font-weight:600;font-size:13px">{_esc(t.get("title") or "(TV spot)")}{unanalyzed}</div>
+            <div class="tags" style="margin-top:6px">{"".join(chips)}</div>
+            <div class="muted" style="margin-top:4px;font-size:11px">spot <code>{_esc(t.get("ad_archive_id"))}</code>{links_html}</div>
+          </div>
+        </div>
+        """)
+    return f'<div class="gallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">{"".join(cards)}</div>'
+
+
 def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_dir: Path,
                            bs_data: dict | None = None,
                            hp_data: dict | None = None,
                            top_ads: list | None = None,
-                           text_ads: list | None = None) -> str:
+                           text_ads: list | None = None,
+                           tv_ads: list | None = None,
+                           tv_metrics: dict | None = None) -> str:
     # Creative gallery
     gallery_items = []
     for rec in recs[:36]:
@@ -2447,6 +2559,31 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
         </div>
         {text_ads_panel}
       </div>"""
+    # iSpot TV-ads lane — only rendered when this brand has TV spots, so non-TV
+    # reports show no TV lane at all.
+    tv_spots_panel = _render_tv_spots_panel(tv_ads or [], dashboard_dir)
+    tv_lane_html = ""
+    if tv_spots_panel:
+        m = tv_metrics or {}
+        tv_lane_html = f"""
+      <div class="lane lane-tv" style="background:#fdf2f8;border-left:4px solid #c0398a;
+                                        border-radius:6px;padding:18px 20px;margin-top:18px">
+        <div class="lane-label" style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <span style="background:#c0398a;color:white;font-size:10px;font-weight:600;letter-spacing:1px;
+                       text-transform:uppercase;padding:3px 8px;border-radius:3px">TV</span>
+          <h3 style="margin:0;font-size:18px">TV ads</h3>
+          <span class="muted" style="font-size:11px">iSpot.tv · national linear + streaming spots</span>
+        </div>
+        <div class="stats" style="margin-bottom:14px">
+          <div class="stat"><div class="label">TV spots shown</div><div class="value">{len(tv_ads or [])}</div></div>
+          <div class="stat"><div class="label">National airings</div><div class="value">{_fmt_metric(m.get('national_airings'))}</div></div>
+          <div class="stat"><div class="label">Total creatives</div><div class="value">{_fmt_metric(m.get('total_creatives'))}</div></div>
+          <div class="stat"><div class="label">Spend rank</div><div class="value">{('#' + str(m['spend_rank'])) if m.get('spend_rank') is not None else _fmt_metric(None)}</div></div>
+          <div class="stat"><div class="label">Est. spend</div><div class="value">{_fmt_metric(m.get('national_spend'))}</div></div>
+          <div class="stat"><div class="label">Impressions</div><div class="value">{_fmt_metric(m.get('impressions'))}</div></div>
+        </div>
+        {tv_spots_panel}
+      </div>"""
     return f"""
     <section id="brand-{_esc(brand['id'])}">
       <h2>{_esc(brand['name'])} <span class="muted">— {_esc(brand['vertical'])} · priority {_esc(pri)}</span></h2>
@@ -2477,6 +2614,7 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
         {ads_html}
       </div>
       {google_lane_html}
+      {tv_lane_html}
       {homepage_html}
       {brand_store_html}
     </section>
@@ -2659,7 +2797,9 @@ def build_dashboard(
         sections_html.append(
             _render_brand_section(brand, recs, recent, out_dir,
                                    bs_data=bs_data, hp_data=hp_data, top_ads=top,
-                                   text_ads=data["text_ads_by_brand"].get(brand["id"], []))
+                                   text_ads=data["text_ads_by_brand"].get(brand["id"], []),
+                                   tv_ads=data["tv_ads_by_brand"].get(brand["id"], []),
+                                   tv_metrics=data["tv_metrics_by_brand"].get(brand["id"], {}))
             .replace("{days}", str(days))
         )
 

@@ -48,6 +48,8 @@ VARIANT_LABELS = {
     "dashboard-v2": "Dashboard v2 (dark)",
     "with-google-dashboard": "Dashboard + Google ATC",
     "with-google-dashboard-v2": "Dashboard + Google ATC (v2)",
+    "with-tv-dashboard": "Dashboard + Google + TV",
+    "with-tv-dashboard-v2": "Dashboard + Google + TV (v2)",
 }
 
 

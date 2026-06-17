@@ -341,6 +341,56 @@ def ingest_one(competitor: Competitor, source_idx: int, settings: Settings | Non
                 },
             )
 
+        if source.type == "tv_ads":
+            from .storage import asset_path
+            ads = result.extras.get("ads", [])
+            brand_metrics = (result.parsed or {}).get("brand_metrics") or {}
+            creative_inserts = 0
+            for ad in ads:
+                # source="tv" tags the row; new ad_archive_ids land in report.new_ads
+                # — that IS the "new TV spot in-market" signal.
+                ad_row_id, is_new = upsert_ad(conn, competitor.id, ad, source="tv")
+                if is_new and ad.get("ad_archive_id"):
+                    report.new_ads.append(ad["ad_archive_id"])
+                # Sidecar next to the downloaded thumbnail carrying the spot's
+                # title, iSpot/video URLs, and the brand-level media weight; then
+                # register the thumbnail as the analyzable 'tv_spot' creative
+                # (the still goes through the normal image vision path).
+                paths = ad.get("local_creative_paths") or []
+                sidecar = asset_path("creative", competitor.id, ad["ad_archive_id"], "tv_spot_meta.json")
+                sidecar.write_text(json.dumps({
+                    "title": ad.get("title"),
+                    "ispot_url": ad.get("ispot_url"),
+                    "video_url": ad.get("video_url"),
+                    "thumbnail_url": ad.get("thumbnail_url"),
+                    "thumbnail_path": paths[0] if paths else None,
+                    "advertiser": ad.get("advertiser"),
+                    "products": ad.get("products"),
+                    "duration_sec": ad.get("duration_sec"),
+                    "brand_metrics": brand_metrics,
+                }, default=str), encoding="utf-8")
+                for asset_path_str in paths:
+                    phash = _safe_phash(asset_path_str)
+                    _, inserted = upsert_creative(
+                        conn, ad_id=ad_row_id, asset_type="tv_spot",
+                        asset_path=asset_path_str, phash=phash, source="tv",
+                    )
+                    if inserted:
+                        creative_inserts += 1
+            # Per-competitor scorecard sidecar for the dashboard TV lane header.
+            brand_p = asset_path("creative", competitor.id, "tv_brand_meta.json")
+            brand_p.write_text(json.dumps(brand_metrics, default=str), encoding="utf-8")
+            audit(
+                conn,
+                actor="enrichment",
+                action="tv_ads_upserted",
+                details={
+                    "total": len(ads),
+                    "new": len(report.new_ads),
+                    "creatives_inserted": creative_inserts,
+                },
+            )
+
     return report
 
 

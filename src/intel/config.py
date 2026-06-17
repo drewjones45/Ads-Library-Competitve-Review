@@ -15,7 +15,7 @@ CONFIG_DIR = ROOT / "config"
 DATA_DIR = Path(os.environ.get("INTEL_DATA_DIR", ROOT / "data")).resolve()
 DB_PATH = Path(os.environ.get("INTEL_DB_PATH", DATA_DIR / "intel.db")).resolve()
 
-SOURCE_TYPES = Literal["website", "meta_ads", "google_ads", "rss", "retailer", "amazon_brand_store"]
+SOURCE_TYPES = Literal["website", "meta_ads", "google_ads", "rss", "retailer", "amazon_brand_store", "tv_ads"]
 
 
 @dataclass
@@ -33,6 +33,9 @@ class Source:
     max_subpages: int = 10             # discovery cap; set to 0 for landing-only
     # Google Ads Transparency Center field. Only used when type == 'google_ads'.
     advertiser_id: str | None = None   # ATC advertiser id, e.g. 'AR1234567890123456'
+    # iSpot.tv TV-ads field. Only used when type == 'tv_ads'. The opaque brand id
+    # from the canonical URL ispot.tv/brands/<id>/<slug> (e.g. 'Zzc' for Bob's).
+    ispot_brand_id: str | None = None
     extra: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
@@ -40,6 +43,7 @@ class Source:
         known = {
             "type", "cadence", "url", "page_id", "page_name", "country",
             "watch", "method", "store_url", "max_subpages", "advertiser_id",
+            "ispot_brand_id",
         }
         extra = {k: v for k, v in d.items() if k not in known}
         return cls(
@@ -54,6 +58,7 @@ class Source:
             store_url=d.get("store_url"),
             max_subpages=int(d.get("max_subpages", 10)),
             advertiser_id=d.get("advertiser_id"),
+            ispot_brand_id=d.get("ispot_brand_id"),
             extra=extra,
         )
 
@@ -66,6 +71,8 @@ class Source:
             parts.append(self.store_url)
         elif self.advertiser_id:
             parts.append(f"advertiser:{self.advertiser_id}")
+        elif self.ispot_brand_id:
+            parts.append(f"ispot:{self.ispot_brand_id}")
         elif self.page_id:
             parts.append(f"page:{self.page_id}")
         elif self.page_name:

@@ -712,10 +712,10 @@ def briefings(limit: int) -> None:
 @click.option("--exclude", "exclude", multiple=True, metavar="BRAND_ID",
               help="drop these competitor ids from the dashboard (repeatable), "
                    "e.g. --exclude revlon to keep a control brand out of the main set.")
-@click.option("--platform", "platform", type=click.Choice(["meta", "google", "all"]), default="meta",
+@click.option("--platform", "platform", type=click.Choice(["meta", "google", "tv", "all"]), default="meta",
               help="ad platform scope. 'meta' (default) keeps existing reports byte-identical even "
-                   "after Google ads land in the DB; 'all' adds Google (platform filter + Text-ads "
-                   "section + per-platform counts); 'google' = Google only.")
+                   "after Google/TV ads land in the DB; 'all' adds Google (Text-ads lane) + TV "
+                   "(iSpot TV-ads lane) + per-platform counts; 'google'/'tv' = that platform only.")
 @click.option("--strategy-doc", "strategy_doc", default=None, metavar="URL",
               help="relative URL to a strategy-report HTML (e.g. ../strategy/bobs_google_positioning.html). "
                    "When set, the 'Latest briefing' section links to that report + its sibling .pdf instead "
@@ -748,8 +748,8 @@ def dashboard(out: str | None, days: int, org_name: str, product_name: str | Non
             console.print("[red]no brands left after --only/--exclude — nothing to render[/red]")
             raise SystemExit(1)
 
-    # Map platform → source scope. 'all' = both; 'meta'/'google' = that one.
-    sources = {"meta", "google"} if platform == "all" else {platform}
+    # Map platform → source scope. 'all' = every platform; else just that one.
+    sources = {"meta", "google", "tv"} if platform == "all" else {platform}
 
     builder = build_dashboard_v2 if use_v2 else build_dashboard
     result = builder(out, days=days, org_name=org_name, product_name=product_name,
