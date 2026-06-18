@@ -1129,13 +1129,26 @@ def analytics_import_cmd(competitor_id: str, in_path: str, dataset_label: str | 
     ALIASES = {
         "utm_campaign": ["utm_campaign", "session campaign", "campaign"],
         "utm_content": ["utm_content", "session manual ad content", "ad content"],
-        "sessions": ["sessions", "session", "users"],
+        "sessions": ["sessions", "session"],
         "conversions": ["conversions", "key events", "conversion", "key event"],
         "conversion_rate": ["conversion_rate", "cvr"],
         "clicks": ["clicks", "click"],
         "spend": ["spend", "cost"],
         "revenue": ["revenue", "total revenue"],
+        # Extra GA4 engagement metrics surfaced per-asset on the dashboard.
+        "total_users": ["total users", "total_users"],
+        "new_users": ["new users", "new_users"],
+        "views": ["views"],
+        "event_count": ["event count", "event_count"],
+        "bounce_rate": ["bounce rate", "bounce_rate"],
+        "engagement_rate": ["engagement rate", "engagement_rate"],
+        "avg_session_duration": ["average session duration", "avg session duration",
+                                 "avg_session_duration"],
     }
+    # Counts are summed across a segment's rows; rates/averages are
+    # session-weighted (you can't sum a bounce rate).
+    COUNT_METRICS = ("total_users", "new_users", "views", "event_count")
+    RATE_METRICS = ("bounce_rate", "engagement_rate", "avg_session_duration")
 
     def _num(v):
         if v is None:
@@ -1189,11 +1202,19 @@ def analytics_import_cmd(competitor_id: str, in_path: str, dataset_label: str | 
     BLANK = {"", "(not set)", "(direct)", "(organic)", "(none)", "(not provided)"}
 
     # Aggregate to (campaign, content). agg[key] = dict of running sums.
-    agg: dict[tuple, dict] = defaultdict(lambda: {
-        "sessions": 0.0, "conversions": 0.0, "clicks": 0.0, "spend": 0.0,
-        "revenue": 0.0, "has_sessions": False, "has_conv": False,
-        "cvr_explicit": None, "n_rows": 0,
-    })
+    def _blank_agg():
+        d = {
+            "sessions": 0.0, "conversions": 0.0, "clicks": 0.0, "spend": 0.0,
+            "revenue": 0.0, "has_sessions": False, "has_conv": False,
+            "cvr_explicit": None, "n_rows": 0,
+        }
+        for m in COUNT_METRICS:
+            d[m] = 0.0; d[m + "_has"] = False
+        for m in RATE_METRICS:
+            d[m + "_wsum"] = 0.0   # sum(rate * sessions) for a session-weighted avg
+            d[m + "_w"] = 0.0      # sum(sessions) over rows that had this rate
+        return d
+    agg: dict[tuple, dict] = defaultdict(_blank_agg)
     n_in = skipped_blank = 0
     for raw in reader:
         n_in += 1
@@ -1216,6 +1237,17 @@ def analytics_import_cmd(competitor_id: str, in_path: str, dataset_label: str | 
                 v = _num(raw.get(colmap[m]))
                 if v is not None:
                     a[m] += v
+        for m in COUNT_METRICS:
+            if colmap[m]:
+                v = _num(raw.get(colmap[m]))
+                if v is not None:
+                    a[m] += v; a[m + "_has"] = True
+        w = sess if (sess is not None and sess > 0) else 0
+        for m in RATE_METRICS:
+            if colmap[m] and w:
+                v = _num(raw.get(colmap[m]))
+                if v is not None:
+                    a[m + "_wsum"] += v * w; a[m + "_w"] += w
         if colmap["conversion_rate"] and a["cvr_explicit"] is None:
             a["cvr_explicit"] = _num(raw.get(colmap["conversion_rate"]))
 
@@ -1227,6 +1259,20 @@ def analytics_import_cmd(competitor_id: str, in_path: str, dataset_label: str | 
             cvr = conversions / sessions
         else:
             cvr = a["cvr_explicit"]
+        # Rich metric bag (only non-None) → stored in extra_json, rendered per asset.
+        metrics: dict[str, float] = {}
+        if sessions is not None:
+            metrics["sessions"] = sessions
+        if conversions is not None:
+            metrics["key_events"] = conversions
+        if cvr is not None:
+            metrics["key_event_rate"] = cvr
+        for m in COUNT_METRICS:
+            if a[m + "_has"]:
+                metrics[m] = a[m]
+        for m in RATE_METRICS:
+            if a[m + "_w"] > 0:
+                metrics[m] = a[m + "_wsum"] / a[m + "_w"]
         parsed_rows.append({
             "utm_campaign": camp or None,
             "utm_content": content or None,
@@ -1236,7 +1282,7 @@ def analytics_import_cmd(competitor_id: str, in_path: str, dataset_label: str | 
             "clicks": a["clicks"] or None,
             "spend": a["spend"] or None,
             "revenue": a["revenue"] or None,
-            "extra": None,
+            "extra": metrics or None,
         })
     n_with_metrics = sum(1 for r in parsed_rows
                          if r["sessions"] is not None or r["conversions"] is not None)

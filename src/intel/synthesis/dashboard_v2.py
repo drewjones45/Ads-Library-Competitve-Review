@@ -34,6 +34,7 @@ from .dashboard import (
     _fmt_metric,
     _format_duration,
     _meta_ad_url,
+    _perf_block_html,
     _relpath,
     _render_tv_spots_panel,
     _thumb_src,
@@ -451,15 +452,17 @@ tr.set-row td { background: var(--bg-elev); color: var(--text-1); font-weight: 7
   border-radius: 2px; letter-spacing: 0.3px; pointer-events: none;
 }
 
-/* Uploaded creative analytics — per-card traffic/CVR chip + sort control. */
-.perf-chip {
-  display: inline-flex; gap: 4px; align-items: baseline; margin: 4px 0 2px;
-  padding: 2px 8px; border-radius: var(--radius-pill, 999px);
-  background: var(--accent-soft, rgba(91,140,255,0.14));
-  color: var(--text-2, #c7cdd9); font-size: 11px; font-weight: 600;
-  border: 1px solid var(--border-1, #2a3140); white-space: nowrap;
+/* Uploaded creative analytics — per-card metrics block + sort control. */
+.perf-block {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 4px 8px; margin: 6px 0 2px; padding: 6px 8px;
+  background: var(--accent-soft, rgba(91,140,255,0.10));
+  border: 1px solid var(--border-1, #2a3140); border-radius: var(--radius-ctl, 6px);
 }
-.perf-chip .perf-num { color: var(--accent, #5b8cff); font-weight: 800; }
+.perf-stat { display: flex; flex-direction: column; line-height: 1.15; }
+.perf-stat b { color: var(--accent, #5b8cff); font-size: 12px; font-weight: 800; }
+.perf-stat .perf-lbl { color: var(--text-3, #8a93a3); font-size: 9.5px;
+  text-transform: uppercase; letter-spacing: 0.3px; }
 .perf-sort-label { color: var(--text-3, #8a93a3); font-size: 11px; margin-left: 12px; }
 .perf-sort-btn {
   background: var(--bg-inset, #11151d); border: 1px solid var(--border-1, #2a3140);
@@ -843,7 +846,8 @@ let _perfSort = null;
 function _initPerfSort() {
   const host = document.getElementById('perf-sort');
   if (!host || !DATA.has_analytics) return;
-  const opts = [['', 'Default'], ['sessions', 'Sessions'], ['cvr', 'CVR']];
+  const opts = [['', 'Default'], ['sessions', 'Sessions'], ['cvr', 'Key-event rate'],
+                ['bounceRate', 'Bounce rate'], ['engagementRate', 'Engagement']];
   host.innerHTML = '<span class="perf-sort-label">Sort by performance:</span> ' +
     opts.map(([k, l]) =>
       `<button class="perf-sort-btn${k === (_perfSort || '') ? ' active' : ''}" data-k="${k}">${l}</button>`
@@ -880,14 +884,11 @@ function _fmtDur(sec) {
 // frame in the asset's directory. Mp4 paths follow the convention
 // `.../{ad_id}/video.mp4`; the first frame is `.../{ad_id}/frame_00_t*.jpg`.
 function _thumbForCreative(c) {
+  // Server resolves the real first-frame into thumbPath (extraction timestamps
+  // vary, so a client-side guess of frame_00_t00000.jpg 404s). Prefer it.
+  if (c.thumbPath) return c.thumbPath;
   if ((c.assetType === 'video' || c.assetType === 'video_evicted')
       && c.imgPath && c.imgPath.endsWith('.mp4')) {
-    // We don't know the exact frame timestamp from the client; the simplest
-    // approach is to swap `video.mp4` → `frame_00_t00000.jpg`. Padding is
-    // fixed-width in process_video (idx:02d, ms:05d) so this works for the
-    // canonical first frame. If extraction shifted the leading frame, the
-    // dashboard falls back to the imgPath (which is the mp4 — browsers
-    // show a play-icon placeholder).
     return c.imgPath.replace(/video\\.mp4$/, 'frame_00_t00000.jpg');
   }
   return c.imgPath;
@@ -899,19 +900,26 @@ function _fmtInt(n) {
   if (n === null || n === undefined || n === '') return '';
   return Math.round(Number(n)).toLocaleString('en-US');
 }
+function _pct(v) {
+  if (v === null || v === undefined || v === '') return null;
+  return (Number(v) * 100).toFixed(1) + '%';
+}
+function _perfStat(val, label) {
+  return val === null ? '' : `<span class="perf-stat"><b>${val}</b><span class="perf-lbl">${label}</span></span>`;
+}
 function _perfChip(c) {
-  if (c.sessions === null && c.conversions === null && c.cvr === null) return '';
-  if (c.sessions === undefined && c.conversions === undefined && c.cvr === undefined) return '';
-  const parts = [];
-  if (c.sessions !== null && c.sessions !== undefined && c.sessions !== '')
-    parts.push(`<span class="perf-num">${_fmtInt(c.sessions)}</span> sessions`);
-  if (c.cvr !== null && c.cvr !== undefined && c.cvr !== '')
-    parts.push(`<span class="perf-num">${(Number(c.cvr) * 100).toFixed(1)}%</span> CVR`);
-  else if (c.conversions !== null && c.conversions !== undefined && c.conversions !== '')
-    parts.push(`<span class="perf-num">${_fmtInt(c.conversions)}</span> conv`);
-  if (!parts.length) return '';
-  const seg = c.perfSegment ? ` title="${escapeHTML(c.perfSegment)}"` : '';
-  return `<div class="perf-chip"${seg}>${parts.join(' · ')}</div>`;
+  const keys = ['sessions','cvr','keyEvents','bounceRate','engagementRate'];
+  if (!keys.some(k => c[k] !== null && c[k] !== undefined && c[k] !== '')) return '';
+  const stats = [
+    _perfStat(c.sessions != null && c.sessions !== '' ? _fmtInt(c.sessions) : null, 'sessions'),
+    _perfStat(_pct(c.cvr), 'key-event rate'),
+    _perfStat(_pct(c.bounceRate), 'bounce'),
+    _perfStat(_pct(c.engagementRate), 'engaged'),
+    _perfStat(c.avgSessionDuration ? _fmtDur(c.avgSessionDuration) : null, 'avg time'),
+  ].filter(Boolean).join('');
+  if (!stats) return '';
+  const seg = c.perfSegment ? ` title="GA4 segment: ${escapeHTML(c.perfSegment)}"` : '';
+  return `<div class="perf-block"${seg}>${stats}</div>`;
 }
 
 function renderFilterGallery() {
@@ -2091,7 +2099,9 @@ def _render_brand_section_v2(brand: dict, recs: list, recent_ads: list,
                              top_ads: list | None = None,
                              text_ads: list | None = None,
                              tv_ads: list | None = None,
-                             tv_metrics: dict | None = None) -> str:
+                             tv_metrics: dict | None = None,
+                             analytics_by_ad: dict | None = None) -> str:
+    analytics_by_ad = analytics_by_ad or {}
     # Creative gallery
     gallery_items = []
     for rec in recs[:36]:
@@ -2132,6 +2142,7 @@ def _render_brand_section_v2(brand: dict, recs: list, recent_ads: list,
           <div class="body">
             <div class="summary">{summary}</div>
             <div class="muted">ad <code>{_esc(rec.ad_archive_id)}</code></div>
+            {_perf_block_html(analytics_by_ad.get(rec.ad_id))}
             <div class="tags">{''.join(tags_html)}</div>
           </div>
         </div>
@@ -2410,7 +2421,8 @@ def build_dashboard_v2(
                                      bs_data=bs_data, hp_data=hp_data, top_ads=top,
                                      text_ads=data["text_ads_by_brand"].get(brand["id"], []),
                                      tv_ads=data["tv_ads_by_brand"].get(brand["id"], []),
-                                     tv_metrics=data["tv_metrics_by_brand"].get(brand["id"], {}))
+                                     tv_metrics=data["tv_metrics_by_brand"].get(brand["id"], {}),
+                                     analytics_by_ad=data.get("analytics_by_ad", {}))
         )
 
     # Reporting: --strategy-doc link replaces the latest-briefing body when set.

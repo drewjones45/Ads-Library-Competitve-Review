@@ -94,6 +94,49 @@ def _thumb_src(asset_path: str | Path, asset_type: str | None, dashboard_dir: Pa
     return _relpath(p, dashboard_dir)
 
 
+def _thumb_abs(asset_path: str | Path, asset_type: str | None) -> str:
+    """Absolute path of a creative's real static thumbnail. For video creatives
+    whose asset is the mp4, return the actual first frame on disk (NOT a guessed
+    `frame_00_t00000.jpg` — extraction timestamps vary, so guessing 404s). Used
+    to seed the client payload so the JS gallery never has to guess."""
+    p = Path(asset_path)
+    if asset_type in ("video", "video_evicted") and p.suffix.lower() == ".mp4":
+        frames = sorted(p.parent.glob("frame_*_t*.jpg"))
+        if frames:
+            return str(frames[0])
+    return str(p)
+
+
+def _perf_block_html(perf: dict | None) -> str:
+    """Server-side render of the per-creative analytics block (mirrors the JS
+    `_perfChip`). Empty string when there's no uploaded data for the ad."""
+    if not perf:
+        return ""
+
+    def _pct(v):
+        return f"{v * 100:.1f}%" if isinstance(v, (int, float)) else None
+
+    def _int(v):
+        return f"{int(v):,}" if isinstance(v, (int, float)) else None
+
+    stats = [
+        (_int(perf.get("sessions")), "sessions"),
+        (_pct(perf.get("cvr")), "key-event rate"),
+        (_pct(perf.get("bounceRate")), "bounce"),
+        (_pct(perf.get("engagementRate")), "engaged"),
+        (_format_duration(perf.get("avgSessionDuration"))
+         if perf.get("avgSessionDuration") else None, "avg time"),
+    ]
+    cells = "".join(
+        f'<span class="perf-stat"><b>{v}</b><span class="perf-lbl">{lbl}</span></span>'
+        for v, lbl in stats if v
+    )
+    if not cells:
+        return ""
+    seg = _esc(perf.get("segment") or "")
+    return f'<div class="perf-block" title="GA4 segment: {seg}">{cells}</div>'
+
+
 def _video_meta_for_render(analysis_json: str | dict | None) -> dict:
     """Extract the video_meta sub-block (or {}) from an analysis JSON blob."""
     if not analysis_json:
@@ -679,18 +722,30 @@ def _collect(conn: sqlite3.Connection, *, days: int,
     analytics_by_ad: dict[int, dict] = {}
     for r in conn.execute(
         "SELECT DISTINCT cl.ad_id, sa.sessions, sa.conversions, sa.conversion_rate, "
-        "  sa.utm_campaign, sa.utm_content "
+        "  sa.utm_campaign, sa.utm_content, sa.extra_json "
         "FROM creative_landing cl JOIN segment_analytics sa "
         "  ON sa.competitor_id = cl.competitor_id "
         "  AND IFNULL(sa.utm_campaign,'') = IFNULL(cl.utm_campaign,'') "
         "  AND IFNULL(sa.utm_content,'') = IFNULL(cl.utm_content,'') "
         "WHERE sa.sessions IS NOT NULL OR sa.conversions IS NOT NULL"
     ).fetchall():
+        try:
+            m = json.loads(r["extra_json"]) if r["extra_json"] else {}
+        except Exception:
+            m = {}
         analytics_by_ad[r["ad_id"]] = {
             "sessions": r["sessions"],
             "conversions": r["conversions"],
             "cvr": r["conversion_rate"],
             "segment": " · ".join(x for x in (r["utm_campaign"], r["utm_content"]) if x),
+            # Extra GA4 engagement metrics (session-weighted at import time).
+            "keyEvents": m.get("key_events"),
+            "bounceRate": m.get("bounce_rate"),
+            "engagementRate": m.get("engagement_rate"),
+            "avgSessionDuration": m.get("avg_session_duration"),
+            "totalUsers": m.get("total_users"),
+            "newUsers": m.get("new_users"),
+            "views": m.get("views"),
         }
     has_analytics = bool(analytics_by_ad)
 
@@ -715,11 +770,21 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             "conversions": perf.get("conversions"),
             "cvr": perf.get("cvr"),
             "perfSegment": perf.get("segment"),
+            "keyEvents": perf.get("keyEvents"),
+            "bounceRate": perf.get("bounceRate"),
+            "engagementRate": perf.get("engagementRate"),
+            "avgSessionDuration": perf.get("avgSessionDuration"),
+            "totalUsers": perf.get("totalUsers"),
+            "newUsers": perf.get("newUsers"),
+            "views": perf.get("views"),
             "id": rec.ad_id,
             "comp": rec.competitor_id,
             "compName": rec.competitor_name,
             "adId": rec.ad_archive_id,
             "imgPath": str(rec.asset_path),  # absolute; relativized in JS at render time
+            # Real static thumbnail (actual first frame for videos) so the JS
+            # gallery never guesses a frame filename that 404s.
+            "thumbPath": _thumb_abs(rec.asset_path, rec.asset_type),
             "assetType": rec.asset_type or "image",
             "platform": rec.source,
             "videoDurationSec": vmeta.get("duration_sec"),
@@ -848,6 +913,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         "tv_metrics_by_brand": tv_metrics_by_brand,
         "tv_in_scope": tv_in_scope,
         "has_analytics": has_analytics,
+        "analytics_by_ad": analytics_by_ad,
         "latest_briefing": dict(latest_briefing) if latest_briefing else None,
         # client-side payloads
         "client_creatives": creatives_index,
@@ -1065,14 +1131,16 @@ tr.set-row td { background: #1f2c4a !important; color: white; font-weight: 600; 
   border-radius: 2px; letter-spacing: 0.3px; pointer-events: none;
 }
 
-/* Uploaded creative analytics — per-card traffic/CVR chip + sort control. */
-.perf-chip {
-  display: inline-flex; gap: 4px; align-items: baseline; margin: 4px 0 2px;
-  padding: 2px 8px; border-radius: 999px; background: #eef3ff;
-  color: #33415c; font-size: 11px; font-weight: 600; border: 1px solid #d4def5;
-  white-space: nowrap;
+/* Uploaded creative analytics — per-card metrics block + sort control. */
+.perf-block {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 4px 8px; margin: 6px 0 2px; padding: 6px 8px;
+  background: #eef3ff; border: 1px solid #d4def5; border-radius: 6px;
 }
-.perf-chip .perf-num { color: #2c5cff; font-weight: 800; }
+.perf-stat { display: flex; flex-direction: column; line-height: 1.15; }
+.perf-stat b { color: #2c5cff; font-size: 12px; font-weight: 800; }
+.perf-stat .perf-lbl { color: #6b7280; font-size: 9.5px; text-transform: uppercase;
+  letter-spacing: 0.3px; }
 .perf-sort-label { color: #6b7280; font-size: 11px; margin-left: 12px; }
 .perf-sort-btn {
   background: #f4f6fb; border: 1px solid #d4def5; color: #33415c;
@@ -1285,14 +1353,11 @@ function _fmtDur(sec) {
 // frame in the asset's directory. Mp4 paths follow the convention
 // `.../{ad_id}/video.mp4`; the first frame is `.../{ad_id}/frame_00_t*.jpg`.
 function _thumbForCreative(c) {
+  // Server resolves the real first-frame into thumbPath (extraction timestamps
+  // vary, so a client-side guess of frame_00_t00000.jpg 404s). Prefer it.
+  if (c.thumbPath) return c.thumbPath;
   if ((c.assetType === 'video' || c.assetType === 'video_evicted')
       && c.imgPath && c.imgPath.endsWith('.mp4')) {
-    // We don't know the exact frame timestamp from the client; the simplest
-    // approach is to swap `video.mp4` → `frame_00_t00000.jpg`. Padding is
-    // fixed-width in process_video (idx:02d, ms:05d) so this works for the
-    // canonical first frame. If extraction shifted the leading frame, the
-    // dashboard falls back to the imgPath (which is the mp4 — browsers
-    // show a play-icon placeholder).
     return c.imgPath.replace(/video\\.mp4$/, 'frame_00_t00000.jpg');
   }
   return c.imgPath;
@@ -1304,20 +1369,26 @@ function _fmtInt(n) {
   if (n === null || n === undefined || n === '') return '';
   return Math.round(Number(n)).toLocaleString('en-US');
 }
+function _pct(v) {
+  if (v === null || v === undefined || v === '') return null;
+  return (Number(v) * 100).toFixed(1) + '%';
+}
+function _perfStat(val, label) {
+  return val === null ? '' : `<span class="perf-stat"><b>${val}</b><span class="perf-lbl">${label}</span></span>`;
+}
 function _perfChip(c) {
-  if ((c.sessions === null || c.sessions === undefined)
-      && (c.conversions === null || c.conversions === undefined)
-      && (c.cvr === null || c.cvr === undefined)) return '';
-  const parts = [];
-  if (c.sessions !== null && c.sessions !== undefined && c.sessions !== '')
-    parts.push(`<span class="perf-num">${_fmtInt(c.sessions)}</span> sessions`);
-  if (c.cvr !== null && c.cvr !== undefined && c.cvr !== '')
-    parts.push(`<span class="perf-num">${(Number(c.cvr) * 100).toFixed(1)}%</span> CVR`);
-  else if (c.conversions !== null && c.conversions !== undefined && c.conversions !== '')
-    parts.push(`<span class="perf-num">${_fmtInt(c.conversions)}</span> conv`);
-  if (!parts.length) return '';
-  const seg = c.perfSegment ? ` title="${escapeHTML(c.perfSegment)}"` : '';
-  return `<div class="perf-chip"${seg}>${parts.join(' · ')}</div>`;
+  const keys = ['sessions','cvr','keyEvents','bounceRate','engagementRate'];
+  if (!keys.some(k => c[k] !== null && c[k] !== undefined && c[k] !== '')) return '';
+  const stats = [
+    _perfStat(c.sessions != null && c.sessions !== '' ? _fmtInt(c.sessions) : null, 'sessions'),
+    _perfStat(_pct(c.cvr), 'key-event rate'),
+    _perfStat(_pct(c.bounceRate), 'bounce'),
+    _perfStat(_pct(c.engagementRate), 'engaged'),
+    _perfStat(c.avgSessionDuration ? _fmtDur(c.avgSessionDuration) : null, 'avg time'),
+  ].filter(Boolean).join('');
+  if (!stats) return '';
+  const seg = c.perfSegment ? ` title="GA4 segment: ${escapeHTML(c.perfSegment)}"` : '';
+  return `<div class="perf-block"${seg}>${stats}</div>`;
 }
 
 // Optional perf sort key ('sessions' | 'cvr' | null) — only when analytics
@@ -1326,7 +1397,8 @@ let _perfSort = null;
 function _initPerfSort() {
   const host = document.getElementById('perf-sort');
   if (!host || !DATA.has_analytics) return;
-  const opts = [['', 'Default'], ['sessions', 'Sessions'], ['cvr', 'CVR']];
+  const opts = [['', 'Default'], ['sessions', 'Sessions'], ['cvr', 'Key-event rate'],
+                ['bounceRate', 'Bounce rate'], ['engagementRate', 'Engagement']];
   host.innerHTML = '<span class="perf-sort-label">Sort by performance:</span> ' +
     opts.map(([k, l]) =>
       `<button class="perf-sort-btn${k === (_perfSort || '') ? ' active' : ''}" data-k="${k}">${l}</button>`
@@ -2588,7 +2660,9 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
                            top_ads: list | None = None,
                            text_ads: list | None = None,
                            tv_ads: list | None = None,
-                           tv_metrics: dict | None = None) -> str:
+                           tv_metrics: dict | None = None,
+                           analytics_by_ad: dict | None = None) -> str:
+    analytics_by_ad = analytics_by_ad or {}
     # Creative gallery
     gallery_items = []
     for rec in recs[:36]:
@@ -2630,6 +2704,7 @@ def _render_brand_section(brand: dict, recs: list, recent_ads: list, dashboard_d
           <div class="body">
             <div class="summary">{summary}</div>
             <div class="muted">ad <code>{_esc(rec.ad_archive_id)}</code></div>
+            {_perf_block_html(analytics_by_ad.get(rec.ad_id))}
             <div class="tags">{''.join(tags_html)}</div>
           </div>
         </div>
@@ -2923,7 +2998,8 @@ def build_dashboard(
                                    bs_data=bs_data, hp_data=hp_data, top_ads=top,
                                    text_ads=data["text_ads_by_brand"].get(brand["id"], []),
                                    tv_ads=data["tv_ads_by_brand"].get(brand["id"], []),
-                                   tv_metrics=data["tv_metrics_by_brand"].get(brand["id"], {}))
+                                   tv_metrics=data["tv_metrics_by_brand"].get(brand["id"], {}),
+                                   analytics_by_ad=data.get("analytics_by_ad", {}))
             .replace("{days}", str(days))
         )
 
