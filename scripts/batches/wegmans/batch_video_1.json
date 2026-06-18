@@ -1,0 +1,306 @@
+[
+  {
+    "creative_id": 64,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/video.mp4",
+    "phash": "d75537016fb980e4",
+    "popularity": 0.965,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_00_t00000.jpg",
+        "t_sec": 0.0
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_01_t01467.jpg",
+        "t_sec": 1.467
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_02_t10367.jpg",
+        "t_sec": 10.367
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_03_t11033.jpg",
+        "t_sec": 11.033
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_04_t11800.jpg",
+        "t_sec": 11.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_05_t12667.jpg",
+        "t_sec": 12.667
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_06_t13900.jpg",
+        "t_sec": 13.9
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_07_t15167.jpg",
+        "t_sec": 15.167
+      }
+    ],
+    "duration_sec": 15.51,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 69,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/video.mp4",
+    "phash": "8367e4fc3ab98305",
+    "popularity": 0.963,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/frame_00_t00600.jpg",
+        "t_sec": 0.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/frame_01_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/frame_02_t01800.jpg",
+        "t_sec": 1.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/frame_03_t02400.jpg",
+        "t_sec": 2.4
+      }
+    ],
+    "duration_sec": 3.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 86,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/video.mp4",
+    "phash": "a931544a73adab56",
+    "popularity": 0.956,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/frame_00_t03600.jpg",
+        "t_sec": 3.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/frame_01_t07200.jpg",
+        "t_sec": 7.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/frame_02_t10800.jpg",
+        "t_sec": 10.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/frame_03_t14400.jpg",
+        "t_sec": 14.4
+      }
+    ],
+    "duration_sec": 18.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 81,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/video.mp4",
+    "phash": "ec6cc29705a5b653",
+    "popularity": 0.935,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/frame_00_t00600.jpg",
+        "t_sec": 0.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/frame_01_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/frame_02_t01800.jpg",
+        "t_sec": 1.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/frame_03_t02400.jpg",
+        "t_sec": 2.4
+      }
+    ],
+    "duration_sec": 3.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 74,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/video.mp4",
+    "phash": "adc7ce2440f02bcf",
+    "popularity": 0.908,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/frame_00_t00600.jpg",
+        "t_sec": 0.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/frame_01_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/frame_02_t01800.jpg",
+        "t_sec": 1.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/frame_03_t02400.jpg",
+        "t_sec": 2.4
+      }
+    ],
+    "duration_sec": 3.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 103,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/video.mp4",
+    "phash": "fe7ecac91d2c6050",
+    "popularity": 0.905,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/frame_00_t00600.jpg",
+        "t_sec": 0.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/frame_01_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/frame_02_t01800.jpg",
+        "t_sec": 1.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/frame_03_t02400.jpg",
+        "t_sec": 2.4
+      }
+    ],
+    "duration_sec": 3.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 451,
+    "competitor_id": "giantfood",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/video.mp4",
+    "phash": "a931544a73adab56",
+    "popularity": 0.954,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/frame_00_t03600.jpg",
+        "t_sec": 3.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/frame_01_t07200.jpg",
+        "t_sec": 7.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/frame_02_t10800.jpg",
+        "t_sec": 10.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/frame_03_t14400.jpg",
+        "t_sec": 14.4
+      }
+    ],
+    "duration_sec": 18.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 453,
+    "competitor_id": "giantfood",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/video.mp4",
+    "phash": "ea61959e66c2392d",
+    "popularity": 0.948,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/frame_00_t03000.jpg",
+        "t_sec": 3.0
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/frame_01_t06010.jpg",
+        "t_sec": 6.01
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/frame_02_t09010.jpg",
+        "t_sec": 9.01
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/frame_03_t12020.jpg",
+        "t_sec": 12.02
+      }
+    ],
+    "duration_sec": 15.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 448,
+    "competitor_id": "giantfood",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/video.mp4",
+    "phash": "86634d5b5a322d9d",
+    "popularity": 0.872,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/frame_00_t03400.jpg",
+        "t_sec": 3.4
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/frame_01_t06800.jpg",
+        "t_sec": 6.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/frame_02_t10200.jpg",
+        "t_sec": 10.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/frame_03_t13600.jpg",
+        "t_sec": 13.6
+      }
+    ],
+    "duration_sec": 17.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  }
+]

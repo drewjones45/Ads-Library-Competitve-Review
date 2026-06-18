@@ -1,0 +1,52 @@
+{
+  "duration_sec": 21.23,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/4399336850353669/frame_00_t00000.jpg",
+      "t_sec": 0.0,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/4399336850353669/frame_01_t01967.jpg",
+      "t_sec": 1.967,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/4399336850353669/frame_02_t07600.jpg",
+      "t_sec": 7.6,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/4399336850353669/frame_03_t10633.jpg",
+      "t_sec": 10.633,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/4399336850353669/frame_04_t11400.jpg",
+      "t_sec": 11.4,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/4399336850353669/frame_05_t13167.jpg",
+      "t_sec": 13.167,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/4399336850353669/frame_06_t16767.jpg",
+      "t_sec": 16.767,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/4399336850353669/frame_07_t17900.jpg",
+      "t_sec": 17.9,
+      "idx": 7
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-06-18T15:22:41+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/4399336850353669/video.mp4"
+}

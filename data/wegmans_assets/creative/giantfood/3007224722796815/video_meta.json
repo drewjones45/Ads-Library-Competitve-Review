@@ -1,0 +1,47 @@
+{
+  "duration_sec": 15.06,
+  "width": 360,
+  "height": 360,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/3007224722796815/frame_00_t00250.jpg",
+      "t_sec": 0.25,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/3007224722796815/frame_01_t00417.jpg",
+      "t_sec": 0.417,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/3007224722796815/frame_02_t00626.jpg",
+      "t_sec": 0.626,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/3007224722796815/frame_03_t00959.jpg",
+      "t_sec": 0.959,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/3007224722796815/frame_04_t02044.jpg",
+      "t_sec": 2.044,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/3007224722796815/frame_05_t03378.jpg",
+      "t_sec": 3.378,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/3007224722796815/frame_06_t10552.jpg",
+      "t_sec": 10.552,
+      "idx": 6
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-06-18T15:23:56+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/3007224722796815/video.mp4"
+}

@@ -1,0 +1,884 @@
+[
+  {
+    "creative_id": 36,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["croissants", "Easter baked goods"],
+      "key_features": ["brand_logo", "cta_button_in_image", "lifestyle_setting"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#c8873a", "#f5e4c0", "#4a2c0a", "#f7c945", "#ffffff"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": ["holiday"],
+      "notable_text": "Happy Easter",
+      "background_color": "beige",
+      "scene_description": "close-up croissants on warm-toned surface Easter themed",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "Shop Now",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans promotes Easter baked goods including croissants with seasonal lifestyle imagery",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 38,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["quiche", "Easter baked goods"],
+      "key_features": ["brand_logo", "cta_button_in_image", "lifestyle_setting"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#d4a94a", "#f5e4c0", "#c8531a", "#f7c945", "#ffffff"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": ["holiday"],
+      "notable_text": "Happy Easter",
+      "background_color": "beige",
+      "scene_description": "sliced quiche on plate Easter-themed surface",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "Shop Now",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans promotes Easter essentials including quiche and carrot cake with holiday imagery",
+      "confidence": 0.91
+    }
+  },
+  {
+    "creative_id": 43,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["flatbread", "bruschetta toppings", "prepared meal"],
+      "key_features": ["brand_logo", "cta_button_in_image", "discount_badge"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#d4401a", "#f5e0a0", "#3a7a2a", "#f5c060", "#ffffff"],
+      "aspect_ratio_guess": "16:9",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "HOT ZONE MEALS",
+      "background_color": "multi",
+      "scene_description": "Mediterranean flatbread with tomato and herb toppings overhead",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "Shop Now",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Hot Zone Meals promoted via Mediterranean flatbread lifestyle food photography",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 44,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["burger", "Mediterranean burger", "prepared meal"],
+      "key_features": ["brand_logo", "cta_button_in_image", "discount_badge"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#c87020", "#d4401a", "#3a7a2a", "#f5c060", "#ffffff"],
+      "aspect_ratio_guess": "16:9",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "HOT ZONE MEALS",
+      "background_color": "multi",
+      "scene_description": "close-up Mediterranean-style burger on sesame bun with greens",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "Shop Now",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Hot Zone Meals featuring a Mediterranean-inspired burger with branded badge",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 45,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["flatbread", "bruschetta toppings", "prepared meal"],
+      "key_features": ["brand_logo", "cta_button_in_image", "price_visible", "discount_badge"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#d4401a", "#f5e0a0", "#3a7a2a", "#f5c060", "#ffffff"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "HOT ZONE MEALS AS LOW AS $3 PER SERVING",
+      "background_color": "multi",
+      "scene_description": "Mediterranean flatbread with tomato herb toppings on white surface",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "shop this recipe",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Hot Zone Meals at $3 per serving promoted via Mediterranean flatbread imagery",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 46,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["burger", "Mediterranean burger", "prepared meal"],
+      "key_features": ["brand_logo", "cta_button_in_image", "price_visible", "discount_badge"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#c87020", "#d4401a", "#3a7a2a", "#f5c060", "#ffffff"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "HOT ZONE MEALS AS LOW AS $4 PER SERVING",
+      "background_color": "multi",
+      "scene_description": "Mediterranean-style burger on sesame bun with side salad",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "shop this recipe",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Hot Zone Meals at $4 per serving promoted via Mediterranean burger imagery",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 47,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["roasted vegetables", "chicken dish", "prepared meal"],
+      "key_features": ["brand_logo", "cta_button_in_image", "price_visible", "discount_badge"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#d4401a", "#f5e0a0", "#3a7a2a", "#f5c060", "#ffffff"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "HOT ZONE MEALS AS LOW AS $2 PER SERVING",
+      "background_color": "multi",
+      "scene_description": "bowl of roasted vegetables and chicken overhead Mediterranean style",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "shop this recipe",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Hot Zone Meals at $2 per serving promoted via roasted veggie bowl imagery",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 49,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["salmon fillet", "roasted tomatoes", "prepared meal"],
+      "key_features": ["brand_logo", "cta_button_in_image"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#d4401a", "#f5a030", "#f5e0a0", "#3a7a2a", "#f5c060"],
+      "aspect_ratio_guess": "16:9",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "HOT ZONE MEALS",
+      "background_color": "multi",
+      "scene_description": "seared salmon with roasted tomatoes on white plate overhead",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "Shop Now",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Mediterranean Hot Zone Meals featuring seared salmon with roasted tomatoes",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 4,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["steak", "grilled chicken", "corn on cob", "marinated meat"],
+      "key_features": ["brand_logo", "cta_button_in_image"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#8b2020", "#d4401a", "#f5c060", "#3a7a2a", "#f5e0a0"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": ["summer"],
+      "notable_text": "full of flavor, ready for the grill",
+      "background_color": "multi",
+      "scene_description": "grilled steak slices with corn and greens on white plate",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "Shop Now",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans summer grill favorites promoted with steak and kabob lifestyle food imagery",
+      "confidence": 0.91
+    }
+  },
+  {
+    "creative_id": 55,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "cta_button_in_image", "text_only_card"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["this week's deals"]
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#e8d0d0", "#1a1a1a", "#cc1f2d", "#f5a0a0"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "ShopRite",
+      "seasonal_tags": [],
+      "notable_text": "Download our app to see this week's deals!",
+      "background_color": "white",
+      "scene_description": "phone mockup showing blueberries coupon on white background",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "LOAD COUPON",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "ShopRite app download ad promoting weekly deals and digital coupons via phone mockup",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 57,
+    "analysis": {
+      "photography_style": "flat_lay",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["graduation cupcakes", "graduation cake", "party desserts"],
+      "key_features": ["brand_logo", "lifestyle_setting", "multi_product_collage"],
+      "text_overlay": {
+        "present": false,
+        "density": "none",
+        "copy_lean": "none"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#d4b830", "#1a1a1a", "#f5f0e0", "#c8a040", "#4a2c0a"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": ["back_to_school"],
+      "notable_text": "GRAD WOO-HOO Congrats",
+      "background_color": "yellow",
+      "scene_description": "graduation cupcake tray with grad cap decoration and congratulations card",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "ShopRite graduation-themed cupcake and cake flat-lay with celebratory card on yellow background",
+      "confidence": 0.88
+    }
+  },
+  {
+    "creative_id": 63,
+    "analysis": {
+      "photography_style": "ugc_creator_style",
+      "production_style": "ugc_creator_style",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["stuffed jalapeno peppers", "street corn dip"],
+      "key_features": ["lifestyle_setting", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#6a7a4a", "#f5c060", "#d4401a", "#c0c0c0", "#3a5a2a"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": false,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Budget-Friendly Summer Side Dish from Stop & Shop",
+      "background_color": "gray",
+      "scene_description": "hand holding platter of stuffed jalapeno peppers on outdoor patio",
+      "model_gender": "ambiguous",
+      "model_demo": "partial hand visible only",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "use_case",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop and Shop budget summer side dish UGC-style video featuring stuffed jalapenos on patio",
+      "confidence": 0.89
+    }
+  },
+  {
+    "creative_id": 68,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["grilled chicken thighs", "grilled vegetables", "zucchini", "bell peppers"],
+      "key_features": ["product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "novelty"],
+      "hook_style": "problem_solution",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5f0e8", "#c87020", "#3a7a2a", "#d4401a", "#f5c060"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": false,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Unlock the power of pickles! Say bye to bland chicken",
+      "background_color": "white",
+      "scene_description": "flat-lay grilled chicken thighs with grilled zucchini and peppers on plates",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "use_case",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop and Shop pickle-marinated chicken ad with grilled meal flat-lay and benefit-led copy",
+      "confidence": 0.9
+    }
+  },
+  {
+    "creative_id": 85,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["Chobani protein drink", "yogurt drink"],
+      "key_features": ["brand_logo", "model_present", "creator_face", "product_close_up"],
+      "text_overlay": {
+        "present": false,
+        "density": "none",
+        "copy_lean": "none"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "social_proof"],
+      "hook_style": "social_proof",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#1a3a7a", "#cc1f2d", "#f5f0e8", "#1a1a1a", "#4a7ac8"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Chobani",
+      "seasonal_tags": [],
+      "notable_text": "200 Protein",
+      "background_color": "blue",
+      "scene_description": "male athlete in USA soccer jersey holding Chobani drink against blue background",
+      "model_gender": "male",
+      "model_demo": "man, 20s-30s, light skin tone, athletic build",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop and Shop sells Chobani protein drink endorsed by USA soccer player in jersey",
+      "confidence": 0.87
+    }
+  },
+  {
+    "creative_id": 80,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["chicken tacos", "flour tortillas", "lime wedges", "salsa"],
+      "key_features": ["product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5f0e8", "#3a7a2a", "#c87020", "#d4401a", "#f5c060"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": false,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": [],
+      "notable_text": "Time for taco night! Easy eats for busy weeks",
+      "background_color": "beige",
+      "scene_description": "overhead platter of chicken tacos with lime and cilantro on linen surface",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "use_case",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop and Shop easy taco night ad featuring overhead chicken taco platter with convenience copy",
+      "confidence": 0.91
+    }
+  },
+  {
+    "creative_id": 73,
+    "analysis": {
+      "photography_style": "flat_lay",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["hamburger rolls", "marshmallows", "sweet potato chips", "lemonade", "ketchup", "grilled meat", "cookies"],
+      "key_features": ["brand_logo", "discount_badge", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5f0e8", "#d4401a", "#1a1a1a", "#f5c060", "#3a7a2a"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": ["summer"],
+      "notable_text": "FEEL GOOD SUMMER DEALS",
+      "background_color": "white",
+      "scene_description": "flat-lay summer BBQ groceries surrounding central summer deals badge",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop and Shop summer deals promotion with BBQ grocery flat-lay and branded deal badge",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 102,
+    "analysis": {
+      "photography_style": "flat_lay",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["beef skewers", "BBQ sauce", "rice", "scallions", "Korean BBQ meal"],
+      "key_features": ["product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5f0e8", "#c87020", "#3a7a2a", "#d4401a", "#4ac8c8"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": false,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Korean BBQ just for you! Beef skewers with sizzle",
+      "background_color": "white",
+      "scene_description": "overhead Korean beef skewer platter with rice and BBQ sauce on white table",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "use_case",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop and Shop Korean BBQ beef skewer meal idea promoted with overhead flat-lay photography",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 76,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["BODYARMOR sport water bottle", "alkaline water"],
+      "key_features": ["brand_logo", "price_visible", "discount_badge"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#cc1f2d", "#1a1a1a", "#e8d0d8", "#4ac840"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "BODYARMOR",
+      "seasonal_tags": [],
+      "notable_text": "SALE 4/$5.00 WHEN YOU BUY 4",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop and Shop promotes BODYARMOR sport water 4 for $5 sale deal on white background",
+      "confidence": 0.96
+    }
+  }
+]

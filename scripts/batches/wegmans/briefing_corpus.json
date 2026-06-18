@@ -1,0 +1,2065 @@
+{
+  "window_days": 30,
+  "competitors": {
+    "wegmans": {
+      "name": "Wegmans",
+      "vertical": "grocery",
+      "new_ads": [
+        {
+          "ad_archive_id": "26466598559661214",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ASummerCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "830545062848368",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Order delicious custom cakes for any celebration through Wegmans Catering on Meals 2GO.\nCustom Cakes on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Apn%3A2g%3ASummerCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1383160066912537",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3AHotCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1296178512619401",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nYour favorite summer wine, beer & spirits at great prices.\nExplore Our Collection",
+          "cta_type": "Shop Now",
+          "link_url": "https://www.wegmans.com/shop/collections/hot-zone-wine?cid=OwnedWBS%3Atr%3Apd%3Aso%3Amt%3Awb%3ASummerHotZone%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1274492638210069",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3AHotCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "777586985232514",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nCreate a Hot Bowl with your favorite flavors and hit all your protein goals.\nBuild-Your-Own Wegmans Bowl",
+          "cta_type": "Shop Now",
+          "link_url": "https://meals2go.com/menu/bowls?cid=HotBowls%3Atr%3Apd%3Aso%3Amt%3A2g%3AHappier%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1265694175671562",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nOrganize your shopping list by aisle and find everything faster on the new Wegmans app.\nDiscover the New Wegmans App",
+          "cta_type": "Download",
+          "link_url": "http://itunes.apple.com/app/id371707711",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2459422031180102",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nOrganize your shopping list by aisle and find everything faster on the new Wegmans app.\nDiscover the New Wegmans App",
+          "cta_type": "Download",
+          "link_url": "http://itunes.apple.com/app/id371707711",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1611518250982089",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Create the perfect custom menu. $150 minimum; delivery availability varies.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering/custom-cakes?cuisine=1985&cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ACustomCakes%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "941722678784820",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nUnlock $500+ in exclusive savings every year with the Wegmans app.\nDiscover the New Wegmans App",
+          "cta_type": "Download",
+          "link_url": "http://itunes.apple.com/app/id371707711",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1638702110557055",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering/custom-cakes?cuisine=1985&cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ACustomCakes%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1343886070943709",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nOrganize your shopping list by aisle and find everything faster on the new Wegmans app.\nDiscover the New Wegmans App",
+          "cta_type": "Download",
+          "link_url": "http://itunes.apple.com/app/id371707711",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2152270902262145",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ASummerCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1177973191020382",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering/custom-cakes?cuisine=1985&cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ACustomCakes%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2341717803003520",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nUnlock $500+ in exclusive savings every year with the Wegmans app.\nDiscover the New Wegmans App",
+          "cta_type": "Download",
+          "link_url": "http://itunes.apple.com/app/id371707711",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "923863570413296",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3AHotCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1247855450790441",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Complete meals with endless flavors. Find something everyone will love!",
+          "cta_type": "Wegmans",
+          "link_url": "https://fb.com/canvas_doc/1558985589224169",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2004014510212352",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nOrganize your shopping list by aisle and find everything faster on the new Wegmans app.\nDiscover the New Wegmans App",
+          "cta_type": "Download",
+          "link_url": "http://itunes.apple.com/app/id371707711",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1302383431779581",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nComplete meals with endless flavors. Find something everyone will love!\nTry Our Grab & Go Bowls",
+          "cta_type": "Shop Now",
+          "link_url": "https://meals2go.com/menu/ready-to-heat#bowls?cid=HotBowls:tr:pd:so:mt:2g:CWMCold:",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "4232047540380542",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nUnlock $500+ in exclusive savings every year with the Wegmans app.\nDiscover the New Wegmans App",
+          "cta_type": "Download",
+          "link_url": "http://itunes.apple.com/app/id371707711",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1276609830656009",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Order delicious custom cakes for any celebration through Wegmans Catering on Meals 2GO.\nCustom Cakes on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering/custom-cakes?cuisine=1985&cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ACustomCakes%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "976979698023129",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3AHotCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1538010314777880",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nWe're committed to bringing you the very best, 7 days a week.\nDiscover Summer's Sweetest Fruit",
+          "cta_type": "Learn More",
+          "link_url": "https://www.wegmans.com/shop/collections/paid-digital-summers-best-produce?cid=SeasonalAwareness%3Aaw%3Apd%3Aso%3Amt%3Asa%3ASummerProduce%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1032513679204433",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nWe're committed to bringing you the very best, 7 days a week.\nDiscover Summer's Sweetest Fruit",
+          "cta_type": "Learn More",
+          "link_url": "https://www.wegmans.com/shop/collections/paid-digital-summers-best-produce?cid=SeasonalAwareness%3Aaw%3Apd%3Aso%3Amt%3Asa%3ASummerProduce%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "4157559894574627",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering/custom-cakes?cuisine=1985&cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ACustomCakes%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1680660179759413",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering/custom-cakes?cuisine=1985&cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ACustomCakes%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "935145872487765",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3AHotCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "4139256629697972",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "#WegmansPartner Gluten-Free Grocery Haul! Thanks @Wegmans for sponsoring this video. Wegmans makes it easy to shop gluten-free!\nGluten Free Follow Me",
+          "cta_type": "Shop now",
+          "link_url": "https://www.wegmans.com/shop/discovery/gluten-free?cid=051426_SummerGFHealth%3Aaw%3Aow%3Aso%3Asl%3Asa%3AJackie",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1653391545705390",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Order delicious custom cakes for any celebration through Wegmans Catering on Meals 2GO.\nCustom Cakes on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Apn%3A2g%3ASummerCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1292966826255509",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nWe're committed to bringing you the very best, 7 days a week.\nDiscover Summer's Sweetest Fruit",
+          "cta_type": "Learn More",
+          "link_url": "https://www.wegmans.com/shop/collections/paid-digital-summers-best-produce?cid=SeasonalAwareness%3Aaw%3Apd%3Aso%3Amt%3Asa%3ASummerProduce%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1289644215876031",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Order delicious custom cakes for any celebration through Wegmans Catering on Meals 2GO.\nCustom Cakes on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ASummerCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1492515588980279",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3AHotCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "819161031247590",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3AHotCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "28166999909569211",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nWe're committed to bringing you the very best, 7 days a week.\nDiscover Summer's Sweetest Fruit",
+          "cta_type": "Learn More",
+          "link_url": "https://www.wegmans.com/shop/collections/paid-digital-summers-best-produce?cid=SeasonalAwareness%3Aaw%3Apd%3Aso%3Amt%3Asa%3ASummerProduce%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1312688107410641",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering/custom-cakes?cuisine=1985&cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ACustomCakes%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1249669047317282",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nOrganize your shopping list by aisle and find everything faster on the new Wegmans app.\nDiscover the New Wegmans App",
+          "cta_type": "Download",
+          "link_url": "http://itunes.apple.com/app/id371707711",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "4333862583540798",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Complete meals with endless flavors. Find something everyone will love!",
+          "cta_type": "Wegmans",
+          "link_url": "https://fb.com/canvas_doc/26050246851265791",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "35510057101926006",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3AHotCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "925275790510352",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Create the perfect custom menu. $150 minimum; delivery availability varies.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ASummerCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1695789318104248",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering/custom-cakes?cuisine=1985&cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ACustomCakes%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "4363415830588548",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nWe're committed to bringing you the very best, 7 days a week.\nDiscover Summer's Sweetest Fruit",
+          "cta_type": "Learn More",
+          "link_url": "https://www.wegmans.com/shop/collections/paid-digital-summers-best-produce?cid=SeasonalAwareness%3Aaw%3Apd%3Aso%3Amt%3Asa%3ASummerProduce%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1745164320175222",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nWe're committed to bringing you the very best, 7 days a week.\nDiscover Summer's Sweetest Fruit",
+          "cta_type": "Learn More",
+          "link_url": "https://www.wegmans.com/shop/collections/paid-digital-summers-best-produce?cid=SeasonalAwareness%3Aaw%3Apd%3Aso%3Amt%3Asa%3ASummerProduce%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "970321715464617",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Create the perfect custom menu. $150 minimum; delivery availability varies.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ASummerCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "4360210957567230",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "From strip steaks to kabobs, we have everything you need for summer grilling.\nSummer Grilling is Here",
+          "cta_type": "Shop now",
+          "link_url": "https://fb.com/canvas_doc/965649006056544",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "932897666404895",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Order delicious custom cakes for any celebration through Wegmans Catering on Meals 2GO.\nCustom Cakes on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Apn%3A2g%3ASummerCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1631678607910593",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nWe're committed to bringing you the very best, 7 days a week.\nDiscover Summer's Sweetest Fruit",
+          "cta_type": "Learn More",
+          "link_url": "https://www.wegmans.com/shop/collections/paid-digital-summers-best-produce?cid=SeasonalAwareness%3Aaw%3Apd%3Aso%3Amt%3Asa%3ASummerProduce%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "982283587744404",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "We're committed to bringing you the very best, 7 days a week.\nSummer's Sweetest Fruit",
+          "cta_type": "Learn More",
+          "link_url": "https://www.wegmans.com/shop/collections/paid-digital-summers-best-produce?cid=SeasonalAwareness%3Aaw%3Apd%3Aso%3Amt%3Asa%3ASummerProduce%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1283139387337128",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Create the perfect custom menu. $150 minimum; delivery availability varies.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ASummerCatering%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1318975259783425",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nWe're committed to bringing you the very best, 7 days a week.\nDiscover Summer's Sweetest Fruit",
+          "cta_type": "Learn More",
+          "link_url": "https://www.wegmans.com/shop/collections/paid-digital-summers-best-produce?cid=SeasonalAwareness%3Aaw%3Apd%3Aso%3Amt%3Asa%3ASummerProduce%3A",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "4351603031652228",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:33:38+00:00",
+          "body_text": "Wegmans\nBuild your custom catering menu for your next event on Meals 2GO.\nEvent Catering on Meals 2GO",
+          "cta_type": "Order Now",
+          "link_url": "https://www.meals2go.com/catering?cid=M2GOCateringAcquisition%3Atr%3Apd%3Aso%3Amt%3A2g%3ASummerCatering%3A",
+          "publisher_platforms": null
+        }
+      ],
+      "top_ads": [
+        {
+          "ad_archive_id": "1628964435106240",
+          "serp_rank": 3,
+          "run_days": 79,
+          "active": true,
+          "popularity_score": 0.994,
+          "body_snippet": "Unlock $500+ in exclusive savings every year with the Wegmans app. Discover the New Wegmans App",
+          "cta_type": "Use App"
+        },
+        {
+          "ad_archive_id": "909347101868643",
+          "serp_rank": 4,
+          "run_days": 79,
+          "active": true,
+          "popularity_score": 0.992,
+          "body_snippet": "Wegmans Unlock $500+ in exclusive savings every year with the Wegmans app. Discover the New Wegmans App",
+          "cta_type": "Download"
+        },
+        {
+          "ad_archive_id": "1361552382686148",
+          "serp_rank": 6,
+          "run_days": 70,
+          "active": true,
+          "popularity_score": 0.986,
+          "body_snippet": "Wegmans Complete meals with endless flavors. Find something everyone will love! Try Our Grab & Go Bowls",
+          "cta_type": "Shop Now"
+        },
+        {
+          "ad_archive_id": "3019004784965587",
+          "serp_rank": 9,
+          "run_days": 79,
+          "active": true,
+          "popularity_score": 0.978,
+          "body_snippet": "Wegmans See how easy meal planning, list building & shopping can be on the Wegmans app. New Wegmans AI Assistant",
+          "cta_type": "Download"
+        },
+        {
+          "ad_archive_id": "1958898521680713",
+          "serp_rank": 1,
+          "run_days": 56,
+          "active": true,
+          "popularity_score": 0.977,
+          "body_snippet": "Wegmans Build your custom catering menu for your next event on Meals 2GO. Event Catering on Meals 2GO",
+          "cta_type": "Order Now"
+        }
+      ],
+      "offers": [],
+      "site_changes": [
+        {
+          "id": 14,
+          "observed_at": "2026-06-18T16:33:37+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "meta_ads",
+          "source_key": "meta_ads|page:117382044987639"
+        },
+        {
+          "id": 2,
+          "observed_at": "2026-06-18T15:20:20+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "google_ads",
+          "source_key": "google_ads|advertiser:AR18314717603664232449"
+        },
+        {
+          "id": 1,
+          "observed_at": "2026-06-18T15:19:18+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "website",
+          "source_key": "website|https://www.wegmans.com"
+        }
+      ],
+      "brand_store_changes": [],
+      "homepage_creatives": [
+        {
+          "observed_at": "2026-06-18T16:32:02+00:00",
+          "image_count": 0,
+          "analyzed_count": 0,
+          "hero_text": "Wegmans Food Markets: Grocery Delivery or Pickup"
+        },
+        {
+          "observed_at": "2026-06-18T15:19:18+00:00",
+          "image_count": 0,
+          "analyzed_count": 0,
+          "hero_text": "Wegmans Food Markets: Grocery Delivery or Pickup"
+        }
+      ],
+      "homepage_promos": []
+    },
+    "shoprite": {
+      "name": "ShopRite",
+      "vertical": "grocery",
+      "new_ads": [
+        {
+          "ad_archive_id": "1636295324094455",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:20:46+00:00",
+          "body_text": "Savings are a tap away. From digital coupons to weekly circulars and shopping lists\u2014ShopRite\u2019s app does it all. Download and shop smarter.\nNever Miss a Deal",
+          "cta_type": "Download",
+          "link_url": "http://play.google.com/store/apps/details?id=com.wakefern.shoprite",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1009499548072641",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:20:46+00:00",
+          "body_text": "Savings are a tap away. From digital coupons to weekly circulars and shopping lists\u2014ShopRite\u2019s app does it all. Download and shop smarter.\nNever Miss a Deal",
+          "cta_type": "Download",
+          "link_url": "http://play.google.com/store/apps/details?id=com.wakefern.shoprite",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "898569043275230",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:20:46+00:00",
+          "body_text": "Make your Dads & Grads party simple with ShopRite catering. Great food, no stress, ready when you are.\nCelebrate Big Moments with Catering\nGrilling Favorites Made Easy",
+          "cta_type": "Order Now",
+          "link_url": "https://deliorder-web.shoprite.com/?utm_source=Instagram&utm_medium=Social%7CBanner&utm_content=Fathers%7CDay%7CGrad%7CCatering%7CGeneric_June%7C18_IG%7CAd%7CImage_Blended_Instafeed_SR%7CFootprint&utm_campaign=WAKE-1208_SR_Corp_Assessment%7CSocial%7CFY%7C2025-2026",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1514014640462189",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:20:46+00:00",
+          "body_text": "ShopRite\nSavings are a tap away. From digital coupons to weekly circulars and shopping lists\u2014ShopRite\u2019s app does it all. Download and shop smarter.\nNever Miss a Deal",
+          "cta_type": "Install Now",
+          "link_url": "http://itunes.apple.com/app/id1170573424",
+          "publisher_platforms": null
+        }
+      ],
+      "top_ads": [
+        {
+          "ad_archive_id": "1636295324094455",
+          "serp_rank": 1,
+          "run_days": 30,
+          "active": true,
+          "popularity_score": 0.825,
+          "body_snippet": "Savings are a tap away. From digital coupons to weekly circulars and shopping lists\u2014ShopRite\u2019s app does it all. Download and shop smarter. Never Miss a Deal",
+          "cta_type": "Download"
+        },
+        {
+          "ad_archive_id": "1009499548072641",
+          "serp_rank": 2,
+          "run_days": 30,
+          "active": true,
+          "popularity_score": 0.642,
+          "body_snippet": "Savings are a tap away. From digital coupons to weekly circulars and shopping lists\u2014ShopRite\u2019s app does it all. Download and shop smarter. Never Miss a Deal",
+          "cta_type": "Download"
+        },
+        {
+          "ad_archive_id": "898569043275230",
+          "serp_rank": 3,
+          "run_days": 0,
+          "active": true,
+          "popularity_score": 0.283,
+          "body_snippet": "Make your Dads & Grads party simple with ShopRite catering. Great food, no stress, ready when you are. Celebrate Big Moments with Catering Grilling Favorites Made Easy",
+          "cta_type": "Order Now"
+        },
+        {
+          "ad_archive_id": "1514014640462189",
+          "serp_rank": 4,
+          "run_days": 1,
+          "active": true,
+          "popularity_score": 0.106,
+          "body_snippet": "ShopRite Savings are a tap away. From digital coupons to weekly circulars and shopping lists\u2014ShopRite\u2019s app does it all. Download and shop smarter. Never Miss a Deal",
+          "cta_type": "Install Now"
+        }
+      ],
+      "offers": [],
+      "site_changes": [
+        {
+          "id": 11,
+          "observed_at": "2026-06-18T16:12:26+00:00",
+          "change_summary": "6 field(s) changed: chrome_dropped, hero_image_path, html_path, regions, screenshot_path, visible_text_excerpt",
+          "severity": 1.0,
+          "type": "website",
+          "source_key": "website|https://www.shoprite.com"
+        },
+        {
+          "id": 4,
+          "observed_at": "2026-06-18T15:20:46+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "meta_ads",
+          "source_key": "meta_ads|page:81828647162"
+        },
+        {
+          "id": 3,
+          "observed_at": "2026-06-18T15:20:37+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "website",
+          "source_key": "website|https://www.shoprite.com"
+        }
+      ],
+      "brand_store_changes": [],
+      "homepage_creatives": [
+        {
+          "observed_at": "2026-06-18T16:12:26+00:00",
+          "image_count": 0,
+          "analyzed_count": 0,
+          "hero_text": "ShopRite | Your Local Grocery Store and Supermarket"
+        },
+        {
+          "observed_at": "2026-06-18T15:20:37+00:00",
+          "image_count": 0,
+          "analyzed_count": 0,
+          "hero_text": "ShopRite | Your Local Grocery Store and Supermarket"
+        }
+      ],
+      "homepage_promos": []
+    },
+    "stopandshop": {
+      "name": "Stop & Shop",
+      "vertical": "grocery",
+      "new_ads": [
+        {
+          "ad_archive_id": "3059018090968991",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Alex Foxx with Stop & Shop\nVisit your local Stop & Shop and get everything you need to kick off summer right. Take advantage of over 10,000 sale items offered each week!\n@stopandshop #ad",
+          "cta_type": "Alex Foxx",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2503165363486973",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Want sweet relief from the heat? Try this watermelon ice cream float!\nFloat into summer\nWatermelon for the win!",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/easy-recipes/?ccr=255806",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2293757627697826",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nAdd fresh savings to your shop! Check out all this week\u2019s deals to see how you can stock up for less.\nSave on your fave items\nDon\u2019t miss these deals.",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3233263030168110",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Erden Weiner with Stop & Shop\nOne quick Stop & Shop run = a whole summer brunch spread. More sun, more fun, more great grocery deals! Make sure to grab some of over 10,000 sale items that are offered each week too! #ad @stopandshop #summerhosting #brunchideas #busyfamilies #feelgoodsummer",
+          "cta_type": "Erden Weiner",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1527574609073008",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nStock up on high-quality meats for less. From grass-fed beef to grill-ready favorites, we\u2019ve got you covered.\nUpgrade your grill game\nBetter steak, better price",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1375827384379240",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Nishat Eats Donuts with Stop & Shop\nCelebrate the season with Stop & Shop\u2019s bakery items, flowers, and fresh produce! With over 10,000 items on sale every week, you\u2019re sure to find everything you need to welcome summer! @stopandshop #sponsored",
+          "cta_type": "Nishat Eats Donuts",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2904563836550976",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Alex Foxx with Stop & Shop\nVisit your local Stop & Shop and get everything you need to kick off summer right. Take advantage of over 10,000 sale items offered each week!\n@stopandshop #ad",
+          "cta_type": "Alex Foxx",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1526099255597306",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nJustin is spreading the news: We have over 10,000 items on sale week after week!\nBig Savings Inside\nSavings Every Week",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2489589918131235",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nThere\u2019s a new title up for grabs in the meat aisle \ud83d\udc51\nSummer deals on meats\nLevel up your cookout",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1032973205734165",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Don't toss that pickle juice! Make zesty grilled pickle-brined chicken thighs with vegetables.\nUnlock the power of pickles!\nSay bye to bland chicken",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/easy-recipes/?ccr=250765",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1483482653531884",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nFrom steaks & hot dogs to popsicles & sunscreen\u201410,000 items are always on sale this summer.\n10,000 items on sale\nStock up & save all summer",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1457908142273239",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nYour favorite Flavor Bombs tomatoes are now Taste of Inspirations - same great taste.\nNew Label, Same Taste\nFlavor Bombs Tomatoes",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/own-brand-savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1539355224572043",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nStock up on high-quality meats for less. From grass-fed beef to grill-ready favorites, we\u2019ve got you covered.\nUpgrade your grill game\nGreat steaks, great prices",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1364844315678249",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nJustin has news: Over 10,000 items on sale every week. Yep, good things really are in store!\nDeals You'll Love\nSave week after week",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/own-brand-savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3480542418789254",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Erden Weiner with Stop & Shop\nOne quick Stop & Shop run = a whole summer brunch spread. More sun, more fun, more great grocery deals! Make sure to grab some of over 10,000 sale items that are offered each week too! #ad @stopandshop #summerhosting #brunchideas #busyfamilies #feelgoodsummer",
+          "cta_type": "Erden Weiner",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1154972590089980",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nJustin is spreading the news: We have over 10,000 items on sale week after week!\nBig Savings Inside\nSavings Every Week",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2453380191798197",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nFrom steaks & hot dogs to popsicles & sunscreen\u201410,000 items are always on sale this summer.\n10,000 items on sale\nStock up & save all summer",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1330130709265839",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Don't toss that pickle juice! Make zesty grilled pickle-brined chicken thighs with vegetables.\nUnlock the power of pickles!\nSay bye to bland chicken",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/easy-recipes/?ccr=250765",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1647262363238778",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nThere\u2019s a new title up for grabs in the meat aisle \ud83d\udc51\nSummer deals on meats\nLevel up your cookout",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "997982806056039",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nFrom steaks & hot dogs to popsicles & sunscreen\u201410,000 items are always on sale this summer.\n10,000 items on sale\nStock up & save all summer",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1633331301067609",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nStock up on high-quality meats for less. From grass-fed beef to grill-ready favorites, we\u2019ve got you covered.\nUpgrade your grill game\nGreat steaks, great prices",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1604753647274122",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nJustin has news: Over 10,000 items on sale every week. Yep, good things really are in store!\nDeals You'll Love\nSave week after week",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/own-brand-savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3232594526920029",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nThere\u2019s a new title up for grabs in the meat aisle \ud83d\udc51\nSummer deals on meats\nLevel up your cookout",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1771724643952497",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nFrom steaks & hot dogs to popsicles & sunscreen\u201410,000 items are always on sale this summer.\n10,000 items on sale\nStock up & save all summer",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "36226930436954319",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Don't toss that pickle juice! Make zesty grilled pickle-brined chicken thighs with vegetables.\nUnlock the power of pickles!\nSay bye to bland chicken",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/easy-recipes/?ccr=250765",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2579619659102798",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Want big restaurant flavor without big prices? Try these chicken tacos with grilled tomatoes and green onion salsa.\nTime for taco night!\nEasy eats for busy weeks",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/cinco-de-mayo/?ccr=152587",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1022185763518793",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nJustin is spreading the news: We have over 10,000 items on sale week after week!\nBig Savings Inside\nSavings Every Week",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1351910730202412",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nFrom marinated favorites to grass-fed steaks, our meat department has everything you need this season.\nGrilling Season\nEverything you need!",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2584187322038074",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nThere\u2019s a new title up for grabs in the meat aisle \ud83d\udc51\nSummer deals on meats\nLevel up your cookout",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3192927934249314",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Nishat Eats Donuts with Stop & Shop\nCelebrate the season with Stop & Shop\u2019s bakery items, flowers, and fresh produce! With over 10,000 items on sale every week, you\u2019re sure to find everything you need to welcome summer! @stopandshop #sponsored",
+          "cta_type": "Nishat Eats Donuts",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2739260746472716",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nJustin has news: Over 10,000 items on sale every week. Yep, good things really are in store!\nDeals You'll Love\nSave week after week",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/own-brand-savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2234216847344748",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nAdd fresh savings to your shop! Check out all this week\u2019s deals to see how you can stock up for less.\nSave on your fave items\nDon\u2019t miss these deals.",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "883591210729931",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Want sweet relief from the heat? Try this watermelon ice cream float!\nFloat into summer\nWatermelon for the win!",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/easy-recipes/?ccr=255806",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1489201125840379",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Want sweet relief from the heat? Try this watermelon ice cream float!\nFloat into summer\nWatermelon for the win!",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/easy-recipes/?ccr=255806",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "997607956015261",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nFrom steaks & hot dogs to popsicles & sunscreen\u201410,000 items are always on sale this summer.\n10,000 items on sale\nStock up & save all summer",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3720290371461477",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nJustin is spreading the news: We have over 10,000 items on sale week after week!\nBig Savings Inside\nSavings Every Week",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2100369353850487",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Alex Foxx with Stop & Shop\nVisit your local Stop & Shop and get everything you need to kick off summer right. Take advantage of over 10,000 sale items offered each week!\n@stopandshop #ad",
+          "cta_type": "Alex Foxx",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3547761338710088",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nFrom steaks & hot dogs to popsicles & sunscreen\u201410,000 items are always on sale this summer.\n10,000 items on sale\nStock up & save all summer",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "996557922866288",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nSave more every trip with Stop & Shop's Savings Station \u2014your quick in-store hub for coupons, deals, and rewards.\nHelpful ways to save!\nSavings station tips!",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/savingsstation-kiosk",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2105201957010958",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Add a little more heat to your grill with these Korean BBQ beef skewers.\nKorean BBQ just for you!\nBeef skewers with sizzle",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/easy-recipes/?ccr=255258",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1737586383791096",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Nishat Eats Donuts with Stop & Shop\nCelebrate the season with Stop & Shop\u2019s bakery items, flowers, and fresh produce! With over 10,000 items on sale every week, you\u2019re sure to find everything you need to welcome summer! @stopandshop #sponsored",
+          "cta_type": "Nishat Eats Donuts",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1706784473998109",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Add a little more heat to your grill with these Korean BBQ beef skewers.\nKorean BBQ just for you!\nBeef skewers with sizzle",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/easy-recipes/?ccr=255258",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "874311162375318",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Add a little more heat to your grill with these Korean BBQ beef skewers.\nKorean BBQ just for you!\nBeef skewers with sizzle",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/easy-recipes/?ccr=255258",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1189071184282035",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Want big restaurant flavor without big prices? Try these chicken tacos with grilled tomatoes and green onion salsa.\nTime for taco night!\nEasy eats for busy weeks",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/cinco-de-mayo/?ccr=152587",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1011546841428601",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nFrom marinated favorites to grass-fed steaks, our meat department has everything you need this season.\nGrilling Season\nEverything you need!",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "26539557479039192",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nJustin has news: Over 10,000 items on sale every week. Yep, good things really are in store!\nDeals You'll Love\nSave week after week",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/own-brand-savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3528879870610434",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nFrom steaks & hot dogs to popsicles & sunscreen\u201410,000 items are always on sale this summer.\n10,000 items on sale\nStock up & save all summer",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/summer-grilling",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1686525555728647",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Want sweet relief from the heat? Try this watermelon ice cream float!\nFloat into summer\nWatermelon for the win!",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/easy-recipes/?ccr=255806",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "978178514753847",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Erden Weiner with Stop & Shop\nOne quick Stop & Shop run = a whole summer brunch spread. More sun, more fun, more great grocery deals! Make sure to grab some of over 10,000 sale items that are offered each week too! #ad @stopandshop #summerhosting #brunchideas #busyfamilies #feelgoodsummer",
+          "cta_type": "Erden Weiner",
+          "link_url": "https://stopandshop.com/savings",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "35218620164452750",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:23:27+00:00",
+          "body_text": "Stop & Shop\nSave more every trip with Stop & Shop's Savings Station \u2014your quick in-store hub for coupons, deals, and rewards.\nHelpful ways to save!\nSavings station tips!",
+          "cta_type": "Shop Now",
+          "link_url": "https://stopandshop.com/pages/savingsstation-kiosk",
+          "publisher_platforms": null
+        }
+      ],
+      "top_ads": [
+        {
+          "ad_archive_id": "1739294110785798",
+          "serp_rank": 3,
+          "run_days": 55,
+          "active": true,
+          "popularity_score": 0.965,
+          "body_snippet": "Stop & Shop Level up your summer spread with this quick, low\u2011effort side. Just our Street Corn Dip + Jalape\u00f1os on the grill! Simple, Affordable & Tasty Summer made easy",
+          "cta_type": "Shop Now"
+        },
+        {
+          "ad_archive_id": "2109464369903296",
+          "serp_rank": 6,
+          "run_days": 56,
+          "active": true,
+          "popularity_score": 0.963,
+          "body_snippet": "Don't toss that pickle juice! Make zesty grilled pickle-brined chicken thighs with vegetables. Unlock the power of pickles! Say bye to bland chicken",
+          "cta_type": "Shop Now"
+        },
+        {
+          "ad_archive_id": "934992535814788",
+          "serp_rank": 17,
+          "run_days": 63,
+          "active": true,
+          "popularity_score": 0.956,
+          "body_snippet": "Feed the Dream.",
+          "cta_type": "Shop Now"
+        },
+        {
+          "ad_archive_id": "2016307982314044",
+          "serp_rank": 14,
+          "run_days": 55,
+          "active": true,
+          "popularity_score": 0.935,
+          "body_snippet": "Want big restaurant flavor without big prices? Try these chicken tacos with grilled tomatoes and green onion salsa. Time for taco night! Easy eats for busy weeks",
+          "cta_type": "Shop Now"
+        },
+        {
+          "ad_archive_id": "982283650925926",
+          "serp_rank": 9,
+          "run_days": 48,
+          "active": true,
+          "popularity_score": 0.908,
+          "body_snippet": "We've made saving a breeze with 10,000+ items on sale every week! Stock up on all your summer must-haves. Stop & Shop Visit Stop & Shop in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Shop Now"
+        }
+      ],
+      "offers": [],
+      "site_changes": [
+        {
+          "id": 6,
+          "observed_at": "2026-06-18T15:23:25+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "meta_ads",
+          "source_key": "meta_ads|page:170000993071234"
+        },
+        {
+          "id": 5,
+          "observed_at": "2026-06-18T15:20:49+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "website",
+          "source_key": "website|https://stopandshop.com"
+        }
+      ],
+      "brand_store_changes": [],
+      "homepage_creatives": [
+        {
+          "observed_at": "2026-06-18T15:20:49+00:00",
+          "image_count": 0,
+          "analyzed_count": 0,
+          "hero_text": null
+        }
+      ],
+      "homepage_promos": []
+    },
+    "giantfood": {
+      "name": "Giant Food",
+      "vertical": "grocery",
+      "new_ads": [
+        {
+          "ad_archive_id": "2453537238453926",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nRipe savings on fruit and more!\nProduce deals\nIn store and online!",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1455711055494219",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Everyday faves are a few points away!\nGIANTFOOD.COM/REWARDS-OVERVIEW\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2286933775451037",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nSnag steak savings!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nWeekly deals\nIn store and online",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view?utm_campaign=giantfoods_dco&utm_source=hprog&utm_medium=paid_display&utm_term=%25epid!&utm_content=%25ecid!",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "987614884011802",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nSnag steak and fried chicken savings!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nSavory savings\nIn store and online!",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "26557297090588669",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nPlace a pickup or delivery order today!\nGet the same prices\nNo matter how you shop",
+          "cta_type": "Shop Now",
+          "link_url": "http://giantfood.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1238447769341916",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Earn with your strep test at Giant Pharmacy.\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "984109927813659",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nRipe savings on fruit and more!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nWeekly deals\nIn store and online",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view?utm_campaign=giantfoods_dco&utm_source=hprog&utm_medium=paid_display&utm_term=%25epid!&utm_content=%25ecid!",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1509264647536812",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nSame great deals in store and online.\nSave big. Shop red.\nDeals down every aisle!",
+          "cta_type": "Shop Now",
+          "link_url": "http://giantfood.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "967662542801845",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nRipe savings on fruit and more!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nWeekly deals\nIn store and online",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view?utm_campaign=giantfoods_dco&utm_source=hprog&utm_medium=paid_display&utm_term=%25epid!&utm_content=%25ecid!",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1776145640431376",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Reach your goal to earn extra points!\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1465582282010015",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Everyday faves are a few points away!\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "927069726901107",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Everyday faves are a few points away!\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2258902174642248",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nRipe savings on fruit and more!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nWeekly deals\nIn store and online",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view?utm_campaign=giantfoods_dco&utm_source=hprog&utm_medium=paid_display&utm_term=%25epid!&utm_content=%25ecid!",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1564888475060069",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nGet expert-level guidance for wherever you\u2019re traveling!\nHTTPS://GIANTFOOD.COM/PAGES/TRAVEL-HEALTH\nBooked a trip?\nBook a consultation!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/pages/travel-health",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3395378420637622",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nPlace a pickup or delivery order today!\nGet the same prices\nNo matter how you shop",
+          "cta_type": "Shop Now",
+          "link_url": "http://giantfood.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1308799464652022",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nRipe savings on fruit and more!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nWeekly deals\nIn store and online",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view?utm_campaign=giantfoods_dco&utm_source=hprog&utm_medium=paid_display&utm_term=%25epid!&utm_content=%25ecid!",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1574489094686700",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Reach your goal to earn extra points!\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1294260055463907",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nListen every week for the best deals for healthier meals.\nHTTPS://GIANTFOOD.COM/PAGES/HEALTH-AND-WELLNESS-PODCAST\nTune in every week\nFor all the tips",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/pages/health-and-wellness-podcast",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "990255153727325",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Earn with your strep test at Giant Pharmacy.\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2884557941714539",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nTake advantage of Giant Pharmacy and Healthy Living services.\nHTTPS://GIANTFOOD.COM/PAGES/WELLNESS\nHere for your wellness\nClasses, vaccines & more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/pages/wellness",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3396977417128948",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Reach your goal to earn extra points!\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2472279763196126",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nSavings on steak, fruit, and more!\nWeekly deals\nIn store and online\nWeekly deals\nIn store and online\nWeekly deals\nIn store and online",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view?utm_campaign=giantfoods_dco&utm_source=hprog&utm_medium=paid_display&utm_term=%25epid!&utm_content=%25ecid!",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1191821269589108",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nSame great deals in store and online.\nSave big. Shop red.\nDeals down every aisle!",
+          "cta_type": "Shop Now",
+          "link_url": "http://giantfood.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3007224722796815",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Save big with pickup and delivery\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1358036076260103",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nRipe savings on fruit and more!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nWeekly deals\nIn store and online",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view?utm_campaign=giantfoods_dco&utm_source=hprog&utm_medium=paid_display&utm_term=%25epid!&utm_content=%25ecid!",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "970114478836774",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nGet expert-level guidance for wherever you\u2019re traveling!\nHTTPS://GIANTFOOD.COM/PAGES/TRAVEL-HEALTH\nBooked a trip?\nBook a consultation!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/pages/travel-health",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1509715514230415",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Earn with your strep test at Giant Pharmacy.\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1008228958345998",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nRipe savings on fruit and more!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nProduce deals\nIn store and online!",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1610883093344066",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nTake advantage of Giant Pharmacy and Healthy Living services.\nHTTPS://GIANTFOOD.COM/PAGES/WELLNESS\nHere for your wellness\nClasses, vaccines & more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/pages/wellness",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1726466335095527",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Everyday faves are a few points away!\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1684271676121571",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nRipe savings on fruit and more!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nWeekly deals\nIn store and online",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view?utm_campaign=giantfoods_dco&utm_source=hprog&utm_medium=paid_display&utm_term=%25epid!&utm_content=%25ecid!",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "935576986130927",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nFlexible Rewards lets you choose the rewards you love.\nGIANTFOOD.COM/REWARDS-OVERVIEW\nPoints = rewards\nSave even more!",
+          "cta_type": "Learn More",
+          "link_url": "http://giantfood.com/rewards-overview",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2033096260575236",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Earn with your strep test at Giant Pharmacy.\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1725663465545021",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Save big with pickup and delivery\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1047966354224635",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nSnag steak savings!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nWeekly deals\nIn store and online",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view?utm_campaign=giantfoods_dco&utm_source=hprog&utm_medium=paid_display&utm_term=%25epid!&utm_content=%25ecid!",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "766785759757992",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Save big with pickup and delivery\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1361512135784877",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nFlexible Rewards lets you choose the rewards you love.\nGIANTFOOD.COM/REWARDS-OVERVIEW\nPoints = rewards\nSave even more!",
+          "cta_type": "Learn More",
+          "link_url": "http://giantfood.com/rewards-overview",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1321573029872412",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Everyday faves are a few points away!\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1385072440311470",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nListen every week for the best deals for healthier meals.\nHTTPS://GIANTFOOD.COM/PAGES/HEALTH-AND-WELLNESS-PODCAST\nTune in every week\nFor all the tips",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/pages/health-and-wellness-podcast",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "970218488958190",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Reach your goal to earn extra points!\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2074342923145179",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nListen every week for the best deals for healthier meals.\nHTTPS://GIANTFOOD.COM/PAGES/HEALTH-AND-WELLNESS-PODCAST\nTune in every week\nFor all the tips",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/pages/health-and-wellness-podcast",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1350782736944596",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nListen to our latest This Week at Giant podcast for more nutritionist picks!\nHTTPS://GIANTFOOD.COM/PAGES/HEALTH-AND-WELLNESS-PODCAST\nNutritionist picks\nHealthy solutions",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/pages/health-and-wellness-podcast",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1452052086049412",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nTake advantage of Giant Pharmacy and Healthy Living services.\nHTTPS://GIANTFOOD.COM/PAGES/WELLNESS\nHere for your wellness\nClasses, vaccines & more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/pages/wellness",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1995566671044146",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Earn with your strep test at Giant Pharmacy.\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1278462337382101",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nRipe savings on fruit and more!\nHTTPS://GIANTFOOD.COM/SAVINGS/WEEKLY-AD/GRID-VIEW\nWeekly deals\nIn store and online",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view?utm_campaign=giantfoods_dco&utm_source=hprog&utm_medium=paid_display&utm_term=%25epid!&utm_content=%25ecid!",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1035975132099907",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Everyday faves are a few points away!\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1152202207031973",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nGet expert-level guidance for wherever you\u2019re traveling!\nHTTPS://GIANTFOOD.COM/PAGES/TRAVEL-HEALTH\nBooked a trip?\nBook a consultation!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/pages/travel-health",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1292694152498172",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Reach your goal to earn extra points!\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Learn More",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "965361142925338",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Save big with pickup and delivery\nGiant Food\nVisit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/savings/weekly-ad/grid-view",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1554464943019698",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T15:24:00+00:00",
+          "body_text": "Giant Food\nDiscover more of our picks on our Healthy Living by Giant podcast.\nHTTPS://GIANTFOOD.COM/PAGES/GUIDING-STARS-SHOP-FOR-STARS\nCheck out our picks\nStar-rated staples!",
+          "cta_type": "Shop Now",
+          "link_url": "https://giantfood.com/pages/guiding-stars-shop-for-stars",
+          "publisher_platforms": null
+        }
+      ],
+      "top_ads": [
+        {
+          "ad_archive_id": "956727320185225",
+          "serp_rank": 5,
+          "run_days": 69,
+          "active": true,
+          "popularity_score": 0.977,
+          "body_snippet": "Giant Food Prices dropped. Deal locked. Red = savings Deals locked in for weeks!",
+          "cta_type": "Shop Now"
+        },
+        {
+          "ad_archive_id": "1751263765842536",
+          "serp_rank": 8,
+          "run_days": 69,
+          "active": true,
+          "popularity_score": 0.96,
+          "body_snippet": "Giant Food Place a pickup or delivery order today! Get the same prices No matter how you shop",
+          "cta_type": "Shop Now"
+        },
+        {
+          "ad_archive_id": "1319220643427046",
+          "serp_rank": 9,
+          "run_days": 63,
+          "active": true,
+          "popularity_score": 0.954,
+          "body_snippet": "Feed the Dream.",
+          "cta_type": "Shop Now"
+        },
+        {
+          "ad_archive_id": "1504140507748555",
+          "serp_rank": 10,
+          "run_days": 69,
+          "active": true,
+          "popularity_score": 0.948,
+          "body_snippet": "Giant Food Prices dropped. Deal locked. HTTPS://GIANTFOOD.COM/BROWSE-AISLES/CATEGORIES/1/DEAL-LOCK Red = savings Deals locked in for weeks!",
+          "cta_type": "Shop Now"
+        },
+        {
+          "ad_archive_id": "1328295545780299",
+          "serp_rank": 13,
+          "run_days": 69,
+          "active": true,
+          "popularity_score": 0.931,
+          "body_snippet": "Save big with pickup and delivery Giant Food Visit Giant in person or online for easy grocery shopping, pharmacy refills, recipe inspiration, and more!",
+          "cta_type": "Shop Now"
+        }
+      ],
+      "offers": [],
+      "site_changes": [
+        {
+          "id": 8,
+          "observed_at": "2026-06-18T15:23:59+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "meta_ads",
+          "source_key": "meta_ads|page:212571735459949"
+        },
+        {
+          "id": 7,
+          "observed_at": "2026-06-18T15:23:30+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "website",
+          "source_key": "website|https://giantfood.com"
+        }
+      ],
+      "brand_store_changes": [],
+      "homepage_creatives": [
+        {
+          "observed_at": "2026-06-18T15:23:30+00:00",
+          "image_count": 0,
+          "analyzed_count": 0,
+          "hero_text": null
+        }
+      ],
+      "homepage_promos": []
+    },
+    "acme": {
+      "name": "ACME Markets",
+      "vertical": "grocery",
+      "new_ads": [],
+      "top_ads": [],
+      "offers": [],
+      "site_changes": [],
+      "brand_store_changes": [],
+      "homepage_creatives": [],
+      "homepage_promos": []
+    },
+    "pricechopper": {
+      "name": "Price Chopper",
+      "vertical": "grocery",
+      "new_ads": [
+        {
+          "ad_archive_id": "2707169463017216",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Join the fight against Alzheimer\u2019s disease and dementia with specially marked Freihofer\u2019s products.\nAlzheimer's Association",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/stores/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1654997592450075",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Save 15% with Advantedge card on all home games!\nHartford Athletic",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/about-us/our-community/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2124313034800298",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2203675067033304",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Save $5 on the Capital Region Golf Card at select stores!\nCapital Region Golf Card",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/event/capital-region-golf-card-2/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "942670108582456",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "We\u2019re proud to work with a variety of local producers and farmers. During Dairy Month, we get to highlight our home.grown. partners who provide us with our PICS Milk, local cheeses, and more.\nCelebrate Local this Dairy Month",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/services/home-grown/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "951410487880246",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Purchase a season pass now through August 7!\nZoom Flume Water Park",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/stores/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2084640965731860",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Price Chopper Supermarkets\nCelebrating Stars, Stripes & savings\nButcher\u2019s Promise Bone-In Strip Steak Savings Pack; Raspberries or Blackberries 6 oz.; Live Lobster; Talenti Gelato Layers or Pints; Breyers Ice Cream",
+          "cta_type": "Shop Now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2156616865128179",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Save $1 off a Megapass for the Boonville Oneida County Fair!\nBoonville Oneida County Fair",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/stores/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "886336674504549",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Save up to $8 off tickets at Market 32 and Price Chopper locations!\nWater Safari",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/stores/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1456536853174682",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Join us at the 44th Annual Strawberry Fest!\nStrawberry Fest",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/about-us/our-community/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1556965835786340",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Celebrating Stars, Stripes & savings",
+          "cta_type": "Price Chopper Supermarkets",
+          "link_url": "https://fb.com/canvas_doc/969412532628213",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1627742665000684",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Round up your change and give your local food bank the means to provide milk and other nutritious food to families.\nFill a Glass with Hope & Fill a Plate with Promise",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/stores/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "3273680656126704",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1448969473940121",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Save $1 off a Megapass for the Clinton County Fair!\nClinton County Fair",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/stores/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1013422027829790",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Join the fight against Parkinson's with specially marked Freihofer\u2019s products.\nParkinson's Foundation",
+          "cta_type": "Sign Up",
+          "link_url": "https://www.pricechopper.com/stores/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1293835146269672",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2707442259626677",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Save $5 on the Capital Region Golf Card at select stores!\nCapital Region Golf Card",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/about-us/our-community/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2966300833772267",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "The boys of summer are back\u2014cheer with Market 32 & Price Chopper!\nWe're proud to support!",
+          "cta_type": "Learn More",
+          "link_url": "https://www.pricechopper.com/about-us/our-community/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1017529114282073",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1555482866207370",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "1039704132342846",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "4417111051941340",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "978356385083636",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2013516422591514",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "988901593951884",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        },
+        {
+          "ad_archive_id": "2165011467653189",
+          "page_name": "\u200b",
+          "first_seen": "2026-06-18T16:12:18+00:00",
+          "body_text": "Let us handle the shopping this season! Now offering FREE pickup.\nPrice Chopper Supermarkets",
+          "cta_type": "Shop now",
+          "link_url": "http://shop.pricechopper.com/",
+          "publisher_platforms": null
+        }
+      ],
+      "top_ads": [
+        {
+          "ad_archive_id": "2707169463017216",
+          "serp_rank": 1,
+          "run_days": 17,
+          "active": true,
+          "popularity_score": 0.749,
+          "body_snippet": "Join the fight against Alzheimer\u2019s disease and dementia with specially marked Freihofer\u2019s products. Alzheimer's Association",
+          "cta_type": "Learn More"
+        },
+        {
+          "ad_archive_id": "1654997592450075",
+          "serp_rank": 2,
+          "run_days": 17,
+          "active": true,
+          "popularity_score": 0.727,
+          "body_snippet": "Save 15% with Advantedge card on all home games! Hartford Athletic",
+          "cta_type": "Learn More"
+        },
+        {
+          "ad_archive_id": "2203675067033304",
+          "serp_rank": 4,
+          "run_days": 17,
+          "active": true,
+          "popularity_score": 0.683,
+          "body_snippet": "Save $5 on the Capital Region Golf Card at select stores! Capital Region Golf Card",
+          "cta_type": "Learn More"
+        },
+        {
+          "ad_archive_id": "2124313034800298",
+          "serp_rank": 3,
+          "run_days": 13,
+          "active": true,
+          "popularity_score": 0.682,
+          "body_snippet": "Let us handle the shopping this season! Now offering FREE pickup. Price Chopper Supermarkets",
+          "cta_type": "Shop now"
+        },
+        {
+          "ad_archive_id": "942670108582456",
+          "serp_rank": 5,
+          "run_days": 17,
+          "active": true,
+          "popularity_score": 0.661,
+          "body_snippet": "We\u2019re proud to work with a variety of local producers and farmers. During Dairy Month, we get to highlight our home.grown. partners who provide us with our PICS Milk, local cheeses, and more. Celebrate Local this Dairy Month",
+          "cta_type": "Learn More"
+        }
+      ],
+      "offers": [],
+      "site_changes": [
+        {
+          "id": 10,
+          "observed_at": "2026-06-18T16:12:18+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "meta_ads",
+          "source_key": "meta_ads|page:86301209824"
+        },
+        {
+          "id": 9,
+          "observed_at": "2026-06-18T16:12:02+00:00",
+          "change_summary": "first observation",
+          "severity": 1.0,
+          "type": "website",
+          "source_key": "website|https://www.pricechopper.com"
+        }
+      ],
+      "brand_store_changes": [],
+      "homepage_creatives": [
+        {
+          "observed_at": "2026-06-18T16:12:02+00:00",
+          "image_count": 0,
+          "analyzed_count": 0,
+          "hero_text": "Price Chopper Supermarkets - Market 32 Grocery Stores"
+        }
+      ],
+      "homepage_promos": []
+    }
+  }
+}

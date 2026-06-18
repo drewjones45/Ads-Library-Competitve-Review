@@ -1,0 +1,688 @@
+[
+  {
+    "creative_id": 600,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "shipping_callout"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "problem_solution",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#1a0a00", "#d4610a", "#f0a020", "#4a4a6a", "#8b6040"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Instacart",
+      "seasonal_tags": ["summer"],
+      "notable_text": "CAMPING JUST GOT EASIER",
+      "background_color": "multi",
+      "scene_description": "campfire at dusk, person roasting marshmallows",
+      "model_gender": "ambiguous",
+      "model_demo": "partial hand visible only, no demographic detail",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": "Shop online for pickup or delivery",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper/Instacart promotes online grocery ordering for camping trips via convenience messaging",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 592,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#1a2a5e", "#c8a020", "#ffffff", "#8b1a1a", "#4a6a30"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Binghamton Rumble Ponies",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Binghamton RUMBLE PONIES",
+      "background_color": "multi",
+      "scene_description": "baseball field, player running bases",
+      "model_gender": "male",
+      "model_demo": "man, 20s-30s, light skin tone, baseball uniform",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper sponsors Binghamton Rumble Ponies minor league baseball team via brand awareness ad",
+      "confidence": 0.91
+    }
+  },
+  {
+    "creative_id": 593,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#0a1a3a", "#2a6aaa", "#ffffff", "#1a3a1a", "#888888"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Hudson Valley Renegades",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Heritage Financial Park Wappingers Falls",
+      "background_color": "multi",
+      "scene_description": "baseball field at night, batter swinging",
+      "model_gender": "male",
+      "model_demo": "man, 20s, darker skin tone, baseball uniform",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper sponsors Hudson Valley Renegades minor league baseball via community brand awareness",
+      "confidence": 0.90
+    }
+  },
+  {
+    "creative_id": 594,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 2,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#1a4a1a", "#ffffff", "#808080", "#c8c820", "#4a4a4a"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Danbury Westerners (diamond dog mascot)",
+      "seasonal_tags": ["summer"],
+      "notable_text": null,
+      "background_color": "green",
+      "scene_description": "baseball field, player throwing ball in green uniform",
+      "model_gender": "male",
+      "model_demo": "man, 20s, medium skin tone, green baseball uniform",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper sponsors a minor league baseball team via community sports partnership awareness ad",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 595,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present", "discount_badge", "price_visible"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["skin_tone_diverse"]
+      },
+      "dominant_colors_hex": ["#1a3a6a", "#f07030", "#ffffff", "#2a5a1a", "#888888"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Syracuse Mets",
+      "seasonal_tags": ["summer"],
+      "notable_text": "SAVE $4 with AdvantEdge card",
+      "background_color": "multi",
+      "scene_description": "baseball field outdoors, fielder in Mets uniform",
+      "model_gender": "male",
+      "model_demo": "man, 20s-30s, darker skin tone, white pinstripe baseball uniform",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper promotes $4 AdvantEdge loyalty card savings via Syracuse Mets baseball sponsorship",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 596,
+    "analysis": {
+      "photography_style": "mixed",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#1a1a4a", "#8a3a8a", "#2a6a2a", "#ffffff", "#4a8a4a"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Valley Cats",
+      "seasonal_tags": ["summer"],
+      "notable_text": "MARKET 32 cares Giving back to our neighbors",
+      "background_color": "green",
+      "scene_description": "baseball field, pitcher throwing, mixed with grass texture",
+      "model_gender": "male",
+      "model_demo": "man, 20s, light skin tone, dark baseball uniform",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Market 32 Cares community program promotes Valley Cats baseball sponsorship and giving back",
+      "confidence": 0.90
+    }
+  },
+  {
+    "creative_id": 597,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present", "discount_badge", "price_visible"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#0a1a3a", "#3aaa5a", "#1a5a1a", "#ffffff", "#888888"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Vermont Lake Monsters",
+      "seasonal_tags": ["summer"],
+      "notable_text": "SAVE $2 with AdvantEdge card",
+      "background_color": "blue",
+      "scene_description": "baseball batter in helmet with underwater blue background",
+      "model_gender": "male",
+      "model_demo": "man, 20s, medium-light skin tone, dark baseball uniform and helmet",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper promotes $2 AdvantEdge loyalty savings via Vermont Lake Monsters baseball sponsorship",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 598,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#1a2a4a", "#c8a020", "#8a1a1a", "#ffffff", "#4a4a4a"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "RailRiders",
+      "seasonal_tags": ["summer"],
+      "notable_text": "MARKET 32 cares Giving back to our neighbors",
+      "background_color": "multi",
+      "scene_description": "baseball field daytime, pitcher in dark uniform mid-throw",
+      "model_gender": "male",
+      "model_demo": "man, 20s, light skin tone, dark baseball uniform",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Market 32 Cares community program highlights RailRiders baseball sponsorship and neighborhood giving",
+      "confidence": 0.91
+    }
+  },
+  {
+    "creative_id": 599,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#3a1a6a", "#ffffff", "#5a3a8a", "#2a5a2a", "#888888"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Keene Swamp Bats",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Price Chopper cares Giving back to our neighbors",
+      "background_color": "multi",
+      "scene_description": "baseball field with spectators, pitcher in purple uniform",
+      "model_gender": "male",
+      "model_demo": "man, 20s, light skin tone, purple baseball uniform",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper Cares community program showcases Keene Swamp Bats baseball sponsorship",
+      "confidence": 0.91
+    }
+  },
+  {
+    "creative_id": 602,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "problem_solution",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#3a5a20", "#7a8a40", "#c8c880", "#1a2a10", "#888858"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Market 32 / Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Golfing just got easier.",
+      "background_color": "green",
+      "scene_description": "golf course fairway with shallow depth of field",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Market 32 and Price Chopper promote grocery convenience for golfers via activity-based lifestyle hook",
+      "confidence": 0.90
+    }
+  },
+  {
+    "creative_id": 604,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["burgers", "hot dogs", "corn on the cob", "peppers", "potatoes"],
+      "key_features": ["brand_logo", "lifestyle_setting", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "problem_solution",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#3a1a00", "#c87020", "#f0a030", "#c83010", "#8a4010"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Market 32 / Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Grilling just got easier.",
+      "background_color": "brown",
+      "scene_description": "close-up of grill with burgers hot dogs corn and vegetables",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Market 32 and Price Chopper promote grocery convenience for summer grilling with food close-up",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 606,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "problem_solution",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#1a3a10", "#c8d820", "#888888", "#2a4a20", "#404040"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Market 32 / Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Biking just got easier.",
+      "background_color": "green",
+      "scene_description": "road cyclist in forest setting, close-up of handlebars",
+      "model_gender": "male",
+      "model_demo": "man, adult, light skin tone, cycling gear visible",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Market 32 and Price Chopper promote grocery convenience for cyclists via activity lifestyle messaging",
+      "confidence": 0.91
+    }
+  },
+  {
+    "creative_id": 608,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "problem_solution",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f07020", "#6090c0", "#c09030", "#1a3050", "#8a6020"],
+      "aspect_ratio_guess": "16:9",
+      "logo_visible": true,
+      "logo_brand": "Instacart",
+      "seasonal_tags": ["summer"],
+      "notable_text": "LAKE TRIPS JUST GOT EASIER",
+      "background_color": "multi",
+      "scene_description": "lake at sunset with dock and reeds, orange sky",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": "Shop online for pickup or delivery",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper/Instacart promotes online grocery ordering for lake trips via summer convenience messaging",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 610,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": ["watermelon", "apples", "berries", "sandwiches", "juice bottle"],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "problem_solution",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 2,
+        "diversity_signals": ["skin_tone_diverse"]
+      },
+      "dominant_colors_hex": ["#c83020", "#5a8a20", "#c8c880", "#8a6040", "#f0f0f0"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Market 32 / Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Picnicking just got easier.",
+      "background_color": "multi",
+      "scene_description": "outdoor picnic spread on blanket with fruits and food",
+      "model_gender": "ambiguous",
+      "model_demo": "partial hands visible of two people, skin tones vary",
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Market 32 and Price Chopper promote grocery convenience for summer picnics with fresh food imagery",
+      "confidence": 0.93
+    }
+  }
+]

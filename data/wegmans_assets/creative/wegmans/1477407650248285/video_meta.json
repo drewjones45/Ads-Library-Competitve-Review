@@ -1,0 +1,52 @@
+{
+  "duration_sec": 15.02,
+  "width": 360,
+  "height": 360,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1477407650248285/frame_00_t00000.jpg",
+      "t_sec": 0.0,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1477407650248285/frame_01_t02878.jpg",
+      "t_sec": 2.878,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1477407650248285/frame_02_t04505.jpg",
+      "t_sec": 4.505,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1477407650248285/frame_03_t06048.jpg",
+      "t_sec": 6.048,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1477407650248285/frame_04_t07549.jpg",
+      "t_sec": 7.549,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1477407650248285/frame_05_t08926.jpg",
+      "t_sec": 8.926,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1477407650248285/frame_06_t11011.jpg",
+      "t_sec": 11.011,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1477407650248285/frame_07_t12304.jpg",
+      "t_sec": 12.304,
+      "idx": 7
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-06-18T16:33:00+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1477407650248285/video.mp4"
+}

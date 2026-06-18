@@ -1,0 +1,32 @@
+{
+  "duration_sec": 6.01,
+  "width": 360,
+  "height": 360,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/frame_00_t01200.jpg",
+      "t_sec": 1.2,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/frame_01_t02400.jpg",
+      "t_sec": 2.4,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/frame_02_t03610.jpg",
+      "t_sec": 3.61,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/frame_03_t04810.jpg",
+      "t_sec": 4.81,
+      "idx": 3
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-06-18T16:12:16+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/video.mp4"
+}

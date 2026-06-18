@@ -1,0 +1,182 @@
+[
+  {
+    "creative_id": 36,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR05647145192600371201/image_0.png",
+    "phash": "bbc2ccc8d76d1261",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 38,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR00490873813714599937/image_0.png",
+    "phash": "bbd2e4c6c4cd9268",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 43,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR03898175273480224769/image_0.png",
+    "phash": "ee3d978d43c9848c",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 44,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR14773805423626551297/image_0.png",
+    "phash": "ee48929127cdc69d",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 45,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR01540259393575059457/image_0.png",
+    "phash": "bbc0c4f0ce699669",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 46,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR09473913087141609473/image_0.png",
+    "phash": "bbc2cd98c26c9669",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 47,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR14919046511609249793/image_0.png",
+    "phash": "bbc2c4dcd26c904f",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 49,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR17447817702377783297/image_0.png",
+    "phash": "ed49968c6791939c",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 4,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR14176782223335751681/image_0.png",
+    "phash": "bbc2ecb213ccd04e",
+    "popularity": 0.047
+  },
+  {
+    "creative_id": 55,
+    "competitor_id": "shoprite",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/shoprite/1636295324094455/image_0.jpg",
+    "phash": "a68c1ed3d1c359d8",
+    "popularity": 0.825
+  },
+  {
+    "creative_id": 57,
+    "competitor_id": "shoprite",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/shoprite/898569043275230/image_0.jpg",
+    "phash": "a6b1d84fe7e43013",
+    "popularity": 0.283
+  },
+  {
+    "creative_id": 63,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/image_0.jpg",
+    "phash": "d75537016fb980e4",
+    "popularity": 0.965
+  },
+  {
+    "creative_id": 68,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/image_0.jpg",
+    "phash": "8367e4fc18bb8907",
+    "popularity": 0.963
+  },
+  {
+    "creative_id": 85,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/image_0.jpg",
+    "phash": "84777ac0eb0d3be0",
+    "popularity": 0.956
+  },
+  {
+    "creative_id": 80,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/image_0.jpg",
+    "phash": "ee6cc09705a5f253",
+    "popularity": 0.935
+  },
+  {
+    "creative_id": 73,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/image_0.jpg",
+    "phash": "ad87c622c1752bd3",
+    "popularity": 0.908
+  },
+  {
+    "creative_id": 102,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/image_0.jpg",
+    "phash": "fe7acac90d2c64d0",
+    "popularity": 0.905
+  },
+  {
+    "creative_id": 76,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1413050987509301/image_0.jpg",
+    "phash": "b7c0590f9a74891f",
+    "popularity": 0.902
+  }
+]

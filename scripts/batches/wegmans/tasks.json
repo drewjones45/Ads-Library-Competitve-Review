@@ -1,0 +1,1798 @@
+[
+  {
+    "creative_id": 1,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR09246439661956497409/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.427
+  },
+  {
+    "creative_id": 2,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR13440187017015066625/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.427
+  },
+  {
+    "creative_id": 3,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR03297575636742176769/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.427
+  },
+  {
+    "creative_id": 13,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR01062723626567991297/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 14,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR04249363410560483329/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 15,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR11382152075908481025/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 16,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR11225764276482342913/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 17,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR05640532729670926337/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 18,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR16398201912270258177/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 19,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR18435514220289196033/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 20,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR02497953537699348481/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 21,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR07825623798509469697/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 22,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR07842210618609238017/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 23,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR07951216201386950657/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 24,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR05094210553157517313/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 25,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR06023932434276417537/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 26,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR01561974748223635457/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 27,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR13692348189095493633/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 28,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR02233339571800637441/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 29,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR01662221621374484481/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 30,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR06443083721531719681/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 31,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR03314174895067234305/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 32,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR02741247973135482881/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 33,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR15332837817118097409/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 34,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR04710509307488108545/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 35,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR09358148806387957761/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 5,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR05608361500478537729/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.327
+  },
+  {
+    "creative_id": 6,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR04984284747866832897/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.327
+  },
+  {
+    "creative_id": 7,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR12032931086876016641/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.327
+  },
+  {
+    "creative_id": 8,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR08922903967436898305/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.327
+  },
+  {
+    "creative_id": 9,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR17437447452301983745/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.327
+  },
+  {
+    "creative_id": 10,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR17784150750172020737/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.327
+  },
+  {
+    "creative_id": 11,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR02201835677446832129/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.327
+  },
+  {
+    "creative_id": 12,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR01077854624553107457/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.321
+  },
+  {
+    "creative_id": 36,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR05647145192600371201/image_0.png",
+    "phash": "bbc2ccc8d76d1261",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 38,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR00490873813714599937/image_0.png",
+    "phash": "bbd2e4c6c4cd9268",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 43,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR03898175273480224769/image_0.png",
+    "phash": "ee3d978d43c9848c",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 44,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR14773805423626551297/image_0.png",
+    "phash": "ee48929127cdc69d",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 45,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR01540259393575059457/image_0.png",
+    "phash": "bbc0c4f0ce699669",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 46,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR09473913087141609473/image_0.png",
+    "phash": "bbc2cd98c26c9669",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 47,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR14919046511609249793/image_0.png",
+    "phash": "bbc2c4dcd26c904f",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 49,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR17447817702377783297/image_0.png",
+    "phash": "ed49968c6791939c",
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 4,
+    "competitor_id": "wegmans",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR14176782223335751681/image_0.png",
+    "phash": "bbc2ecb213ccd04e",
+    "popularity": 0.047
+  },
+  {
+    "creative_id": 55,
+    "competitor_id": "shoprite",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/shoprite/1636295324094455/image_0.jpg",
+    "phash": "a68c1ed3d1c359d8",
+    "popularity": 0.825
+  },
+  {
+    "creative_id": 57,
+    "competitor_id": "shoprite",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/shoprite/898569043275230/image_0.jpg",
+    "phash": "a6b1d84fe7e43013",
+    "popularity": 0.283
+  },
+  {
+    "creative_id": 63,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/image_0.jpg",
+    "phash": "d75537016fb980e4",
+    "popularity": 0.965
+  },
+  {
+    "creative_id": 68,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/image_0.jpg",
+    "phash": "8367e4fc18bb8907",
+    "popularity": 0.963
+  },
+  {
+    "creative_id": 85,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/image_0.jpg",
+    "phash": "84777ac0eb0d3be0",
+    "popularity": 0.956
+  },
+  {
+    "creative_id": 80,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/image_0.jpg",
+    "phash": "ee6cc09705a5f253",
+    "popularity": 0.935
+  },
+  {
+    "creative_id": 73,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/image_0.jpg",
+    "phash": "ad87c622c1752bd3",
+    "popularity": 0.908
+  },
+  {
+    "creative_id": 102,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/image_0.jpg",
+    "phash": "fe7acac90d2c64d0",
+    "popularity": 0.905
+  },
+  {
+    "creative_id": 76,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1413050987509301/image_0.jpg",
+    "phash": "b7c0590f9a74891f",
+    "popularity": 0.902
+  },
+  {
+    "creative_id": 107,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1385067596984374/image_0.jpg",
+    "phash": "de1db1e1632eaa48",
+    "popularity": 0.894
+  },
+  {
+    "creative_id": 70,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/908531328888223/image_0.jpg",
+    "phash": "c41be920d68a5b6f",
+    "popularity": 0.89
+  },
+  {
+    "creative_id": 75,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1525280198994551/image_0.jpg",
+    "phash": "c4a9999cbbc2e4b1",
+    "popularity": 0.888
+  },
+  {
+    "creative_id": 109,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/948534484474132/image_0.jpg",
+    "phash": "bee1b2c9cf1428b2",
+    "popularity": 0.885
+  },
+  {
+    "creative_id": 115,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/846163105201610/image_0.jpg",
+    "phash": "b7e0d88fd348881f",
+    "popularity": 0.836
+  },
+  {
+    "creative_id": 106,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/971650845378657/image_0.jpg",
+    "phash": "bf70c0c2e432a71f",
+    "popularity": 0.832
+  },
+  {
+    "creative_id": 59,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1000806109128134/image_0.jpg",
+    "phash": "e91a1265b22e6d9e",
+    "popularity": 0.831
+  },
+  {
+    "creative_id": 65,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2195957167827409/image_0.jpg",
+    "phash": "bd38f3f2310bca30",
+    "popularity": 0.823
+  },
+  {
+    "creative_id": 124,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1255853556696305/image_0.jpg",
+    "phash": "b760d89fc6188f13",
+    "popularity": 0.822
+  },
+  {
+    "creative_id": 134,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/858352623954728/image_0.jpg",
+    "phash": "f39f87649ac0d885",
+    "popularity": 0.817
+  },
+  {
+    "creative_id": 61,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2735383770170989/image_0.jpg",
+    "phash": "a81556781fe137c3",
+    "popularity": 0.816
+  },
+  {
+    "creative_id": 155,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1233088485309610/image_0.jpg",
+    "phash": "f30c4343cdbc7c43",
+    "popularity": 0.813
+  },
+  {
+    "creative_id": 87,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1685763122440172/image_0.jpg",
+    "phash": "d0f0e2af9d9c6261",
+    "popularity": 0.801
+  },
+  {
+    "creative_id": 67,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1474507857709227/image_0.jpg",
+    "phash": "e83313cc9e5b688d",
+    "popularity": 0.796
+  },
+  {
+    "creative_id": 72,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1304589788478658/image_0.jpg",
+    "phash": "9198666e953d366a",
+    "popularity": 0.788
+  },
+  {
+    "creative_id": 136,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1681741956182852/image_0.jpg",
+    "phash": "c4136b3c25ee394e",
+    "popularity": 0.78
+  },
+  {
+    "creative_id": 77,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1877535166256730/image_0.jpg",
+    "phash": "c0eebfb8d0930d64",
+    "popularity": 0.754
+  },
+  {
+    "creative_id": 84,
+    "competitor_id": "stopandshop",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2179785106192472/image_0.jpg",
+    "phash": "d494bfefc3c01514",
+    "popularity": 0.743
+  },
+  {
+    "creative_id": 64,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/video.mp4",
+    "phash": "d75537016fb980e4",
+    "popularity": 0.965,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_00_t00000.jpg",
+        "t_sec": 0.0
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_01_t01467.jpg",
+        "t_sec": 1.467
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_02_t10367.jpg",
+        "t_sec": 10.367
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_03_t11033.jpg",
+        "t_sec": 11.033
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_04_t11800.jpg",
+        "t_sec": 11.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_05_t12667.jpg",
+        "t_sec": 12.667
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_06_t13900.jpg",
+        "t_sec": 13.9
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/1739294110785798/frame_07_t15167.jpg",
+        "t_sec": 15.167
+      }
+    ],
+    "duration_sec": 15.51,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 69,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/video.mp4",
+    "phash": "8367e4fc3ab98305",
+    "popularity": 0.963,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/frame_00_t00600.jpg",
+        "t_sec": 0.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/frame_01_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/frame_02_t01800.jpg",
+        "t_sec": 1.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2109464369903296/frame_03_t02400.jpg",
+        "t_sec": 2.4
+      }
+    ],
+    "duration_sec": 3.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 86,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/video.mp4",
+    "phash": "a931544a73adab56",
+    "popularity": 0.956,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/frame_00_t03600.jpg",
+        "t_sec": 3.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/frame_01_t07200.jpg",
+        "t_sec": 7.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/frame_02_t10800.jpg",
+        "t_sec": 10.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/934992535814788/frame_03_t14400.jpg",
+        "t_sec": 14.4
+      }
+    ],
+    "duration_sec": 18.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 81,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/video.mp4",
+    "phash": "ec6cc29705a5b653",
+    "popularity": 0.935,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/frame_00_t00600.jpg",
+        "t_sec": 0.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/frame_01_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/frame_02_t01800.jpg",
+        "t_sec": 1.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2016307982314044/frame_03_t02400.jpg",
+        "t_sec": 2.4
+      }
+    ],
+    "duration_sec": 3.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 74,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/video.mp4",
+    "phash": "adc7ce2440f02bcf",
+    "popularity": 0.908,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/frame_00_t00600.jpg",
+        "t_sec": 0.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/frame_01_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/frame_02_t01800.jpg",
+        "t_sec": 1.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/982283650925926/frame_03_t02400.jpg",
+        "t_sec": 2.4
+      }
+    ],
+    "duration_sec": 3.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 103,
+    "competitor_id": "stopandshop",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/video.mp4",
+    "phash": "fe7ecac91d2c6050",
+    "popularity": 0.905,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/frame_00_t00600.jpg",
+        "t_sec": 0.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/frame_01_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/frame_02_t01800.jpg",
+        "t_sec": 1.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2056655094893199/frame_03_t02400.jpg",
+        "t_sec": 2.4
+      }
+    ],
+    "duration_sec": 3.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 444,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/956727320185225/image_0.jpg",
+    "phash": "d0c04c3f3b3b4dcc",
+    "popularity": 0.977
+  },
+  {
+    "creative_id": 449,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1751263765842536/image_0.jpg",
+    "phash": "9c01be0f3bfac24a",
+    "popularity": 0.96
+  },
+  {
+    "creative_id": 450,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/image_0.jpg",
+    "phash": "84777ac0eb0d3be0",
+    "popularity": 0.954
+  },
+  {
+    "creative_id": 452,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/image_0.jpg",
+    "phash": "b131cecece393131",
+    "popularity": 0.948
+  },
+  {
+    "creative_id": 456,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1328295545780299/image_0.jpg",
+    "phash": "b8b947c338e32c78",
+    "popularity": 0.931
+  },
+  {
+    "creative_id": 440,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1673452230476080/image_0.jpg",
+    "phash": "91e24d1d3e1f5962",
+    "popularity": 0.93
+  },
+  {
+    "creative_id": 462,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/795860563592200/image_0.jpg",
+    "phash": "e5985f862dd82565",
+    "popularity": 0.897
+  },
+  {
+    "creative_id": 455,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/2854314814900076/image_0.jpg",
+    "phash": "e6a45b9309d931ec",
+    "popularity": 0.896
+  },
+  {
+    "creative_id": 447,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/image_0.jpg",
+    "phash": "c41be920d68a5b6f",
+    "popularity": 0.872
+  },
+  {
+    "creative_id": 471,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1468714668058668/image_0.jpg",
+    "phash": "b686af45c1d4256e",
+    "popularity": 0.828
+  },
+  {
+    "creative_id": 441,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1772484517049402/image_0.jpg",
+    "phash": "a7bc076e99266ad0",
+    "popularity": 0.819
+  },
+  {
+    "creative_id": 443,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/972994052156550/image_0.jpg",
+    "phash": "e83313cc9e5b688d",
+    "popularity": 0.79
+  },
+  {
+    "creative_id": 468,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/855218490926993/image_0.jpg",
+    "phash": "ef8a44c02dff03e4",
+    "popularity": 0.775
+  },
+  {
+    "creative_id": 457,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/947320174873460/image_0.jpg",
+    "phash": "d0e0e6af9d987261",
+    "popularity": 0.774
+  },
+  {
+    "creative_id": 493,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1247989077322883/image_0.jpg",
+    "phash": "f3884ca337e233cc",
+    "popularity": 0.759
+  },
+  {
+    "creative_id": 476,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1547512563565624/image_0.jpg",
+    "phash": "c4136b3c25ee394e",
+    "popularity": 0.741
+  },
+  {
+    "creative_id": 442,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1684230732609887/image_0.jpg",
+    "phash": "a4e4eb1e9ef34124",
+    "popularity": 0.738
+  },
+  {
+    "creative_id": 459,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1278389851127248/image_0.jpg",
+    "phash": "9198666e953d366a",
+    "popularity": 0.722
+  },
+  {
+    "creative_id": 445,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1539324294367912/image_0.jpg",
+    "phash": "94e54b1f3ef16124",
+    "popularity": 0.721
+  },
+  {
+    "creative_id": 502,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/26557297090588669/image_0.jpg",
+    "phash": "d06f2f90d06f2f90",
+    "popularity": 0.719
+  },
+  {
+    "creative_id": 481,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/991452273230941/image_0.jpg",
+    "phash": "e9161269d693cb9c",
+    "popularity": 0.718
+  },
+  {
+    "creative_id": 484,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1508416284074389/image_0.jpg",
+    "phash": "ed8b43b034c6297d",
+    "popularity": 0.706
+  },
+  {
+    "creative_id": 458,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/2036690197272326/image_0.jpg",
+    "phash": "d494bfefc3c01914",
+    "popularity": 0.704
+  },
+  {
+    "creative_id": 460,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1006423545187899/image_0.jpg",
+    "phash": "c0e6bfb8d0931f60",
+    "popularity": 0.693
+  },
+  {
+    "creative_id": 454,
+    "competitor_id": "giantfood",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/2238036777014066/image_0.jpg",
+    "phash": "db84e9b487916c1b",
+    "popularity": 0.692
+  },
+  {
+    "creative_id": 451,
+    "competitor_id": "giantfood",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/video.mp4",
+    "phash": "a931544a73adab56",
+    "popularity": 0.954,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/frame_00_t03600.jpg",
+        "t_sec": 3.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/frame_01_t07200.jpg",
+        "t_sec": 7.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/frame_02_t10800.jpg",
+        "t_sec": 10.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1319220643427046/frame_03_t14400.jpg",
+        "t_sec": 14.4
+      }
+    ],
+    "duration_sec": 18.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 453,
+    "competitor_id": "giantfood",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/video.mp4",
+    "phash": "ea61959e66c2392d",
+    "popularity": 0.948,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/frame_00_t03000.jpg",
+        "t_sec": 3.0
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/frame_01_t06010.jpg",
+        "t_sec": 6.01
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/frame_02_t09010.jpg",
+        "t_sec": 9.01
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1504140507748555/frame_03_t12020.jpg",
+        "t_sec": 12.02
+      }
+    ],
+    "duration_sec": 15.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 448,
+    "competitor_id": "giantfood",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/video.mp4",
+    "phash": "86634d5b5a322d9d",
+    "popularity": 0.872,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/frame_00_t03400.jpg",
+        "t_sec": 3.4
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/frame_01_t06800.jpg",
+        "t_sec": 6.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/frame_02_t10200.jpg",
+        "t_sec": 10.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1518540339911488/frame_03_t13600.jpg",
+        "t_sec": 13.6
+      }
+    ],
+    "duration_sec": 17.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 477,
+    "competitor_id": "giantfood",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1547512563565624/video.mp4",
+    "phash": "854e79b90652796d",
+    "popularity": 0.741,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1547512563565624/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1547512563565624/frame_00_t03400.jpg",
+        "t_sec": 3.4
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1547512563565624/frame_01_t06800.jpg",
+        "t_sec": 6.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1547512563565624/frame_02_t10200.jpg",
+        "t_sec": 10.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1547512563565624/frame_03_t13600.jpg",
+        "t_sec": 13.6
+      }
+    ],
+    "duration_sec": 17.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 446,
+    "competitor_id": "giantfood",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1539324294367912/video.mp4",
+    "phash": "94e54b1f3ef14125",
+    "popularity": 0.721,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1539324294367912/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1539324294367912/frame_00_t01800.jpg",
+        "t_sec": 1.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1539324294367912/frame_01_t03600.jpg",
+        "t_sec": 3.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1539324294367912/frame_02_t05400.jpg",
+        "t_sec": 5.4
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/1539324294367912/frame_03_t07200.jpg",
+        "t_sec": 7.2
+      }
+    ],
+    "duration_sec": 9.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 503,
+    "competitor_id": "giantfood",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/26557297090588669/video.mp4",
+    "phash": "d3927eee246d0f04",
+    "popularity": 0.719,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/26557297090588669/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/26557297090588669/frame_00_t00250.jpg",
+        "t_sec": 0.25
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/26557297090588669/frame_01_t00417.jpg",
+        "t_sec": 0.417
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/26557297090588669/frame_02_t00626.jpg",
+        "t_sec": 0.626
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/26557297090588669/frame_03_t00959.jpg",
+        "t_sec": 0.959
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/giantfood/26557297090588669/frame_04_t02377.jpg",
+        "t_sec": 2.377
+      }
+    ],
+    "duration_sec": 15.06,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 570,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2707169463017216/image_0.jpg",
+    "phash": "fc92816d9599b2e8",
+    "popularity": 0.749
+  },
+  {
+    "creative_id": 571,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1654997592450075/image_0.jpg",
+    "phash": "bcbecc4c43f3c301",
+    "popularity": 0.727
+  },
+  {
+    "creative_id": 574,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2203675067033304/image_0.jpg",
+    "phash": "8a363c6b871e70a7",
+    "popularity": 0.683
+  },
+  {
+    "creative_id": 572,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2124313034800298/image_0.jpg",
+    "phash": "cd8d72f382ee0a70",
+    "popularity": 0.682
+  },
+  {
+    "creative_id": 575,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/942670108582456/image_0.jpg",
+    "phash": "fb81c63abdd26a10",
+    "popularity": 0.661
+  },
+  {
+    "creative_id": 577,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/951410487880246/image_0.jpg",
+    "phash": "f9808c4fd0afcb68",
+    "popularity": 0.569
+  },
+  {
+    "creative_id": 578,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2084640965731860/image_0.jpg",
+    "phash": "ea44513e85e03f6d",
+    "popularity": 0.547
+  },
+  {
+    "creative_id": 585,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/3273680656126704/image_0.jpg",
+    "phash": "bf003edfa02a0af6",
+    "popularity": 0.462
+  },
+  {
+    "creative_id": 583,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1556965835786340/image_0.jpg",
+    "phash": "bcc1b99c4e6ee484",
+    "popularity": 0.459
+  },
+  {
+    "creative_id": 591,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2707442259626677/image_0.jpg",
+    "phash": "8a37386b871e70a7",
+    "popularity": 0.397
+  },
+  {
+    "creative_id": 589,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1293835146269672/image_0.jpg",
+    "phash": "ed9528d2f04f1b29",
+    "popularity": 0.396
+  },
+  {
+    "creative_id": 600,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/image_0.jpg",
+    "phash": "939221c6cc798f2f",
+    "popularity": 0.33
+  },
+  {
+    "creative_id": 592,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2966300833772267/image_0.jpg",
+    "phash": "b3931f64649d3153",
+    "popularity": 0.311
+  },
+  {
+    "creative_id": 593,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2966300833772267/image_1.jpg",
+    "phash": "f637854e40f8686b",
+    "popularity": 0.311
+  },
+  {
+    "creative_id": 594,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2966300833772267/image_2.jpg",
+    "phash": "88651f9be06d8d36",
+    "popularity": 0.311
+  },
+  {
+    "creative_id": 595,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2966300833772267/image_3.jpg",
+    "phash": "91626963ad9bb64a",
+    "popularity": 0.311
+  },
+  {
+    "creative_id": 596,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2966300833772267/image_4.jpg",
+    "phash": "adf0d0875c13663d",
+    "popularity": 0.311
+  },
+  {
+    "creative_id": 597,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2966300833772267/image_5.jpg",
+    "phash": "90ab39c5969679e1",
+    "popularity": 0.311
+  },
+  {
+    "creative_id": 598,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2966300833772267/image_6.jpg",
+    "phash": "8b26931b4ce5cbcc",
+    "popularity": 0.311
+  },
+  {
+    "creative_id": 599,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2966300833772267/image_7.jpg",
+    "phash": "c578dccc86d0ac6e",
+    "popularity": 0.311
+  },
+  {
+    "creative_id": 602,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1555482866207370/image_0.jpg",
+    "phash": "f23232b2b2b2be34",
+    "popularity": 0.308
+  },
+  {
+    "creative_id": 604,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1039704132342846/image_0.jpg",
+    "phash": "d0b770d82bc91db1",
+    "popularity": 0.286
+  },
+  {
+    "creative_id": 606,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/4417111051941340/image_0.jpg",
+    "phash": "8961a9c461be8efc",
+    "popularity": 0.264
+  },
+  {
+    "creative_id": 608,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/978356385083636/image_0.jpg",
+    "phash": "c0d63f1ba0787ec2",
+    "popularity": 0.242
+  },
+  {
+    "creative_id": 610,
+    "competitor_id": "pricechopper",
+    "asset_type": "image",
+    "context": "meta_ad",
+    "schema": "image",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2013516422591514/image_0.jpg",
+    "phash": "ccb325ada1fbc830",
+    "popularity": 0.22
+  },
+  {
+    "creative_id": 573,
+    "competitor_id": "pricechopper",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2124313034800298/video.mp4",
+    "phash": "ed8d70f3026e1b70",
+    "popularity": 0.682,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2124313034800298/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2124313034800298/frame_00_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2124313034800298/frame_01_t02410.jpg",
+        "t_sec": 2.41
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2124313034800298/frame_02_t03610.jpg",
+        "t_sec": 3.61
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2124313034800298/frame_03_t04820.jpg",
+        "t_sec": 4.82
+      }
+    ],
+    "duration_sec": 6.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 576,
+    "competitor_id": "pricechopper",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/942670108582456/video.mp4",
+    "phash": "99307e4be6cd6832",
+    "popularity": 0.661,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/942670108582456/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/942670108582456/frame_00_t03090.jpg",
+        "t_sec": 3.09
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/942670108582456/frame_01_t06190.jpg",
+        "t_sec": 6.19
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/942670108582456/frame_02_t09280.jpg",
+        "t_sec": 9.28
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/942670108582456/frame_03_t12380.jpg",
+        "t_sec": 12.38
+      }
+    ],
+    "duration_sec": 15.47,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 579,
+    "competitor_id": "pricechopper",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2084640965731860/video.mp4",
+    "phash": "ea44513e05e07f6d",
+    "popularity": 0.547,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2084640965731860/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2084640965731860/frame_00_t01600.jpg",
+        "t_sec": 1.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2084640965731860/frame_01_t03210.jpg",
+        "t_sec": 3.21
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2084640965731860/frame_02_t04810.jpg",
+        "t_sec": 4.81
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/2084640965731860/frame_03_t06420.jpg",
+        "t_sec": 6.42
+      }
+    ],
+    "duration_sec": 8.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 586,
+    "competitor_id": "pricechopper",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/3273680656126704/video.mp4",
+    "phash": "8e7023dfb2201df5",
+    "popularity": 0.462,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/3273680656126704/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/3273680656126704/frame_00_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/3273680656126704/frame_01_t02410.jpg",
+        "t_sec": 2.41
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/3273680656126704/frame_02_t03610.jpg",
+        "t_sec": 3.61
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/3273680656126704/frame_03_t04820.jpg",
+        "t_sec": 4.82
+      }
+    ],
+    "duration_sec": 6.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 590,
+    "competitor_id": "pricechopper",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1293835146269672/video.mp4",
+    "phash": "ec9529cad25452b7",
+    "popularity": 0.396,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1293835146269672/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1293835146269672/frame_00_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1293835146269672/frame_01_t02410.jpg",
+        "t_sec": 2.41
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1293835146269672/frame_02_t03610.jpg",
+        "t_sec": 3.61
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1293835146269672/frame_03_t04820.jpg",
+        "t_sec": 4.82
+      }
+    ],
+    "duration_sec": 6.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 601,
+    "competitor_id": "pricechopper",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/video.mp4",
+    "phash": "9b8126c6e4719f1e",
+    "popularity": 0.33,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/frame_00_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/frame_01_t02400.jpg",
+        "t_sec": 2.4
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/frame_02_t03610.jpg",
+        "t_sec": 3.61
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/pricechopper/1017529114282073/frame_03_t04810.jpg",
+        "t_sec": 4.81
+      }
+    ],
+    "duration_sec": 6.01,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  }
+]

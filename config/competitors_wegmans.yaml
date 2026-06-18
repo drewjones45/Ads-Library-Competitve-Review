@@ -1,0 +1,157 @@
+# Source registry for the WEGMANS grocery competitive set.
+#
+# Wegmans positioning: Northeast / mid-Atlantic large-format PREMIUM grocer
+# (NY, NJ, PA, MD, VA, MA, NC, DE, CT). Family-owned. Known for exceptional
+# fresh & prepared foods, deep private label, and a destination shopping
+# experience. Subject brand of this deployment.
+#
+# Competitive set: "Northeast-only mainstream" supermarket rivals (per client
+# direction 2026-06-18) — the regional banners Wegmans competes with head-to-head
+# for the weekly grocery wallet, rather than national premium/club players:
+#   - ShopRite      — Wakefern co-op; dominant NJ/NY value supermarket
+#   - Stop & Shop   — Ahold Delhaize; New England / NY metro mainstream
+#   - Giant Food    — Ahold Delhaize; DC / MD / VA mainstream (Landover banner)
+#   - ACME Markets  — Albertsons banner; greater Philadelphia / NJ / NY
+#   - Price Chopper — Northeast Grocery Inc. (Price Chopper / Market 32); upstate NY
+#
+# -----------------------------------------------------------------------------
+# Meta Ad Library page_id resolution (resolved + VERIFIED via ads_library_search
+# MCP on 2026-06-18; verified by re-querying page_ids and confirming page_name +
+# ad volume, same playbook as competitors_philo.yaml):
+#   wegmans     → 117382044987639  VERIFIED ("Wegmans", ~369 active US ads; e.g.
+#                 "Summer's Sweetest Fruit" produce campaigns). NOTE: the MCP
+#                 free-text search does NOT surface this page (it ranks ad-copy
+#                 matches and buried it under spam + the "Wegmans Careers"
+#                 recruiting page 100722482129951). It was found via the public
+#                 Ad Library UI (search_type=page) and confirmed by re-querying
+#                 page_ids=[117382044987639]. Lesson: verify brand pages in the
+#                 web UI, not just MCP free-text. (Earlier runs wrongly concluded
+#                 Wegmans had no Meta presence — corrected 2026-06-18.)
+#   shoprite    → 81828647162      VERIFIED ("ShopRite", ~87 ads; Bowl & Basket /
+#                 weekly-circular creative)
+#   stopandshop → 170000993071234  VERIFIED ("Stop & Shop", ~307 ads; "Spend $30
+#                 save $10", grill / BTS creative)
+#   giantfood   → 212571735459949  VERIFIED ("Giant Food", ~116 ads; the Landover
+#                 MD / DC-area Ahold Delhaize banner — NOT Giant Eagle, NOT
+#                 Giant/Martin's of Carlisle PA)
+#   acme        → 63500838144      VERIFIED ("ACME Markets", ~97 ads; "family-backed
+#                 quality" / delivery creative)
+#   pricechopper→ 86301209824      VERIFIED ("Price Chopper Supermarkets", ~34 ads;
+#                 weekly circular + local sponsorship creative)
+#
+# Google Ads Transparency Center: ENABLED for WEGMANS only (the subject brand),
+# mirroring the Philo deployment's "Google for the subject brand only" choice.
+# Here it is doubly necessary because Wegmans has no Meta presence — Google ATC
+# is the only ad-platform creative source for the subject brand. SerpApi's ATC
+# engine has no name search, but a domain query (text="wegmans.com") surfaced the
+# clean direct advertiser (agencies like Adswerve were rejected):
+#   wegmans → AR18314717603664232449  ("Wegmans Food Markets Inc") VERIFIED — 40+
+#             active US creatives (mostly video, plus text + image), region 2840.
+# Competitor Google AR-ids were intentionally NOT wired: domain search returned
+# only parent/agency advertisers (Ahold Delhaize USA, Albertsons Companies,
+# Dandelion, MethodGroupe, Merkle) that mix multiple banners — too noisy for a
+# clean per-brand source. The competitors are fully covered by their verified
+# Meta brand pages above.
+
+competitors:
+  - id: wegmans
+    name: Wegmans
+    vertical: grocery
+    priority: high            # subject brand
+    sources:
+      - type: website
+        url: https://www.wegmans.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "117382044987639"        # Wegmans — VERIFIED via Ad Library UI + page_ids re-query (369 active US ads)
+        page_name: Wegmans
+        country: US
+        cadence: daily
+        method: scrape
+      - type: google_ads
+        advertiser_id: "AR18314717603664232449"   # Wegmans Food Markets Inc — resolved via SerpApi domain search (text=wegmans.com)
+        page_name: Wegmans
+        country: US                                # mapped to geo code 2840 on the SerpApi path
+        cadence: daily
+        method: api
+
+  - id: shoprite
+    name: ShopRite
+    vertical: grocery
+    priority: high            # closest direct comp (dominant NJ/NY value supermarket)
+    sources:
+      - type: website
+        url: https://www.shoprite.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "81828647162"            # ShopRite — VERIFIED via ads_library_search MCP
+        page_name: ShopRite
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: stopandshop
+    name: Stop & Shop
+    vertical: grocery
+    priority: high
+    sources:
+      - type: website
+        url: https://stopandshop.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "170000993071234"        # Stop & Shop — VERIFIED via ads_library_search MCP
+        page_name: Stop & Shop
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: giantfood
+    name: Giant Food
+    vertical: grocery
+    priority: medium
+    sources:
+      - type: website
+        url: https://giantfood.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "212571735459949"        # Giant Food (Landover MD) — VERIFIED via ads_library_search MCP
+        page_name: Giant Food
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: acme
+    name: ACME Markets
+    vertical: grocery
+    priority: medium
+    sources:
+      - type: website
+        url: https://www.acmemarkets.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "63500838144"            # ACME Markets — VERIFIED via ads_library_search MCP
+        page_name: ACME Markets
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: pricechopper
+    name: Price Chopper
+    vertical: grocery
+    priority: medium
+    sources:
+      - type: website
+        url: https://www.pricechopper.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "86301209824"            # Price Chopper Supermarkets — VERIFIED via ads_library_search MCP
+        page_name: Price Chopper Supermarkets
+        country: US
+        cadence: daily
+        method: scrape

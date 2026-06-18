@@ -1,0 +1,29 @@
+=== acme ===
+  exit=137 (acme)
+=== pricechopper ===
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+                                Ingestion report                                
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┓
+┃ competitor ┃ source     ┃ ok ┃ changed ┃ sev  ┃ new_ads ┃ offers ┃ summary   ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━┩
+│ pricechop… │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ pricechop… │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 26      │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+└────────────┴────────────┴────┴─────────┴──────┴─────────┴────────┴───────────┘
+  exit=0 (pricechopper)
+=== shoprite ===
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+                                Ingestion report                                
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┓
+┃ competitor ┃ source     ┃ ok ┃ changed ┃ sev  ┃ new_ads ┃ offers ┃ summary   ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━┩
+│ shoprite   │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 6         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ chrome_d… │
+│            │            │    │         │      │         │        │ hero_ima… │
+│            │            │    │         │      │         │        │ html_pa   │
+│ shoprite   │ meta_ads|… │ ✓  │ no      │ 0.00 │ 0       │ 0      │           │
+└────────────┴────────────┴────┴─────────┴──────┴─────────┴────────┴───────────┘
+  exit=0 (shoprite)

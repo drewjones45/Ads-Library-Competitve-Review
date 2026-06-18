@@ -1,0 +1,737 @@
+[
+  {
+    "creative_id": 627,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["rosé wine bottle", "prosecco bottle", "light beer can", "tortilla chips", "guacamole"],
+      "key_features": ["discount_badge", "brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["Hot Zone Prices"]
+      },
+      "value_props": ["price"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f4c6a8", "#ffffff", "#d4001f", "#3a6f9b", "#f5e9c0"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Mimi en Provence, La Marca, Michelob Ultra",
+      "seasonal_tags": ["summer"],
+      "notable_text": "HOT ZONE PRICES",
+      "background_color": "white",
+      "scene_description": "tabletop with wine, beer, chips, and guacamole",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans promotes rosé, prosecco, and beer at Hot Zone promotional prices",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 628,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["rosé wine bottle", "canned hard lemonade", "light beer can"],
+      "key_features": ["discount_badge", "brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["Hot Zone Prices"]
+      },
+      "value_props": ["price"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5c8a8", "#ffffff", "#f9e047", "#3a6f9b", "#d4001f"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Mimi en Provence, Surfside, Michelob Ultra",
+      "seasonal_tags": ["summer"],
+      "notable_text": "HOT ZONE PRICES",
+      "background_color": "white",
+      "scene_description": "tabletop with wine bottle, canned cocktail, and beer can",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans promotes rosé wine, canned cocktail, and light beer at sale prices",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 631,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["rosé wine bottle", "prosecco bottle", "canned hard lemonade", "tortilla chips", "guacamole"],
+      "key_features": ["discount_badge", "brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["Hot Zone Prices"]
+      },
+      "value_props": ["price"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5c8a8", "#ffffff", "#f9e047", "#3a7a9c", "#5a9b5e"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Mimi en Provence, La Marca, Surfside",
+      "seasonal_tags": ["summer"],
+      "notable_text": "HOT ZONE PRICES",
+      "background_color": "white",
+      "scene_description": "tabletop spread with wine, sparkling wine, canned cocktail, chips, guacamole",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Hot Zone Prices promotion featuring rosé, prosecco, canned cocktail, and snacks",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 632,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["rosé wine bottle", "prosecco bottle", "canned hard lemonade"],
+      "key_features": ["discount_badge", "brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["Hot Zone Prices"]
+      },
+      "value_props": ["price"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5c8a8", "#ffffff", "#f9e047", "#3a7a9c", "#2b2b2b"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Mimi en Provence, La Marca, Surfside",
+      "seasonal_tags": ["summer"],
+      "notable_text": "HOT ZONE PRICES",
+      "background_color": "white",
+      "scene_description": "tabletop with rosé wine bottle, prosecco, and canned cocktail",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Hot Zone Prices ad featuring rosé, prosecco, and canned cocktail on sale",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 684,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "ugc_creator_style",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof"],
+      "hook_style": "social_proof",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#c8b99a", "#4a7dbf", "#2e2e2e", "#8c6f3e", "#ffffff"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": ["holiday"],
+      "notable_text": "My new favorite place is Wegmans",
+      "background_color": "beige",
+      "scene_description": "exterior storefront of Wegmans urban building with holiday window display",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "UGC-style ad showing Wegmans storefront exterior with testimonial overlay text",
+      "confidence": 0.9
+    }
+  },
+  {
+    "creative_id": 641,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["fruit salad tray", "watermelon chunks", "strawberries", "blueberries", "pineapple chunks", "cantaloupe chunks", "honeydew chunks"],
+      "key_features": ["brand_logo"],
+      "text_overlay": {
+        "present": false,
+        "density": "none",
+        "copy_lean": "none"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#e03535", "#1a1a1a", "#f5a623", "#5a9b5e", "#f5e2c8"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": ["summer"],
+      "notable_text": null,
+      "background_color": "black",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Overhead flat-lay of colorful mixed fruit salad in clear plastic tray",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 698,
+    "analysis": {
+      "photography_style": "text_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f0a800", "#c87800", "#1a1a1a", "#e8c060", "#a06000"],
+      "aspect_ratio_guess": "4:5",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "Wegmans Careers",
+      "background_color": "gradient",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Minimal branded Wegmans Careers recruitment ad on gold-orange gradient background",
+      "confidence": 0.97
+    }
+  },
+  {
+    "creative_id": 694,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["hot catering food tray", "grilled chicken", "shredded cheese", "guacamole", "burrito bowl"],
+      "key_features": ["brand_logo", "cta_button_in_image"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty", "convenience"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5f5f5", "#d4521e", "#c8a05a", "#2b2b2b", "#7c9c50"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Wegmans meals 2GO",
+      "seasonal_tags": [],
+      "notable_text": "new hot catering",
+      "background_color": "white",
+      "scene_description": "marble surface with hot catering food trays overhead",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "order on our app",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans promotes new hot catering service available to order via meals 2GO app",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 658,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["strawberry flat", "fresh strawberries"],
+      "key_features": [],
+      "text_overlay": {
+        "present": false,
+        "density": "none",
+        "copy_lean": "none"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#d42020", "#4a8a3a", "#f5f5f5", "#e85a5a", "#c8e8c0"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": ["summer"],
+      "notable_text": null,
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Product-only close-up of fresh strawberries in clear clamshell flat tray",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 719,
+    "analysis": {
+      "photography_style": "screenshot_ui",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["cookies", "juice box", "sparkling lemonade", "fruit snacks"],
+      "key_features": ["brand_logo", "discount_badge", "cta_button_in_image"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["Expires on 03/29/26"]
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#d4521e", "#f5f0e8", "#2b2b2b", "#f5a623"],
+      "aspect_ratio_guess": "4:5",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "Digital Coupons",
+      "background_color": "white",
+      "scene_description": "hand holding smartphone showing Wegmans digital coupons screen",
+      "model_gender": "ambiguous",
+      "model_demo": "hand only visible, skin tone light-medium",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": "Clip",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans app digital coupons feature shown on phone with clippable grocery savings",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 670,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["rosé wine bottle", "prosecco bottle", "light beer can"],
+      "key_features": ["discount_badge", "brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["Hot Zone Prices"]
+      },
+      "value_props": ["price"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5c8a8", "#ffffff", "#d4001f", "#3a6f9b", "#2b2b2b"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Mimi en Provence, La Marca, Michelob Ultra",
+      "seasonal_tags": ["summer"],
+      "notable_text": "HOT ZONE PRICES",
+      "background_color": "white",
+      "scene_description": "tabletop with rosé bottle, prosecco, and Michelob Ultra can",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Hot Zone Prices promotion with rosé wine, prosecco, and light beer",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 723,
+    "analysis": {
+      "photography_style": "mixed",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "cta_button_in_image", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof", "inclusivity"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#7b2d8b", "#f5c800", "#ffffff", "#1a1a1a", "#4a3a6e"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "Pottsville Wegmans is hiring.",
+      "background_color": "purple",
+      "scene_description": "warehouse setting with male employee in blue uniform",
+      "model_gender": "male",
+      "model_demo": "man, 20s-30s, dark skin tone, wearing blue Wegmans uniform",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": "explore warehouse roles >",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Pottsville warehouse hiring ad featuring employee photo and team culture message",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 724,
+    "analysis": {
+      "photography_style": "mixed",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "cta_button_in_image", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof", "inclusivity"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#7b2d8b", "#f5c800", "#ffffff", "#1a1a1a", "#4a3a6e"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "build your future in Pottsville!",
+      "background_color": "purple",
+      "scene_description": "warehouse setting with male employee in yellow Wegmans uniform",
+      "model_gender": "male",
+      "model_demo": "man, 20s-30s, light skin tone, wearing yellow Wegmans shirt",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": "join our warehouse team >",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans Pottsville warehouse hiring ad with employee photo and community-focused benefits",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 728,
+    "analysis": {
+      "photography_style": "screenshot_ui",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["roasted chicken thighs", "baby potatoes", "broccoli"],
+      "key_features": ["brand_logo", "cta_button_in_image"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#d4521e", "#f5e8b0", "#2b2b2b", "#ffffff", "#7c9c50"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "Ingredients",
+      "background_color": "beige",
+      "scene_description": "hands holding phone showing Wegmans recipe ingredients screen, lemons in background",
+      "model_gender": "female",
+      "model_demo": "hands only, medium-dark skin tone",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": "Shop This Recipe",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans app recipe feature shown on phone with Shop This Recipe button and ingredient list",
+      "confidence": 0.94
+    }
+  },
+  {
+    "creative_id": 739,
+    "analysis": {
+      "photography_style": "flat_lay",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["AI assistant app icon"],
+      "key_features": ["brand_logo", "cta_button_in_image"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty", "convenience"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5f0e8", "#e0601e", "#9b30c8", "#f5a623", "#1a1a1a"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Wegmans",
+      "seasonal_tags": [],
+      "notable_text": "new! Wegmans AI Assistant",
+      "background_color": "beige",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": "now available in our app",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Wegmans promotes new AI Assistant feature for meal planning and grocery shopping in app",
+      "confidence": 0.97
+    }
+  }
+]

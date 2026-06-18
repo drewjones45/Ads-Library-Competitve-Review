@@ -1,0 +1,884 @@
+[
+  {
+    "creative_id": 445,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["tampax tampons", "pepto bismol", "gillette venus razor", "olay regenerist moisturizer", "native body wash", "secret deodorant", "crest 3d white toothpaste"],
+      "key_features": ["brand_logo", "multi_product_collage", "text_only_card", "discount_badge"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["Offer valid 6/1/26 – 6/30/26", "in June"]
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#00b4c8", "#f4a924", "#ffffff", "#e03c31", "#6b2d8b"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": ["summer"],
+      "notable_text": "EARN 1000 FLEX POINTS",
+      "background_color": "gradient",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": "LEVEL UP YOUR SAVINGS",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant Food rewards ad promoting 1000 flex points on P&G health and beauty purchases",
+      "confidence": 0.97
+    }
+  },
+  {
+    "creative_id": 502,
+    "analysis": {
+      "photography_style": "text_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#6b2d8b", "#ffffff"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "Giant",
+      "background_color": "purple",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant Food brand identity card on solid purple background with logo only",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 481,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["laundry detergent sheets", "Tide Evo laundry detergent box"],
+      "key_features": ["brand_logo", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty", "efficacy"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#e85c1e", "#87ceeb", "#1e3a8a", "#ffffff", "#f5a623"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Tide",
+      "seasonal_tags": [],
+      "notable_text": "all in one clean real laundry magic",
+      "background_color": "gradient",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Tide Evo new laundry detergent sheets promoted with benefit-led messaging at Giant",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 484,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["rotisserie chicken"],
+      "key_features": ["price_visible", "brand_logo", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "sustainability"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#e03c31", "#6b2d8b", "#c8a200", "#f5a623"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "$5.99 /EA.",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant rotisserie chicken priced at $5.99 featuring eco-friendly reduced plastic packaging",
+      "confidence": 0.97
+    }
+  },
+  {
+    "creative_id": 458,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["frozen breakfast sandwiches", "frozen breakfast bowls"],
+      "key_features": ["brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty", "efficacy"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#8b1a1a", "#ffffff", "#c8a200", "#1e3a8a", "#2d7a2d"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "ALL NEW PROTEIN Breakfast",
+      "background_color": "red",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Jimmy Dean new high-protein breakfast items promoted as available at Giant Food",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 460,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["M&M's candy party bags"],
+      "key_features": ["brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#e03c31", "#f5d300", "#1e3a8a", "#ffffff", "#2d7a2d"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": ["summer"],
+      "notable_text": "celebrate every summer moment",
+      "background_color": "red",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "M&M's patriotic summer party bags promoted as available at Giant Food",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 454,
+    "analysis": {
+      "photography_style": "mixed",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["deli sliced ham", "deli sliced turkey", "charcuterie meat skewers"],
+      "key_features": ["brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty", "efficacy"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#000000", "#ffffff", "#8b1a1a", "#c8a200", "#d4b483"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "ALL NEW",
+      "background_color": "black",
+      "scene_description": "dark slate surface with meat and apple skewers",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Hillshire Reserve new premium deli meats promoted as all new and available at Giant",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 570,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 2,
+        "diversity_signals": ["age_range_broad", "single_demo"]
+      },
+      "dominant_colors_hex": ["#4fc3f7", "#2e7d32", "#ffffff", "#6b2d8b", "#8d6e63"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Price Chopper",
+      "seasonal_tags": [],
+      "notable_text": null,
+      "background_color": "multi",
+      "scene_description": "older couple walking hand in hand on suburban sidewalk",
+      "model_gender": "mixed",
+      "model_demo": "older man and woman, 60s-70s, light skin tone",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper and Freihofer's Bakery co-branded charity ad supporting Parkinson's Foundation",
+      "confidence": 0.94
+    }
+  },
+  {
+    "creative_id": 571,
+    "analysis": {
+      "photography_style": "text_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience", "social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#4a7c2f", "#1e3a8a", "#f5d300"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Price Chopper",
+      "seasonal_tags": [],
+      "notable_text": "ADAPTIVE PROGRAMMING SERIES",
+      "background_color": "green",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper Market32 Cares community ad for South Burlington adaptive recreation programs",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 574,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["golf discount card"],
+      "key_features": ["price_visible", "discount_badge", "brand_logo", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#87ceeb", "#ffffff", "#4a7c2f", "#1e3a8a", "#f5d300"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "CAPITAL REGION GOLF 2025 CARD",
+      "background_color": "blue",
+      "scene_description": "hand in golf glove holding green discount card against blue sky",
+      "model_gender": "ambiguous",
+      "model_demo": "hand only visible, gloved",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": "SAVE $5 with AdvantEdge card",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper promoting Capital Region Golf 2025 card with $5 AdvantEdge loyalty savings",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 572,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["flower bouquets", "roses"],
+      "key_features": ["brand_logo", "lifestyle_setting"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#c0392b", "#ffffff", "#2d7a2d", "#000000"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Price Chopper",
+      "seasonal_tags": ["valentines"],
+      "notable_text": "Bouquets just got easier.",
+      "background_color": "red",
+      "scene_description": "close-up of red and white roses in full bloom",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper floral department ad promoting convenient bouquet ordering with rose close-up",
+      "confidence": 0.94
+    }
+  },
+  {
+    "creative_id": 575,
+    "analysis": {
+      "photography_style": "text_only",
+      "production_style": "meme_graphic",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": [],
+      "text_overlay": {
+        "present": false,
+        "density": "none",
+        "copy_lean": "none"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#3cb84a", "#2d9e3a"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": [],
+      "notable_text": null,
+      "background_color": "green",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Solid green textured background with no readable content or branding visible",
+      "confidence": 0.6
+    }
+  },
+  {
+    "creative_id": 577,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["water park tickets", "water park admission"],
+      "key_features": ["price_visible", "discount_badge", "brand_logo", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 4,
+        "diversity_signals": ["age_range_broad", "skin_tone_diverse"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#f5a623", "#1e3a8a", "#87ceeb", "#2d7a2d"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "SAVE UP TO $8 at the register",
+      "background_color": "blue",
+      "scene_description": "family on yellow raft at water park splashing down slide",
+      "model_gender": "mixed",
+      "model_demo": "family group, children and adults, mixed skin tones",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": "SAVE UP TO $8 at the register",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper promoting Enchanted Forest Water Safari tickets with up to $8 AdvantEdge savings",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 578,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["bone-in strip steak", "steak savings pack"],
+      "key_features": ["price_visible", "discount_badge", "brand_logo", "product_close_up", "limited_time_text"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["GRILL DEAL OF THE WEEK!", "Father's Day cookouts", "save BIG all summer long"]
+      },
+      "value_props": ["price"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#1e3a8a", "#ffffff", "#e03c31", "#8b1a1a", "#f5d300"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Celebrating STARS, STRIPES & SAVINGS AMERICA'S 250th BIRTHDAY!",
+      "background_color": "blue",
+      "scene_description": "plated sliced bone-in strip steak with green beans",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper patriotic summer savings ad featuring $10.99/lb Angus bone-in strip steak deal",
+      "confidence": 0.97
+    }
+  },
+  {
+    "creative_id": 585,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["BBQ ribs", "pork ribs"],
+      "key_features": ["brand_logo", "lifestyle_setting"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#1a1a1a", "#8b1a1a", "#c0392b", "#ffffff", "#4a3728"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Barbecuing just got easier.",
+      "background_color": "black",
+      "scene_description": "glazed BBQ pork ribs on grill grate with smoke",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper summer BBQ ad promoting meat department with grilling-ease benefit message",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 583,
+    "analysis": {
+      "photography_style": "screenshot_ui",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["weekly grocery flyer", "grocery items"],
+      "key_features": ["brand_logo", "cta_button_in_image"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#4a7c2f", "#1e3a8a", "#e03c31", "#000000"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "SHOP OUR WEEKLY FLYER",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": "SHOP OUR WEEKLY FLYER",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper and Market32 weekly circular promotion directing customers to shop current deals",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 591,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["golf discount card"],
+      "key_features": ["price_visible", "discount_badge", "brand_logo", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#87ceeb", "#ffffff", "#4a7c2f", "#1e3a8a", "#f5d300"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "CAPITAL REGION GOLF 2026 CARD",
+      "background_color": "blue",
+      "scene_description": "hand in golf glove holding green discount card against blue sky",
+      "model_gender": "ambiguous",
+      "model_demo": "hand only visible, gloved",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": "SAVE $5 with AdvantEdge card",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper promoting Capital Region Golf 2026 card with $5 AdvantEdge loyalty savings",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 589,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["cherry tomatoes", "tomato plants"],
+      "key_features": ["brand_logo", "lifestyle_setting"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#c0392b", "#e74c3c", "#2d7a2d", "#ffffff", "#f39c12"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Price Chopper",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Gardening just got easier.",
+      "background_color": "red",
+      "scene_description": "close-up of ripe cherry tomatoes on vine in garden",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Price Chopper garden center ad promoting convenience with vine tomato close-up imagery",
+      "confidence": 0.94
+    }
+  }
+]

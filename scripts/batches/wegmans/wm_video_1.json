@@ -1,0 +1,294 @@
+[
+  {
+    "creative_id": 622,
+    "competitor_id": "wegmans",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1361552382686148/video.mp4",
+    "phash": "a73a522089ff55d1",
+    "popularity": 0.986,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1361552382686148/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1361552382686148/frame_00_t00000.jpg",
+        "t_sec": 0.0
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1361552382686148/frame_01_t01210.jpg",
+        "t_sec": 1.21
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1361552382686148/frame_02_t02711.jpg",
+        "t_sec": 2.711
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1361552382686148/frame_03_t03587.jpg",
+        "t_sec": 3.587
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1361552382686148/frame_04_t04213.jpg",
+        "t_sec": 4.213
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1361552382686148/frame_05_t04963.jpg",
+        "t_sec": 4.963
+      }
+    ],
+    "duration_sec": 6.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 649,
+    "competitor_id": "wegmans",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1471040527993690/video.mp4",
+    "phash": "8c6ef35ac2236467",
+    "popularity": 0.936,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1471040527993690/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1471040527993690/frame_00_t01200.jpg",
+        "t_sec": 1.2
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1471040527993690/frame_01_t02410.jpg",
+        "t_sec": 2.41
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1471040527993690/frame_02_t03610.jpg",
+        "t_sec": 3.61
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1471040527993690/frame_03_t04820.jpg",
+        "t_sec": 4.82
+      }
+    ],
+    "duration_sec": 6.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 640,
+    "competitor_id": "wegmans",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1677525486575309/video.mp4",
+    "phash": "b5f2f016de9ac809",
+    "popularity": 0.93,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1677525486575309/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1677525486575309/frame_00_t03000.jpg",
+        "t_sec": 3.0
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1677525486575309/frame_01_t06010.jpg",
+        "t_sec": 6.01
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1677525486575309/frame_02_t09010.jpg",
+        "t_sec": 9.01
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1677525486575309/frame_03_t12020.jpg",
+        "t_sec": 12.02
+      }
+    ],
+    "duration_sec": 15.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 654,
+    "competitor_id": "wegmans",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/769592912755212/video.mp4",
+    "phash": "99680f23e7413ef8",
+    "popularity": 0.902,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/769592912755212/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/769592912755212/frame_00_t00000.jpg",
+        "t_sec": 0.0
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/769592912755212/frame_01_t01969.jpg",
+        "t_sec": 1.969
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/769592912755212/frame_02_t03937.jpg",
+        "t_sec": 3.937
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/769592912755212/frame_03_t04872.jpg",
+        "t_sec": 4.872
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/769592912755212/frame_04_t05873.jpg",
+        "t_sec": 5.873
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/769592912755212/frame_05_t07708.jpg",
+        "t_sec": 7.708
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/769592912755212/frame_06_t09610.jpg",
+        "t_sec": 9.61
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/769592912755212/frame_07_t11778.jpg",
+        "t_sec": 11.778
+      }
+    ],
+    "duration_sec": 15.0,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 668,
+    "competitor_id": "wegmans",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/997035046183133/video.mp4",
+    "phash": "a9631fe4cbf20c0e",
+    "popularity": 0.901,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/997035046183133/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/997035046183133/frame_00_t00000.jpg",
+        "t_sec": 0.0
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/997035046183133/frame_01_t01335.jpg",
+        "t_sec": 1.335
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/997035046183133/frame_02_t02127.jpg",
+        "t_sec": 2.127
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/997035046183133/frame_03_t03170.jpg",
+        "t_sec": 3.17
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/997035046183133/frame_04_t04546.jpg",
+        "t_sec": 4.546
+      }
+    ],
+    "duration_sec": 6.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 685,
+    "competitor_id": "wegmans",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2127487604701500/video.mp4",
+    "phash": "be23497a87c3835c",
+    "popularity": 0.867,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2127487604701500/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2127487604701500/frame_00_t00000.jpg",
+        "t_sec": 0.0
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2127487604701500/frame_01_t00751.jpg",
+        "t_sec": 0.751
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2127487604701500/frame_02_t01585.jpg",
+        "t_sec": 1.585
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2127487604701500/frame_03_t02419.jpg",
+        "t_sec": 2.419
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2127487604701500/frame_04_t03420.jpg",
+        "t_sec": 3.42
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2127487604701500/frame_05_t04296.jpg",
+        "t_sec": 4.296
+      }
+    ],
+    "duration_sec": 6.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 699,
+    "competitor_id": "wegmans",
+    "asset_type": "video",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1846740799321749/video.mp4",
+    "phash": "98e7926d9231cd9c",
+    "popularity": 0.845,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1846740799321749/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1846740799321749/frame_00_t06800.jpg",
+        "t_sec": 6.8
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1846740799321749/frame_01_t13600.jpg",
+        "t_sec": 13.6
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1846740799321749/frame_02_t20410.jpg",
+        "t_sec": 20.41
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/1846740799321749/frame_03_t27210.jpg",
+        "t_sec": 27.21
+      }
+    ],
+    "duration_sec": 34.01,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  },
+  {
+    "creative_id": 720,
+    "competitor_id": "wegmans",
+    "asset_type": "video_evicted",
+    "context": "meta_ad",
+    "schema": "video",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2005142433721145/frame_00_t03000.jpg",
+    "phash": "d68169dd254262fd",
+    "popularity": 0.804,
+    "sidecar_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2005142433721145/video_meta.json",
+    "frames": [
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2005142433721145/frame_00_t03000.jpg",
+        "t_sec": 3.0
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2005142433721145/frame_01_t06010.jpg",
+        "t_sec": 6.01
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2005142433721145/frame_02_t09010.jpg",
+        "t_sec": 9.01
+      },
+      {
+        "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/2005142433721145/frame_03_t12020.jpg",
+        "t_sec": 12.02
+      }
+    ],
+    "duration_sec": 15.02,
+    "transcript_full": null,
+    "transcript_quality": "skipped"
+  }
+]

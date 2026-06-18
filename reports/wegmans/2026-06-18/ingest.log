@@ -1,0 +1,4 @@
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+homepage stopandshop_com__root: blocked by 'datadome' anti-bot wall — recording as blocked observation
+homepage giantfood_com__root: blocked by 'datadome' anti-bot wall — recording as blocked observation

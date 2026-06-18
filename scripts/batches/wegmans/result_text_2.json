@@ -1,0 +1,348 @@
+[
+  {
+    "creative_id": 28,
+    "analysis": {
+      "headlines": [
+        {"text": "Order Freshly Prepared Food", "intent": "benefit", "sale_status": "no_sale", "urgency": false},
+        {"text": "Order Catering on Meals 2GO", "intent": "cta", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Order fresh sushi, salads, sandwiches, and everything in-between on Wegmans Meals 2GO.", "copy_lean": "feature_led", "value_props": ["selection", "convenience"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "demo",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["selection", "convenience"],
+      "primary_cta": "Order Catering on Meals 2GO",
+      "summary_one_line": "Order fresh sushi, salads, sandwiches and more via Wegmans Meals 2GO catering.",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 29,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.6 ★ (2.5K) · Grocery store · Open", "copy_lean": "brand_led", "value_props": ["social_proof", "quality"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "quality"],
+      "primary_cta": "Call or Directions",
+      "summary_one_line": "Wegmans grocery store, highly rated and open, call or get directions.",
+      "confidence": 0.75
+    }
+  },
+  {
+    "creative_id": 30,
+    "analysis": {
+      "headlines": [
+        {"text": "Order Catering on Meals 2GO", "intent": "cta", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Order Wegmans Catering on Meals 2GO and choose from curbside pickup, carryout or delivery.", "copy_lean": "feature_led", "value_props": ["convenience"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "demo",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["convenience"],
+      "primary_cta": "Order Catering on Meals 2GO",
+      "summary_one_line": "Order Wegmans catering on Meals 2GO with pickup, carryout, or delivery.",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 31,
+    "analysis": {
+      "headlines": [
+        {"text": "Order Freshly Prepared Food", "intent": "benefit", "sale_status": "no_sale", "urgency": false},
+        {"text": "Order Catering on Meals 2GO", "intent": "cta", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Order Wegmans Catering on Meals 2GO and choose from curbside pickup, carryout or delivery. Order fresh sushi, salads, sandwiches, and everything in-between on Wegmans Meals 2GO.", "copy_lean": "feature_led", "value_props": ["convenience", "selection"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "demo",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["convenience", "selection"],
+      "primary_cta": "Order Catering on Meals 2GO",
+      "summary_one_line": "Order freshly prepared Wegmans catering with pickup, carryout, or delivery on Meals 2GO.",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 32,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans - Depew", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.6 ★★★★½ (2,845) · $$ · Grocery store · Depew", "copy_lean": "brand_led", "value_props": ["social_proof"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof"],
+      "primary_cta": "Call, Website, or Directions",
+      "summary_one_line": "Wegmans Depew location, 4.6-star grocery store, call or get directions.",
+      "confidence": 0.75
+    }
+  },
+  {
+    "creative_id": 33,
+    "analysis": {
+      "headlines": [
+        {"text": "Order Catering on Meals 2GO", "intent": "cta", "sale_status": "no_sale", "urgency": false},
+        {"text": "Tasty Catering for...", "intent": "benefit", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "From small gatherings to large parties, we cater every occasion. Order through Meals 2GO.", "copy_lean": "benefit_led", "value_props": ["convenience", "selection"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "mixed",
+      "hook_style": "demo",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["convenience", "selection"],
+      "primary_cta": "Order through Meals 2GO",
+      "summary_one_line": "Wegmans caters every occasion from small gatherings to large parties via Meals 2GO.",
+      "confidence": 0.88
+    }
+  },
+  {
+    "creative_id": 34,
+    "analysis": {
+      "headlines": [
+        {"text": "Order Catering on Meals 2GO", "intent": "cta", "sale_status": "no_sale", "urgency": false},
+        {"text": "Order Freshly...", "intent": "benefit", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "demo",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["convenience"],
+      "primary_cta": "Order Catering on Meals 2GO",
+      "summary_one_line": "Order freshly prepared Wegmans catering on Meals 2GO.",
+      "confidence": 0.72
+    }
+  },
+  {
+    "creative_id": 35,
+    "analysis": {
+      "headlines": [
+        {"text": "Complete Catering Solutions", "intent": "feature", "sale_status": "no_sale", "urgency": false},
+        {"text": "Order Catering on Meals 2GO", "intent": "cta", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Order Wegmans Catering on Meals 2GO and choose from curbside pickup, carryout or delivery.", "copy_lean": "feature_led", "value_props": ["convenience"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "demo",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["convenience"],
+      "primary_cta": "Order Catering on Meals 2GO",
+      "summary_one_line": "Complete catering solutions on Wegmans Meals 2GO with pickup, carryout, or delivery.",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 5,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans Catering on Meals 2GO", "intent": "brand", "sale_status": "no_sale", "urgency": false},
+        {"text": "Now Delivering in...", "intent": "feature", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Endless ways to build your custom menu on Meals 2GO. $150 minimum order. Delivery varies. Order for any occasion on Meals 2GO. $150 minimum; delivery availability varies.", "copy_lean": "feature_led", "value_props": ["selection", "convenience"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "demo",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["selection", "convenience"],
+      "primary_cta": "Order on Meals 2GO",
+      "summary_one_line": "Wegmans catering now delivering; custom menus from $150 minimum on Meals 2GO.",
+      "confidence": 0.9
+    }
+  },
+  {
+    "creative_id": 6,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.5 ★ (1.1K) · Grocery store · Open", "copy_lean": "brand_led", "value_props": ["social_proof", "quality"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "quality"],
+      "primary_cta": "Call or Directions",
+      "summary_one_line": "Wegmans grocery store open now, 4.5-star rated, call or get directions.",
+      "confidence": 0.75
+    }
+  },
+  {
+    "creative_id": 7,
+    "analysis": {
+      "headlines": [
+        {"text": "Order on Meals 2GO", "intent": "cta", "sale_status": "no_sale", "urgency": false},
+        {"text": "Catering for Any Occasion", "intent": "benefit", "sale_status": "no_sale", "urgency": false},
+        {"text": "Your Party, Ready to Enjoy", "intent": "benefit", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "From hot to ready-to-enjoy options, create the perfect menu for your event on Meals 2GO. From hot to ready-to-enjoy options, discover catering everyone will love on Meals 2GO.", "copy_lean": "benefit_led", "value_props": ["selection", "convenience", "quality"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "mixed",
+      "hook_style": "demo",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["selection", "convenience", "quality"],
+      "primary_cta": "Order on Meals 2GO",
+      "summary_one_line": "Catering for any occasion — hot or ready-to-enjoy — order on Wegmans Meals 2GO.",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 8,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.6 ★ (3.3K) · Grocery store · Open", "copy_lean": "brand_led", "value_props": ["social_proof", "quality"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "quality"],
+      "primary_cta": "Call or Directions",
+      "summary_one_line": "Wegmans grocery store open now, 4.6-star rated, call or get directions.",
+      "confidence": 0.75
+    }
+  },
+  {
+    "creative_id": 9,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans Catering on Meals 2GO", "intent": "brand", "sale_status": "no_sale", "urgency": false},
+        {"text": "Graduations, Birthdays & More", "intent": "benefit", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Create the perfect menu for your next event with delicious catering options on Meals 2GO. From hot to ready-to-enjoy...", "copy_lean": "benefit_led", "value_props": ["selection", "convenience", "quality"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "mixed",
+      "hook_style": "demo",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["selection", "convenience", "quality"],
+      "primary_cta": "Order on Meals 2GO",
+      "summary_one_line": "Wegmans catering for graduations, birthdays and more — build your perfect menu on Meals 2GO.",
+      "confidence": 0.91
+    }
+  },
+  {
+    "creative_id": 10,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans Catering on Meals 2GO", "intent": "brand", "sale_status": "no_sale", "urgency": false},
+        {"text": "View Our Catering Menu", "intent": "cta", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Create the perfect menu for your next event with delicious catering options on Meals 2GO. From hot to ready-to-enjoy options, discover catering everyone will...", "copy_lean": "benefit_led", "value_props": ["selection", "quality"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "mixed",
+      "hook_style": "demo",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["selection", "quality"],
+      "primary_cta": "View Our Catering Menu",
+      "summary_one_line": "View Wegmans catering menu on Meals 2GO and create the perfect event spread.",
+      "confidence": 0.91
+    }
+  },
+  {
+    "creative_id": 11,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans Catering on Meals 2GO", "intent": "brand", "sale_status": "no_sale", "urgency": false},
+        {"text": "View Our Catering Menu", "intent": "cta", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Order for any occasion on Meals 2GO. Delivery availability varies by location. Endless ways to build your custom menu on Meals 2GO. Delivery varies by location. A Proud Family Company.", "copy_lean": "feature_led", "value_props": ["selection", "convenience"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "mixed",
+      "hook_style": "brand_led",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["selection", "convenience"],
+      "primary_cta": "View Our Catering Menu",
+      "summary_one_line": "View Wegmans catering menu on Meals 2GO — endless custom options, proud family company.",
+      "confidence": 0.9
+    }
+  },
+  {
+    "creative_id": 12,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans Catering on Meals 2GO", "intent": "brand", "sale_status": "no_sale", "urgency": false},
+        {"text": "View Our Catering Menu", "intent": "cta", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Order for any occasion on Meals 2GO. Delivery availability varies by location. Endless ways to build your custom menu on Meals 2GO. Delivery varies by location. A Proud Family Company.", "copy_lean": "feature_led", "value_props": ["selection", "convenience"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "mixed",
+      "hook_style": "brand_led",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["selection", "convenience"],
+      "primary_cta": "View Our Catering Menu",
+      "summary_one_line": "View Wegmans catering menu on Meals 2GO — endless custom options, proud family company.",
+      "confidence": 0.9
+    }
+  }
+]

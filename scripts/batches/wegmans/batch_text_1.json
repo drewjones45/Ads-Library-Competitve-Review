@@ -1,0 +1,182 @@
+[
+  {
+    "creative_id": 1,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR09246439661956497409/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.427
+  },
+  {
+    "creative_id": 2,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR13440187017015066625/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.427
+  },
+  {
+    "creative_id": 3,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR03297575636742176769/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.427
+  },
+  {
+    "creative_id": 13,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR01062723626567991297/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 14,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR04249363410560483329/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 15,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR11382152075908481025/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 16,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR11225764276482342913/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 17,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR05640532729670926337/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 18,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR16398201912270258177/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 19,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR18435514220289196033/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 20,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR02497953537699348481/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 21,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR07825623798509469697/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 22,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR07842210618609238017/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 23,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR07951216201386950657/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 24,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR05094210553157517313/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 25,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR06023932434276417537/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 26,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR01561974748223635457/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  },
+  {
+    "creative_id": 27,
+    "competitor_id": "wegmans",
+    "asset_type": "text_ad",
+    "context": "google_text_ad",
+    "schema": "text",
+    "asset_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/wegmans/g_CR13692348189095493633/text_ad_meta.json",
+    "phash": null,
+    "popularity": 0.35
+  }
+]

@@ -1,0 +1,383 @@
+[
+  {
+    "creative_id": 1,
+    "analysis": {
+      "headlines": [
+        {"text": "Perfect for Any Occasion - Wegmans Catering on Meals 2GO", "intent": "benefit", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Order for any occasion on Meals 2GO. Delivery availability varies by location.", "copy_lean": "benefit_led", "value_props": ["convenience", "service"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "mixed",
+      "hook_style": "unknown",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["convenience", "service"],
+      "primary_cta": "Order for any occasion on Meals 2GO",
+      "summary_one_line": "Wegmans catering on Meals 2GO for any occasion, delivery varies by location",
+      "confidence": 0.88
+    }
+  },
+  {
+    "creative_id": 2,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.6 (4.1K) · Grocery store · Open", "copy_lean": "brand_led", "value_props": ["social_proof", "service"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service"],
+      "primary_cta": "Call or get Directions",
+      "summary_one_line": "Wegmans grocery store local ad with 4.6-star rating and Call/Directions CTAs",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 3,
+    "analysis": {
+      "headlines": [
+        {"text": "View Our Catering Menu - Wegmans Catering on Meals 2GO", "intent": "cta", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Order for any occasion on Meals 2GO. $150 minimum; delivery availability varies. Endless ways to build your custom menu on Meals 2GO. $150 minimum order...", "copy_lean": "feature_led", "value_props": ["selection", "convenience", "service"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "unknown",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["selection", "convenience", "service"],
+      "primary_cta": "View Our Catering Menu",
+      "summary_one_line": "View Wegmans catering menu on Meals 2GO with $150 minimum and endless custom options",
+      "confidence": 0.9
+    }
+  },
+  {
+    "creative_id": 13,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.6 (2.9K) · $$ · Grocery store · Open 24 hours", "copy_lean": "brand_led", "value_props": ["social_proof", "service", "convenience"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service", "convenience"],
+      "primary_cta": "Call or get Directions",
+      "summary_one_line": "Wegmans 24-hour grocery store local ad with 4.6-star rating and Call/Directions CTAs",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 14,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.6 (2.3K) · $$ · Grocery store · Open 24 hours", "copy_lean": "brand_led", "value_props": ["social_proof", "service", "convenience"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service", "convenience"],
+      "primary_cta": "Call or get Directions",
+      "summary_one_line": "Wegmans 24-hour grocery store local ad with 4.6-star rating and Call/Directions CTAs",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 15,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.6 (5.2K) · $$ · Grocery store · Open", "copy_lean": "brand_led", "value_props": ["social_proof", "service"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service"],
+      "primary_cta": "Call or get Directions",
+      "summary_one_line": "Wegmans grocery store local ad with 4.6-star rating and Call/Directions CTAs",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 16,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.6 (5.7K) · Grocery store · Open", "copy_lean": "brand_led", "value_props": ["social_proof", "service"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service"],
+      "primary_cta": "Call or get Directions",
+      "summary_one_line": "Wegmans grocery store local ad with 4.6-star rating and Call/Directions CTAs",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 17,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.5 (3.9K) · Grocery store · Open", "copy_lean": "brand_led", "value_props": ["social_proof", "service"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service"],
+      "primary_cta": "Call or get Directions",
+      "summary_one_line": "Wegmans grocery store local ad with 4.5-star rating and Call/Directions CTAs",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 18,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans - Lake Grove", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.3 (442) · Grocery store · Lake Grove", "copy_lean": "brand_led", "value_props": ["social_proof", "service"], "urgency": false},
+        {"text": "Order Catering on Meals 2GO - Order Wegmans Catering on Meals 2GO and choose from curbside...", "copy_lean": "feature_led", "value_props": ["convenience", "service"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "unknown",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service", "convenience"],
+      "primary_cta": "Call, Website, or Directions",
+      "summary_one_line": "Wegmans Lake Grove location ad with catering order prompt and Call/Website/Directions CTAs",
+      "confidence": 0.85
+    }
+  },
+  {
+    "creative_id": 19,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.5 (3.3K) · $$ · Grocery store · Open", "copy_lean": "brand_led", "value_props": ["social_proof", "service"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service"],
+      "primary_cta": "Call or get Directions",
+      "summary_one_line": "Wegmans grocery store local ad with 4.5-star rating and Call/Directions CTAs",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 20,
+    "analysis": {
+      "headlines": [
+        {"text": "View Our Catering Menu - Catering for Every Occasion", "intent": "cta", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "From small gatherings to large parties, we cater every occasion. Order through Meals 2GO. Order Wegmans...", "copy_lean": "benefit_led", "value_props": ["convenience", "service", "selection"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "mixed",
+      "hook_style": "unknown",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["convenience", "service", "selection"],
+      "primary_cta": "View Our Catering Menu",
+      "summary_one_line": "View Wegmans catering menu on Meals 2GO for small gatherings to large parties",
+      "confidence": 0.9
+    }
+  },
+  {
+    "creative_id": 21,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.5 (3.3K) · Grocery store · Open", "copy_lean": "brand_led", "value_props": ["social_proof", "service"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service"],
+      "primary_cta": "Call or get Directions",
+      "summary_one_line": "Wegmans grocery store local ad with 4.5-star rating and Call/Directions CTAs",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 22,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans - Chestnut...", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.4 (2,241) · $$ · Grocery store · Chestnut Hill", "copy_lean": "brand_led", "value_props": ["social_proof", "service"], "urgency": false},
+        {"text": "Read reviews (2,241)", "copy_lean": "brand_led", "value_props": ["social_proof"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service"],
+      "primary_cta": "Call, Website, or Directions",
+      "summary_one_line": "Wegmans Chestnut Hill location local ad with 4.4-star rating and Call/Website/Directions CTAs",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 23,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.6 (2.3K) · $$ · Grocery store · Open 24 hours", "copy_lean": "brand_led", "value_props": ["social_proof", "service", "convenience"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service", "convenience"],
+      "primary_cta": "Call or get Directions",
+      "summary_one_line": "Wegmans 24-hour grocery store local ad with 4.6-star rating and Call/Directions CTAs",
+      "confidence": 0.82
+    }
+  },
+  {
+    "creative_id": 24,
+    "analysis": {
+      "headlines": [
+        {"text": "Custom Cakes, Cupcakes & More - Order a Delicious Custom Cake", "intent": "feature", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Customize your cake with personal greetings, dietary needs, and more. Order on Meals 2GO. Order...", "copy_lean": "feature_led", "value_props": ["selection", "convenience", "inclusivity"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "unknown",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["selection", "convenience", "inclusivity"],
+      "primary_cta": "Order a Delicious Custom Cake",
+      "summary_one_line": "Order custom cakes and cupcakes on Wegmans Meals 2GO with personal greetings and dietary options",
+      "confidence": 0.9
+    }
+  },
+  {
+    "creative_id": 25,
+    "analysis": {
+      "headlines": [
+        {"text": "Fresh Flower Delivery - Online Flower Delivery - Show Your Appreciation", "intent": "feature", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "Shop floral bouquets and vase arrangements on Wegmans Meals 2GO. Order online today. Send flowers to make someone's day. Shop fresh...", "copy_lean": "benefit_led", "value_props": ["convenience", "quality"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "emotional",
+      "hook_style": "unknown",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["convenience", "quality"],
+      "primary_cta": "Order online today",
+      "summary_one_line": "Fresh flower delivery via Wegmans Meals 2GO — bouquets and arrangements ordered online",
+      "confidence": 0.9
+    }
+  },
+  {
+    "creative_id": 26,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans - Collegeville", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.5 (2,455) · $$ · Grocery store · Collegeville", "copy_lean": "brand_led", "value_props": ["social_proof", "service"], "urgency": false},
+        {"text": "Order Catering on Meals 2GO - Order Wegmans Catering on Meals 2GO and choose from curbside...", "copy_lean": "feature_led", "value_props": ["convenience", "service"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "unknown",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service", "convenience"],
+      "primary_cta": "Call, Website, or Directions",
+      "summary_one_line": "Wegmans Collegeville location ad with catering order prompt and Call/Website/Directions CTAs",
+      "confidence": 0.85
+    }
+  },
+  {
+    "creative_id": 27,
+    "analysis": {
+      "headlines": [
+        {"text": "Wegmans", "intent": "brand", "sale_status": "no_sale", "urgency": false}
+      ],
+      "descriptions": [
+        {"text": "4.5 (3.9K) · $$ · Grocery store · Open 24 hours", "copy_lean": "brand_led", "value_props": ["social_proof", "service", "convenience"], "urgency": false}
+      ],
+      "sale_status": "no_sale",
+      "offer_kind": "none",
+      "offer_value": null,
+      "emotional_vs_rational": "rational",
+      "hook_style": "social_proof",
+      "urgency_cues": {"present": false, "examples": []},
+      "value_props": ["social_proof", "service", "convenience"],
+      "primary_cta": "Call or get Directions",
+      "summary_one_line": "Wegmans 24-hour grocery store local ad with 4.5-star rating and Call/Directions CTAs",
+      "confidence": 0.82
+    }
+  }
+]

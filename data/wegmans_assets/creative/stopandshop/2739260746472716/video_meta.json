@@ -1,0 +1,32 @@
+{
+  "duration_sec": 20.48,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2739260746472716/frame_00_t04100.jpg",
+      "t_sec": 4.1,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2739260746472716/frame_01_t08190.jpg",
+      "t_sec": 8.19,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2739260746472716/frame_02_t12290.jpg",
+      "t_sec": 12.29,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2739260746472716/frame_03_t16380.jpg",
+      "t_sec": 16.38,
+      "idx": 3
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-06-18T15:23:16+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/wegmans_assets/creative/stopandshop/2739260746472716/video.mp4"
+}

@@ -1,0 +1,884 @@
+[
+  {
+    "creative_id": 444,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["iced tea gallon jug", "hamburger rolls", "strawberries"],
+      "key_features": ["brand_logo", "text_only_card", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#cc0000", "#ffffff", "#4b1a8c", "#f5a623", "#2b2b2b"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "SAVE BIG. SHOP RED.",
+      "background_color": "red",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant Food promotes store-wide savings with bold red brand campaign and product imagery",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 449,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["grocery bags", "fresh produce", "watermelon"],
+      "key_features": ["brand_logo", "cta_button_in_image", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["PLACE YOUR ORDER NOW"]
+      },
+      "value_props": ["convenience", "price"],
+      "hook_style": "benefit_led",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 2,
+        "diversity_signals": ["skin_tone_diverse"]
+      },
+      "dominant_colors_hex": ["#5b1fa0", "#f5c800", "#ffffff", "#2b2b2b", "#f0a050"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "GET THE SAME GREAT DEALS IN STORE AND ONLINE",
+      "background_color": "purple",
+      "scene_description": "kitchen counter with grocery bags and produce",
+      "model_gender": "mixed",
+      "model_demo": "man and woman, 30s, light and East Asian skin tones",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": "PLACE YOUR ORDER NOW!",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant Food promotes same in-store and online deals with happy couple unloading groceries",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 450,
+    "analysis": {
+      "photography_style": "model_on_figure",
+      "production_style": "polished_brand",
+      "product_emphasis": "balanced",
+      "products_visible": ["Chobani protein yogurt drink"],
+      "key_features": ["brand_logo", "model_present", "product_close_up"],
+      "text_overlay": {
+        "present": false,
+        "density": "none",
+        "copy_lean": "none"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "social_proof"],
+      "hook_style": "social_proof",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#1a2a6e", "#cc1a1a", "#f5f0e8", "#3a6abf", "#ffffff"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Chobani",
+      "seasonal_tags": [],
+      "notable_text": null,
+      "background_color": "blue",
+      "scene_description": "studio dark blue background with athlete in USA soccer jersey",
+      "model_gender": "male",
+      "model_demo": "man, late 20s, light skin tone, tattooed arm, wearing USA jersey #10",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Chobani protein drink endorsed by US soccer athlete in studio athlete portrait",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 452,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": [],
+      "key_features": [],
+      "text_overlay": {
+        "present": false,
+        "density": "none",
+        "copy_lean": "none"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": [],
+      "hook_style": "unknown",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#f5c0b0"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": [],
+      "notable_text": null,
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Nearly blank white image with minimal visible content",
+      "confidence": 0.3
+    }
+  },
+  {
+    "creative_id": 456,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["dairy-free coconut yogurt alternative multipack"],
+      "key_features": ["price_visible", "brand_logo"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "inclusivity"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#5b1fa0", "#c8a86e", "#000000", "#e8e0d0"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "So Delicious",
+      "seasonal_tags": [],
+      "notable_text": "2/ $10.00",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "So Delicious dairy-free vanilla coconut yogurt 4-pack priced at 2 for $10",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 440,
+    "analysis": {
+      "photography_style": "mixed",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["weekly circular flyer"],
+      "key_features": ["brand_logo", "discount_badge", "price_visible", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["5 DAYS ONLY"]
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#cc0000", "#ffffff", "#4b1a8c", "#f5a623", "#2b2b2b"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "SAVE BIG. SHOP RED.",
+      "background_color": "red",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant Food circular ad promoting 5-day-only deals with SAVE BIG SHOP RED campaign",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 462,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["Ice Breakers mints tin"],
+      "key_features": ["price_visible", "brand_logo"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#5b1fa0", "#1a3a8c", "#0050b0", "#b0c8e0"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Ice Breakers",
+      "seasonal_tags": [],
+      "notable_text": "$3.29",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Ice Breakers Cool Mint sugar-free mints priced at $3.29 at Giant",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 455,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["frozen ground beef burger patties box"],
+      "key_features": ["price_visible", "brand_logo"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#5b1fa0", "#8b1a1a", "#2b1a0a", "#f5c050"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": ["summer"],
+      "notable_text": "$12.99",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant brand ground beef burger patties 8-pack all-natural priced at $12.99",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 447,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["laundry scent booster bottle"],
+      "key_features": ["brand_logo", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#000000", "#c8904a", "#d4c090", "#c8d4b0", "#f5f0e0"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Unstopables",
+      "seasonal_tags": [],
+      "notable_text": "NON-STOP LUXE SCENT THAT LASTS 24 HOURS",
+      "background_color": "black",
+      "scene_description": "black background with gold accent arch and white flowers",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Downy Unstopables luxury scent booster N.26 featuring 24-hour fragrance claim",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 471,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["grocery bags", "fresh produce", "watermelon"],
+      "key_features": ["brand_logo", "lifestyle_setting", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "benefit_led",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 2,
+        "diversity_signals": ["skin_tone_diverse"]
+      },
+      "dominant_colors_hex": ["#5b1fa0", "#f5c800", "#ffffff", "#2b8a3e", "#f0a050"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "USE POINTS FOR SAVINGS!",
+      "background_color": "purple",
+      "scene_description": "bright kitchen interior with couple unpacking Giant grocery bags",
+      "model_gender": "mixed",
+      "model_demo": "man, 30s, East Asian; woman, 30s, light skin tone",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant Flexible Rewards loyalty program promoting points for gas, grocery, and free item savings",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 441,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "cta_button_in_image", "model_present"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["APPLY TODAY", "Rates valid May 17 - Sept 12, 2026"]
+      },
+      "value_props": ["convenience"],
+      "hook_style": "benefit_led",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 4,
+        "diversity_signals": ["skin_tone_diverse", "age_range_broad"]
+      },
+      "dominant_colors_hex": ["#f5c800", "#4b1a8c", "#ffffff", "#ff6600", "#2b2b2b"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": ["summer"],
+      "notable_text": "JOIN OUR {TEAM}",
+      "background_color": "yellow",
+      "scene_description": "store employees posing together at deli counter",
+      "model_gender": "mixed",
+      "model_demo": "mixed group, 20s-30s, diverse skin tones",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": "APPLY TODAY!",
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant Food recruiting seasonal staff at Longneck Millville and Rehoboth Beach stores",
+      "confidence": 0.97
+    }
+  },
+  {
+    "creative_id": 443,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["feminine pads package", "feminine hygiene product box"],
+      "key_features": ["brand_logo", "before_after"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "novelty"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#5ab4e0", "#1a50a0", "#ffffff", "#a0c8f0", "#e0f0f8"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Always",
+      "seasonal_tags": [],
+      "notable_text": "NEW & IMPROVED absorbs up to 2x faster*",
+      "background_color": "blue",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": true,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Always Flex-Foam new and improved pads claiming 2x faster absorption vs prior version",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 468,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["toothpaste box"],
+      "key_features": ["price_visible", "brand_logo", "discount_badge"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#5b1fa0", "#80c8d0", "#2b8aaa", "#c0c0c0"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Crest",
+      "seasonal_tags": [],
+      "notable_text": "$3.99/EA.",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Crest 3D White Brilliance Blast toothpaste large size on sale at $3.99 with coupon",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 457,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["antacid tablets", "multivitamins", "pain reliever", "toothpaste"],
+      "key_features": ["brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof", "convenience"],
+      "hook_style": "social_proof",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 3,
+        "diversity_signals": ["skin_tone_diverse"]
+      },
+      "dominant_colors_hex": ["#2b2b2b", "#c8c8c8", "#1a3a8c", "#cc1a1a", "#4b8a4b"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "HALEON Official Partner of U.S. Soccer",
+      "background_color": "gray",
+      "scene_description": "US Soccer players dynamic action poses on dark background",
+      "model_gender": "male",
+      "model_demo": "male athletes, 20s, diverse skin tones, USA soccer jerseys",
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Haleon health brands Tums Centrum Advil Sensodyne available at Giant via US Soccer partnership",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 493,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["rice cakes bag"],
+      "key_features": ["price_visible", "brand_logo"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#ffffff", "#5b1fa0", "#2a5ab0", "#c8d4e8", "#e8e0d0"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "2/ $5.00",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant brand low sodium rice cakes priced 2 for $5 in simple product shot",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 476,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["laundry detergent large jug", "fabric refresher spray bottle"],
+      "key_features": ["brand_logo", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#2a8a2a", "#f5d820", "#ffffff", "#b0d840", "#e0f090"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Gain",
+      "seasonal_tags": ["summer"],
+      "notable_text": "Our greatest scent ever",
+      "background_color": "green",
+      "scene_description": "vibrant green background with yellow flowers surrounding Gain products",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Gain Plus Oxi laundry detergent and spray promoted as greatest scent ever with floral imagery",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 442,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["tampons", "antacid tablets", "razor", "moisturizer", "deodorant"],
+      "key_features": ["brand_logo", "multi_product_collage", "discount_badge"],
+      "text_overlay": {
+        "present": true,
+        "density": "heavy",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": true,
+        "examples": ["when you spend $30 on select health and beauty products in June", "Offer valid 6/1/26 - 6/30/26"]
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#30b0c0", "#f58000", "#ffffff", "#5b1fa0", "#f5e800"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Giant",
+      "seasonal_tags": [],
+      "notable_text": "EARN 1000 FLEX POINTS",
+      "background_color": "blue",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "theme",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Giant Flexible Rewards offering 1000 points for $30 spend on P&G health and beauty items",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 459,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["razor handle with blade cartridge"],
+      "key_features": ["brand_logo", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["social_proof", "efficacy"],
+      "hook_style": "social_proof",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#1a2a6e", "#0050b0", "#ff6600", "#c0c8d8", "#ffffff"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Gillette",
+      "seasonal_tags": [],
+      "notable_text": "Gillette PREFERRED 2 TO 1 VS LEADING 5-BLADED COMPETITOR",
+      "background_color": "blue",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": ["Preferred 2 to 1 vs leading competitor"],
+      "summary_one_line": "Gillette razor preferred 2-to-1 over leading 5-bladed competitor with product close-up on dark blue",
+      "confidence": 0.95
+    }
+  }
+]

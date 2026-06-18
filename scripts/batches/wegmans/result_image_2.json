@@ -1,0 +1,884 @@
+[
+  {
+    "creative_id": 107,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["watermelon float drink", "glass pitcher", "ice cream"],
+      "key_features": ["lifestyle_setting", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#e85a6a", "#4fbfbf", "#f5f0e8", "#ffffff", "#6aab3e"],
+      "aspect_ratio_guess": "4:5",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": ["summer"],
+      "notable_text": "Float into summer",
+      "background_color": "white",
+      "scene_description": "outdoor wooden table with watermelon drinks and summer greenery",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Summer watermelon float drink recipe promotion with aspirational lifestyle photography",
+      "confidence": 0.92
+    }
+  },
+  {
+    "creative_id": 70,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["laundry scent booster beads"],
+      "key_features": ["brand_logo", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "novelty"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#0a0a0a", "#c8a96e", "#ffffff", "#f0e8d0", "#3a3a3a"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Unstopables",
+      "seasonal_tags": [],
+      "notable_text": "NON-STOP LUXE SCENT THAT LASTS 24 HOURS",
+      "background_color": "black",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Unstopables laundry scent beads promoted as 24-hour luxury fragrance product",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 75,
+    "analysis": {
+      "photography_style": "mixed",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["microwave popcorn"],
+      "key_features": ["brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#1a3a6e", "#cc1111", "#f5f0e8", "#4a4a6a", "#e8c840"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": [],
+      "notable_text": "WIN $20K DISNEY GIFT CARD",
+      "background_color": "blue",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Orville Redenbacher popcorn Star Wars sweepstakes for $20K Disney gift card at Stop & Shop",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 109,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "ugc_creator_style",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "creator_face", "lifestyle_setting"],
+      "text_overlay": {
+        "present": false,
+        "density": "none",
+        "copy_lean": "none"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "founder_story",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#2a2a2a", "#c8c8c8", "#e8e0d0", "#cc2222", "#4aaa4a"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": [],
+      "notable_text": null,
+      "background_color": "gray",
+      "scene_description": "grocery store checkout area with sale signs and balloons",
+      "model_gender": "male",
+      "model_demo": "man, 20s-30s, light skin tone, curly dark hair, mustache, wearing Stop & Shop uniform",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop & Shop employee character Justin in UGC-style store video ad",
+      "confidence": 0.88
+    }
+  },
+  {
+    "creative_id": 115,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["tea bags box"],
+      "key_features": ["price_visible", "discount_badge", "brand_logo"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#cc2222", "#f5f5f5", "#1a1a1a", "#e8c840", "#cc1a1a"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Twinings",
+      "seasonal_tags": [],
+      "notable_text": "2/$7 00",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Twinings English Breakfast tea on sale 2 for $7 at Stop & Shop",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 106,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["bell peppers bag"],
+      "key_features": ["price_visible", "discount_badge", "brand_logo"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5f5f5", "#1a1a1a", "#cc2222", "#e8a020", "#e8e020"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": [],
+      "notable_text": "$3 99 EA",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop & Shop brand rainbow bell peppers on sale at $3.99 each",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 59,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["ground beef tray"],
+      "key_features": ["brand_logo", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "problem_solution",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5d800", "#1a1a1a", "#ffffff", "#c83030", "#5a5a5a"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": [],
+      "notable_text": "Your faves FOR LESS!",
+      "background_color": "yellow",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop & Shop ground beef promoted as everyday favorite at lower prices",
+      "confidence": 0.94
+    }
+  },
+  {
+    "creative_id": 65,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "ugc_creator_style",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["cake"],
+      "key_features": ["brand_logo", "creator_face", "lifestyle_setting"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#2a2a2a", "#f5d800", "#c8c8a0", "#f5f0e8", "#3a3a3a"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": [],
+      "notable_text": "LOWER PRICES!",
+      "background_color": "gray",
+      "scene_description": "bakery area with bread racks and employee decorating yellow cake",
+      "model_gender": "male",
+      "model_demo": "man, 20s, light skin tone, curly dark hair, wearing Stop & Shop uniform",
+      "product_in_use": "in_use",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop & Shop employee decorates cake reading 'Lower Prices' in store bakery",
+      "confidence": 0.91
+    }
+  },
+  {
+    "creative_id": 124,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["soft pretzel bites snack container"],
+      "key_features": ["price_visible", "discount_badge", "brand_logo"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "offer_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price"],
+      "hook_style": "urgency",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5f5f5", "#1a1a1a", "#cc2222", "#e87820", "#3a6ab4"],
+      "aspect_ratio_guess": "1:1",
+      "logo_visible": true,
+      "logo_brand": "King's Hawaiian",
+      "seasonal_tags": [],
+      "notable_text": "$7 99 EA",
+      "background_color": "white",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "King's Hawaiian soft pretzel bites on sale at $7.99 each at Stop & Shop",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 134,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "ugc_creator_style",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["brand_logo", "creator_face", "lifestyle_setting"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["convenience"],
+      "hook_style": "founder_story",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#2a2a2a", "#c8c8c8", "#f5f5f5", "#cc2222", "#4aaa4a"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": [],
+      "notable_text": "Justin has a message for you...",
+      "background_color": "gray",
+      "scene_description": "grocery store checkout lanes with GO Rewards screen visible",
+      "model_gender": "male",
+      "model_demo": "man, 20s-30s, light skin tone, dark hair, wearing Stop & Shop uniform",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Stop & Shop character Justin delivers personal message at checkout in UGC-style video",
+      "confidence": 0.87
+    }
+  },
+  {
+    "creative_id": 61,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "polished_brand",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": ["chicken skewers", "salad greens"],
+      "key_features": ["lifestyle_setting", "product_close_up"],
+      "text_overlay": {
+        "present": false,
+        "density": "none",
+        "copy_lean": "none"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#c8782a", "#4a8040", "#f0e0c0", "#8a6030", "#d0c090"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": ["summer"],
+      "notable_text": null,
+      "background_color": "beige",
+      "scene_description": "close-up grilled chicken skewers with chimichurri sauce on plate",
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Appetizing grilled chicken skewer close-up with chimichurri sauce lifestyle food shot",
+      "confidence": 0.85
+    }
+  },
+  {
+    "creative_id": 155,
+    "analysis": {
+      "photography_style": "lifestyle",
+      "production_style": "ugc_creator_style",
+      "product_emphasis": "lifestyle_forward",
+      "products_visible": [],
+      "key_features": ["creator_face"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["price", "convenience"],
+      "hook_style": "problem_solution",
+      "emotional_vs_rational": "mixed",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 1,
+        "diversity_signals": ["single_demo"]
+      },
+      "dominant_colors_hex": ["#3a3a3a", "#b0b8c0", "#f5f5f5", "#c8a870", "#808080"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": false,
+      "logo_brand": null,
+      "seasonal_tags": [],
+      "notable_text": "PSA: How to save $$$$",
+      "background_color": "gray",
+      "scene_description": "woman standing excitedly in front of elevators with large cursive wall text",
+      "model_gender": "female",
+      "model_demo": "woman, 20s-30s, light skin tone, blonde hair, blue cardigan",
+      "product_in_use": "n/a",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "n/a",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Creator-style savings tip PSA ad with enthusiastic woman promising money-saving advice",
+      "confidence": 0.83
+    }
+  },
+  {
+    "creative_id": 87,
+    "analysis": {
+      "photography_style": "mixed",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["antacid tablets", "vitamins bottle", "pain reliever", "toothpaste"],
+      "key_features": ["brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "brand_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "social_proof"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": true,
+        "approx_count": 3,
+        "diversity_signals": ["skin_tone_diverse", "single_demo"]
+      },
+      "dominant_colors_hex": ["#3a3a3a", "#1a6a3a", "#f5f5f5", "#c8c8c8", "#2a4a8a"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": [],
+      "notable_text": "HALEON Official Partner of U.S. Soccer",
+      "background_color": "gray",
+      "scene_description": null,
+      "model_gender": "mixed",
+      "model_demo": "male soccer players, diverse skin tones, athletic wear",
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Haleon health products (Tums, Centrum, Advil, Sensodyne) via US Soccer partnership at Stop & Shop",
+      "confidence": 0.93
+    }
+  },
+  {
+    "creative_id": 67,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["feminine hygiene pads"],
+      "key_features": ["brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "novelty"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#80ccee", "#1a4a9a", "#ffffff", "#c8e0f8", "#4a90d8"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Always",
+      "seasonal_tags": [],
+      "notable_text": "NEW & IMPROVED absorbs up to 2x faster",
+      "background_color": "blue",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": true,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Always Flex-Foam pads new formula absorbs 2x faster than previous product",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 72,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["razor"],
+      "key_features": ["brand_logo", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "social_proof"],
+      "hook_style": "social_proof",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#1a2a7a", "#cc4400", "#3a6ab4", "#f5f5f5", "#0a0a3a"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Gillette",
+      "seasonal_tags": [],
+      "notable_text": "Gillette PREFERRED 2 TO 1 VS LEADING 5-BLADED COMPETITOR",
+      "background_color": "blue",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "single",
+      "certifications_visible": [],
+      "awards_or_rankings": ["preferred 2 to 1 vs leading competitor"],
+      "summary_one_line": "Gillette razor promoted as preferred 2-to-1 over leading 5-bladed competitor",
+      "confidence": 0.96
+    }
+  },
+  {
+    "creative_id": 136,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["laundry detergent bottle", "laundry spray"],
+      "key_features": ["brand_logo", "product_close_up"],
+      "text_overlay": {
+        "present": true,
+        "density": "light",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "novelty"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#2a8a2a", "#f5d800", "#f5f5f5", "#c8d820", "#f0e860"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Gain",
+      "seasonal_tags": [],
+      "notable_text": "Our greatest scent ever",
+      "background_color": "green",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Gain Plus laundry detergent promoted as greatest scent ever with floral imagery",
+      "confidence": 0.95
+    }
+  },
+  {
+    "creative_id": 77,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["candy bags"],
+      "key_features": ["brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["novelty", "convenience"],
+      "hook_style": "aesthetic",
+      "emotional_vs_rational": "emotional",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#f5d800", "#cc2222", "#2a6acc", "#f5f5f5", "#c8a820"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": ["summer"],
+      "notable_text": "celebrate every summer moment",
+      "background_color": "yellow",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "M&Ms summer party pack lineup promoted for celebrations at Stop & Shop",
+      "confidence": 0.94
+    }
+  },
+  {
+    "creative_id": 84,
+    "analysis": {
+      "photography_style": "studio_product_only",
+      "production_style": "polished_brand",
+      "product_emphasis": "product_forward",
+      "products_visible": ["breakfast sandwich box", "breakfast bowl box"],
+      "key_features": ["brand_logo", "multi_product_collage"],
+      "text_overlay": {
+        "present": true,
+        "density": "medium",
+        "copy_lean": "benefit_led"
+      },
+      "urgency_cues": {
+        "present": false,
+        "examples": []
+      },
+      "value_props": ["efficacy", "novelty", "convenience"],
+      "hook_style": "demo",
+      "emotional_vs_rational": "rational",
+      "casting": {
+        "people_visible": false,
+        "approx_count": 0,
+        "diversity_signals": ["n/a"]
+      },
+      "dominant_colors_hex": ["#8a1a1a", "#f5f5f5", "#1a1a4a", "#c8a820", "#e87820"],
+      "aspect_ratio_guess": "9:16",
+      "logo_visible": true,
+      "logo_brand": "Stop & Shop",
+      "seasonal_tags": [],
+      "notable_text": "ALL NEW PROTEIN Breakfast",
+      "background_color": "red",
+      "scene_description": null,
+      "model_gender": "not_visible",
+      "model_demo": null,
+      "product_in_use": "displayed_only",
+      "before_after_present": false,
+      "cta_verbatim_text": null,
+      "creative_context": "meta_ad",
+      "hero_banner_present": null,
+      "category_nav_visible": null,
+      "shoppable_imagery": null,
+      "product_grouping": "collection",
+      "certifications_visible": [],
+      "awards_or_rankings": [],
+      "summary_one_line": "Jimmy Dean new high-protein breakfast sandwiches and bowls available at Stop & Shop",
+      "confidence": 0.94
+    }
+  }
+]
