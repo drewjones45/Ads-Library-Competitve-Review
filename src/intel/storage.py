@@ -291,6 +291,7 @@ def init_db(db_path: Path | None = None) -> Path:
         _migrate_creatives_table(conn)
         _migrate_ads_table(conn)
         _migrate_source_column(conn)
+        _migrate_analytics_tables(conn)
     return p
 
 
@@ -415,6 +416,59 @@ def _migrate_homepage_promos_table(conn: sqlite3.Connection) -> None:
     """)
 
 
+def _migrate_analytics_tables(conn: sqlite3.Connection) -> None:
+    """Create the per-creative landing-UTM table and the uploaded
+    segment-analytics table. Both are additive — they back the Philo
+    "creative performance" feature (capture UTMs per creative, upload
+    sessions/conversions keyed by utm_campaign+utm_content). Idempotent.
+    """
+    conn.executescript("""
+    -- One row per creative: the landing URL of its parent ad + parsed UTMs.
+    -- Populated by `intel utm-capture`. The custom `utm_content_id` is Philo's
+    -- own per-creative identifier (not a standard UTM key).
+    CREATE TABLE IF NOT EXISTS creative_landing (
+      creative_id INTEGER PRIMARY KEY REFERENCES creatives(id) ON DELETE CASCADE,
+      ad_id INTEGER REFERENCES ads(id),
+      competitor_id TEXT REFERENCES competitors(id),
+      landing_url TEXT,
+      clean_url TEXT,
+      utm_source TEXT,
+      utm_medium TEXT,
+      utm_campaign TEXT,
+      utm_content TEXT,
+      utm_term TEXT,
+      utm_content_id TEXT,
+      captured_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_creative_landing_comp
+      ON creative_landing(competitor_id);
+    CREATE INDEX IF NOT EXISTS idx_creative_landing_segment
+      ON creative_landing(competitor_id, utm_campaign, utm_content);
+
+    -- Uploaded analytics at the (utm_campaign, utm_content) grain. Each creative
+    -- inherits the metrics of its segment. Replaced wholesale per competitor on
+    -- each `intel analytics-import` (the latest CSV is the source of truth).
+    CREATE TABLE IF NOT EXISTS segment_analytics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      competitor_id TEXT NOT NULL REFERENCES competitors(id),
+      utm_campaign TEXT,
+      utm_content TEXT,
+      sessions REAL,
+      conversions REAL,
+      conversion_rate REAL,
+      clicks REAL,
+      spend REAL,
+      revenue REAL,
+      extra_json TEXT,             -- any additional CSV columns, verbatim
+      dataset_label TEXT,
+      uploaded_at TEXT,
+      UNIQUE(competitor_id, utm_campaign, utm_content)
+    );
+    CREATE INDEX IF NOT EXISTS idx_segment_analytics_comp
+      ON segment_analytics(competitor_id);
+    """)
+
+
 @contextmanager
 def connect(db_path: Path | None = None) -> Iterator[sqlite3.Connection]:
     p = Path(db_path or DB_PATH)
@@ -427,6 +481,7 @@ def connect(db_path: Path | None = None) -> Iterator[sqlite3.Connection]:
     _migrate_homepage_promos_table(conn)
     _migrate_ads_table(conn)
     _migrate_source_column(conn)
+    _migrate_analytics_tables(conn)
     conn.commit()
     try:
         yield conn
@@ -870,3 +925,79 @@ def record_task_result(
         ),
     )
     return cur.lastrowid or 0
+
+
+# ----------------------------------------------------------------------------
+# Per-creative landing UTMs + uploaded segment analytics (Philo perf feature)
+# ----------------------------------------------------------------------------
+
+def upsert_creative_landing(
+    conn: sqlite3.Connection,
+    *,
+    creative_id: int,
+    ad_id: int | None,
+    competitor_id: str | None,
+    landing_url: str | None,
+    clean_url: str | None,
+    utm: dict[str, Any],
+) -> None:
+    """Store the parsed landing-page UTMs for one creative. `utm` is the dict
+    produced by analysis.landing.parse_url()['utm'] plus the custom
+    'utm_content_id' pulled from query_params. Idempotent per creative_id."""
+    conn.execute(
+        "INSERT INTO creative_landing(creative_id, ad_id, competitor_id, landing_url, "
+        "  clean_url, utm_source, utm_medium, utm_campaign, utm_content, utm_term, "
+        "  utm_content_id, captured_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?) "
+        "ON CONFLICT(creative_id) DO UPDATE SET "
+        "  ad_id=excluded.ad_id, competitor_id=excluded.competitor_id, "
+        "  landing_url=excluded.landing_url, clean_url=excluded.clean_url, "
+        "  utm_source=excluded.utm_source, utm_medium=excluded.utm_medium, "
+        "  utm_campaign=excluded.utm_campaign, utm_content=excluded.utm_content, "
+        "  utm_term=excluded.utm_term, utm_content_id=excluded.utm_content_id, "
+        "  captured_at=excluded.captured_at",
+        (
+            creative_id, ad_id, competitor_id, landing_url, clean_url,
+            utm.get("utm_source"), utm.get("utm_medium"), utm.get("utm_campaign"),
+            utm.get("utm_content"), utm.get("utm_term"), utm.get("utm_content_id"),
+            utcnow(),
+        ),
+    )
+
+
+def replace_segment_analytics(
+    conn: sqlite3.Connection,
+    competitor_id: str,
+    rows: list[dict[str, Any]],
+    *,
+    dataset_label: str | None = None,
+) -> int:
+    """Replace ALL uploaded analytics for a competitor with `rows` (the
+    'Replace all' import mode). Each row keys on (utm_campaign, utm_content) and
+    carries sessions/conversions/conversion_rate (+ optional clicks/spend/revenue
+    and an extra_json catch-all). Returns the number of rows written."""
+    conn.execute("DELETE FROM segment_analytics WHERE competitor_id=?", (competitor_id,))
+    ts = utcnow()
+    n = 0
+    for r in rows:
+        conn.execute(
+            "INSERT INTO segment_analytics(competitor_id, utm_campaign, utm_content, "
+            "  sessions, conversions, conversion_rate, clicks, spend, revenue, "
+            "  extra_json, dataset_label, uploaded_at) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?) "
+            "ON CONFLICT(competitor_id, utm_campaign, utm_content) DO UPDATE SET "
+            "  sessions=excluded.sessions, conversions=excluded.conversions, "
+            "  conversion_rate=excluded.conversion_rate, clicks=excluded.clicks, "
+            "  spend=excluded.spend, revenue=excluded.revenue, "
+            "  extra_json=excluded.extra_json, dataset_label=excluded.dataset_label, "
+            "  uploaded_at=excluded.uploaded_at",
+            (
+                competitor_id, r.get("utm_campaign"), r.get("utm_content"),
+                r.get("sessions"), r.get("conversions"), r.get("conversion_rate"),
+                r.get("clicks"), r.get("spend"), r.get("revenue"),
+                json.dumps(r.get("extra")) if r.get("extra") else None,
+                dataset_label, ts,
+            ),
+        )
+        n += 1
+    return n

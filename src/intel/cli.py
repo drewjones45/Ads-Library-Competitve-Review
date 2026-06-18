@@ -990,5 +990,275 @@ def evals_history(limit: int) -> None:
     console.print(t)
 
 
+@cli.command("utm-capture")
+@click.option("--competitor", "competitor_id", default="philo",
+              help="brand id to capture landing-page UTMs for (default: philo)")
+def utm_capture_cmd(competitor_id: str) -> None:
+    """Capture each creative's landing-page URL + parse its UTM parameters.
+
+    Walks every creative tied to a paid ad for the competitor, reads the parent
+    ad's link_url, parses the UTMs (source/medium/campaign/content/term + the
+    custom utm_content_id), and stores them per-creative in `creative_landing`.
+    Idempotent — safe to re-run after each ingest.
+    """
+    from .analysis.landing import parse_url
+    from .storage import upsert_creative_landing
+
+    with connect() as conn:
+        rows = conn.execute(
+            "SELECT c.id AS creative_id, c.ad_id, a.competitor_id, a.link_url "
+            "FROM creatives c JOIN ads a ON a.id = c.ad_id "
+            "WHERE a.competitor_id = ? AND a.link_url IS NOT NULL AND a.link_url <> ''",
+            (competitor_id,),
+        ).fetchall()
+        if not rows:
+            console.print(f"[yellow]no ad-linked creatives with link_urls for[/yellow] {competitor_id}")
+            return
+        n_with_utm = 0
+        for r in rows:
+            parsed = parse_url(r["link_url"])
+            utm = dict(parsed["utm"])
+            # utm_content_id is Philo-custom — not in the standard _UTM_KEYS set,
+            # so pull it straight from the parsed query params.
+            utm["utm_content_id"] = parsed["query_params"].get("utm_content_id")
+            if any(utm.values()):
+                n_with_utm += 1
+            upsert_creative_landing(
+                conn,
+                creative_id=r["creative_id"],
+                ad_id=r["ad_id"],
+                competitor_id=r["competitor_id"],
+                landing_url=r["link_url"],
+                clean_url=parsed["clean_url"],
+                utm=utm,
+            )
+    console.print(
+        f"[green]captured[/green] {len(rows)} creatives for [bold]{competitor_id}[/bold] "
+        f"({n_with_utm} with UTM params)"
+    )
+
+
+@cli.command("analytics-export")
+@click.option("--competitor", "competitor_id", default="philo",
+              help="brand id to export (default: philo)")
+@click.option("--out", "out_path", required=True, type=click.Path(),
+              help="CSV path to write")
+def analytics_export_cmd(competitor_id: str, out_path: str) -> None:
+    """Export the campaign/content segments to a CSV template to fill + re-upload.
+
+    One row per distinct (utm_campaign, utm_content) the competitor's creatives
+    map to, with the number of creatives in each segment and empty metric columns
+    (sessions/conversions/conversion_rate). Fill those in and feed the file to
+    `intel analytics-import`. Any metrics already uploaded are pre-filled so a
+    re-export shows current values.
+    """
+    import csv
+
+    with connect() as conn:
+        rows = conn.execute(
+            "SELECT cl.utm_campaign, cl.utm_content, COUNT(*) AS n_creatives, "
+            "  MIN(cl.landing_url) AS example_landing_url, "
+            "  sa.sessions, sa.conversions, sa.conversion_rate "
+            "FROM creative_landing cl "
+            "LEFT JOIN segment_analytics sa "
+            "  ON sa.competitor_id = cl.competitor_id "
+            "  AND IFNULL(sa.utm_campaign,'') = IFNULL(cl.utm_campaign,'') "
+            "  AND IFNULL(sa.utm_content,'') = IFNULL(cl.utm_content,'') "
+            "WHERE cl.competitor_id = ? "
+            "GROUP BY cl.utm_campaign, cl.utm_content "
+            "ORDER BY n_creatives DESC",
+            (competitor_id,),
+        ).fetchall()
+    if not rows:
+        console.print(
+            f"[yellow]no captured UTMs for[/yellow] {competitor_id} — "
+            "run `intel utm-capture` first."
+        )
+        sys.exit(2)
+    out = Path(out_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    cols = ["utm_campaign", "utm_content", "n_creatives", "example_landing_url",
+            "sessions", "conversions", "conversion_rate"]
+    with out.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(cols)
+        for r in rows:
+            w.writerow([
+                r["utm_campaign"] or "", r["utm_content"] or "", r["n_creatives"],
+                r["example_landing_url"] or "",
+                "" if r["sessions"] is None else r["sessions"],
+                "" if r["conversions"] is None else r["conversions"],
+                "" if r["conversion_rate"] is None else r["conversion_rate"],
+            ])
+    console.print(
+        f"[green]wrote[/green] {len(rows)} segments → {out}\n"
+        "Fill in sessions/conversions/conversion_rate (conversion_rate optional — "
+        "computed from conversions/sessions if blank), then run "
+        f"[bold]intel analytics-import --competitor {competitor_id} --in {out}[/bold]"
+    )
+
+
+@cli.command("analytics-import")
+@click.option("--competitor", "competitor_id", default="philo",
+              help="brand id the CSV belongs to (default: philo)")
+@click.option("--in", "in_path", required=True, type=click.Path(exists=True),
+              help="filled CSV to import")
+@click.option("--label", "dataset_label", default=None,
+              help="optional label for this dataset (e.g. 'GA4 May 2026')")
+def analytics_import_cmd(competitor_id: str, in_path: str, dataset_label: str | None) -> None:
+    """Import creative analytics, matched on utm_campaign + utm_content.
+
+    Replaces ALL prior analytics for the competitor with this file, aggregating
+    to the (utm_campaign, utm_content) grain. Two input shapes are accepted:
+
+      * the `analytics-export` template (utm_campaign, utm_content, sessions,
+        conversions, conversion_rate, ...), and
+      * a raw **GA4 export** ("Session campaign" / "Session manual ad content" /
+        "Sessions" / "Key events" columns, with a leading comment block) —
+        recognized automatically and summed to the campaign+content grain.
+
+    conversion_rate is recomputed from summed conversions/sessions. Rows whose
+    campaign is blank (GA4 grand-total / (direct) / (organic) noise without a
+    campaign) are skipped so they can't bleed onto un-tagged creatives.
+    """
+    import csv
+    from collections import defaultdict
+    from .storage import replace_segment_analytics
+
+    # Column aliases — first match wins (case-insensitive, trimmed).
+    ALIASES = {
+        "utm_campaign": ["utm_campaign", "session campaign", "campaign"],
+        "utm_content": ["utm_content", "session manual ad content", "ad content"],
+        "sessions": ["sessions", "session", "users"],
+        "conversions": ["conversions", "key events", "conversion", "key event"],
+        "conversion_rate": ["conversion_rate", "cvr"],
+        "clicks": ["clicks", "click"],
+        "spend": ["spend", "cost"],
+        "revenue": ["revenue", "total revenue"],
+    }
+
+    def _num(v):
+        if v is None:
+            return None
+        v = str(v).strip().replace(",", "").replace("$", "").replace("%", "")
+        if v == "":
+            return None
+        try:
+            return float(v)
+        except ValueError:
+            return None
+
+    # Read all lines; the GA4 export prefixes a '#'-comment block + blank lines
+    # before the real header. Find the first row that carries a campaign column.
+    raw_lines = open(in_path, encoding="utf-8-sig").read().splitlines()
+    header_idx = None
+    for i, line in enumerate(raw_lines):
+        low = line.lower()
+        if ("utm_campaign" in low) or ("session campaign" in low) or \
+           (low.startswith("campaign,") or ",campaign," in low):
+            header_idx = i
+            break
+    if header_idx is None:
+        console.print("[red]could not find a header row with a campaign column "
+                      "(utm_campaign / Session campaign)[/red]")
+        sys.exit(2)
+
+    import io as _io
+    reader = csv.DictReader(_io.StringIO("\n".join(raw_lines[header_idx:])))
+    fields = [f for f in (reader.fieldnames or []) if f]
+
+    def _resolve(canonical):
+        for cand in ALIASES[canonical]:
+            for f in fields:
+                if f.strip().lower() == cand:
+                    return f
+        return None
+
+    colmap = {c: _resolve(c) for c in ALIASES}
+    if not colmap["utm_campaign"] or not colmap["utm_content"]:
+        console.print("[red]need a campaign column and a content column "
+                      "(utm_campaign+utm_content or GA4 'Session campaign'+"
+                      "'Session manual ad content')[/red]")
+        sys.exit(2)
+    is_ga4 = colmap["utm_campaign"] != "utm_campaign"
+    if is_ga4:
+        console.print(f"[cyan]detected GA4 export[/cyan] — aggregating "
+                      f"'{colmap['sessions']}' / '{colmap['conversions']}' "
+                      "to campaign+content")
+
+    BLANK = {"", "(not set)", "(direct)", "(organic)", "(none)", "(not provided)"}
+
+    # Aggregate to (campaign, content). agg[key] = dict of running sums.
+    agg: dict[tuple, dict] = defaultdict(lambda: {
+        "sessions": 0.0, "conversions": 0.0, "clicks": 0.0, "spend": 0.0,
+        "revenue": 0.0, "has_sessions": False, "has_conv": False,
+        "cvr_explicit": None, "n_rows": 0,
+    })
+    n_in = skipped_blank = 0
+    for raw in reader:
+        n_in += 1
+        camp = (raw.get(colmap["utm_campaign"]) or "").strip()
+        content = (raw.get(colmap["utm_content"]) or "").strip()
+        if camp.lower() in BLANK:   # grand-total / untagged noise
+            skipped_blank += 1
+            continue
+        key = (camp, content if content.lower() not in BLANK else "")
+        a = agg[key]
+        a["n_rows"] += 1
+        sess = _num(raw.get(colmap["sessions"])) if colmap["sessions"] else None
+        conv = _num(raw.get(colmap["conversions"])) if colmap["conversions"] else None
+        if sess is not None:
+            a["sessions"] += sess; a["has_sessions"] = True
+        if conv is not None:
+            a["conversions"] += conv; a["has_conv"] = True
+        for m in ("clicks", "spend", "revenue"):
+            if colmap[m]:
+                v = _num(raw.get(colmap[m]))
+                if v is not None:
+                    a[m] += v
+        if colmap["conversion_rate"] and a["cvr_explicit"] is None:
+            a["cvr_explicit"] = _num(raw.get(colmap["conversion_rate"]))
+
+    parsed_rows: list[dict] = []
+    for (camp, content), a in agg.items():
+        sessions = a["sessions"] if a["has_sessions"] else None
+        conversions = a["conversions"] if a["has_conv"] else None
+        if conversions is not None and sessions:
+            cvr = conversions / sessions
+        else:
+            cvr = a["cvr_explicit"]
+        parsed_rows.append({
+            "utm_campaign": camp or None,
+            "utm_content": content or None,
+            "sessions": sessions,
+            "conversions": conversions,
+            "conversion_rate": cvr,
+            "clicks": a["clicks"] or None,
+            "spend": a["spend"] or None,
+            "revenue": a["revenue"] or None,
+            "extra": None,
+        })
+    n_with_metrics = sum(1 for r in parsed_rows
+                         if r["sessions"] is not None or r["conversions"] is not None)
+    n_total = n_in
+    with connect() as conn:
+        n = replace_segment_analytics(conn, competitor_id, parsed_rows,
+                                      dataset_label=dataset_label)
+        # How many creatives now resolve to an uploaded segment?
+        matched_creatives = conn.execute(
+            "SELECT COUNT(*) FROM creative_landing cl JOIN segment_analytics sa "
+            "  ON sa.competitor_id = cl.competitor_id "
+            "  AND IFNULL(sa.utm_campaign,'') = IFNULL(cl.utm_campaign,'') "
+            "  AND IFNULL(sa.utm_content,'') = IFNULL(cl.utm_content,'') "
+            "WHERE cl.competitor_id = ?", (competitor_id,),
+        ).fetchone()[0]
+    console.print(
+        f"[green]imported[/green] {n} campaign+content segments for "
+        f"[bold]{competitor_id}[/bold] (aggregated from {n_total} input rows, "
+        f"{skipped_blank} blank-campaign rows skipped; {n_with_metrics} segments "
+        f"have metrics) · [bold]{matched_creatives}[/bold] creatives now have analytics"
+    )
+
+
 if __name__ == "__main__":
     cli()

@@ -176,10 +176,21 @@ if row:
 PY
 echo
 
+# ---- 8b. capture landing-page UTMs for Philo creatives ----
+# Stores each Philo creative's landing URL + parsed UTMs in `creative_landing`
+# (the join source for uploaded analytics). Philo-only by request. Re-run-safe.
+bold "[8b] capture Philo creative UTMs"; rule
+.venv/bin/intel utm-capture --competitor philo
+echo
+
 # ---- 9. HTML dashboard ----
+# Plain (Meta) set + the all-platform "with-google" set. The with-google set is
+# where Google ATC ads AND uploaded creative analytics (traffic/CVR chips) show.
 bold "[9/9] HTML dashboard"; rule
 .venv/bin/intel dashboard    --out "$REPORTS/dashboard"    --days "$DAYS"
 .venv/bin/intel dashboard --v2 --out "$REPORTS/dashboard-v2" --days "$DAYS"
+.venv/bin/intel dashboard --platform all    --out "$REPORTS/with-google/dashboard"    --days "$DAYS"
+.venv/bin/intel dashboard --platform all --v2 --out "$REPORTS/with-google/dashboard-v2" --days "$DAYS"
 echo
 
 # ---- summary ----

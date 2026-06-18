@@ -237,6 +237,38 @@ def _collect(conn: sqlite3.Connection, *, days: int,
     if brand_filter:
         keep = set(brand_filter)
         all_recs = [r for r in all_recs if r.competitor_id in keep]
+
+    # --- Video-ad cover stills -----------------------------------------------
+    # A Meta video ad carries a cover/preview image (creative_image_urls) that
+    # gets stored as a plain 'image' creative. Surfaced raw it reads as a
+    # static-image ad — blurring "real still" vs "cut of video", the exact
+    # confusion we want to avoid. For every 'image' creative whose ad ALSO has
+    # a video creative (i.e. it's that video's cover):
+    #   - if an analyzed video frame for the same ad is already in the gallery,
+    #     drop the cover (the frame represents the ad — no double-listing);
+    #   - otherwise relabel the cover 'video_evicted' so it renders with the
+    #     play badge + "Watch on Meta Ad Library" click-out instead of looking
+    #     like a standalone still. Net: each video ad appears once, always
+    #     marked as video; genuine static-image ads are untouched.
+    video_ad_ids = {
+        row[0] for row in conn.execute(
+            "SELECT DISTINCT ad_id FROM creatives "
+            "WHERE ad_id IS NOT NULL AND asset_type IN ('video','video_evicted')"
+        ).fetchall()
+    }
+    analyzed_video_ad_ids = {
+        r.ad_id for r in all_recs
+        if r.ad_id and r.asset_type in ("video", "video_evicted")
+    }
+    _reconciled = []
+    for r in all_recs:
+        if r.asset_type == "image" and r.ad_id in video_ad_ids:
+            if r.ad_id in analyzed_video_ad_ids:
+                continue  # an analyzed video frame already represents this ad
+            r.asset_type = "video_evicted"  # relabel cover → badges as video
+        _reconciled.append(r)
+    all_recs = _reconciled
+
     # Paid-ad creatives, minus non-taxonomy page assets. text_ad has an ad_id
     # (so ad_id>0 alone wouldn't drop it) but points at a JSON sidecar, not an
     # image, and lacks the visual taxonomy — excluding it keeps the per-brand
@@ -639,6 +671,29 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         "ORDER BY created_at DESC LIMIT 1"
     ).fetchone()
 
+    # Uploaded creative analytics (Philo perf feature). Metrics live at the
+    # (utm_campaign, utm_content) grain in segment_analytics; every creative of
+    # an ad shares that ad's landing UTMs, so we resolve metrics per ad_id via
+    # creative_landing. Empty (no analytics uploaded) → empty dict → no chips
+    # render, so deployments without uploads are byte-identical.
+    analytics_by_ad: dict[int, dict] = {}
+    for r in conn.execute(
+        "SELECT DISTINCT cl.ad_id, sa.sessions, sa.conversions, sa.conversion_rate, "
+        "  sa.utm_campaign, sa.utm_content "
+        "FROM creative_landing cl JOIN segment_analytics sa "
+        "  ON sa.competitor_id = cl.competitor_id "
+        "  AND IFNULL(sa.utm_campaign,'') = IFNULL(cl.utm_campaign,'') "
+        "  AND IFNULL(sa.utm_content,'') = IFNULL(cl.utm_content,'') "
+        "WHERE sa.sessions IS NOT NULL OR sa.conversions IS NOT NULL"
+    ).fetchall():
+        analytics_by_ad[r["ad_id"]] = {
+            "sessions": r["sessions"],
+            "conversions": r["conversions"],
+            "cvr": r["conversion_rate"],
+            "segment": " · ".join(x for x in (r["utm_campaign"], r["utm_content"]) if x),
+        }
+    has_analytics = bool(analytics_by_ad)
+
     # --- payloads for client-side features (filter, brand-vs-brand, delta view) ---
     creatives_index: list[dict] = []
     for rec in gallery_recs:
@@ -654,7 +709,12 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         vmeta = a.get("video_meta") or {}
         landing_info = ad_landing_by_id.get(rec.ad_id or 0) or {}
         utm_info = landing_info.get("utm") or {}
+        perf = analytics_by_ad.get(rec.ad_id or 0) or {}
         creatives_index.append({
+            "sessions": perf.get("sessions"),
+            "conversions": perf.get("conversions"),
+            "cvr": perf.get("cvr"),
+            "perfSegment": perf.get("segment"),
             "id": rec.ad_id,
             "comp": rec.competitor_id,
             "compName": rec.competitor_name,
@@ -787,6 +847,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         "tv_ads_by_brand": tv_ads_by_brand,
         "tv_metrics_by_brand": tv_metrics_by_brand,
         "tv_in_scope": tv_in_scope,
+        "has_analytics": has_analytics,
         "latest_briefing": dict(latest_briefing) if latest_briefing else None,
         # client-side payloads
         "client_creatives": creatives_index,
@@ -1003,6 +1064,22 @@ tr.set-row td { background: #1f2c4a !important; color: white; font-weight: 600; 
   color: white; font-size: 10px; font-weight: 700; padding: 1px 5px;
   border-radius: 2px; letter-spacing: 0.3px; pointer-events: none;
 }
+
+/* Uploaded creative analytics — per-card traffic/CVR chip + sort control. */
+.perf-chip {
+  display: inline-flex; gap: 4px; align-items: baseline; margin: 4px 0 2px;
+  padding: 2px 8px; border-radius: 999px; background: #eef3ff;
+  color: #33415c; font-size: 11px; font-weight: 600; border: 1px solid #d4def5;
+  white-space: nowrap;
+}
+.perf-chip .perf-num { color: #2c5cff; font-weight: 800; }
+.perf-sort-label { color: #6b7280; font-size: 11px; margin-left: 12px; }
+.perf-sort-btn {
+  background: #f4f6fb; border: 1px solid #d4def5; color: #33415c;
+  border-radius: 6px; font-size: 11px; padding: 2px 8px; margin-left: 4px;
+  cursor: pointer; font-family: inherit;
+}
+.perf-sort-btn.active { background: #2c5cff; color: #fff; border-color: #2c5cff; }
 
 /* Filter UI — dropdown style */
 .filter-bar { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 8px;
@@ -1221,10 +1298,54 @@ function _thumbForCreative(c) {
   return c.imgPath;
 }
 
+// Compact traffic/conversion chip from uploaded analytics. Renders nothing
+// when no analytics are present (so non-Philo decks stay clean / byte-identical).
+function _fmtInt(n) {
+  if (n === null || n === undefined || n === '') return '';
+  return Math.round(Number(n)).toLocaleString('en-US');
+}
+function _perfChip(c) {
+  if ((c.sessions === null || c.sessions === undefined)
+      && (c.conversions === null || c.conversions === undefined)
+      && (c.cvr === null || c.cvr === undefined)) return '';
+  const parts = [];
+  if (c.sessions !== null && c.sessions !== undefined && c.sessions !== '')
+    parts.push(`<span class="perf-num">${_fmtInt(c.sessions)}</span> sessions`);
+  if (c.cvr !== null && c.cvr !== undefined && c.cvr !== '')
+    parts.push(`<span class="perf-num">${(Number(c.cvr) * 100).toFixed(1)}%</span> CVR`);
+  else if (c.conversions !== null && c.conversions !== undefined && c.conversions !== '')
+    parts.push(`<span class="perf-num">${_fmtInt(c.conversions)}</span> conv`);
+  if (!parts.length) return '';
+  const seg = c.perfSegment ? ` title="${escapeHTML(c.perfSegment)}"` : '';
+  return `<div class="perf-chip"${seg}>${parts.join(' · ')}</div>`;
+}
+
+// Optional perf sort key ('sessions' | 'cvr' | null) — only when analytics
+// have been uploaded. null preserves the default (filter-order) layout.
+let _perfSort = null;
+function _initPerfSort() {
+  const host = document.getElementById('perf-sort');
+  if (!host || !DATA.has_analytics) return;
+  const opts = [['', 'Default'], ['sessions', 'Sessions'], ['cvr', 'CVR']];
+  host.innerHTML = '<span class="perf-sort-label">Sort by performance:</span> ' +
+    opts.map(([k, l]) =>
+      `<button class="perf-sort-btn${k === (_perfSort || '') ? ' active' : ''}" data-k="${k}">${l}</button>`
+    ).join('');
+  host.querySelectorAll('.perf-sort-btn').forEach(b => b.addEventListener('click', () => {
+    _perfSort = b.dataset.k || null;
+    _initPerfSort();
+    renderFilterGallery();
+  }));
+}
+
 function renderFilterGallery() {
   const container = document.getElementById('filter-gallery-grid');
   if (!container) return;
-  const matched = DATA.client_creatives.filter(matchesFilters);
+  let matched = DATA.client_creatives.filter(matchesFilters);
+  if (DATA.has_analytics && _perfSort) {
+    const key = _perfSort;
+    matched = matched.slice().sort((a, b) => (Number(b[key]) || -1) - (Number(a[key]) || -1));
+  }
   container.innerHTML = matched.map(c => {
     const thumb = _thumbForCreative(c);
     const dur = _fmtDur(c.videoDurationSec);
@@ -1242,6 +1363,7 @@ function renderFilterGallery() {
       <div class="body">
         <div class="summary">${escapeHTML(c.summary || '(no summary)')}</div>
         <div class="muted"><code>${escapeHTML(c.comp)}</code> · ad <code>${c.adId}</code></div>
+        ${_perfChip(c)}
         <div class="tags">
           ${DATA.google_in_scope && c.platform ? `<span class="tag">${escapeHTML(c.platform)}</span>` : ''}
           ${c.photo ? `<span class="tag">${c.photo}</span>` : ''}
@@ -1395,6 +1517,7 @@ document.getElementById('clear-filters')?.addEventListener('click', () => {
 });
 
 buildFilterDropdowns();
+_initPerfSort();
 renderFilterGallery();
 
 // ---- BRAND vs BRAND ----
@@ -2782,6 +2905,7 @@ def build_dashboard(
       <div class="filter-status">
         <span id="filter-status-count"></span>
         <button id="clear-filters">Clear all filters</button>
+        <span id="perf-sort"></span>
       </div>
       <div class="gallery" id="filter-gallery-grid"></div>
     </section>
@@ -2856,6 +2980,7 @@ def build_dashboard(
         "client_tallies": data["client_tallies"],
         "client_set_tally": data["client_set_tally"],
         "google_in_scope": data["google_in_scope"],
+        "has_analytics": data.get("has_analytics", False),
         "brands_meta": brands_meta,
         "window_days": days,
     }

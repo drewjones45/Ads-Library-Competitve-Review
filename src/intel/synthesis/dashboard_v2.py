@@ -451,6 +451,24 @@ tr.set-row td { background: var(--bg-elev); color: var(--text-1); font-weight: 7
   border-radius: 2px; letter-spacing: 0.3px; pointer-events: none;
 }
 
+/* Uploaded creative analytics — per-card traffic/CVR chip + sort control. */
+.perf-chip {
+  display: inline-flex; gap: 4px; align-items: baseline; margin: 4px 0 2px;
+  padding: 2px 8px; border-radius: var(--radius-pill, 999px);
+  background: var(--accent-soft, rgba(91,140,255,0.14));
+  color: var(--text-2, #c7cdd9); font-size: 11px; font-weight: 600;
+  border: 1px solid var(--border-1, #2a3140); white-space: nowrap;
+}
+.perf-chip .perf-num { color: var(--accent, #5b8cff); font-weight: 800; }
+.perf-sort-label { color: var(--text-3, #8a93a3); font-size: 11px; margin-left: 12px; }
+.perf-sort-btn {
+  background: var(--bg-inset, #11151d); border: 1px solid var(--border-1, #2a3140);
+  color: var(--text-2, #c7cdd9); border-radius: var(--radius-ctl, 6px);
+  font-size: 11px; padding: 2px 8px; margin-left: 4px; cursor: pointer; font-family: inherit;
+}
+.perf-sort-btn.active { background: var(--accent, #5b8cff); color: var(--accent-contrast, #fff);
+  border-color: var(--accent, #5b8cff); }
+
 /* Filter UI — dropdown style */
 .filter-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;
               margin: 10px 0 16px; }
@@ -819,6 +837,24 @@ const filterState = {
   utmSource: new Set(), utmMedium: new Set(),
 };
 
+// Optional perf sort key ('sessions' | 'cvr' | null) — only when analytics
+// have been uploaded. null preserves the default (filter-order) layout.
+let _perfSort = null;
+function _initPerfSort() {
+  const host = document.getElementById('perf-sort');
+  if (!host || !DATA.has_analytics) return;
+  const opts = [['', 'Default'], ['sessions', 'Sessions'], ['cvr', 'CVR']];
+  host.innerHTML = '<span class="perf-sort-label">Sort by performance:</span> ' +
+    opts.map(([k, l]) =>
+      `<button class="perf-sort-btn${k === (_perfSort || '') ? ' active' : ''}" data-k="${k}">${l}</button>`
+    ).join('');
+  host.querySelectorAll('.perf-sort-btn').forEach(b => b.addEventListener('click', () => {
+    _perfSort = b.dataset.k || null;
+    _initPerfSort();
+    renderFilterGallery();
+  }));
+}
+
 function matchesFilters(c) {
   for (const [grp, set] of Object.entries(filterState)) {
     if (set.size === 0) continue;
@@ -857,10 +893,36 @@ function _thumbForCreative(c) {
   return c.imgPath;
 }
 
+// Compact traffic/conversion chip from uploaded analytics. Renders nothing
+// when no analytics are present for the creative (so non-Philo decks are clean).
+function _fmtInt(n) {
+  if (n === null || n === undefined || n === '') return '';
+  return Math.round(Number(n)).toLocaleString('en-US');
+}
+function _perfChip(c) {
+  if (c.sessions === null && c.conversions === null && c.cvr === null) return '';
+  if (c.sessions === undefined && c.conversions === undefined && c.cvr === undefined) return '';
+  const parts = [];
+  if (c.sessions !== null && c.sessions !== undefined && c.sessions !== '')
+    parts.push(`<span class="perf-num">${_fmtInt(c.sessions)}</span> sessions`);
+  if (c.cvr !== null && c.cvr !== undefined && c.cvr !== '')
+    parts.push(`<span class="perf-num">${(Number(c.cvr) * 100).toFixed(1)}%</span> CVR`);
+  else if (c.conversions !== null && c.conversions !== undefined && c.conversions !== '')
+    parts.push(`<span class="perf-num">${_fmtInt(c.conversions)}</span> conv`);
+  if (!parts.length) return '';
+  const seg = c.perfSegment ? ` title="${escapeHTML(c.perfSegment)}"` : '';
+  return `<div class="perf-chip"${seg}>${parts.join(' · ')}</div>`;
+}
+
 function renderFilterGallery() {
   const container = document.getElementById('filter-gallery-grid');
   if (!container) return;
-  const matched = DATA.client_creatives.filter(matchesFilters);
+  let matched = DATA.client_creatives.filter(matchesFilters);
+  if (DATA.has_analytics && _perfSort) {
+    // Sort by the chosen metric desc; creatives without data sink to the bottom.
+    const key = _perfSort;
+    matched = matched.slice().sort((a, b) => (Number(b[key]) || -1) - (Number(a[key]) || -1));
+  }
   container.innerHTML = matched.map(c => {
     const thumb = _thumbForCreative(c);
     const dur = _fmtDur(c.videoDurationSec);
@@ -878,6 +940,7 @@ function renderFilterGallery() {
       <div class="body">
         <div class="summary">${escapeHTML(c.summary || '(no summary)')}</div>
         <div class="muted"><code>${escapeHTML(c.comp)}</code> · ad <code>${c.adId}</code></div>
+        ${_perfChip(c)}
         <div class="tags">
           ${DATA.google_in_scope && c.platform ? `<span class="tag">${escapeHTML(c.platform)}</span>` : ''}
           ${c.photo ? `<span class="tag">${c.photo}</span>` : ''}
@@ -1031,6 +1094,7 @@ document.getElementById('clear-filters')?.addEventListener('click', () => {
 });
 
 buildFilterDropdowns();
+_initPerfSort();
 renderFilterGallery();
 
 // ---- BRAND vs BRAND ----
@@ -2328,6 +2392,7 @@ def build_dashboard_v2(
       <div class="filter-status">
         <span id="filter-status-count"></span>
         <button id="clear-filters">Clear all filters</button>
+        <span id="perf-sort"></span>
       </div>
       <div class="gallery" id="filter-gallery-grid"></div>
     </section>
@@ -2394,6 +2459,7 @@ def build_dashboard_v2(
         "client_tallies_weighted": data["client_tallies_weighted"],
         "client_set_tally": data["client_set_tally"],
         "google_in_scope": data["google_in_scope"],
+        "has_analytics": data.get("has_analytics", False),
         "brands_meta": brands_meta,
         "window_days": days,
     }
