@@ -6,9 +6,23 @@ gitignored and large. To put the dashboards online, we build a **self-contained
 static site** (`dist/`) that copies + rewrites every asset reference to be
 portable, then deploy that folder to Netlify.
 
-Because the assets only exist on the machine that ran the ingest, **the site is
-built locally, not in Netlify CI.** A Git-connected build would have no `data/`
-and would render broken images.
+**Git-push deploys work** (2026-07-14). The site is Git-connected: a push to
+`main` triggers Netlify CI, which runs `python3 scripts/build_site.py` (stdlib
+only — nothing to install) and publishes `dist/`. This works because the
+`philo`/`trex`/`wegmans` deployments' `data/*_assets/` ARE committed, and
+because `build_site.py` resolves asset refs against the repo's own `data/` tree
+rather than the absolute paths baked into the HTML.
+
+That last part is the whole trick, and it used to be broken: the dashboards
+embed absolute paths from the machine that generated them
+(`/Users/<you>/…/data/…`). In a CI container those do not exist, so the asset was
+silently skipped while its `<img>` ref was still rewritten — publishing a site
+whose images all 404. If you see mass 404s, that is the failure mode to check.
+
+Caveat: the **bobs** deployment's assets live under `data/creative/`, which IS
+gitignored, so its dashboards still render broken images in a CI build. The
+build now prints a loud `⚠ … could not be resolved` warning listing anything it
+could not find. Deploy locally (below) if you need bobs' images.
 
 ## One-time setup
 

@@ -14,9 +14,12 @@ but 404s on any web host. This script makes them hostable:
     `imgPath`s — to portable `../assets/...`,
   * generates a dist/index.html landing page linking everything.
 
-Because the assets are local + large + gitignored, the build runs HERE (not in
-Netlify CI). Deploy the resulting dist/ with `netlify deploy --dir dist` or
-drag-and-drop. See NETLIFY.md.
+Asset refs are resolved against THIS repo's data/ tree, not the absolute paths
+baked into the HTML by the machine that generated it — so a Netlify CI build
+from a git checkout produces the same dist/ as a local build, as long as the
+referenced data/*_assets/ are committed. (They are for philo/trex/wegmans; the
+bobs deployment's data/creative/ is gitignored, so those refs 404 in CI — the
+build warns about any it cannot resolve.) See NETLIFY.md.
 
 Usage:
   python3 scripts/build_site.py                 # latest date per deployment
@@ -81,36 +84,45 @@ def discover() -> dict[str, dict[str, dict[str, Path]]]:
     return out
 
 
-def rewrite_html(idx: Path, dest_dir: Path, assets_dir: Path) -> tuple[int, int]:
+def rewrite_html(idx: Path, dest_dir: Path, assets_dir: Path) -> tuple[int, int, list[str]]:
     """Copy referenced assets into assets_dir and rewrite refs to ../assets/...
-    Returns (n_refs_rewritten, n_assets_copied)."""
+    Returns (n_refs_rewritten, n_assets_copied, unresolved_asset_paths)."""
     text = idx.read_text(encoding="utf-8")
     html_dir = idx.parent
     seen: dict[str, str] = {}  # original path string -> replacement
     copied = 0
+    missing: list[str] = []
 
     for m in ASSET_RE.finditer(text):
         raw = m.group(2)
         if raw in seen:
             continue
-        # Resolve to a real file on disk.
-        if raw.startswith("/"):
-            src = Path(raw)
-        else:
-            src = (html_dir / raw).resolve()
         # Portable path = everything after the LAST 'data/' segment.
         marker = raw.rsplit("/data/", 1)
         if len(marker) != 2:
             continue
         rel_under_data = marker[1]  # e.g. 'philo_assets/creative/x.jpg'
+
+        # Resolve to a real file on disk. The dashboards embed ABSOLUTE paths
+        # from the machine that generated them, so an absolute `raw` resolves
+        # only on that machine — in a fresh checkout (Netlify CI) it does not
+        # exist. Falling back to this repo's own data/ tree is what lets a CI
+        # build produce the same dist/ as a local one; without it the ref is
+        # still rewritten but the file is never copied, and the site 404s.
+        candidates = [Path(raw) if raw.startswith("/") else (html_dir / raw).resolve()]
+        candidates.append(ROOT / "data" / rel_under_data)
+        src = next((c for c in candidates if c.exists()), None)
+
         replacement = "../assets/" + rel_under_data
         seen[raw] = replacement
-        if src.exists():
-            dst = assets_dir / rel_under_data
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            if not dst.exists():
-                shutil.copy2(src, dst)
-                copied += 1
+        if src is None:
+            missing.append(rel_under_data)
+            continue
+        dst = assets_dir / rel_under_data
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if not dst.exists():
+            shutil.copy2(src, dst)
+            copied += 1
 
     # Apply replacements (longest first to avoid partial overlaps).
     for raw in sorted(seen, key=len, reverse=True):
@@ -118,7 +130,7 @@ def rewrite_html(idx: Path, dest_dir: Path, assets_dir: Path) -> tuple[int, int]
 
     dest_dir.mkdir(parents=True, exist_ok=True)
     (dest_dir / "index.html").write_text(text, encoding="utf-8")
-    return len(seen), copied
+    return len(seen), copied, missing
 
 
 def brand_count(idx: Path) -> str:
@@ -209,6 +221,7 @@ def main() -> None:
     # site[dep][date][variant] = relative href into dist
     site: dict[str, dict[str, dict[str, str]]] = defaultdict(lambda: defaultdict(dict))
     total_refs = total_assets = total_dash = 0
+    all_missing: list[str] = []
 
     for dep, dates in discovered.items():
         chosen_dates = sorted(dates) if args.all else [sorted(dates)[-1]]
@@ -216,13 +229,15 @@ def main() -> None:
             assets_dir = out / dep / date / "assets"
             for variant, idx in dates[date].items():
                 dest_dir = out / dep / date / variant
-                refs, copied = rewrite_html(idx, dest_dir, assets_dir)
+                refs, copied, missing = rewrite_html(idx, dest_dir, assets_dir)
+                all_missing.extend(missing)
                 href = f"{dep}/{date}/{variant}/index.html"
                 site[dep][date][variant] = href
                 total_refs += refs
                 total_assets += copied
                 total_dash += 1
-                print(f"  {dep}/{date}/{variant}: {refs} refs, {copied} assets copied")
+                warn = f"  \u26a0 {len(missing)} UNRESOLVED" if missing else ""
+                print(f"  {dep}/{date}/{variant}: {refs} refs, {copied} assets copied{warn}")
 
     build_landing(site, out, args.date_label)
     size_mb = sum(f.stat().st_size for f in out.rglob("*") if f.is_file()) / (1024 * 1024)
@@ -231,6 +246,19 @@ def main() -> None:
         f"  {total_refs} refs rewritten · {total_assets} asset files · {size_mb:.1f} MB total\n"
         f"  landing page: {out}/index.html"
     )
+
+    # Never fail silently: an unresolved ref is still rewritten to ../assets/...,
+    # so it becomes a 404 on the deployed site. Assets under a gitignored tree
+    # (e.g. the bobs deployment's data/creative/) are legitimately absent in a CI
+    # checkout, so warn loudly rather than failing the whole build.
+    if all_missing:
+        by_tree: dict[str, int] = defaultdict(int)
+        for rel in all_missing:
+            by_tree[rel.split("/")[0]] += 1
+        print(f"\n  ⚠ {len(all_missing)} asset ref(s) could not be resolved — these WILL 404:")
+        for tree, n in sorted(by_tree.items(), key=lambda kv: -kv[1]):
+            print(f"      {tree}: {n}")
+        print("    (not in this checkout — gitignored, or not committed)")
 
 
 if __name__ == "__main__":
