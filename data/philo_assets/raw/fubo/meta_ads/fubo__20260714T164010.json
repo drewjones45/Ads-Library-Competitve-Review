@@ -1,0 +1,152 @@
+[
+  {
+    "ad_archive_id": "1242724767784143",
+    "page_name": "\u200b",
+    "page_id": "679262275469242",
+    "is_active_inferred": true,
+    "active_status_label": "active",
+    "start_date": "2026-06-11",
+    "end_date": null,
+    "body_text": "WWW.FUBO.TV\nMira en vivo\nPor solo $9.99 el primer mes TODA la Copa Mundial en vivo. Entra en Fubo Latino y no te pierdas la acci\u00f3n\nSee details",
+    "cta_type": "Fubo",
+    "link_url": "http://www.fubo.tv/stream/la/worldcup-es/",
+    "publisher_platforms": null,
+    "creative_image_urls": [
+      "https://scontent-den2-1.xx.fbcdn.net/v/t39.35426-6/722473687_2044207232871253_3999994530656007898_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=WvvohzUa5K4Q7kNvwHdzPv5&_nc_oc=Adq36qQwUIMVMcTgN6mx32blB9xU8aSwSl1H6v3l0YyGj2_hd3Iqun7GGs_aYOe7v6YWxLIeypk3-Ibe4rclfQJl&_nc_zt=14&_nc_ht=scontent-den2-1.xx&_nc_gid=3Os-mYNt4yyTpjmSMqly5Q&_nc_ss=7b20f&oh=00_AQA15_LCodkJ_2oziquTzNLwqUjJv5YylCNZ7CFi9W9I9A&oe=6A5C3D18"
+    ],
+    "creative_video_urls": [
+      "https://video-den2-1.xx.fbcdn.net/o1/v/t2/f2/m412/AQNMXDDL5vDn1IUyqrps4pbKli31EXIu61RUc58vrh434qR9134hjsnrljSK0wywJKqKzCpcauvjhPvLs2A4lyvPznPltj7cBE0lQCOcug.mp4?_nc_cat=107&_nc_sid=ef5aa3&_nc_ht=video-den2-1.xx.fbcdn.net&_nc_ohc=C-_ITL55Ss8Q7kNvwEZFD5m&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5WSV9VU0VDQVNFX1BST0RVQ1RfVFlQRS4uQzMuMzYwLnN2ZV9zZCIsInhwdl9hc3NldF9pZCI6MjA1OTE1MzkyNTAwNDM3NiwiYXNzZXRfYWdlX2RheXMiOjMyLCJ2aV91c2VjYXNlX2lkIjoxMDc5OSwiZHVyYXRpb25fcyI6MzMsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&_nc_gid=3Os-mYNt4yyTpjmSMqly5Q&_nc_ss=7b20f&_nc_zt=28&oh=00_AQBGEkLDj_lmoVp9CimyeEUh_Y4zXD18aHoPNqFCm15yCQ&oe=6A5C54DB"
+    ],
+    "raw_source": "browser_scrape",
+    "local_creative_paths": [
+      "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/1242724767784143/image_0.jpg"
+    ],
+    "local_video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/1242724767784143/video.mp4",
+    "video_meta": {
+      "duration_sec": 33.83,
+      "width": 360,
+      "height": 636,
+      "has_audio": true,
+      "frames": [
+        {
+          "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/1242724767784143/frame_00_t06770.jpg",
+          "t_sec": 6.77,
+          "idx": 0
+        },
+        {
+          "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/1242724767784143/frame_01_t13530.jpg",
+          "t_sec": 13.53,
+          "idx": 1
+        },
+        {
+          "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/1242724767784143/frame_02_t20300.jpg",
+          "t_sec": 20.3,
+          "idx": 2
+        },
+        {
+          "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/1242724767784143/frame_03_t27060.jpg",
+          "t_sec": 27.06,
+          "idx": 3
+        }
+      ],
+      "transcript_full": null,
+      "transcript_quality": "skipped",
+      "scraped_at": "2026-07-14T16:40:10+00:00",
+      "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/1242724767784143/video.mp4"
+    },
+    "competitor_id": "fubo",
+    "serp_position_rank": 0
+  },
+  {
+    "ad_archive_id": "1766157291504769",
+    "page_name": "\u200b",
+    "page_id": "679262275469242",
+    "is_active_inferred": true,
+    "active_status_label": "active",
+    "start_date": "2026-07-07",
+    "end_date": null,
+    "body_text": "FUBO.TV\nWatch the FIFA World Cup 2026\u2122\nWatch the FIFA World Cup 2026\u2122 on FOX and FS1 available with Fubo. Get $10/mo off your first two months of Fubo Sports when you pay with Cash App!\nSee details",
+    "cta_type": "Fubo",
+    "link_url": "https://www.fubo.tv/stream/cashapp/?irmp=365718&irad=3926184",
+    "publisher_platforms": null,
+    "creative_image_urls": [
+      "https://scontent-den2-1.xx.fbcdn.net/v/t39.35426-6/742606407_27365487883118040_4914470901715577022_n.jpg?stp=dst-jpg_s600x600_tt6&_nc_cat=107&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=PhgFKQXfkhUQ7kNvwF8yv8-&_nc_oc=AdqOKBsk2NiTw8vDRvf6hqOJ7MN-AEhBx4yYb78-SZdGUTsXox3dENjApyelh5rQvq2FcNzIQijgGW7LoFp6FbtI&_nc_zt=14&_nc_ht=scontent-den2-1.xx&_nc_gid=3Os-mYNt4yyTpjmSMqly5Q&_nc_ss=7b20f&oh=00_AQDbfg0Uxn1WGlQx-aFI-dOOaok8Gn9vtV_cQz9z3EDHMg&oe=6A5C2B7E"
+    ],
+    "creative_video_urls": [],
+    "raw_source": "browser_scrape",
+    "local_creative_paths": [
+      "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/1766157291504769/image_0.jpg"
+    ],
+    "competitor_id": "fubo",
+    "serp_position_rank": 1
+  },
+  {
+    "ad_archive_id": "1935170770525330",
+    "page_name": "\u200b",
+    "page_id": "679262275469242",
+    "is_active_inferred": true,
+    "active_status_label": "active",
+    "start_date": "2026-07-07",
+    "end_date": null,
+    "body_text": "FUBO.TV\nMira en vivo\nMira La Copa Mundial de la FIFA 2026\u2122 en Telemundo con Fubo Latino\nSee details",
+    "cta_type": "Fubo",
+    "link_url": "http://www.fubo.tv/stream/la/worldcup-es/",
+    "publisher_platforms": null,
+    "creative_image_urls": [
+      "https://scontent-den2-1.xx.fbcdn.net/v/t39.35426-6/740929746_866929703161931_8515739472228603791_n.jpg?stp=dst-jpg_s600x600_tt6&_nc_cat=102&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=8xQYMrbyeZgQ7kNvwGm5Uxg&_nc_oc=Adpj_8ZpXYsMIb3jaAqZ_7-ewl8g9TQXRuU1I3sfGthdR4JpfcQUVfWlmyaE0qHmhaI59BYd74zXuLYxQVPpVRN2&_nc_zt=14&_nc_ht=scontent-den2-1.xx&_nc_gid=3Os-mYNt4yyTpjmSMqly5Q&_nc_ss=7b20f&oh=00_AQBO3ik0LoJQXA41vLX_mTMmhdUjnQnPA4rA_1_DnxZC2w&oe=6A5C1F91"
+    ],
+    "creative_video_urls": [],
+    "raw_source": "browser_scrape",
+    "local_creative_paths": [
+      "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/1935170770525330/image_0.jpg"
+    ],
+    "competitor_id": "fubo",
+    "serp_position_rank": 2
+  },
+  {
+    "ad_archive_id": "1639951204800586",
+    "page_name": "\u200b",
+    "page_id": "679262275469242",
+    "is_active_inferred": true,
+    "active_status_label": "active",
+    "start_date": "2026-07-14",
+    "end_date": null,
+    "body_text": "\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7fInglaterra vs Argentina \ud83c\udde6\ud83c\uddf7\nLlega la hora de la verdad. \ud83d\udd25 No te pierdas las semifinales del Mundial en vivo con Fubo Latino\nFUBO.TV\nMira en vivo\nMira La Copa Mundial de la FIFA 2026\u2122 en Telemundo con Fubo Latino\nSee details",
+    "cta_type": "Fubo",
+    "link_url": "http://www.fubo.tv/stream/la/worldcup-es/",
+    "publisher_platforms": null,
+    "creative_image_urls": [
+      "https://scontent-den2-1.xx.fbcdn.net/v/t39.35426-6/745963218_2145100663021322_4113302293601232661_n.jpg?stp=dst-jpg_s600x600_tt6&_nc_cat=106&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=zPNjxoPd4t8Q7kNvwEWkr2M&_nc_oc=Adrz8C0PJ-ysFsWuT_3AnKlutVVSZAASiHCM1z7ee6Ty0XA46MzT33BXvh9BkqbNYP5b5rr1aw4AHx6EaYms_CXi&_nc_zt=14&_nc_ht=scontent-den2-1.xx&_nc_gid=3Os-mYNt4yyTpjmSMqly5Q&_nc_ss=7b20f&oh=00_AQBEmFJjvFBC5k8pr9ZZTR_8YUukic3C169aNxe7S_07YQ&oe=6A5C53F4"
+    ],
+    "creative_video_urls": [],
+    "raw_source": "browser_scrape",
+    "local_creative_paths": [
+      "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/1639951204800586/image_0.jpg"
+    ],
+    "competitor_id": "fubo",
+    "serp_position_rank": 3
+  },
+  {
+    "ad_archive_id": "4285934348334710",
+    "page_name": "\u200b",
+    "page_id": "679262275469242",
+    "is_active_inferred": true,
+    "active_status_label": "active",
+    "start_date": "2026-07-13",
+    "end_date": null,
+    "body_text": "\ud83c\uddf2\ud83c\uddfd Chivas vs Toluca en vivo\n\u26bd La Liga MX y mucho m\u00e1s f\u00fatbol internacional en vivo y en espa\u00f1ol en Fubo \ud83d\ude4c\nFUBO.TV\nM\u00e1s f\u00fatbol, menos pago\nTus deportes favoritos en vivo desde cualquier dispositivo con Fubo.",
+    "cta_type": "Learn more",
+    "link_url": "https://www.fubo.tv/stream/latino-es/",
+    "publisher_platforms": null,
+    "creative_image_urls": [
+      "https://scontent-den2-1.xx.fbcdn.net/v/t39.35426-6/744108878_1785054076175727_510317842825456098_n.jpg?stp=dst-jpg_s600x600_tt6&_nc_cat=105&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=W79q0p1WnvQQ7kNvwHjDdXS&_nc_oc=Adrsov-tlg-JXsnIzU6DmUUkSZ-2v5gl4QCNh2fUCu26C6-ey54r9lEQXkyU2c-4xfBRr-4qBOBu_hQeEFa9THLG&_nc_zt=14&_nc_ht=scontent-den2-1.xx&_nc_gid=3Os-mYNt4yyTpjmSMqly5Q&_nc_ss=7b20f&oh=00_AQBGW_hwE3otEVjLLCyRk-T3BX5NipC1PZOKq_ctC2hSlQ&oe=6A5C4E6A"
+    ],
+    "creative_video_urls": [],
+    "raw_source": "browser_scrape",
+    "local_creative_paths": [
+      "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/fubo/4285934348334710/image_0.jpg"
+    ],
+    "competitor_id": "fubo",
+    "serp_position_rank": 4
+  }
+]

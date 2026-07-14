@@ -1,0 +1,67 @@
+{
+  "duration_sec": 15.02,
+  "width": 360,
+  "height": 450,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_00_t00000.jpg",
+      "t_sec": 0.0,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_01_t01126.jpg",
+      "t_sec": 1.126,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_02_t02377.jpg",
+      "t_sec": 2.377,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_03_t03712.jpg",
+      "t_sec": 3.712,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_04_t05047.jpg",
+      "t_sec": 5.047,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_05_t06215.jpg",
+      "t_sec": 6.215,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_06_t07049.jpg",
+      "t_sec": 7.049,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_07_t08217.jpg",
+      "t_sec": 8.217,
+      "idx": 7
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_08_t11720.jpg",
+      "t_sec": 11.72,
+      "idx": 8
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_09_t11762.jpg",
+      "t_sec": 11.762,
+      "idx": 9
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/frame_10_t12513.jpg",
+      "t_sec": 12.513,
+      "idx": 10
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-14T16:45:05+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/1495001208977219/video.mp4"
+}

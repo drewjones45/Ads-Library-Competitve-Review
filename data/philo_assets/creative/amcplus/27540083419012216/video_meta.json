@@ -1,0 +1,72 @@
+{
+  "duration_sec": 48.13,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_00_t00000.jpg",
+      "t_sec": 0.0,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_01_t00967.jpg",
+      "t_sec": 0.967,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_02_t02433.jpg",
+      "t_sec": 2.433,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_03_t05567.jpg",
+      "t_sec": 5.567,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_04_t07067.jpg",
+      "t_sec": 7.067,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_05_t10000.jpg",
+      "t_sec": 10.0,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_06_t14200.jpg",
+      "t_sec": 14.2,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_07_t28533.jpg",
+      "t_sec": 28.533,
+      "idx": 7
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_08_t31567.jpg",
+      "t_sec": 31.567,
+      "idx": 8
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_09_t34900.jpg",
+      "t_sec": 34.9,
+      "idx": 9
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_10_t37833.jpg",
+      "t_sec": 37.833,
+      "idx": 10
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/frame_11_t41400.jpg",
+      "t_sec": 41.4,
+      "idx": 11
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-14T16:44:18+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/amcplus/27540083419012216/video.mp4"
+}

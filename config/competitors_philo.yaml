@@ -11,6 +11,15 @@
 #   - Fubo          — sports-first live-TV bundle (premium)
 #   - Hulu + Live TV — full live-TV bundle + SVOD library (premium)
 #   - YouTube TV    — full live-TV bundle, market leader (premium)
+#   - AMC+          — added 2026-07-14 at user request. NOT a live-TV bundle:
+#                     it's a ~$10/mo entertainment SVOD (AMC/Shudder/IFC/
+#                     Sundance libraries). Competes with Philo on the same
+#                     budget entertainment-streaming wallet and on the same
+#                     "no sports, cheap, bingeable" wedge, but markets almost
+#                     entirely via show-promo creative (The Walking Dead: Dead
+#                     City, Anne Rice titles) rather than price/offer creative.
+#                     Read its numbers as a content-marketing comp, not a
+#                     bundle-price comp.
 #
 # -----------------------------------------------------------------------------
 # Meta page_id resolution results (resolved + VERIFIED via ads_library_search
@@ -122,6 +131,22 @@ competitors:
       - type: meta_ads
         page_id: "6500552187"             # Hulu — VERIFIED via ads_library_search MCP
         page_name: Hulu
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: amcplus
+    name: AMC+
+    vertical: streaming
+    priority: high            # same budget/no-sports entertainment wallet as Philo
+    sources:
+      - type: website
+        url: https://www.amcplus.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "105975121062147"        # AMC Plus — VERIFIED via ads_library_search MCP (2026-07-14; page_name "AMC Plus", 176 active US ads). page_id supplied by user from the Ad Library UI.
+        page_name: AMC Plus
         country: US
         cadence: daily
         method: scrape
