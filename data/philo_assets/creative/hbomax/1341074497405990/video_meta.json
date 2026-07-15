@@ -1,0 +1,32 @@
+{
+  "duration_sec": 21.57,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hbomax/1341074497405990/frame_00_t04310.jpg",
+      "t_sec": 4.31,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hbomax/1341074497405990/frame_01_t08630.jpg",
+      "t_sec": 8.63,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hbomax/1341074497405990/frame_02_t12940.jpg",
+      "t_sec": 12.94,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hbomax/1341074497405990/frame_03_t17260.jpg",
+      "t_sec": 17.26,
+      "idx": 3
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-15T15:18:47+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/hbomax/1341074497405990/video.mp4"
+}

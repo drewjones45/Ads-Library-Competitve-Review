@@ -1,0 +1,52 @@
+{
+  "duration_sec": 30.04,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/peacock/1047531640959598/frame_00_t00000.jpg",
+      "t_sec": 0.0,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/peacock/1047531640959598/frame_01_t03253.jpg",
+      "t_sec": 3.253,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/peacock/1047531640959598/frame_02_t08717.jpg",
+      "t_sec": 8.717,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/peacock/1047531640959598/frame_03_t16016.jpg",
+      "t_sec": 16.016,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/peacock/1047531640959598/frame_04_t21313.jpg",
+      "t_sec": 21.313,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/peacock/1047531640959598/frame_05_t22356.jpg",
+      "t_sec": 22.356,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/peacock/1047531640959598/frame_06_t26485.jpg",
+      "t_sec": 26.485,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/peacock/1047531640959598/frame_07_t27986.jpg",
+      "t_sec": 27.986,
+      "idx": 7
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-15T15:20:54+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/peacock/1047531640959598/video.mp4"
+}

@@ -1,0 +1,72 @@
+{
+  "duration_sec": 66.03,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_00_t00000.jpg",
+      "t_sec": 0.0,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_01_t03879.jpg",
+      "t_sec": 3.879,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_02_t11261.jpg",
+      "t_sec": 11.261,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_03_t26193.jpg",
+      "t_sec": 26.193,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_04_t27569.jpg",
+      "t_sec": 27.569,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_05_t33367.jpg",
+      "t_sec": 33.367,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_06_t38080.jpg",
+      "t_sec": 38.08,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_07_t39039.jpg",
+      "t_sec": 39.039,
+      "idx": 7
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_08_t49508.jpg",
+      "t_sec": 49.508,
+      "idx": 8
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_09_t50592.jpg",
+      "t_sec": 50.592,
+      "idx": 9
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_10_t59935.jpg",
+      "t_sec": 59.935,
+      "idx": 10
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/frame_11_t61478.jpg",
+      "t_sec": 61.478,
+      "idx": 11
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-15T15:17:57+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/netflix/2256505218439650/video.mp4"
+}

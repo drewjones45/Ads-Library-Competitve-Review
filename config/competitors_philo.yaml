@@ -40,6 +40,30 @@
 #                bucket as Fiberon in the decking set — meta_ads source omitted;
 #                website source only.
 #
+# -----------------------------------------------------------------------------
+# Content-SVOD expansion (added 2026-07-15 at user request). These are premium
+# on-demand streamers, NOT live-TV bundles — they compete with Philo for the
+# same entertainment wallet (like AMC+), not on skinny-bundle price. page_ids
+# supplied by the user and VERIFIED via ads_library_search on 2026-07-15:
+#   netflix       → 6275848869      VERIFIED (page_name "Netflix")
+#   hbomax        → 627947847690655 VERIFIED (page_name "HBO Max")
+#   peacock       → 102202437839341 VERIFIED (page_name "Peacock TV")
+#   starz         → 91570464218     VERIFIED (page_name "STARZ"; hard price
+#                   creative e.g. "$24 FOR 1 YEAR", "$3/MO FOR 3 MONTHS")
+#   mgmplus       → 45104949301     VERIFIED (page_name "MGM+"; only ~9 ads)
+#   paramountplus → 113028887202008 VERIFIED (page_name "Paramount+")
+#   appletv       → 100484820802    VERIFIED (page_name "Apple TV")
+#   fxnow (FX)    → 17265241079     VERIFIED (page_name "FX Networks"; note the
+#                   live creative is Emmy "Consider"/FYC awards advertising, not
+#                   consumer acquisition — read the numbers with that in mind).
+#                   There is no separate "FXNow" page; FX content streams on Hulu.
+#
+# Requested but NOT added (no active Meta brand-page ads — same fails-gracefully
+# bucket as youtube_tv):
+#   Showtime → folded into "Paramount+ with Showtime"; no standalone advertiser.
+#   SYFY     → NBCUniversal cable net; content lives on Peacock; the page runs
+#              no brand ads (free-text returns only resellers/spam). Omitted.
+#
 # Google Ads Transparency Center: ENABLED for Philo only (2026-06-16). The user
 # primarily cares about Philo's Google Ads data, not the competitors', so only
 # the subject brand carries a google_ads source. SerpApi's ATC engine offers no
@@ -147,6 +171,135 @@ competitors:
       - type: meta_ads
         page_id: "105975121062147"        # AMC Plus — VERIFIED via ads_library_search MCP (2026-07-14; page_name "AMC Plus", 176 active US ads). page_id supplied by user from the Ad Library UI.
         page_name: AMC Plus
+        country: US
+        cadence: daily
+        method: scrape
+
+  # --- Content-SVOD expansion (2026-07-15) — premium on-demand, not live-TV ---
+  - id: netflix
+    name: Netflix
+    vertical: streaming
+    priority: medium          # market-leader SVOD; entertainment wallet, not live-TV
+    sources:
+      - type: website
+        url: https://www.netflix.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "6275848869"             # Netflix — VERIFIED via ads_library_search MCP
+        page_name: Netflix
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: hbomax
+    name: HBO Max
+    vertical: streaming
+    priority: medium
+    sources:
+      - type: website
+        url: https://www.max.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "627947847690655"        # HBO Max — VERIFIED via ads_library_search MCP
+        page_name: HBO Max
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: peacock
+    name: Peacock
+    vertical: streaming
+    priority: medium
+    sources:
+      - type: website
+        url: https://www.peacocktv.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "102202437839341"        # Peacock TV — VERIFIED via ads_library_search MCP
+        page_name: Peacock TV
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: starz
+    name: Starz
+    vertical: streaming
+    priority: medium          # premium add-on SVOD; runs hard price/offer creative
+    sources:
+      - type: website
+        url: https://www.starz.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "91570464218"            # STARZ — VERIFIED via ads_library_search MCP
+        page_name: STARZ
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: mgmplus
+    name: MGM+
+    vertical: streaming
+    priority: low             # small advertiser (~9 ads), premium add-on SVOD
+    sources:
+      - type: website
+        url: https://www.mgmplus.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "45104949301"            # MGM+ — VERIFIED via ads_library_search MCP
+        page_name: MGM+
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: paramountplus
+    name: Paramount+
+    vertical: streaming
+    priority: medium
+    sources:
+      - type: website
+        url: https://www.paramountplus.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "113028887202008"        # Paramount+ — VERIFIED via ads_library_search MCP
+        page_name: Paramount+
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: appletv
+    name: Apple TV+
+    vertical: streaming
+    priority: medium
+    sources:
+      - type: website
+        url: https://tv.apple.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "100484820802"           # Apple TV — VERIFIED via ads_library_search MCP
+        page_name: Apple TV
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: fxnow
+    name: FX
+    vertical: streaming
+    priority: low             # FX Networks page; live creative is Emmy FYC, not acquisition
+    sources:
+      - type: website
+        url: https://www.fxnetworks.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "17265241079"            # FX Networks — VERIFIED via ads_library_search MCP
+        page_name: FX Networks
         country: US
         cadence: daily
         method: scrape

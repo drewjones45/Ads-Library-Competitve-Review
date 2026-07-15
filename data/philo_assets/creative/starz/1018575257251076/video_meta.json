@@ -1,0 +1,32 @@
+{
+  "duration_sec": 21.48,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/starz/1018575257251076/frame_00_t04300.jpg",
+      "t_sec": 4.3,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/starz/1018575257251076/frame_01_t08590.jpg",
+      "t_sec": 8.59,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/starz/1018575257251076/frame_02_t12890.jpg",
+      "t_sec": 12.89,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/starz/1018575257251076/frame_03_t17180.jpg",
+      "t_sec": 17.18,
+      "idx": 3
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-15T15:23:20+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets/creative/starz/1018575257251076/video.mp4"
+}
