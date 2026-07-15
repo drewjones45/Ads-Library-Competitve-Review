@@ -250,6 +250,10 @@ section h3 { margin: 24px 0 10px; font-size: 11px; text-transform: uppercase;
               border-radius: var(--radius-ctl); padding: 14px 16px;
               transition: border-color .15s ease; }
 .brand-card:hover { border-color: var(--accent); }
+.brand-card.subject-brand { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
+.subject-badge { display: inline-block; font-size: 9.5px; font-weight: 700; color: var(--bg-base);
+                 background: var(--accent); border-radius: 4px; padding: 1px 6px; margin-left: 6px;
+                 text-transform: uppercase; letter-spacing: .04em; }
 .brand-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .brand-card a { color: var(--accent); text-decoration: none; font-weight: 700; font-size: 14.5px; }
 .brand-card .vertical { font-size: 10px; color: var(--text-3); text-transform: uppercase;
@@ -1450,10 +1454,12 @@ def _render_brand_cards_v2(data: dict) -> str:
     items = []
     for b in data["brands"]:
         pri = b["priority"] or "medium"
+        subj_cls = " subject-brand" if b.get("is_subject") else ""
+        subj_badge = ' <span class="subject-badge">★ Subject</span>' if b.get("is_subject") else ""
         items.append(f"""
-        <div class="brand-card">
+        <div class="brand-card{subj_cls}">
           <div class="brand-card-head">
-            <a href="#brand-{_esc(b['id'])}">{_esc(b['name'])}</a>
+            <a href="#brand-{_esc(b['id'])}">{_esc(b['name'])}</a>{subj_badge}
             <span class="vertical"><span class="pri-dot pri-{_esc(pri)}"
                   title="priority {_esc(pri)}"></span>{_esc(b['vertical'])}</span>
           </div>
@@ -2284,6 +2290,7 @@ def build_dashboard_v2(
     brand_ids: set[str] | None = None,
     sources: set[str] | None = None,
     strategy_doc: str | None = None,
+    subject: str | None = None,
 ) -> dict[str, Any]:
     """Generate the v2 dashboard at out_dir/index.html. Returns summary metadata.
 
@@ -2298,7 +2305,7 @@ def build_dashboard_v2(
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
-        data = _collect(conn, days=days, brand_ids=brand_ids, sources=sources)
+        data = _collect(conn, days=days, brand_ids=brand_ids, sources=sources, subject=subject)
 
     sections_html = []
 

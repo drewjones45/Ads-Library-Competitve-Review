@@ -720,10 +720,14 @@ def briefings(limit: int) -> None:
               help="relative URL to a strategy-report HTML (e.g. ../strategy/bobs_google_positioning.html). "
                    "When set, the 'Latest briefing' section links to that report + its sibling .pdf instead "
                    "of rendering the briefing body.")
+@click.option("--subject", "subject", default=None, metavar="BRAND_ID",
+              help="pin BRAND_ID first and give it the 'primary brand' highlight (accent card + ★ badge). "
+                   "Purely presentational; the data is unchanged.")
 @click.option("--open-after", is_flag=True, help="open the dashboard in your default browser after build")
 def dashboard(out: str | None, days: int, org_name: str, product_name: str | None,
               use_v2: bool, only: tuple[str, ...], exclude: tuple[str, ...],
-              open_after: bool, platform: str, strategy_doc: str | None) -> None:
+              open_after: bool, platform: str, strategy_doc: str | None,
+              subject: str | None) -> None:
     """Render a static HTML dashboard from the current DB + creatives."""
     from datetime import datetime as _dt
     if out is None:
@@ -753,7 +757,8 @@ def dashboard(out: str | None, days: int, org_name: str, product_name: str | Non
 
     builder = build_dashboard_v2 if use_v2 else build_dashboard
     result = builder(out, days=days, org_name=org_name, product_name=product_name,
-                     brand_ids=brand_ids, sources=sources, strategy_doc=strategy_doc)
+                     brand_ids=brand_ids, sources=sources, strategy_doc=strategy_doc,
+                     subject=subject)
     console.print(f"[green]wrote[/green] {result['path']}  "
                   f"({result['n_brands']} brands · {result['n_analyzed']} analyzed creatives · "
                   f"{result['size_bytes']//1024} KB)")

@@ -133,6 +133,25 @@ def rewrite_html(idx: Path, dest_dir: Path, assets_dir: Path) -> tuple[int, int,
     return len(seen), copied, missing
 
 
+def _copy_strategy(date_root: Path, dest: Path) -> int:
+    """Copy every strategy .html/.pdf under a report date into dest (flat).
+
+    The strategy HTML is self-contained (inline base64 thumbnails), so no ref
+    rewriting is needed. Both a top-level strategy/ and a nested
+    with-google/strategy/ (bobs) flatten into the same dest folder; their
+    filenames differ, so they coexist."""
+    copied = 0
+    for strat in date_root.rglob("strategy"):
+        if not strat.is_dir():
+            continue
+        for f in sorted(strat.iterdir()):
+            if f.is_file() and f.suffix.lower() in (".html", ".pdf"):
+                dest.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(f, dest / f.name)
+                copied += 1
+    return copied
+
+
 def brand_count(idx: Path) -> str:
     """Best-effort: pull the brand count out of the embedded data for the card."""
     try:
@@ -223,10 +242,12 @@ def main() -> None:
     total_refs = total_assets = total_dash = 0
     all_missing: list[str] = []
 
+    total_strategy = 0
     for dep, dates in discovered.items():
         chosen_dates = sorted(dates) if args.all else [sorted(dates)[-1]]
         for date in chosen_dates:
             assets_dir = out / dep / date / "assets"
+            date_root = None
             for variant, idx in dates[date].items():
                 dest_dir = out / dep / date / variant
                 refs, copied, missing = rewrite_html(idx, dest_dir, assets_dir)
@@ -238,12 +259,29 @@ def main() -> None:
                 total_dash += 1
                 warn = f"  \u26a0 {len(missing)} UNRESOLVED" if missing else ""
                 print(f"  {dep}/{date}/{variant}: {refs} refs, {copied} assets copied{warn}")
+                if date_root is None:
+                    date_root = next((p for p in idx.parents if p.name == date), None)
+
+            # Strategy docs (HTML + PDF) live in a `strategy/` folder under the
+            # report date. The dashboards link them via ../strategy/<name>.(html|pdf)
+            # \u2014 but build_site only discovers index.html dashboards, so without this
+            # the link 404s on the deployed site (true for bobs/trex too until now).
+            # The strategy HTML is self-contained (base64 thumbnails), so a verbatim
+            # copy into dist/<dep>/<date>/strategy/ is enough; the flattened variant
+            # dirs all sit one level up, so ../strategy/ resolves for every one.
+            if date_root is not None:
+                strat_dest = out / dep / date / "strategy"
+                n = _copy_strategy(date_root, strat_dest)
+                if n:
+                    total_strategy += n
+                    print(f"  {dep}/{date}/strategy: {n} file(s) copied")
 
     build_landing(site, out, args.date_label)
     size_mb = sum(f.stat().st_size for f in out.rglob("*") if f.is_file()) / (1024 * 1024)
     print(
         f"\nbuilt {total_dash} dashboard(s) across {len(site)} deployment(s) → {out}\n"
-        f"  {total_refs} refs rewritten · {total_assets} asset files · {size_mb:.1f} MB total\n"
+        f"  {total_refs} refs rewritten · {total_assets} asset files · "
+        f"{total_strategy} strategy file(s) · {size_mb:.1f} MB total\n"
         f"  landing page: {out}/index.html"
     )
 

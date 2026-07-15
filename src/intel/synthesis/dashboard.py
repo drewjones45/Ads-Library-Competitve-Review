@@ -163,7 +163,8 @@ def _meta_ad_url(ad_archive_id: str | None) -> str:
 
 def _collect(conn: sqlite3.Connection, *, days: int,
              brand_ids: set[str] | None = None,
-             sources: set[str] | None = None) -> dict[str, Any]:
+             sources: set[str] | None = None,
+             subject: str | None = None) -> dict[str, Any]:
     """Pull every shape of data the dashboard needs in one pass.
 
     brand_ids, when given, restricts the dashboard to that allow-list of
@@ -265,7 +266,18 @@ def _collect(conn: sqlite3.Connection, *, days: int,
             "creatives_analyzed": creatives_analyzed,
             "new_ads": new_ads,
             "top_cta": top_cta["cta_type"] if top_cta else None,
+            "is_subject": False,
         })
+
+    # Subject brand: pin it first and tag it so the renderers can give it the
+    # "primary brand" treatment (accent card + badge). Purely presentational —
+    # every other query above is subject-agnostic.
+    if subject:
+        for i, b in enumerate(brands):
+            if b["id"] == subject:
+                b["is_subject"] = True
+                brands.insert(0, brands.pop(i))
+                break
 
     # All analyzed creatives are pulled once. We then split into two cohorts
     # for downstream use:
@@ -895,6 +907,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "window_days": days,
+        "subject": subject,
         "brands": brands,
         "by_comp_recs": by_comp,
         "set_tally": set_tally,
@@ -979,6 +992,11 @@ section h3 { margin-top: 22px; font-size: 14px; text-transform: uppercase; color
 .brand-card dt { color: #777; }
 .brand-card dd { margin: 0; font-weight: 500; }
 .priority-high { border-left: 4px solid #d9534f; }
+.brand-card.subject-brand { border: 2px solid #2f6fed; border-left: 4px solid #2f6fed;
+                            box-shadow: 0 0 0 3px rgba(47,111,237,0.12); background: #f5f8ff; }
+.subject-badge { display: inline-block; font-size: 10px; font-weight: 700; color: #fff;
+                 background: #2f6fed; border-radius: 4px; padding: 1px 6px; vertical-align: middle;
+                 text-transform: uppercase; letter-spacing: .04em; }
 .priority-medium { border-left: 4px solid #f0ad4e; }
 .priority-low { border-left: 4px solid #999; }
 
@@ -1800,9 +1818,11 @@ def _render_brand_cards(data: dict) -> str:
     items = []
     for b in data["brands"]:
         pri = b["priority"] or "medium"
+        subj_cls = " subject-brand" if b.get("is_subject") else ""
+        subj_badge = ' <span class="subject-badge">★ Subject</span>' if b.get("is_subject") else ""
         items.append(f"""
-        <div class="brand-card priority-{_esc(pri)}">
-          <a href="#brand-{_esc(b['id'])}">{_esc(b['name'])}</a>
+        <div class="brand-card priority-{_esc(pri)}{subj_cls}">
+          <a href="#brand-{_esc(b['id'])}">{_esc(b['name'])}</a>{subj_badge}
           <span class="vertical">{_esc(b['vertical'])}</span>
           <dl>
             <dt>Ads (total / active)</dt><dd>{b['ads_total']} / {b['ads_active']}</dd>
@@ -2859,6 +2879,7 @@ def build_dashboard(
     brand_ids: set[str] | None = None,
     sources: set[str] | None = None,
     strategy_doc: str | None = None,
+    subject: str | None = None,
 ) -> dict[str, Any]:
     """Generate the dashboard at out_dir/index.html. Returns summary metadata.
 
@@ -2871,7 +2892,7 @@ def build_dashboard(
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
-        data = _collect(conn, days=days, brand_ids=brand_ids, sources=sources)
+        data = _collect(conn, days=days, brand_ids=brand_ids, sources=sources, subject=subject)
 
     sections_html = []
 

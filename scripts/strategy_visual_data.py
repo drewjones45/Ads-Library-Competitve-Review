@@ -265,4 +265,120 @@ DEPLOYMENTS = {
             "Memorial Day",
         ],
     },
+    # AMC+ as subject brand, read against the full 13-brand streaming set in
+    # philo.db (added 2026-07-15). All numbers below are grounded in the
+    # measured vision analysis (price-presence % per brand, value-prop mix).
+    "amcplus": {
+        "db_path": "data/philo.db",
+        "subject_brand": "amcplus",
+        "brand_labels": {
+            "amcplus": "AMC+",
+            "philo": "Philo",
+            "frndly": "Frndly TV",
+            "sling": "Sling TV",
+            "fubo": "Fubo",
+            "hulu": "Hulu + Live TV",
+            "netflix": "Netflix",
+            "hbomax": "HBO Max",
+            "peacock": "Peacock",
+            "starz": "Starz",
+            "mgmplus": "MGM+",
+            "paramountplus": "Paramount+",
+            "appletv": "Apple TV+",
+        },
+        "brand_order": ["amcplus", "starz", "hbomax", "appletv", "paramountplus",
+                        "mgmplus", "netflix", "peacock", "hulu", "philo",
+                        "frndly", "sling", "fubo"],
+        "header_eyebrow": "Horizon Commerce · Brand Marketing Mode",
+        "header_meta": "Strategy Brief · Confidential",
+        "hero": {
+            "lead_in": "The opportunity is",
+            "italic": "affordable prestige, unclaimed",
+            "subtitle": "A competitive read for AMC+. In a 13-brand streaming set where nearly everyone leads with a price — Starz at $3/mo, Frndly at $6.99, Fubo at $9.99 — AMC+ is the one brand that advertises on almost none. Its creative is pure franchise IP: Anne Rice's Immortal Universe, The Walking Dead, Shudder horror. That's a genuine differentiator and a gap in the same breath. AMC+ owns exclusive prestige-horror equity AND one of the lowest prices in the set — but it only ever advertises the first half.",
+        },
+        "quadrant": {
+            "title": "Where each brand sits in the category",
+            # x = how price/offer-led the paid creative is (measured price-presence %)
+            # y = broad general catalog (bottom) vs curated / genre-owned (top)
+            "x_axis": ("Content-led messaging", "Price / offer-led messaging"),
+            "y_axis": ("Broad general catalog", "Curated / genre-owned"),
+            "brands": {
+                "amcplus":        (0.02, 0.90),   # 1% price, horror/prestige-owned
+                "mgmplus":        (0.00, 0.72),   # 0% price, curated premium
+                "paramountplus":  (0.00, 0.30),   # 0% price, broad
+                "netflix":        (0.22, 0.34),   # 22% price, broad
+                "hulu":           (0.21, 0.30),   # 21% price, broad
+                "peacock":        (0.25, 0.30),   # 25% price, broad + sports
+                "hbomax":         (0.25, 0.58),   # 25% price, prestige
+                "appletv":        (0.50, 0.62),   # price-present but soft free-trial; prestige originals
+                "starz":          (0.86, 0.66),   # 48% offer-led, aggressive discount; thriller/drama
+                "philo":          (0.44, 0.20),   # 34% price, broad live-TV
+                "sling":          (0.55, 0.16),   # 37% price, broad live-TV
+                "frndly":         (0.88, 0.14),   # 72% price, budget live-TV lite
+                "fubo":           (0.90, 0.10),   # 86% price, sports bundle
+            },
+        },
+        "quadrant_caption": "AMC+ sits alone in the top-left: the most genre-owned brand in the set and the one that advertises on price the least. Starz proves the same prestige-add-on wallet responds to a hard discount; AMC+ leaves that lever untouched despite being cheaper.",
+        "reference_themes": [
+            {
+                "title": "AMC+'s franchise-IP engine — the Anne Rice Immortal Universe",
+                "intro": "AMC+'s paid Meta is overwhelmingly one asset: Anne Rice's Immortal Universe, led by The Vampire Lestat. Exclusivity (67%) and novelty (60%) are its top value props — no price anywhere. This is real distinctive equity, but the concentration is also the risk: paid presence rises and falls with a single title's premiere calendar.",
+                "items": [
+                    {"ad_archive_id": "864095512827359", "caption": "The Vampire Lestat hero — hot-pink title lockup, 'ALL NEW SUNDAYS 9P / EXCLUSIVELY ON AMC+'. Tune-in urgency, zero price."},
+                    {"ad_archive_id": "1022880870209405", "caption": "The franchise stacked into one card — Lestat, Talamasca, Mayfair Witches. The 'Immortal Universe' is the closest thing AMC+ has to a brand platform."},
+                    {"ad_archive_id": "2142263539667740", "caption": "UGC creator reaction over a Rolling Stone cover — borrowing editorial credibility to hype the debut. Prestige signalling, not conversion."},
+                    {"ad_archive_id": "1493048145904334", "caption": "Handheld red-carpet premiere footage at the Lestat step-and-repeat. Event buzz — the brand behaving like a network, not a subscription."},
+                ],
+            },
+            {
+                "title": "The genre equity beyond Lestat — Shudder & the horror library",
+                "intro": "AMC+ folds in Shudder (Tales from the Crypt, The Mortuary Assistant) and The Walking Dead universe. This is the ownable position no broad rival can take: AMC+ is the genre home for horror and prestige-cult drama, at a fraction of a premium bundle's price.",
+                "items": [
+                    {"ad_archive_id": "2171887983668186", "caption": "Tales from the Crypt on Shudder — Crypt Keeper key art, 'STREAM NOW'. The horror-library depth that differentiates AMC+ from every general SVOD."},
+                    {"ad_archive_id": "1666431881324032", "caption": "Subtitled scene clip as a narrative show promo. Mood-first storytelling — AMC+'s signature, and a lane the price-led brands can't occupy."},
+                ],
+            },
+            {
+                "title": "What AMC+ never says: price — and what the discounters prove",
+                "intro": "The whitespace. AMC+ runs ~1% price creative. Meanwhile the same premium-add-on wallet is being won on hard offers: Starz trains urgency with $3/mo and $24/yr; Frndly builds a budget identity with an always-on $6.99 bar. AMC+ is cheaper than Starz yet gives a prospect no affordability signal and no reason to act now.",
+                "items": [
+                    {"ad_archive_id": "984050980902307", "comp_override": "starz", "caption": "Starz: 'Over 65% off — $24 for 1 year' stapled to a cinematic still. Proof the prestige-add-on buyer responds to a hard discount."},
+                    {"ad_archive_id": "2219781175468030", "comp_override": "starz", "caption": "Starz: '$3/month for 3 months, 75% off.' Aggressive, repeated, urgency-driven — the exact lever AMC+ declines to pull."},
+                    {"ad_archive_id": "776709758398599", "comp_override": "frndly", "caption": "Frndly: '50+ channels starting at $6.99/month.' An always-on price bar that makes affordability the brand. AMC+ has the low price but never the signal."},
+                ],
+            },
+            {
+                "title": "The content-only cohort — and how AMC+ breaks out of it",
+                "intro": "AMC+'s 0-price posture groups it with Paramount+ (0%) and Netflix's content teasers — but those are broad general catalogs. AMC+'s edge is that it is BOTH content-only AND genre-owned AND cheap. The move is to pair the franchise IP it already leads with an affordable-prestige wedge no broad rival can credibly claim.",
+                "items": [
+                    {"ad_archive_id": "1632813661057187", "comp_override": "paramountplus", "caption": "Paramount+: 'Your Great Reality Escape.' Content-led like AMC+, but broad and un-owned — a slate, not a genre position."},
+                    {"ad_archive_id": "1706949886984384", "comp_override": "netflix", "caption": "Netflix: single-title tease, no price. The category leader can afford pure content; AMC+ can't coast on scale — it needs the affordable-prestige wedge to stand out."},
+                ],
+            },
+        ],
+        "highlight_phrases": [
+            "affordable prestige",
+            "Immortal Universe",
+            "The Vampire Lestat",
+            "Anne Rice",
+            "Talamasca",
+            "Mayfair Witches",
+            "The Walking Dead",
+            "Shudder",
+            "Tales from the Crypt",
+            "1% price",
+            "0% offer-led",
+            "67% exclusivity",
+            "60% novelty",
+            "$3/mo",
+            "$24 for 1 year",
+            "$6.99",
+            "$9.99",
+            "EXCLUSIVELY ON AMC+",
+            "STREAM NOW",
+            "genre-owned",
+            "premium-add-on wallet",
+            "the affordable-prestige lane no one is defending",
+        ],
+    },
 }
