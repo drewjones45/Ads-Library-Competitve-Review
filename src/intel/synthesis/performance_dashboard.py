@@ -2055,6 +2055,8 @@ def build_performance_dashboard(
         '</select></span></div>'
         '<div class="funnels" id="funnels"></div>'
         '<div class="note" id="fnNote"></div></section>'
+        '<div class="note" id="cov"></div>'
+        '<div id="tables"></div>'
         '<section class="viz" id="rankSec">'
         '<h2>Meta rating vs ROAS <span class="h2sub">does the platform\'s own '
         "grade predict return?</span></h2>"
@@ -2088,10 +2090,8 @@ def build_performance_dashboard(
         '<div class="tl" id="skTl"></div>'
         '<div class="note" id="skNote"></div>'
         '<div id="adPanel"></div></section>'
-        '<div class="note" id="cov"></div>'
-        '<div id="tables"></div>'
-        "<footer>The funnel, rating and scale/kill views above all respond to the same "
-        "filter bar as the tables below. Two of them deliberately use a different time "
+        "<footer>The funnel, rating and scale/kill views all respond to the same "
+        "filter bar as the attribute tables. Two of them deliberately use a different time "
         "window than the 90-day headline: Meta's quality rankings only exist for recent "
         "delivery, so the rating plot is scoped to the window where they are populated, and "
         "the scale/kill chart accumulates day by day so an ad's position reflects spend up "
