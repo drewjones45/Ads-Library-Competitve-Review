@@ -123,10 +123,19 @@ def _get(client: httpx.Client, url: str, params: dict | None, *, tries: int = 3)
             r = client.get(url, params=params)
             if r.status_code == 200:
                 return r.json()
-            # 4xx other than rate-limit is a real error; don't burn retries on it.
-            if r.status_code < 500 and r.status_code != 429:
-                raise MetaAccountError(f"{r.status_code} {r.text[:300]}")
-            last = f"{r.status_code} {r.text[:200]}"
+            # Meta returns a 400 with "Service temporarily unavailable"
+            # (subcode 1504044) when an insights query is momentarily too heavy —
+            # and marks it `is_transient: false`, which is wrong. The identical
+            # request succeeds on retry. Treat it as retryable despite the flag.
+            body = r.text[:400]
+            transient_400 = (
+                r.status_code == 400
+                and ("1504044" in body or "temporarily unavailable" in body.lower())
+            )
+            # Other 4xx really are terminal; don't burn retries on them.
+            if r.status_code < 500 and r.status_code != 429 and not transient_400:
+                raise MetaAccountError(f"{r.status_code} {body[:300]}")
+            last = f"{r.status_code} {body[:200]}"
         except httpx.HTTPError as exc:  # network flake
             last = str(exc)
         time.sleep(1.5 * (attempt + 1))
@@ -640,3 +649,45 @@ def fetch_adsets(
         if owns:
             c.close()
     return out
+
+
+# ------------------------------------------------------------ time series ---
+
+def fetch_series(
+    account_id: str,
+    *,
+    since: str,
+    until: str,
+    increment: int = 7,
+    client: httpx.Client | None = None,
+) -> list[dict[str, Any]]:
+    """Ad-level insights broken into fixed-width buckets across the window.
+
+    `increment=7` gives ~13 points across a 90-day window, which is the sparkline
+    resolution the stat tiles want. Daily (`increment=1`) is available but ships
+    7x the numbers to the browser for a line that renders at ~120px wide — the
+    extra resolution is invisible and costs page weight.
+    """
+    owns = client is None
+    c = client or httpx.Client(timeout=180)
+    params: dict[str, Any] = {
+        "access_token": _token(),
+        "level": "ad",
+        "fields": "ad_id,impressions,spend,clicks,actions,action_values,video_play_actions",
+        "time_range": json.dumps({"since": since, "until": until}),
+        "time_increment": str(increment),
+        "limit": "500",
+    }
+    rows: list[dict[str, Any]] = []
+    url = f"{GRAPH}/act_{account_id}/insights"
+    try:
+        page_params: dict | None = params
+        while url:
+            data = _get(c, url, page_params)
+            rows.extend(data.get("data", []))
+            url = (data.get("paging") or {}).get("next") or ""
+            page_params = None
+    finally:
+        if owns:
+            c.close()
+    return rows

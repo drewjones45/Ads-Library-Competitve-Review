@@ -77,19 +77,51 @@ def _norm(v: Any) -> str | None:
     return str(v)
 
 
+def _pick_windows(conn: sqlite3.Connection) -> tuple[tuple[str, str] | None, tuple[str, str] | None]:
+    """Choose the reporting window and the period to compare it against.
+
+    `ad_performance` can hold several overlapping windows — a 90-day pull and a
+    30-day one both legitimately live there. Summing across them double-counts
+    every ad that appears in both, so exactly ONE window is selected as the
+    reporting period: the widest window ending at the latest date_stop.
+
+    The comparison period is then the most recent window that ends on or before
+    the reporting window starts, i.e. the immediately-preceding period.
+    """
+    rows = conn.execute(
+        "SELECT date_start, date_stop, COUNT(*) n FROM ad_performance "
+        "WHERE date_start IS NOT NULL GROUP BY 1,2"
+    ).fetchall()
+    if not rows:
+        return None, None
+    wins = [(r["date_start"], r["date_stop"]) for r in rows]
+    latest_stop = max(w[1] for w in wins)
+    current = min((w for w in wins if w[1] == latest_stop), key=lambda w: w[0])
+    prior_cands = [w for w in wins if w[1] <= current[0]]
+    prior = max(prior_cands, key=lambda w: w[1]) if prior_cands else None
+    return current, prior
+
+
 def _fetch(conn: sqlite3.Connection, competitor_ids: list[str] | None) -> list[dict]:
-    """One row per owned ad, with metrics summed across windows and the vision
-    analysis of its best available creative attached.
+    """One row per owned ad for the current reporting window, with its weekly
+    series, its prior-period totals, and the vision analysis of its best
+    available creative attached.
 
     An ad can have several creative rows (dynamic creative serves multiple
     variants, and a rendered preview sits alongside the raw asset). The preview
     is preferred when present because it is the ad as actually served; otherwise
     the first analyzed asset wins.
     """
-    where, params = "", []
+    current, prior = _pick_windows(conn)
+    where_parts, params = [], []
     if competitor_ids:
-        where = f"WHERE oa.competitor_id IN ({','.join('?' * len(competitor_ids))})"
-        params = list(competitor_ids)
+        where_parts.append(f"oa.competitor_id IN ({','.join('?' * len(competitor_ids))})")
+        params.extend(competitor_ids)
+    # Scope the metric join to ONE window — see _pick_windows.
+    join_extra = ""
+    if current:
+        join_extra = " AND p.date_start = ? AND p.date_stop = ?"
+    where = ("WHERE " + " AND ".join(where_parts)) if where_parts else ""
 
     rows = conn.execute(f"""
         SELECT oa.platform_ad_id, oa.competitor_id, oa.account_name, oa.ad_name,
@@ -104,10 +136,44 @@ def _fetch(conn: sqlite3.Connection, competitor_ids: list[str] | None) -> list[d
                SUM(p.video_3s) AS video_3s, SUM(p.video_plays) AS video_plays,
                MAX(p.frequency) AS frequency
         FROM owned_ads oa
-        LEFT JOIN ad_performance p ON p.platform_ad_id = oa.platform_ad_id
+        LEFT JOIN ad_performance p
+          ON p.platform_ad_id = oa.platform_ad_id{join_extra}
         {where}
         GROUP BY oa.platform_ad_id
-    """, params).fetchall()
+    """, ([*( [current[0], current[1]] if current else [])] + params)).fetchall()
+
+    # Weekly series for the sparklines, projected onto ONE canonical timeline.
+    #
+    # Meta only returns buckets in which an ad actually delivered, so each ad's
+    # raw series has a different length and start. Summing those element-wise
+    # would add week 3 of one ad to week 1 of another. Every ad is therefore
+    # mapped onto the full sorted set of buckets, with 0 for weeks it did not run
+    # — which is also the truthful value for those weeks.
+    all_buckets = [
+        r[0] for r in conn.execute(
+            "SELECT DISTINCT bucket_start FROM ad_performance_series ORDER BY 1"
+        ).fetchall()
+    ]
+    bidx = {b: i for i, b in enumerate(all_buckets)}
+    n_b = len(all_buckets)
+    series_by_ad: dict[str, dict[str, list[float]]] = {}
+    for s in conn.execute(
+        "SELECT platform_ad_id, bucket_start, impressions, spend, clicks, "
+        "  purchases, revenue, video_3s, video_plays "
+        "FROM ad_performance_series"
+    ).fetchall():
+        i = bidx.get(s["bucket_start"])
+        if i is None:
+            continue
+        d = series_by_ad.setdefault(s["platform_ad_id"], {
+            k: [0.0] * n_b for k in ("im", "sp", "ck", "rv", "v3", "vp")
+        })
+        d["im"][i] = s["impressions"] or 0
+        d["sp"][i] = s["spend"] or 0
+        d["ck"][i] = s["clicks"] or 0
+        d["rv"][i] = s["revenue"] or 0
+        d["v3"][i] = s["video_3s"] or 0
+        d["vp"][i] = s["video_plays"] or 0
 
     out: list[dict] = []
     for r in rows:
@@ -145,8 +211,48 @@ def _fetch(conn: sqlite3.Connection, competitor_ids: list[str] | None) -> list[d
             if any_asset:
                 d["asset_path"] = any_asset["asset_path"]
                 d["asset_type"] = any_asset["asset_type"]
+        # An ad in owned_ads that did not deliver in this window (e.g. it only
+        # ran in the comparison period) has no metrics here — drop it rather
+        # than carrying a phantom zero-impression row into the tables.
+        if not (d.get("impressions") or d.get("spend")):
+            continue
+        d["series"] = series_by_ad.get(d["platform_ad_id"])
+        d["_window"] = current
+        d["_prior_window"] = prior
+        d["_buckets"] = all_buckets
         out.append(d)
     return out
+
+
+def _fetch_prior(conn: sqlite3.Connection, prior: tuple[str, str] | None,
+                 competitor_ids: list[str] | None) -> list[dict]:
+    """The comparison period's own ad population, with the same filter facets.
+
+    The comparison is NOT "these same ads, earlier" — most current ads simply
+    did not exist in the prior period, so that framing reports every new ad as
+    infinite growth and inflates every delta. Instead the prior period is
+    summed over the ads that actually ran *then*, filtered by the same facets,
+    which is what a period-over-period number is supposed to mean.
+    """
+    if not prior:
+        return []
+    where = ["p.date_start=?", "p.date_stop=?"]
+    params: list[Any] = [prior[0], prior[1]]
+    if competitor_ids:
+        where.append(f"oa.competitor_id IN ({','.join('?' * len(competitor_ids))})")
+        params.extend(competitor_ids)
+    rows = conn.execute(f"""
+        SELECT oa.competitor_id, oa.account_name, oa.creative_class,
+               oa.audience_stage, oa.audience_gender, oa.audience_age, oa.audience_geo,
+               SUM(p.impressions) im, SUM(p.spend) sp, SUM(p.clicks) ck,
+               SUM(p.purchases) pu, SUM(p.revenue) rv,
+               SUM(p.video_3s) v3, SUM(p.video_plays) vp
+        FROM owned_ads oa
+        JOIN ad_performance p ON p.platform_ad_id = oa.platform_ad_id
+        WHERE {' AND '.join(where)}
+        GROUP BY oa.platform_ad_id
+    """, params).fetchall()
+    return [dict(r) for r in rows]
 
 
 def _bucket_stats(rows: list[dict]) -> dict[str, float]:
@@ -421,6 +527,51 @@ padding:1.5px 6px;border-radius:99px;border:1px solid var(--line);color:var(--di
 margin:0 4px 6px 0}
 .pill.dpa{border-color:var(--warn);color:var(--warn)}
 .pill.aud{border-color:var(--accent);color:var(--accent)}
+
+/* ---- KPI tiles (reference layout: label / big value / vs-prior + delta / sparkline) ---- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(292px,1fr));gap:16px;margin:18px 0 6px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+box-shadow:var(--shadow)}
+.kpi .lbl{font-size:12.5px;color:var(--fg);opacity:.85;margin-bottom:8px}
+.kpi .val{font-size:30px;font-weight:600;letter-spacing:-.01em;line-height:1.1}
+.kpi .foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:10px}
+.kpi .cmp{font-size:11.5px;color:var(--dim);line-height:1.45}
+.kpi .cmpv{color:var(--fg);opacity:.75}
+.kpi .delta{display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;margin-top:3px}
+.kpi .delta.pos{color:var(--good)} .kpi .delta.neg{color:var(--bad)}
+.kpi .delta.flat{color:var(--dim)}
+.kpi .spark{flex:0 0 auto}
+/* ---- filter bar ---- */
+.fbar{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+padding:14px 16px;margin:18px 0;box-shadow:var(--shadow)}
+.fbar .r1{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+padding-bottom:12px;border-bottom:1px solid var(--line)}
+.fbar .r2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:12px}
+.flabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);
+white-space:nowrap}
+.win{background:var(--panel2);border:1px solid var(--line);border-radius:7px;
+padding:6px 10px;font-size:12.5px;color:var(--fg);white-space:nowrap}
+.segs{display:flex;gap:4px;background:var(--panel2);border:1px solid var(--line);
+border-radius:8px;padding:3px}
+.seg{background:none;border:none;color:var(--dim);border-radius:6px;padding:5px 11px;
+font-size:12px;cursor:pointer;white-space:nowrap}
+.seg:hover{color:var(--fg)}
+.seg.on{background:var(--accent);color:#fff;font-weight:600}
+.spacer{flex:1 1 auto}
+/* pill-shaped dimension chips */
+.chip{position:relative;display:inline-flex;align-items:center}
+.chip select{appearance:none;-webkit-appearance:none;background:var(--panel2);
+border:1px solid var(--line);border-radius:999px;color:var(--fg);
+padding:7px 30px 7px 13px;font-size:12.5px;cursor:pointer;max-width:230px;
+text-overflow:ellipsis}
+.chip select:hover{border-color:var(--accent)}
+.chip select:focus{outline:none;border-color:var(--accent)}
+.chip.set select{border-color:var(--accent);color:var(--accent)}
+.chip:after{content:"⌄";position:absolute;right:12px;top:47%;transform:translateY(-50%);
+pointer-events:none;color:var(--dim);font-size:13px}
+.chip.locked{background:var(--panel2);border:1px solid var(--line);border-radius:999px;
+padding:7px 13px;font-size:12.5px;color:var(--dim)}
+.chip.locked b{color:var(--fg);font-weight:600}
 .empty{color:var(--dim);padding:24px;text-align:center;background:var(--panel);
 border:1px solid var(--line);border-radius:10px}
 footer{color:var(--dim);font-size:12px;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
@@ -492,13 +643,18 @@ JS = r"""
       ADS.forEach(function(a){var v=a[key]; if(v!==undefined&&v!==null&&v!=='') vals[v]=(vals[v]||0)+1;});
       var opts=Object.keys(vals).sort(function(x,y){return vals[y]-vals[x];});
       if(opts.length<2) return '';
-      return '<div class="fld"><label>'+esc(f[1])+'</label><select data-k="'+key+'">'+
-        '<option value="">All ('+opts.length+')</option>'+
-        opts.map(function(o){return '<option value="'+esc(o)+'">'+esc(o)+' &middot; '+vals[o]+'</option>';}).join('')+
-        '</select></div>';
+      return '<span class="chip" data-for="'+key+'"><select data-k="'+key+'" '+
+        'aria-label="'+esc(f[1])+'">'+
+        '<option value="">'+esc(f[1])+': All</option>'+
+        opts.map(function(o){return '<option value="'+esc(o)+'">'+esc(f[1])+': '+esc(o)+' \u00b7 '+vals[o]+'</option>';}).join('')+
+        '</select></span>';
     }).join('');
     host.querySelectorAll('select').forEach(function(sel){
-      sel.addEventListener('change',function(){state[sel.dataset.k]=sel.value;render();});
+      sel.addEventListener('change',function(){
+        state[sel.dataset.k]=sel.value;
+        sel.closest('.chip').classList.toggle('set', !!sel.value);
+        render();
+      });
     });
   }
 
@@ -522,6 +678,110 @@ JS = r"""
   }
 
   // --- one attribute table ---
+
+  // ---- sparkline: 2px line, series hue, 10% wash, end-dot with surface ring ----
+  function sparkline(vals, hue){
+    var W=104,H=34,pad=3;
+    if(!vals || vals.length<2) return '<svg width="'+W+'" height="'+H+'"></svg>';
+    var mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals);
+    var span=(mx-mn)||1;
+    var n=vals.length;
+    var x=function(i){return pad+i*(W-2*pad)/(n-1);};
+    var y=function(v){return H-pad-((v-mn)/span)*(H-2*pad);};
+    var d='',area='';
+    for(var i=0;i<n;i++){ d+=(i?' L':'M')+x(i).toFixed(1)+' '+y(vals[i]).toFixed(1); }
+    area='M'+x(0).toFixed(1)+' '+(H-pad)+' L'+d.slice(1)+' L'+x(n-1).toFixed(1)+' '+(H-pad)+' Z';
+    var lx=x(n-1).toFixed(1), ly=y(vals[n-1]).toFixed(1);
+    return '<svg class="spark" width="'+W+'" height="'+H+'" aria-hidden="true">'+
+      '<path d="'+area+'" fill="'+hue+'" fill-opacity="0.10"/>'+
+      '<path d="'+d+'" fill="none" stroke="'+hue+'" stroke-width="2" '+
+      'stroke-linejoin="round" stroke-linecap="round"/>'+
+      '<circle cx="'+lx+'" cy="'+ly+'" r="2.6" fill="'+hue+'" '+
+      'stroke="var(--panel)" stroke-width="2"/></svg>';
+  }
+
+  // Per-bucket series for the filtered pool. Derived rates are recomputed from
+  // summed components per bucket — averaging per-ad rates would let a tiny ad
+  // swing the line as hard as a multi-million-impression one.
+  function poolSeries(pool){
+    var n=BUCKETS.length; if(!n) return null;
+    var im=new Array(n).fill(0), sp=new Array(n).fill(0), ck=new Array(n).fill(0),
+        rv=new Array(n).fill(0), v3=new Array(n).fill(0), vim=new Array(n).fill(0);
+    var any=false;
+    pool.forEach(function(a){
+      if(!a.s) return; any=true;
+      for(var i=0;i<n;i++){
+        im[i]+=a.s.im[i]||0; sp[i]+=a.s.sp[i]||0; ck[i]+=a.s.ck[i]||0;
+        rv[i]+=a.s.rv[i]||0; v3[i]+=a.s.v3[i]||0;
+        if((a.s.vp[i]||0)>0) vim[i]+=a.s.im[i]||0;
+      }
+    });
+    if(!any) return null;
+    return {im:im, sp:sp, ck:ck, rv:rv,
+      ctr:im.map(function(v,i){return v?100*ck[i]/v:0;}),
+      roas:sp.map(function(v,i){return v?rv[i]/v:0;}),
+      ssr:vim.map(function(v,i){return v?100*v3[i]/v:0;}),
+      pu:im.map(function(_,i){return 0;})};
+  }
+
+  // Prior period aggregated over the ads that actually ran THEN, matched on the
+  // same filter facets. Creative-attribute filters have no counterpart in the
+  // prior population (those ads were never vision-analyzed), so only the shared
+  // facets apply — which is why the comparison is honest for audience/brand
+  // slices and simply broad for the rest.
+  var PFIELDS=['b','ac','stage','gen','geo','age','cl'];
+  function priorAgg(){
+    var im=0,sp=0,ck=0,rv=0,v3=0,vim=0,n=0;
+    PADS.forEach(function(a){
+      for(var i=0;i<PFIELDS.length;i++){
+        var k=PFIELDS[i];
+        if(state[k] && String(a[k]||'')!==state[k]) return;
+      }
+      n++; im+=a.im||0; sp+=a.sp||0; ck+=a.ck||0; rv+=a.rv||0; v3+=a.v3||0;
+      if((a.vp||0)>0) vim+=a.im||0;
+    });
+    if(!n) return null;
+    return {ads:n,im:im,sp:sp,ck:ck,rv:rv,
+      ctr:im?100*ck/im:0, roas:sp?rv/sp:0, ssr:vim?100*v3/vim:null};
+  }
+
+  function renderKpis(pool, all){
+    var S=poolSeries(pool), P=priorAgg();
+    // higherIsBetter drives the delta colour — a fall in CPM is good news.
+    var tiles=[
+      {k:'Total spend',   v:money(all.sp), cur:all.sp,  prev:P&&P.sp,  s:S&&S.sp,  hib:null},
+      {k:'Impressions',   v:num(all.im),   cur:all.im,  prev:P&&P.im,  s:S&&S.im,  hib:true},
+      {k:'Scroll-stop rate', v:(all.ssr===null?'\u2014':all.ssr.toFixed(2)+'%'),
+       cur:all.ssr, prev:P&&P.ssr, s:S&&S.ssr, hib:true},
+      {k:'Click through rate', v:all.ctr.toFixed(2)+'%', cur:all.ctr, prev:P&&P.ctr, s:S&&S.ctr, hib:true},
+      {k:'ROAS',          v:all.roas.toFixed(2), cur:all.roas, prev:P&&P.roas, s:S&&S.roas, hib:true},
+      {k:'Total clicks',  v:num(all.ck),   cur:all.ck,  prev:P&&P.ck,  s:S&&S.ck,  hib:true}
+    ];
+    document.getElementById('kpis').innerHTML=tiles.map(function(t){
+      var pct=null;
+      if(t.prev!==null&&t.prev!==undefined&&t.prev!==0&&t.cur!==null) pct=100*(t.cur-t.prev)/t.prev;
+      var dir = pct===null?'flat':(pct>0.05?'pos':(pct<-0.05?'neg':'flat'));
+      // Colour by GOODNESS, not direction. hib:null = neutral measure (spend),
+      // where up/down is neither good nor bad, so it stays muted.
+      var cls='flat';
+      if(pct!==null&&t.hib!==null) cls=((pct>0)===t.hib)?'pos':'neg';
+      var hue = cls==='pos'?'var(--good)':(cls==='neg'?'var(--bad)':'var(--accent)');
+      var arrow = dir==='pos'?'\u2197':(dir==='neg'?'\u2198':'\u2192');
+      var fmt=function(x){
+        if(x===null||x===undefined) return '\u2014';
+        if(t.k==='Total spend') return money(x);
+        if(t.k==='ROAS') return (+x).toFixed(2);
+        if(/rate/i.test(t.k)) return (+x).toFixed(2)+'%';
+        return num(x);
+      };
+      return '<div class="kpi"><div class="lbl">'+esc(t.k)+'</div>'+
+        '<div class="val">'+t.v+'</div><div class="foot"><div>'+
+        '<div class="cmp">vs prior period<br><span class="cmpv">'+fmt(t.prev)+'</span></div>'+
+        '<div class="delta '+cls+'">'+arrow+' '+(pct===null?'n/a':(pct>0?'+':'')+pct.toFixed(1)+'%')+'</div>'+
+        '</div>'+(t.s?sparkline(t.s,hue):'')+'</div></div>';
+    }).join('');
+  }
+
   function tableHTML(spec, pool, base, tid){
     var key=spec[0], label=spec[1], kind=spec[2], vision=spec[3];
     var buckets={};
@@ -577,15 +837,9 @@ JS = r"""
     var readable=pool.filter(function(a){return a.A;});
     DRILL={};
 
-    // headline cards
+    // headline KPI tiles
     var all=agg(pool), rd=agg(readable);
-    document.getElementById('cards').innerHTML=[
-      ['Ads', num(all.ads)],['Spend', money(all.sp)],['Impressions', num(all.im)],
-      ['Scroll-stop', all.ssr===null?'\u2014':all.ssr.toFixed(2)+'%'],
-      ['CTR', all.ctr.toFixed(2)+'%'],['CPM','$'+all.cpm.toFixed(2)],
-      ['ROAS', all.roas.toFixed(2)],['Purchases', num(all.pu)],
-      ['Analyzed', num(rd.ads)]
-    ].map(function(c){return '<div class="card"><div class="k">'+c[0]+'</div><div class="v">'+c[1]+'</div></div>';}).join('');
+    renderKpis(pool, all);
 
     var pct=all.sp?100*rd.sp/all.sp:0;
     document.getElementById('cov').innerHTML='<b>Coverage:</b> vision-attribute tables cover <b>'+
@@ -642,7 +896,8 @@ JS = r"""
 
   document.getElementById('resetFilters').addEventListener('click',function(){
     FILTERS.forEach(function(f){state[f[0]]='';});
-    document.querySelectorAll('#filterFields select').forEach(function(s){s.value='';});
+    document.querySelectorAll('#filterFields select').forEach(function(s){
+      s.value=''; s.closest('.chip').classList.remove('set');});
     render();
   });
 
@@ -700,6 +955,20 @@ def build_performance_dashboard(
             "v3": r.get("video_3s") or 0,
             "vp": r.get("video_plays") or 0,
         }
+        # Weekly series for the sparklines. Component metrics only — derived
+        # rates (CTR, ROAS, scroll-stop) are recomputed per bucket in the
+        # browser so a filtered sparkline stays exact rather than averaging
+        # pre-computed per-ad rates.
+        ser = r.get("series")
+        if ser:
+            rec["s"] = {
+                "im": [round(x) for x in ser["im"]],
+                "sp": [round(x, 2) for x in ser["sp"]],
+                "ck": [round(x) for x in ser["ck"]],
+                "rv": [round(x, 2) for x in ser["rv"]],
+                "v3": [round(x) for x in ser["v3"]],
+                "vp": [round(x) for x in ser["vp"]],
+            }
         # Only readable analyses contribute vision attributes — see
         # MIN_ANALYSIS_CONFIDENCE for why unreadable ones are dropped entirely.
         if r.get("analysis") and _is_readable(r):
@@ -724,23 +993,67 @@ def build_performance_dashboard(
                 rec["A"] = attrs
         ads.append(rec)
 
+    window = rows[0].get("_window") if rows else None
+    prior_window = rows[0].get("_prior_window") if rows else None
+    buckets: list[str] = rows[0].get("_buckets") or [] if rows else []
+    prior_rows = _fetch_prior(conn, prior_window, competitor_ids)
+    pads = [
+        {"b": pr.get("competitor_id") or "", "ac": pr.get("account_name") or "",
+         "cl": pr.get("creative_class") or "unknown",
+         "stage": pr.get("audience_stage") or "", "gen": pr.get("audience_gender") or "",
+         "age": pr.get("audience_age") or "", "geo": pr.get("audience_geo") or "",
+         "im": pr.get("im") or 0, "sp": round(pr.get("sp") or 0, 2),
+         "ck": pr.get("ck") or 0, "pu": pr.get("pu") or 0,
+         "rv": round(pr.get("rv") or 0, 2),
+         "v3": pr.get("v3") or 0, "vp": pr.get("vp") or 0}
+        for pr in prior_rows
+    ]
+
     total_spend = sum(a["sp"] for a in ads)
     analyzed = [a for a in ads if a.get("A")]
     brands = sorted({a["b"] for a in ads if a["b"]})
 
     filt_json = json.dumps(FILTERS)
+    def _fmt(d: str) -> str:
+        return d
+
+    win_label = (
+        f"{_fmt(window[0])} – {_fmt(window[1])}" if window else "all data"
+    )
+    prior_label = (
+        f"{_fmt(prior_window[0])} – {_fmt(prior_window[1])}" if prior_window else None
+    )
+    sub = (
+        f'{", ".join(html.escape(b) for b in brands)} · owned-account performance · '
+        f"{html.escape(win_label)}"
+        + (f" vs {html.escape(prior_label)}" if prior_label else "")
+    )
+
     body = (
         '<div class="topbar"><div>'
-        "<h1>Creative performance — owned Meta accounts</h1>"
-        f'<div class="sub">{", ".join(html.escape(b) for b in brands)} · '
-        "first-party spend joined to creative attributes and audience targeting, on ad id"
-        "</div></div>"
+        "<h1>Creative performance</h1>"
+        f'<div class="sub">{sub}</div></div>'
         '<button class="toggle" id="themeToggle" type="button">Theme</button></div>'
-        '<div class="filters"><div class="frow" id="filterFields"></div>'
-        '<div class="frow" style="margin-top:12px">'
-        '<button class="fbtn" id="resetFilters" type="button">Reset filters</button>'
-        '<div class="fstat" id="fstat" style="margin:0"></div></div></div>'
-        '<div class="cards" id="cards"></div>'
+        '<div class="fbar">'
+        '<div class="r1">'
+        '<span class="flabel">Reporting window</span>'
+        f'<span class="win">{html.escape(win_label)}</span>'
+        '<span class="segs" id="winSegs">'
+        f'<button class="seg on" type="button" title="{html.escape(win_label)}">90D</button>'
+        '</span>'
+        '<span class="spacer"></span>'
+        '<span class="flabel">Compare</span>'
+        '<span class="segs">'
+        '<button class="seg on" type="button" '
+        f'title="{html.escape(prior_label or "no prior period ingested")}">Prior period</button>'
+        "</span></div>"
+        '<div class="r2">'
+        '<span class="chip locked">Source:&nbsp;<b>Meta owned accounts</b></span>'
+        '<span id="filterFields"></span>'
+        '<button class="fbtn" id="resetFilters" type="button">Reset</button>'
+        "</div>"
+        '<div class="fstat" id="fstat"></div></div>'
+        '<div class="kpis" id="kpis"></div>'
         '<div class="note" id="cov"></div>'
         '<div id="tables"></div>'
         "<footer>CTR/ROAS index: 100 = the baseline for the <em>current filter</em>, so "
@@ -767,7 +1080,9 @@ def build_performance_dashboard(
         f"var FILTERS={filt_json};"
         f"var META_SPECS={json.dumps(meta_specs)};"
         f"var VISION_SPECS={json.dumps(vision_specs)};"
-        f"var MINIMP={int(min_impressions)};var MAXC={MAX_CARDS_PER_BUCKET};</script>"
+        f"var MINIMP={int(min_impressions)};var MAXC={MAX_CARDS_PER_BUCKET};"
+        f"var BUCKETS={json.dumps(buckets)};"
+        f"var PADS={json.dumps(pads, separators=(',', ':'))};</script>"
         f"<script>{JS}</script></body></html>",
         encoding="utf-8",
     )

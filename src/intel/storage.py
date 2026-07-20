@@ -570,6 +570,23 @@ def _migrate_owned_perf_tables(conn: sqlite3.Connection) -> None:
     );
     CREATE INDEX IF NOT EXISTS idx_ad_perf_comp ON ad_performance(competitor_id);
     CREATE INDEX IF NOT EXISTS idx_ad_perf_ad ON ad_performance(platform_ad_id);
+
+    -- Bucketed series backing the stat-tile sparklines. One row per ad per
+    -- bucket (weekly by default). Kept separate from ad_performance, which holds
+    -- whole-window totals, so the two grains can never be summed together by
+    -- accident.
+    CREATE TABLE IF NOT EXISTS ad_performance_series (
+      platform_ad_id TEXT NOT NULL,
+      competitor_id TEXT,
+      account_id TEXT,
+      bucket_start TEXT NOT NULL,
+      impressions REAL, spend REAL, clicks REAL,
+      purchases REAL, revenue REAL, video_3s REAL, video_plays REAL,
+      fetched_at TEXT,
+      PRIMARY KEY (platform_ad_id, bucket_start)
+    );
+    CREATE INDEX IF NOT EXISTS idx_ad_series_ad ON ad_performance_series(platform_ad_id);
+    CREATE INDEX IF NOT EXISTS idx_ad_series_bucket ON ad_performance_series(bucket_start);
     """)
     _migrate_owned_audience_columns(conn)
     _migrate_ad_performance_video_columns(conn)
@@ -1215,5 +1232,32 @@ def upsert_ad_performance(
             row.get("video_p25"), row.get("video_p50"), row.get("video_p75"),
             row.get("video_p100"), row.get("video_3s"), row.get("video_plays"),
             row.get("extra_json"), utcnow(),
+        ),
+    )
+
+
+def upsert_ad_series(
+    conn: sqlite3.Connection,
+    *,
+    competitor_id: str | None,
+    account_id: str,
+    row: dict[str, Any],
+) -> None:
+    """Store one ad's metrics for one time bucket (sparkline input)."""
+    conn.execute(
+        "INSERT INTO ad_performance_series(platform_ad_id, competitor_id, account_id, "
+        "  bucket_start, impressions, spend, clicks, purchases, revenue, "
+        "  video_3s, video_plays, fetched_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?) "
+        "ON CONFLICT(platform_ad_id, bucket_start) DO UPDATE SET "
+        "  impressions=excluded.impressions, spend=excluded.spend, clicks=excluded.clicks, "
+        "  purchases=excluded.purchases, revenue=excluded.revenue, "
+        "  video_3s=excluded.video_3s, video_plays=excluded.video_plays, "
+        "  fetched_at=excluded.fetched_at",
+        (
+            row.get("platform_ad_id"), competitor_id, account_id, row.get("date_start"),
+            row.get("impressions"), row.get("spend"), row.get("clicks"),
+            row.get("purchases"), row.get("revenue"),
+            row.get("video_3s"), row.get("video_plays"), utcnow(),
         ),
     )
