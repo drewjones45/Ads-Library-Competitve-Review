@@ -1,0 +1,16 @@
+ingesting account 263673744705629 (JD Sports US Brand & COOP) → brand jdsports 
+2026-04-20 → 2026-07-19
+✓ 282 ads · 461 assets · 188/189 previews rendered
+  spend $1,793,470 · 90% on creative that can be vision-analyzed
+    analyzable   261 ads  $   1,615,215
+    dpa           19 ads  $     164,919
+    no_asset       2 ads  $      13,336
+ingesting account 399719270800712 (JD Sports - US) → brand jdsports 2026-04-20 →
+2026-07-19
+✓ 230 ads · 145 assets · 52/52 previews rendered
+  spend $1,957,772 · 11% on creative that can be vision-analyzed
+    dpa          138 ads  $   1,750,648
+    analyzable    92 ads  $     207,124
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.

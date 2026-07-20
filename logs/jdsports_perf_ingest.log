@@ -1,0 +1,40 @@
+=== JD Sports US Brand & COOP (263673744705629) → jdsports
+ingesting account 263673744705629 (JD Sports US Brand & COOP) → brand jdsports 
+2026-04-20 → 2026-07-19
+✓ 282 ads · 342 assets · 69/70 previews rendered
+  spend $1,792,556 · 90% on creative that can be vision-analyzed
+    analyzable   261 ads  $   1,614,377
+    dpa           19 ads  $     164,843
+    no_asset       2 ads  $      13,336
+
+=== JD Sports - US (399719270800712) → jdsports
+ingesting account 399719270800712 (JD Sports - US) → brand jdsports 2026-04-20 →
+2026-07-19
+✓ 230 ads · 133 assets · 40/40 previews rendered
+  spend $1,957,142 · 11% on creative that can be vision-analyzed
+    dpa          138 ads  $   1,750,028
+    analyzable    92 ads  $     207,114
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+
+=== Finish Line Official (27213418) → finishline
+ingesting account 27213418 (Finish Line Official) → brand finishline 2026-04-20 
+→ 2026-07-19
+✓ 103 ads · 0 assets · 0/0 previews rendered
+  spend $1,233,622 · 0% on creative that can be vision-analyzed
+    dpa          103 ads  $   1,233,622
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+
+=== Finish Line Brand & COOP (627413344530702) → finishline
+ingesting account 627413344530702 (Finish Line Brand & COOP) → brand finishline 
+2026-04-20 → 2026-07-19
+✓ 8 ads · 0 assets · 0/0 previews rendered
+  spend $48,433 · 0% on creative that can be vision-analyzed
+    dpa            8 ads  $      48,433
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+

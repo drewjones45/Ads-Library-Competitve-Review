@@ -154,9 +154,28 @@ def _bucket_stats(rows: list[dict]) -> dict[str, float]:
     }
 
 
+# Vision analyses below this confidence are excluded from attribute rollups.
+# Meta caps ad-thumbnail downloads hard — some arrive at 64x64, where nothing
+# beyond rough colour is genuinely legible and the analyser correctly self-reports
+# ~0.3 confidence. Letting those vote would manufacture attribute distributions
+# out of unreadable pixels, which is worse than a smaller honest sample.
+MIN_ANALYSIS_CONFIDENCE = 0.45
+
+
+def _is_readable(r: dict) -> bool:
+    a = r.get("analysis") or {}
+    conf = a.get("confidence")
+    if conf is None:
+        return True  # older analyses predate the confidence field
+    try:
+        return float(conf) >= MIN_ANALYSIS_CONFIDENCE
+    except (TypeError, ValueError):
+        return True
+
+
 def _attribute_table(rows: list[dict], min_impressions: int) -> list[dict]:
     """Cross-tab every tracked attribute value against performance."""
-    analyzed = [r for r in rows if r.get("analysis")]
+    analyzed = [r for r in rows if r.get("analysis") and _is_readable(r)]
     tables: list[dict] = []
 
     def emit(label: str, buckets: dict[str, list[dict]]) -> None:
