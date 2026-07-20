@@ -744,6 +744,31 @@ display:flex;gap:9px;align-items:center;white-space:nowrap}
 .skz .sp{opacity:.85;font-weight:400;margin-left:auto}
 .skz.g{background:var(--zGood)}.skz.w{background:var(--zWait)}.skz.k{background:var(--zBad)}
 :root[data-theme="light"] .skz{color:#fff}
+/* The segments double as the filter for the list below, so they read as
+   controls: pointer cursor, and unselected ones recede when one is active. */
+.skz{cursor:pointer;transition:opacity .12s ease,box-shadow .12s ease;position:relative}
+.skz:hover{opacity:.92}
+.skzs.picked .skz{opacity:.42}
+.skzs.picked .skz.on{opacity:1;box-shadow:inset 0 -3px 0 rgba(255,255,255,.85)}
+.skz .pick{font-size:10px;opacity:.75;font-weight:400;letter-spacing:.04em}
+.sklist{margin-top:14px}
+.sklist .lhd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.sklist .lhd b{font-size:14px}
+.sklist .lhd .hint{color:var(--dim);font-size:12px}
+/* Kept deliberately compact: this sits between the chart and the ad drill-down,
+   and an unbounded 60-row table pushed the section past 15,000px, burying
+   everything below it. Scrolls internally with a pinned header instead. */
+.sklist .tblwrap{max-height:430px;overflow-y:auto}
+.sklist table{min-width:760px}
+.sklist thead th{position:sticky;top:0;background:var(--panel);z-index:1;
+box-shadow:inset 0 -1px 0 var(--line)}
+.sklist .zdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;
+vertical-align:middle;flex:none}
+.sklist .adnm{display:block;max-width:430px;overflow:hidden;text-overflow:ellipsis;
+white-space:nowrap;font-size:12.5px}
+.sklist .sub{color:var(--dim);font-size:11px;margin-top:2px}
+.sklist tbody tr{cursor:pointer}
+.sklist tbody tr:hover{background:var(--panel2)}
 .skdot{stroke:var(--panel);stroke-width:1;cursor:pointer}
 .skdot:hover{stroke:var(--fg);stroke-width:2}
 .tl{margin:14px 0 0;background:var(--panel);border:1px solid var(--line);
@@ -1127,7 +1152,7 @@ JS = r"""
   // curve and rising scale curve — an ad is only called when its spend is
   // enough to distinguish it from the target.
   var SK_K=2.0, SK_METRIC='cpa', SK_TARGET=null, SK_FRAME=null, SK_PLAYING=false, SK_TIMER=null;
-  var SK_LAUNCH='';
+  var SK_LAUNCH='', SK_ZONE='';   // '' = every zone listed
 
   // Launch date is the ad's CREATION date, not the first day it delivered in
   // this window. The distinction matters: 166 of these ads were built before
@@ -1235,6 +1260,7 @@ JS = r"""
       document.getElementById('skZones').innerHTML='';
       document.getElementById('skTl').style.display='none';
       document.getElementById('skNote').innerHTML='';
+      document.getElementById('skTable').innerHTML='';
       return;
     }
     document.getElementById('skTl').style.display='';
@@ -1260,13 +1286,31 @@ JS = r"""
     // --- header segments -----------------------------------------------------
     var zl=[['g','SCALE'],['w','WAIT'],['k','KILL']];
     var totSp=tot.reduce(function(s,t){return s+t.sp;},0)||1;
-    document.getElementById('skZones').innerHTML=zl.map(function(z){
+    // A zone with no ads can't be selected; if the active one empties out (a
+    // filter change), fall back to showing all rather than an empty list.
+    if(SK_ZONE && !buckets[SK_ZONE].length) SK_ZONE='';
+    var zhost=document.getElementById('skZones');
+    zhost.className='skzones skzs'+(SK_ZONE?' picked':'');
+    zhost.innerHTML=zl.map(function(z){
       var b=buckets[z[0]], sp=b.reduce(function(s,t){return s+t.sp;},0);
       if(!b.length) return '';
-      return '<div class="skz '+z[0]+'" style="flex:'+Math.max(sp/totSp,0.08)+'">'+
+      return '<div class="skz '+z[0]+(SK_ZONE===z[0]?' on':'')+'" data-z="'+z[0]+'" '+
+        'role="button" tabindex="0" aria-pressed="'+(SK_ZONE===z[0])+'" '+
+        'title="Click to list the '+z[1].toLowerCase()+' ads below" '+
+        'style="flex:'+Math.max(sp/totSp,0.08)+'">'+
         '<span class="n">'+b.length+'</span><span>'+z[1]+'</span>'+
         '<span class="sp">'+money(sp)+'</span></div>';
     }).join('');
+    zhost.querySelectorAll('.skz').forEach(function(el){
+      var pick=function(){
+        SK_ZONE=(SK_ZONE===el.dataset.z)?'':el.dataset.z;   // click again to clear
+        renderSK(ADS.filter(passes));
+      };
+      el.addEventListener('click',pick);
+      el.addEventListener('keydown',function(e){
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}
+      });
+    });
 
     // --- scatter -------------------------------------------------------------
     var W=980,H=420,PL=66,PR=110,PT=14,PB=54;
@@ -1347,8 +1391,9 @@ JS = r"""
       c.addEventListener('click',function(){showAd(c.dataset.id,target);});
     });
 
-    // --- timeline ------------------------------------------------------------
+    // --- timeline + action list ----------------------------------------------
     renderTimeline(withDaily);
+    renderSKList(buckets,target);
 
     var wrong=buckets.k.reduce(function(s,t){return s+t.sp;},0);
     var isAuto=!(SK_TARGET!==null&&SK_TARGET>0);
@@ -1403,6 +1448,58 @@ JS = r"""
         ' no CPA to plot. ':'')+
       'Dot position uses spend accumulated up to the selected day, so dragging the timeline '+
       'replays how each ad actually got where it is.';
+  }
+
+  // The action list under the chart. Reads the same `buckets` the zone segments
+  // summarise, so the table can never disagree with the number on the segment
+  // that filtered it.
+  var SK_ROWS=60;
+  function renderSKList(buckets,target){
+    var ZL={g:['SCALE','var(--zGood)'],w:['WAIT','var(--zWait)'],k:['KILL','var(--zBad)']};
+    var order=SK_ZONE?[SK_ZONE]:['k','g','w'];   // worst first when unfiltered
+    var rows=[];
+    order.forEach(function(z){
+      buckets[z].forEach(function(t){ rows.push(t); });
+    });
+    rows.sort(function(a,b){return b.sp-a.sp;});
+    var shown=rows.slice(0,SK_ROWS);
+    var host=document.getElementById('skTable');
+    if(!rows.length){ host.innerHTML=''; return; }
+
+    var head=SK_ZONE
+      ? '<b style="color:'+ZL[SK_ZONE][1]+'">'+ZL[SK_ZONE][0]+'</b> &mdash; '+rows.length+
+        ' ad'+(rows.length===1?'':'s')+' &middot; '+money(rows.reduce(function(s,t){return s+t.sp;},0))
+      : '<b>All ads in view</b> &mdash; '+rows.length+' &middot; '+
+        money(rows.reduce(function(s,t){return s+t.sp;},0));
+    var hint=SK_ZONE
+      ? 'Click the highlighted bar again to clear the filter. Click any row for that ad’s history.'
+      : 'Click a bar above to list just that zone. Click any row for that ad’s history.';
+
+    var body=shown.map(function(t){
+      var a=t.a, days=(t.last-t.first+1);
+      return '<tr data-id="'+esc(a.id)+'">'+
+        '<td><span class="zdot" style="background:'+ZL[t.z][1]+'"></span>'+
+          '<span class="adnm" title="'+esc(a.nm||a.id)+'">'+esc(a.nm||a.id)+'</span>'+
+          '<div class="sub">'+(a.cr?'launched '+esc(a.cr)+' &middot; ':'')+days+
+          ' day'+(days===1?'':'s')+' delivering'+(a.stage?' &middot; '+esc(a.stage):'')+'</div></td>'+
+        '<td>'+money(t.sp)+'</td>'+
+        '<td>'+(t.cpa?money2(t.cpa):'<span class="flat">&mdash;</span>')+'</td>'+
+        '<td>'+t.roas.toFixed(2)+'x</td>'+
+        '<td>'+num(t.pu)+'</td>'+
+        '<td style="color:'+ZL[t.z][1]+';font-weight:600">'+ZL[t.z][0]+'</td></tr>';
+    }).join('');
+
+    host.innerHTML='<div class="sklist"><div class="lhd">'+head+
+      '<span class="hint">'+hint+'</span></div>'+
+      (rows.length>shown.length
+        ? '<div class="hint" style="color:var(--dim);font-size:12px;margin-bottom:6px">'+
+          'Showing the top '+shown.length+' by spend of '+rows.length+'.</div>' : '')+
+      '<div class="tblwrap"><table><thead><tr><th>Ad</th><th>Spend</th><th>CPA</th>'+
+      '<th>ROAS</th><th>Purchases</th><th>Verdict</th></tr></thead><tbody>'+body+
+      '</tbody></table></div></div>';
+    host.querySelectorAll('tbody tr').forEach(function(tr){
+      tr.addEventListener('click',function(){ showAd(tr.dataset.id,target); });
+    });
   }
 
   function renderTimeline(pool){
@@ -2102,6 +2199,7 @@ def build_performance_dashboard(
         '<div id="skPlot"></div>'
         '<div class="tl" id="skTl"></div>'
         '<div class="note" id="skNote"></div>'
+        '<div id="skTable"></div>'
         '<div id="adPanel"></div></section>'
         "<footer>The funnel, rating and scale/kill views all respond to the same "
         "filter bar as the attribute tables. Two of them deliberately use a different time "
