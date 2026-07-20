@@ -78,6 +78,12 @@ INSIGHT_FIELDS = [
     "ad_id", "ad_name", "campaign_id", "campaign_name", "adset_id", "adset_name",
     "impressions", "spend", "clicks", "ctr", "cpc", "cpm", "reach", "frequency",
     "actions", "action_values", "purchase_roas",
+    # Meta's own quality assessment. These are ordinal buckets, not scores, and
+    # they are only defined over recent delivery — a 90-day window returns
+    # UNKNOWN for every ad (measured: 25/25 UNKNOWN at 90d, 144/253 ranked at
+    # 30d). Ingest them anyway; the dashboard scopes them to the window where
+    # they exist and says so.
+    "quality_ranking", "engagement_rate_ranking", "conversion_rate_ranking",
     "video_play_actions",
     "video_thruplay_watched_actions", "video_p25_watched_actions",
     "video_p50_watched_actions", "video_p75_watched_actions",
@@ -250,6 +256,32 @@ def normalize_insight(row: dict[str, Any]) -> dict[str, Any]:
         "purchases": purchases,
         "revenue": revenue,
         "roas": roas_v,
+        # --- funnel steps -----------------------------------------------------
+        # Meta reports the same conversion under several attribution surfaces
+        # (`add_to_cart`, `omni_add_to_cart`, `onsite_web_add_to_cart`,
+        # `offsite_conversion.fb_pixel_add_to_cart`). `_action_value` takes the
+        # FIRST match, not the sum, so these are deduplicated totals — summing
+        # the aliases would count one cart add up to four times.
+        #
+        # The omni_* surface is listed first deliberately: `purchases`/`revenue`
+        # above resolve to `omni_purchase` on these accounts (measured: it wins
+        # 584/584 rows), so a funnel built on the web-only surface would end on a
+        # smaller number than the ROAS tiles report and read as a discrepancy.
+        # Measured on the current window, omni and web-only are identical for
+        # cart-add and checkout and diverge only at purchase (256,339 vs
+        # 222,731) — that gap is in-store/offline conversions, which genuinely
+        # never passed an on-site checkout. The dashboard footnotes it rather
+        # than hiding it by silently switching surfaces mid-funnel.
+        "landing_page_views": _action_value(actions, ("omni_landing_page_view",
+                                                      "landing_page_view")),
+        "view_content": _action_value(actions, ("omni_view_content", "view_content")),
+        "add_to_cart": _action_value(actions, ("omni_add_to_cart", "add_to_cart")),
+        "initiate_checkout": _action_value(actions, ("omni_initiated_checkout",
+                                                     "initiate_checkout")),
+        # Ordinal, and only populated for recent delivery — see INSIGHT_FIELDS.
+        "quality_ranking": row.get("quality_ranking"),
+        "engagement_rate_ranking": row.get("engagement_rate_ranking"),
+        "conversion_rate_ranking": row.get("conversion_rate_ranking"),
         # Scroll-stop / hook rate inputs.
         #
         # The numerator is 3-second video views, which Meta reports as the
@@ -664,9 +696,15 @@ def fetch_series(
     """Ad-level insights broken into fixed-width buckets across the window.
 
     `increment=7` gives ~13 points across a 90-day window, which is the sparkline
-    resolution the stat tiles want. Daily (`increment=1`) is available but ships
-    7x the numbers to the browser for a line that renders at ~120px wide — the
-    extra resolution is invisible and costs page weight.
+    resolution the stat tiles want — daily would ship 7x the numbers to the
+    browser for a line that renders at ~120px wide.
+
+    `increment=1` is the input to the scale/kill timeline, which animates
+    cumulative spend and CPA day by day and therefore genuinely needs the
+    resolution. Daily rows are stored in `ad_daily`, NOT in
+    `ad_performance_series`: that table is keyed (platform_ad_id, bucket_start)
+    with no width column, so writing daily rows into it would collide with the
+    weekly rows that share a start date and silently corrupt the sparklines.
     """
     owns = client is None
     c = client or httpx.Client(timeout=180)
@@ -691,3 +729,36 @@ def fetch_series(
         if owns:
             c.close()
     return rows
+
+
+def normalize_series_row(row: dict[str, Any]) -> dict[str, Any]:
+    """Flatten one time-bucketed insights row.
+
+    Deliberately narrower than `normalize_insight`: a bucketed row exists once
+    per ad per period, so the row count is ~90x the window's ad count and every
+    stored column is paid for 90 times over. Only what the timeline and the
+    sparklines actually plot is kept.
+    """
+    def f(key: str) -> float:
+        try:
+            return float(row.get(key) or 0)
+        except (TypeError, ValueError):
+            return 0.0
+
+    actions = row.get("actions")
+    values = row.get("action_values")
+    return {
+        "platform_ad_id": row.get("ad_id"),
+        # For a bucketed row `date_start` IS the bucket start.
+        "date_start": row.get("date_start"),
+        "date_stop": row.get("date_stop"),
+        "impressions": f("impressions"),
+        "spend": f("spend"),
+        "clicks": f("clicks"),
+        "purchases": _action_value(actions, ("omni_purchase", "purchase",
+                                             "offsite_conversion.fb_pixel_purchase")),
+        "revenue": _action_value(values, ("omni_purchase", "purchase",
+                                          "offsite_conversion.fb_pixel_purchase")),
+        "video_3s": _action_value(actions, ("video_view",)),
+        "video_plays": _action_value(row.get("video_play_actions"), ("video_view",)),
+    }

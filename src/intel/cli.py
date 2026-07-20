@@ -1311,10 +1311,6 @@ def analytics_import_cmd(competitor_id: str, in_path: str, dataset_label: str | 
     )
 
 
-if __name__ == "__main__":
-    cli()
-
-
 # ----------------------------------------------------------------------------
 # Owned Meta ad-account performance
 # ----------------------------------------------------------------------------
@@ -1436,3 +1432,84 @@ def perf_dashboard_cmd(competitor_ids: tuple[str, ...], out_dir: str,
     if open_after:
         import webbrowser
         webbrowser.open(f"file://{Path(res['path']).resolve()}")
+
+
+@cli.command("perf-series")
+@click.option("--account", "account_id", required=True,
+              help="Meta ad account id (numeric, no 'act_' prefix)")
+@click.option("--competitor", "competitor_id", required=True)
+@click.option("--since", "since", required=True, help="start date YYYY-MM-DD")
+@click.option("--until", "until", required=True, help="end date YYYY-MM-DD")
+@click.option("--increment", "increment", default=7, show_default=True,
+              type=click.Choice(["1", "7"]), help="bucket width in days")
+@click.option("--chunk-days", "chunk_days", default=0, show_default=True,
+              help="split the window into chunks of N days (0 = auto: 15 for daily, whole window for weekly)")
+def perf_series_cmd(account_id: str, competitor_id: str, since: str, until: str,
+                    increment: str, chunk_days: int) -> None:
+    """Ingest time-bucketed metrics for an owned account.
+
+    `--increment 7` fills `ad_performance_series`, which feeds the stat-tile
+    sparklines. `--increment 1` fills `ad_daily`, which feeds the scale/kill
+    timeline. They are separate tables on purpose — see the note on
+    `_migrate_ad_daily_table` for what collides if they aren't.
+
+    Daily pulls are chunked because a 90-day ad-level daily query asks Meta for
+    ~90x the rows of a summary query, and these accounts reliably 500 on it
+    (retries included — it is a load failure, not a transient one). Chunks are
+    written as they arrive, so a mid-run failure keeps everything already
+    fetched instead of discarding the whole window.
+    """
+    from datetime import date, timedelta
+
+    from . import storage
+    from .adapters import meta_account as ma
+    from .adapters.meta_account import MetaAccountError
+
+    inc = int(increment)
+    step = chunk_days or (15 if inc == 1 else 0)
+    console.print(
+        f"[bold]series[/bold] account {account_id} → [bold]{competitor_id}[/bold] "
+        f"[dim]{since} → {until}, {inc}-day buckets"
+        + (f", {step}-day chunks" if step else "") + "[/dim]"
+    )
+
+    d0, d1 = date.fromisoformat(since), date.fromisoformat(until)
+    spans: list[tuple[str, str]] = []
+    if step:
+        cur = d0
+        while cur <= d1:
+            end = min(cur + timedelta(days=step - 1), d1)
+            spans.append((cur.isoformat(), end.isoformat()))
+            cur = end + timedelta(days=1)
+    else:
+        spans.append((since, until))
+
+    write = storage.upsert_ad_daily if inc == 1 else storage.upsert_ad_series
+    table = "ad_daily" if inc == 1 else "ad_performance_series"
+    total, failed = 0, []
+    for s, u in spans:
+        try:
+            raw = ma.fetch_series(account_id, since=s, until=u, increment=inc)
+        except MetaAccountError as exc:
+            console.print(f"  [yellow]chunk {s}→{u} failed:[/yellow] {str(exc)[:120]}")
+            failed.append((s, u))
+            continue
+        n = 0
+        with connect() as conn:
+            for r in raw:
+                row = ma.normalize_series_row(r)
+                if not row.get("platform_ad_id") or not row.get("date_start"):
+                    continue
+                write(conn, competitor_id=competitor_id, account_id=account_id, row=row)
+                n += 1
+        total += n
+        if step:
+            console.print(f"  [dim]{s}→{u}: {n} rows[/dim]")
+
+    if failed:
+        console.print(f"[yellow]⚠ {len(failed)} chunk(s) failed:[/yellow] {failed}")
+    console.print(f"[green]✓[/green] {total} rows → {table}")
+
+
+if __name__ == "__main__":
+    cli()

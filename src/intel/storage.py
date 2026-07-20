@@ -479,6 +479,55 @@ def _migrate_ad_performance_video_columns(conn: sqlite3.Connection) -> None:
             conn.execute(f"ALTER TABLE ad_performance ADD COLUMN {col} REAL")
 
 
+def _migrate_ad_performance_funnel_columns(conn: sqlite3.Connection) -> None:
+    """Add funnel-step and Meta-ranking columns to ad_performance.
+
+    The funnel counts were always present inside `extra_json` (the raw actions
+    blob is stored verbatim), so existing rows can be backfilled locally with no
+    further API calls — see scripts/backfill_funnel_columns.py. Promoting them to
+    real columns is what lets the dashboard aggregate them in SQL instead of
+    JSON-parsing 600 blobs per render.
+
+    The ranking columns are TEXT because Meta returns ordinal buckets
+    ('ABOVE_AVERAGE', 'AVERAGE', 'BELOW_AVERAGE_10'…), not numbers.
+    """
+    have = {r[1] for r in conn.execute("PRAGMA table_info(ad_performance)").fetchall()}
+    if not have:
+        return
+    for col in ("landing_page_views", "view_content", "add_to_cart", "initiate_checkout"):
+        if col not in have:
+            conn.execute(f"ALTER TABLE ad_performance ADD COLUMN {col} REAL")
+    for col in ("quality_ranking", "engagement_rate_ranking", "conversion_rate_ranking"):
+        if col not in have:
+            conn.execute(f"ALTER TABLE ad_performance ADD COLUMN {col} TEXT")
+
+
+def _migrate_ad_daily_table(conn: sqlite3.Connection) -> None:
+    """Per-ad, per-day metrics backing the scale/kill timeline.
+
+    Deliberately a separate table from `ad_performance_series` rather than a
+    finer increment written into it. That table is keyed
+    (platform_ad_id, bucket_start) with no bucket-width column, so a daily row
+    and a weekly row that share a start date would collide on the primary key —
+    the daily value would overwrite the weekly one and the stat-tile sparklines
+    would silently plot a single day against a 13-week axis.
+    """
+    conn.executescript("""
+    CREATE TABLE IF NOT EXISTS ad_daily (
+      platform_ad_id TEXT NOT NULL,
+      competitor_id TEXT,
+      account_id TEXT,
+      day TEXT NOT NULL,
+      impressions REAL, spend REAL, clicks REAL,
+      purchases REAL, revenue REAL, video_3s REAL, video_plays REAL,
+      fetched_at TEXT,
+      PRIMARY KEY (platform_ad_id, day)
+    );
+    CREATE INDEX IF NOT EXISTS idx_ad_daily_day ON ad_daily(day);
+    CREATE INDEX IF NOT EXISTS idx_ad_daily_ad ON ad_daily(platform_ad_id);
+    """)
+
+
 def _migrate_owned_audience_columns(conn: sqlite3.Connection) -> None:
     """Add audience facets to owned_ads on databases that predate them.
 
@@ -590,6 +639,8 @@ def _migrate_owned_perf_tables(conn: sqlite3.Connection) -> None:
     """)
     _migrate_owned_audience_columns(conn)
     _migrate_ad_performance_video_columns(conn)
+    _migrate_ad_performance_funnel_columns(conn)
+    _migrate_ad_daily_table(conn)
 
 
 @contextmanager
@@ -1209,8 +1260,10 @@ def upsert_ad_performance(
         "  date_start, date_stop, impressions, spend, clicks, ctr, cpc, cpm, reach, "
         "  frequency, link_clicks, purchases, revenue, roas, thruplays, "
         "  video_p25, video_p50, video_p75, video_p100, video_3s, video_plays, "
+        "  landing_page_views, view_content, add_to_cart, initiate_checkout, "
+        "  quality_ranking, engagement_rate_ranking, conversion_rate_ranking, "
         "  extra_json, fetched_at) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
         "ON CONFLICT(platform_ad_id, date_start, date_stop) DO UPDATE SET "
         "  competitor_id=excluded.competitor_id, account_id=excluded.account_id, "
         "  impressions=excluded.impressions, spend=excluded.spend, clicks=excluded.clicks, "
@@ -1220,7 +1273,14 @@ def upsert_ad_performance(
         "  thruplays=excluded.thruplays, video_p25=excluded.video_p25, "
         "  video_p50=excluded.video_p50, video_p75=excluded.video_p75, "
         "  video_p100=excluded.video_p100, video_3s=excluded.video_3s, "
-        "  video_plays=excluded.video_plays, extra_json=excluded.extra_json, "
+        "  video_plays=excluded.video_plays, "
+        "  landing_page_views=excluded.landing_page_views, "
+        "  view_content=excluded.view_content, add_to_cart=excluded.add_to_cart, "
+        "  initiate_checkout=excluded.initiate_checkout, "
+        "  quality_ranking=excluded.quality_ranking, "
+        "  engagement_rate_ranking=excluded.engagement_rate_ranking, "
+        "  conversion_rate_ranking=excluded.conversion_rate_ranking, "
+        "  extra_json=excluded.extra_json, "
         "  fetched_at=excluded.fetched_at",
         (
             row.get("platform_ad_id"), competitor_id, account_id,
@@ -1231,7 +1291,37 @@ def upsert_ad_performance(
             row.get("revenue"), row.get("roas"), row.get("thruplays"),
             row.get("video_p25"), row.get("video_p50"), row.get("video_p75"),
             row.get("video_p100"), row.get("video_3s"), row.get("video_plays"),
+            row.get("landing_page_views"), row.get("view_content"),
+            row.get("add_to_cart"), row.get("initiate_checkout"),
+            row.get("quality_ranking"), row.get("engagement_rate_ranking"),
+            row.get("conversion_rate_ranking"),
             row.get("extra_json"), utcnow(),
+        ),
+    )
+
+
+def upsert_ad_daily(
+    conn: sqlite3.Connection,
+    *,
+    competitor_id: str | None,
+    account_id: str,
+    row: dict[str, Any],
+) -> None:
+    """Store one ad's metrics for one calendar day (scale/kill timeline input)."""
+    conn.execute(
+        "INSERT INTO ad_daily(platform_ad_id, competitor_id, account_id, day, "
+        "  impressions, spend, clicks, purchases, revenue, video_3s, video_plays, fetched_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?) "
+        "ON CONFLICT(platform_ad_id, day) DO UPDATE SET "
+        "  impressions=excluded.impressions, spend=excluded.spend, clicks=excluded.clicks, "
+        "  purchases=excluded.purchases, revenue=excluded.revenue, "
+        "  video_3s=excluded.video_3s, video_plays=excluded.video_plays, "
+        "  fetched_at=excluded.fetched_at",
+        (
+            row.get("platform_ad_id"), competitor_id, account_id, row.get("date_start"),
+            row.get("impressions"), row.get("spend"), row.get("clicks"),
+            row.get("purchases"), row.get("revenue"),
+            row.get("video_3s"), row.get("video_plays"), utcnow(),
         ),
     )
 
