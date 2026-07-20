@@ -527,9 +527,17 @@ META_SPECS = [
     ("age", "Audience — age band", "scalar"),
     ("gen", "Audience — gender targeting", "scalar"),
     ("opt", "Delivery optimisation goal", "scalar"),
-    ("an", "Ad set (audience)", "scalar"),
-    ("cp", "Campaign", "scalar"),
     ("ac", "Ad account", "scalar"),
+]
+
+# Rendered last, after the creative-attribute tables. Campaign and ad-set names
+# are account *structure*, not a property of the creative: they have a long tail
+# of near-unique values (one bucket per campaign), so they read as a reference
+# listing rather than a comparison, and they push the attribute tables down the
+# page if left among them. They still cover 100% of filtered spend.
+TAIL_SPECS = [
+    ("cp", "Campaign", "scalar"),
+    ("an", "Ad set (audience)", "scalar"),
 ]
 
 CSS = """
@@ -1790,6 +1798,10 @@ JS = r"""
       html+='<div class="note">No creative-attribute tables for this filter &mdash; none of the '+
         'matching ads have a readable creative analysis (catalog ads have no fixed creative).</div>';
     }
+    // Account structure last — see TAIL_SPECS for why these sit apart from the
+    // attribute tables rather than among them.
+    html+='<h3 class="grp">Account structure &mdash; all ads (100% of filtered spend)</h3>';
+    TAIL_SPECS.forEach(function(s,i){ html+=tableHTML(s, pool, all, 't'+i); });
     document.getElementById('tables').innerHTML=html;
     wireRows();
   }
@@ -1889,6 +1901,7 @@ def build_performance_dashboard(
         + [(k, lab, "list", True) for k, lab in LIST_ATTRS]
     )
     meta_specs = [(k, lab, kind, False) for k, lab, kind in META_SPECS]
+    tail_specs = [(k, lab, kind, False) for k, lab, kind in TAIL_SPECS]
 
     ads: list[dict[str, Any]] = []
     for r in rows:
@@ -2120,6 +2133,7 @@ def build_performance_dashboard(
         f"<script>var ADS={json.dumps(ads, separators=(',', ':'))};"
         f"var FILTERS={filt_json};"
         f"var META_SPECS={json.dumps(meta_specs)};"
+        f"var TAIL_SPECS={json.dumps(tail_specs)};"
         f"var VISION_SPECS={json.dumps(vision_specs)};"
         f"var MINIMP={int(min_impressions)};var MAXC={MAX_CARDS_PER_BUCKET};"
         f"var BUCKETS={json.dumps(buckets)};"
