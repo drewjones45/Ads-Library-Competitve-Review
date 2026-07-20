@@ -171,11 +171,12 @@ def _fetch(conn: sqlite3.Connection, competitor_ids: list[str] | None) -> list[d
         if i is None:
             continue
         d = series_by_ad.setdefault(s["platform_ad_id"], {
-            k: [0.0] * n_b for k in ("im", "sp", "ck", "rv", "v3", "vp")
+            k: [0.0] * n_b for k in ("im", "sp", "ck", "pu", "rv", "v3", "vp")
         })
         d["im"][i] = s["impressions"] or 0
         d["sp"][i] = s["spend"] or 0
         d["ck"][i] = s["clicks"] or 0
+        d["pu"][i] = s["purchases"] or 0
         d["rv"][i] = s["revenue"] or 0
         d["v3"][i] = s["video_3s"] or 0
         d["vp"][i] = s["video_plays"] or 0
@@ -622,11 +623,15 @@ margin:0 4px 6px 0}
 .pill.aud{border-color:var(--accent);color:var(--accent)}
 
 /* ---- KPI tiles (reference layout: label / big value / vs-prior + delta / sparkline) ---- */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(292px,1fr));gap:16px;margin:18px 0 6px}
+/* 10 tiles, so the track is sized to fit 5 per row on a full-width wrap
+   (2 clean rows) rather than 4 + a ragged remainder. */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:14px;margin:18px 0 6px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
 box-shadow:var(--shadow)}
 .kpi .lbl{font-size:12.5px;color:var(--fg);opacity:.85;margin-bottom:8px}
-.kpi .val{font-size:30px;font-weight:600;letter-spacing:-.01em;line-height:1.1}
+.kpi{padding:15px 16px}
+.kpi .val{font-size:26px;font-weight:600;letter-spacing:-.015em;line-height:1.1;
+font-variant-numeric:tabular-nums;white-space:nowrap}
 .kpi .foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:10px}
 .kpi .cmp{font-size:11.5px;color:var(--dim);line-height:1.45}
 .kpi .cmpv{color:var(--fg);opacity:.75}
@@ -778,6 +783,8 @@ JS = r"""
   // like a round number someone chose rather than the measured blend.
   var money2=function(n){return '$'+(n||0).toLocaleString(undefined,
     {minimumFractionDigits:2,maximumFractionDigits:2});};
+  var pct2=function(n){return (+n).toFixed(2)+'%';};
+  var mult=function(n){return (+n).toFixed(2)+'x';};
   var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
 
@@ -796,6 +803,9 @@ JS = r"""
     }
     return {ads:list.length,im:im,sp:sp,ck:ck,pu:pu,rv:rv,
       ctr:im?100*ck/im:0, cpm:im?1000*sp/im:0, roas:sp?rv/sp:0,
+      // Conversion rate is purchases per CLICK, matching the CTR tile's
+      // denominator so impressions → clicks → purchases reads as one chain.
+      cvr:ck?100*pu/ck:0,
       v3:v3, vim:vim, vads:vads, ssr:vim?100*v3/vim:null};
   }
   function ssrCell(st){
@@ -1537,22 +1547,28 @@ JS = r"""
   function poolSeries(pool){
     var n=BUCKETS.length; if(!n) return null;
     var im=new Array(n).fill(0), sp=new Array(n).fill(0), ck=new Array(n).fill(0),
-        rv=new Array(n).fill(0), v3=new Array(n).fill(0), vim=new Array(n).fill(0);
+        pu=new Array(n).fill(0), rv=new Array(n).fill(0),
+        v3=new Array(n).fill(0), vim=new Array(n).fill(0);
     var any=false;
     pool.forEach(function(a){
       if(!a.s) return; any=true;
       for(var i=0;i<n;i++){
         im[i]+=a.s.im[i]||0; sp[i]+=a.s.sp[i]||0; ck[i]+=a.s.ck[i]||0;
+        pu[i]+=(a.s.pu&&a.s.pu[i])||0;
         rv[i]+=a.s.rv[i]||0; v3[i]+=a.s.v3[i]||0;
         if((a.s.vp[i]||0)>0) vim[i]+=a.s.im[i]||0;
       }
     });
     if(!any) return null;
-    return {im:im, sp:sp, ck:ck, rv:rv,
+    // Derived rates are rebuilt from summed components per bucket, never
+    // averaged from per-ad rates — a 200-impression ad must not swing a week as
+    // hard as a 2M-impression one.
+    return {im:im, sp:sp, ck:ck, pu:pu, rv:rv,
       ctr:im.map(function(v,i){return v?100*ck[i]/v:0;}),
+      cpm:im.map(function(v,i){return v?1000*sp[i]/v:0;}),
+      cvr:ck.map(function(v,i){return v?100*pu[i]/v:0;}),
       roas:sp.map(function(v,i){return v?rv[i]/v:0;}),
-      ssr:vim.map(function(v,i){return v?100*v3[i]/v:0;}),
-      pu:im.map(function(_,i){return 0;})};
+      ssr:vim.map(function(v,i){return v?100*v3[i]/v:0;})};
   }
 
   // Prior period aggregated over the ads that actually ran THEN, matched on the
@@ -1562,31 +1578,43 @@ JS = r"""
   // slices and simply broad for the rest.
   var PFIELDS=['b','ac','stage','gen','geo','age','cl'];
   function priorAgg(){
-    var im=0,sp=0,ck=0,rv=0,v3=0,vim=0,n=0;
+    var im=0,sp=0,ck=0,pu=0,rv=0,v3=0,vim=0,n=0;
     PADS.forEach(function(a){
       for(var i=0;i<PFIELDS.length;i++){
         var k=PFIELDS[i];
         if(state[k] && String(a[k]||'')!==state[k]) return;
       }
-      n++; im+=a.im||0; sp+=a.sp||0; ck+=a.ck||0; rv+=a.rv||0; v3+=a.v3||0;
+      n++; im+=a.im||0; sp+=a.sp||0; ck+=a.ck||0; pu+=a.pu||0;
+      rv+=a.rv||0; v3+=a.v3||0;
       if((a.vp||0)>0) vim+=a.im||0;
     });
     if(!n) return null;
-    return {ads:n,im:im,sp:sp,ck:ck,rv:rv,
-      ctr:im?100*ck/im:0, roas:sp?rv/sp:0, ssr:vim?100*v3/vim:null};
+    return {ads:n,im:im,sp:sp,ck:ck,pu:pu,rv:rv,
+      ctr:im?100*ck/im:0, cpm:im?1000*sp/im:0, cvr:ck?100*pu/ck:0,
+      roas:sp?rv/sp:0, ssr:vim?100*v3/vim:null};
   }
 
   function renderKpis(pool, all){
     var S=poolSeries(pool), P=priorAgg();
     // higherIsBetter drives the delta colour — a fall in CPM is good news.
+    // Ordered as a funnel: money in, reach, cost of reach, attention, clicks,
+    // click rate, conversions, conversion rate, money out, return. `f` is the
+    // tile's own formatter so the delta's "prior" value is rendered the same way
+    // as its headline \u2014 a shared formatter guessing from the label breaks as
+    // soon as two tiles are both percentages with different precision.
+    // hib = higher-is-better, which drives the delta COLOUR: a fall in CPM is
+    // good news. null = neutral, where up is neither good nor bad.
     var tiles=[
-      {k:'Total spend',   v:money(all.sp), cur:all.sp,  prev:P&&P.sp,  s:S&&S.sp,  hib:null},
-      {k:'Impressions',   v:num(all.im),   cur:all.im,  prev:P&&P.im,  s:S&&S.im,  hib:true},
-      {k:'Scroll-stop rate', v:(all.ssr===null?'\u2014':all.ssr.toFixed(2)+'%'),
-       cur:all.ssr, prev:P&&P.ssr, s:S&&S.ssr, hib:true},
-      {k:'Click through rate', v:all.ctr.toFixed(2)+'%', cur:all.ctr, prev:P&&P.ctr, s:S&&S.ctr, hib:true},
-      {k:'ROAS',          v:all.roas.toFixed(2), cur:all.roas, prev:P&&P.roas, s:S&&S.roas, hib:true},
-      {k:'Total clicks',  v:num(all.ck),   cur:all.ck,  prev:P&&P.ck,  s:S&&S.ck,  hib:true}
+      {k:'Total spend',   cur:all.sp,   prev:P&&P.sp,   s:S&&S.sp,   hib:null, f:money},
+      {k:'Impressions',   cur:all.im,   prev:P&&P.im,   s:S&&S.im,   hib:true, f:num},
+      {k:'CPM',           cur:all.cpm,  prev:P&&P.cpm,  s:S&&S.cpm,  hib:false,f:money2},
+      {k:'Scroll-stop rate', cur:all.ssr, prev:P&&P.ssr, s:S&&S.ssr, hib:true, f:pct2},
+      {k:'Clicks',        cur:all.ck,   prev:P&&P.ck,   s:S&&S.ck,   hib:true, f:num},
+      {k:'Click through rate', cur:all.ctr, prev:P&&P.ctr, s:S&&S.ctr, hib:true, f:pct2},
+      {k:'Purchases',     cur:all.pu,   prev:P&&P.pu,   s:S&&S.pu,   hib:true, f:num},
+      {k:'Conversion rate',cur:all.cvr, prev:P&&P.cvr,  s:S&&S.cvr,  hib:true, f:pct2},
+      {k:'Revenue',       cur:all.rv,   prev:P&&P.rv,   s:S&&S.rv,   hib:true, f:money},
+      {k:'ROAS',          cur:all.roas, prev:P&&P.roas, s:S&&S.roas, hib:true, f:mult}
     ];
     document.getElementById('kpis').innerHTML=tiles.map(function(t){
       var pct=null;
@@ -1599,14 +1627,10 @@ JS = r"""
       var hue = cls==='pos'?'var(--good)':(cls==='neg'?'var(--bad)':'var(--accent)');
       var arrow = dir==='pos'?'\u2197':(dir==='neg'?'\u2198':'\u2192');
       var fmt=function(x){
-        if(x===null||x===undefined) return '\u2014';
-        if(t.k==='Total spend') return money(x);
-        if(t.k==='ROAS') return (+x).toFixed(2);
-        if(/rate/i.test(t.k)) return (+x).toFixed(2)+'%';
-        return num(x);
+        return (x===null||x===undefined||!isFinite(x))?'\u2014':t.f(x);
       };
       return '<div class="kpi"><div class="lbl">'+esc(t.k)+'</div>'+
-        '<div class="val">'+t.v+'</div><div class="foot"><div>'+
+        '<div class="val">'+fmt(t.cur)+'</div><div class="foot"><div>'+
         '<div class="cmp">vs prior period<br><span class="cmpv">'+fmt(t.prev)+'</span></div>'+
         '<div class="delta '+cls+'">'+arrow+' '+(pct===null?'n/a':(pct>0?'+':'')+pct.toFixed(1)+'%')+'</div>'+
         '</div>'+(t.s?sparkline(t.s,hue):'')+'</div></div>';
@@ -1856,6 +1880,7 @@ def build_performance_dashboard(
                 "im": [round(x) for x in ser["im"]],
                 "sp": [round(x, 2) for x in ser["sp"]],
                 "ck": [round(x) for x in ser["ck"]],
+                "pu": [round(x) for x in ser["pu"]],
                 "rv": [round(x, 2) for x in ser["rv"]],
                 "v3": [round(x) for x in ser["v3"]],
                 "vp": [round(x) for x in ser["vp"]],
