@@ -2214,20 +2214,6 @@ def build_performance_dashboard(
         '</select></span></div>'
         '<div class="funnels" id="funnels"></div>'
         '<div class="note" id="fnNote"></div></section>'
-        '<div class="note" id="cov"></div>'
-        '<div id="tables"></div>'
-        '<section class="viz" id="rankSec">'
-        '<h2>Meta rating vs ROAS <span class="h2sub">does the platform\'s own '
-        "grade predict return?</span></h2>"
-        '<div class="vizbar">'
-        '<span class="flabel">Rating</span>'
-        '<span class="segs" id="rankSegs">'
-        '<button class="seg on" data-r="q" type="button">Quality</button>'
-        '<button class="seg" data-r="e" type="button">Engagement</button>'
-        '<button class="seg" data-r="c" type="button">Conversion</button>'
-        "</span></div>"
-        '<div id="rankPlot"></div>'
-        '<div class="note" id="rankNote"></div></section>'
         '<section class="viz" id="skSec">'
         '<h2>Scale or kill <span class="h2sub">every ad by spend and efficiency'
         "</span></h2>"
@@ -2250,6 +2236,20 @@ def build_performance_dashboard(
         '<div class="note" id="skNote"></div>'
         '<div id="skTable"></div>'
         '<div id="adPanel"></div></section>'
+        '<div class="note" id="cov"></div>'
+        '<div id="tables"></div>'
+        '<section class="viz" id="rankSec">'
+        '<h2>Meta rating vs ROAS <span class="h2sub">does the platform\'s own '
+        "grade predict return?</span></h2>"
+        '<div class="vizbar">'
+        '<span class="flabel">Rating</span>'
+        '<span class="segs" id="rankSegs">'
+        '<button class="seg on" data-r="q" type="button">Quality</button>'
+        '<button class="seg" data-r="e" type="button">Engagement</button>'
+        '<button class="seg" data-r="c" type="button">Conversion</button>'
+        "</span></div>"
+        '<div id="rankPlot"></div>'
+        '<div class="note" id="rankNote"></div></section>'
         "<footer>The funnel, rating and scale/kill views all respond to the same "
         "filter bar as the attribute tables. Two of them deliberately use a different time "
         "window than the 90-day headline: Meta's quality rankings only exist for recent "
