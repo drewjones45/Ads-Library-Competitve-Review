@@ -1454,26 +1454,65 @@ JS = r"""
   // summarise, so the table can never disagree with the number on the segment
   // that filtered it.
   var SK_ROWS=60;
+
+  // Money at stake against the target, in dollars — the quantity that makes one
+  // ad more urgent than another.
+  //
+  //   CPA mode:  what these conversions SHOULD have cost, minus what they did.
+  //   ROAS mode: what this spend SHOULD have returned, minus what it did.
+  //
+  // Negative means the ad is behind target and the figure is how much it burned;
+  // positive means it beat target and the figure is the surplus it produced.
+  // Sorting on this rather than on raw spend is the difference between "biggest
+  // ad" and "biggest problem": a $95k ad a shade over target wastes far less
+  // than a $40k ad at triple the target CPA. An ad with no conversions scores
+  // -spend, which is correct — all of it was wasted.
+  function skImpact(t,target){
+    return (SK_METRIC==='cpa') ? (t.pu*target - t.sp) : (t.rv - t.sp*target);
+  }
+
   function renderSKList(buckets,target){
     var ZL={g:['SCALE','var(--zGood)'],w:['WAIT','var(--zWait)'],k:['KILL','var(--zBad)']};
     var order=SK_ZONE?[SK_ZONE]:['k','g','w'];   // worst first when unfiltered
-    var rows=[];
+    var rows=[], shownBy={}, totalBy={};
     order.forEach(function(z){
-      buckets[z].forEach(function(t){ rows.push(t); });
+      var b=buckets[z].map(function(t){ t.imp=skImpact(t,target); return t; });
+      // Priority differs by verdict, so each zone is ranked on its own terms and
+      // the zones are then concatenated in `order` — a single global sort would
+      // interleave "kill this first" with "scale this first", which is not a
+      // ranking anyone can act on.
+      if(z==='k')      b.sort(function(x,y){return x.imp-y.imp;});   // worst burn first
+      else if(z==='g') b.sort(function(x,y){return y.imp-x.imp;});   // biggest surplus first
+      else             b.sort(function(x,y){return y.sp-x.sp;});     // undecided: most at risk
+      // Unfiltered, cap EACH zone rather than the concatenated list. A flat
+      // top-60 over kill-then-scale-then-wait would be 60 kill rows and no
+      // scale row at all — the zones would silently vanish behind the cap.
+      var cap=SK_ZONE?SK_ROWS:Math.round(SK_ROWS/3);
+      b.slice(0,cap).forEach(function(t){ rows.push(t); });
+      shownBy[z]=Math.min(cap,b.length); totalBy[z]=b.length;
     });
-    rows.sort(function(a,b){return b.sp-a.sp;});
-    var shown=rows.slice(0,SK_ROWS);
+    var shown=rows;
     var host=document.getElementById('skTable');
     if(!rows.length){ host.innerHTML=''; return; }
 
+    // Counts describe the whole zone, not the capped page of it.
+    var nAll=0, spAll=0;
+    order.forEach(function(z){
+      nAll+=buckets[z].length;
+      buckets[z].forEach(function(t){ spAll+=t.sp; });
+    });
     var head=SK_ZONE
-      ? '<b style="color:'+ZL[SK_ZONE][1]+'">'+ZL[SK_ZONE][0]+'</b> &mdash; '+rows.length+
-        ' ad'+(rows.length===1?'':'s')+' &middot; '+money(rows.reduce(function(s,t){return s+t.sp;},0))
-      : '<b>All ads in view</b> &mdash; '+rows.length+' &middot; '+
-        money(rows.reduce(function(s,t){return s+t.sp;},0));
-    var hint=SK_ZONE
-      ? 'Click the highlighted bar again to clear the filter. Click any row for that ad’s history.'
-      : 'Click a bar above to list just that zone. Click any row for that ad’s history.';
+      ? '<b style="color:'+ZL[SK_ZONE][1]+'">'+ZL[SK_ZONE][0]+'</b> &mdash; '+nAll+
+        ' ad'+(nAll===1?'':'s')+' &middot; '+money(spAll)
+      : '<b>All ads in view</b> &mdash; '+nAll+' &middot; '+money(spAll);
+    var rank={
+      k:'Ranked by money burned against target — act on the top row first.',
+      g:'Ranked by surplus produced against target — the strongest case for more budget first.',
+      w:'Ranked by spend at risk — these have not earned a verdict yet.'
+    }[SK_ZONE] || 'Grouped kill, then scale, then wait; each ranked by dollars at stake against target.';
+    var hint=rank+(SK_ZONE
+      ? ' Click the highlighted bar again to clear. Click a row for that ad’s history.'
+      : ' Click a bar above to list one zone. Click a row for that ad’s history.');
 
     var body=shown.map(function(t){
       var a=t.a, days=(t.last-t.first+1);
@@ -1486,16 +1525,26 @@ JS = r"""
         '<td>'+(t.cpa?money2(t.cpa):'<span class="flat">&mdash;</span>')+'</td>'+
         '<td>'+t.roas.toFixed(2)+'x</td>'+
         '<td>'+num(t.pu)+'</td>'+
+        '<td style="color:'+(t.imp<0?'var(--zBad)':'var(--zGood)')+';font-weight:600" '+
+          'title="'+(t.imp<0
+            ? 'Spent '+money(-t.imp)+' more than these conversions should have cost at target'
+            : 'Produced '+money(t.imp)+' more value than target required')+'">'+
+          (t.imp<0?'-':'+')+money(Math.abs(t.imp))+'</td>'+
         '<td style="color:'+ZL[t.z][1]+';font-weight:600">'+ZL[t.z][0]+'</td></tr>';
     }).join('');
 
     host.innerHTML='<div class="sklist"><div class="lhd">'+head+
       '<span class="hint">'+hint+'</span></div>'+
-      (rows.length>shown.length
+      (nAll>shown.length
         ? '<div class="hint" style="color:var(--dim);font-size:12px;margin-bottom:6px">'+
-          'Showing the top '+shown.length+' by spend of '+rows.length+'.</div>' : '')+
+          'Showing the highest-priority '+
+          order.map(function(z){
+            return shownBy[z]+' of '+totalBy[z]+' '+ZL[z][0].toLowerCase();
+          }).join(' &middot; ')+'.</div>' : '')+
       '<div class="tblwrap"><table><thead><tr><th>Ad</th><th>Spend</th><th>CPA</th>'+
-      '<th>ROAS</th><th>Purchases</th><th>Verdict</th></tr></thead><tbody>'+body+
+      '<th>ROAS</th><th>Purchases</th>'+
+      '<th title="Dollars gained or lost against the target — the sort key">'+
+      'vs target</th><th>Verdict</th></tr></thead><tbody>'+body+
       '</tbody></table></div></div>';
     host.querySelectorAll('tbody tr').forEach(function(tr){
       tr.addEventListener('click',function(){ showAd(tr.dataset.id,target); });
