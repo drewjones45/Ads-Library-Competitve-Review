@@ -101,6 +101,7 @@ def _fetch(conn: sqlite3.Connection, competitor_ids: list[str] | None) -> list[d
                SUM(p.clicks) AS clicks, SUM(p.link_clicks) AS link_clicks,
                SUM(p.purchases) AS purchases, SUM(p.revenue) AS revenue,
                SUM(p.thruplays) AS thruplays, SUM(p.video_p100) AS video_p100,
+               SUM(p.video_3s) AS video_3s, SUM(p.video_plays) AS video_plays,
                MAX(p.frequency) AS frequency
         FROM owned_ads oa
         LEFT JOIN ad_performance p ON p.platform_ad_id = oa.platform_ad_id
@@ -394,6 +395,7 @@ tr.sum.open .caret{transform:rotate(90deg);color:var(--accent)}
 .idx{font-weight:600}
 .up{color:var(--good)} .down{color:var(--bad)} .flat{color:var(--dim)}
 .n{color:var(--dim);font-size:12px;font-weight:400}
+.vn{color:var(--dim);font-size:10.5px;font-weight:400}
 .bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:4px;max-width:280px}
 .bar>i{display:block;height:100%;background:var(--accent)}
 tr.detail>td{padding:0;border-bottom:1px solid var(--line);background:var(--bg)}
@@ -448,11 +450,25 @@ JS = r"""
 
   // --- aggregation (single definition, used for buckets and baselines) ---
   function agg(list){
-    var im=0,sp=0,ck=0,pu=0,rv=0;
+    var im=0,sp=0,ck=0,pu=0,rv=0,v3=0,vim=0,vads=0;
     for(var i=0;i<list.length;i++){var a=list[i];
-      im+=a.im||0; sp+=a.sp||0; ck+=a.ck||0; pu+=a.pu||0; rv+=a.rv||0;}
+      im+=a.im||0; sp+=a.sp||0; ck+=a.ck||0; pu+=a.pu||0; rv+=a.rv||0;
+      v3+=a.v3||0;
+      // Scroll-stop rate is a VIDEO metric. Static and catalog-image ads can
+      // never register a 3-second view, so counting their impressions in the
+      // denominator drags the rate toward zero for reasons that have nothing to
+      // do with the creative. Only ads that actually served video (vp>0) are
+      // counted, and vads is surfaced so a thin video sample is visible.
+      if((a.vp||0)>0){ vim+=a.im||0; vads++; }
+    }
     return {ads:list.length,im:im,sp:sp,ck:ck,pu:pu,rv:rv,
-      ctr:im?100*ck/im:0, cpm:im?1000*sp/im:0, roas:sp?rv/sp:0};
+      ctr:im?100*ck/im:0, cpm:im?1000*sp/im:0, roas:sp?rv/sp:0,
+      v3:v3, vim:vim, vads:vads, ssr:vim?100*v3/vim:null};
+  }
+  function ssrCell(st){
+    if(st.ssr===null) return '<span class="flat" title="no video ads in this bucket">&mdash;</span>';
+    return st.ssr.toFixed(2)+'%<span class="vn" title="'+st.vads+
+      ' video ad'+(st.vads===1?'':'s')+' of '+st.ads+'">&nbsp;('+st.vads+')</span>';
   }
   function idxCell(v){
     if(!v||!isFinite(v)) return '<span class="flat">&mdash;</span>';
@@ -496,6 +512,8 @@ JS = r"""
       '<div class="nm" title="'+esc(a.nm)+'">'+esc(a.nm||'(unnamed)')+'</div>'+
       '<div class="mrow"><span>spend</span><b>'+money(a.sp)+'</b></div>'+
       '<div class="mrow"><span>impr.</span><b>'+num(a.im)+'</b></div>'+
+      '<div class="mrow"><span>scroll-stop</span><b>'+
+        ((a.vp||0)>0&&a.im?(100*(a.v3||0)/a.im).toFixed(2)+'%':'\u2014')+'</b></div>'+
       '<div class="mrow"><span>CTR</span><b>'+(a.im?100*a.ck/a.im:0).toFixed(2)+'%</b></div>'+
       '<div class="mrow"><span>CPM</span><b>$'+(a.im?1000*a.sp/a.im:0).toFixed(2)+'</b></div>'+
       '<div class="mrow"><span>ROAS</span><b>'+(a.sp?a.rv/a.sp:0).toFixed(2)+'</b></div>'+
@@ -527,21 +545,26 @@ JS = r"""
     var rows=ents.map(function(e,i){
       var rid=tid+'-'+i;
       var ctrIdx=base.ctr?100*e.ctr/base.ctr:0, roasIdx=base.roas?100*e.roas/base.roas:0;
+      var ssrIdx=(base.ssr&&e.ssr!==null)?100*e.ssr/base.ssr:0;
       DRILL[rid]=e.ads_list;
       return '<tr class="sum" data-target="'+rid+'">'+
         '<td><span class="caret">&#9654;</span>'+esc(e.value)+
         '<div class="bar"><i style="width:'+(100*e.im/maxi).toFixed(0)+'%"></i></div></td>'+
         '<td class="n">'+e.ads+'</td><td>'+num(e.im)+'</td><td>'+money(e.sp)+'</td>'+
+        '<td>'+ssrCell(e)+'</td><td>'+idxCell(ssrIdx)+'</td>'+
         '<td>'+e.ctr.toFixed(2)+'%</td><td>'+idxCell(ctrIdx)+'</td>'+
         '<td>$'+e.cpm.toFixed(2)+'</td><td>'+e.roas.toFixed(2)+'</td><td>'+idxCell(roasIdx)+'</td></tr>'+
-        '<tr class="detail" id="'+rid+'" hidden><td colspan="9"><div class="drill"></div></td></tr>';
+        '<tr class="detail" id="'+rid+'" hidden><td colspan="11"><div class="drill"></div></td></tr>';
     }).join('');
     return '<h2>'+esc(label)+'<span class="n">click a row to see its ads</span></h2>'+
       '<div class="tblwrap"><table><thead><tr><th>'+esc(label)+'</th><th>ads</th>'+
-      '<th>impressions</th><th>spend</th><th>CTR</th><th>CTR idx</th><th>CPM</th>'+
+      '<th>impressions</th><th>spend</th>'+
+      '<th title="3-second video views / impressions of video ads only">scroll-stop</th>'+
+      '<th>SSR idx</th><th>CTR</th><th>CTR idx</th><th>CPM</th>'+
       '<th>ROAS</th><th>ROAS idx</th></tr></thead><tbody>'+rows+'</tbody>'+
       '<tfoot><tr><td class="n">baseline (current filter)</td><td class="n">'+base.ads+'</td>'+
       '<td class="n">'+num(base.im)+'</td><td class="n">'+money(base.sp)+'</td>'+
+      '<td class="n">'+(base.ssr===null?'&mdash;':base.ssr.toFixed(2)+'%')+'</td><td class="n">100</td>'+
       '<td class="n">'+base.ctr.toFixed(2)+'%</td><td class="n">100</td>'+
       '<td class="n">$'+base.cpm.toFixed(2)+'</td><td class="n">'+base.roas.toFixed(2)+'</td>'+
       '<td class="n">100</td></tr></tfoot></table></div>';
@@ -558,6 +581,7 @@ JS = r"""
     var all=agg(pool), rd=agg(readable);
     document.getElementById('cards').innerHTML=[
       ['Ads', num(all.ads)],['Spend', money(all.sp)],['Impressions', num(all.im)],
+      ['Scroll-stop', all.ssr===null?'\u2014':all.ssr.toFixed(2)+'%'],
       ['CTR', all.ctr.toFixed(2)+'%'],['CPM','$'+all.cpm.toFixed(2)],
       ['ROAS', all.roas.toFixed(2)],['Purchases', num(all.pu)],
       ['Analyzed', num(rd.ads)]
@@ -670,6 +694,11 @@ def build_performance_dashboard(
             "ck": r.get("clicks") or 0,
             "pu": r.get("purchases") or 0,
             "rv": round(r.get("revenue") or 0, 2),
+            # Scroll-stop inputs. `vp` (autoplay initiations) is what marks an ad
+            # as having served video at all — it is the denominator gate, not a
+            # metric in its own right.
+            "v3": r.get("video_3s") or 0,
+            "vp": r.get("video_plays") or 0,
         }
         # Only readable analyses contribute vision attributes — see
         # MIN_ANALYSIS_CONFIDENCE for why unreadable ones are dropped entirely.
@@ -718,7 +747,11 @@ def build_performance_dashboard(
         "indices re-base as you narrow. Above 100 is better than that baseline, below is "
         "worse. Audience facets are derived from each ad set's targeting spec (custom "
         "audiences, age, gender, geo); funnel stage is inferred, since Meta exposes no "
-        "explicit prospecting/retargeting flag. These are correlations across ads that "
+        "explicit prospecting/retargeting flag. Scroll-stop rate is 3-second video views "
+        "divided by the impressions of <em>video ads only</em> — static and catalog-image "
+        "ads cannot register a 3-second view, so including them would drag the rate down "
+        "for reasons unrelated to the creative; the bracketed number is how many ads in "
+        "that bucket actually served video. These are correlations across ads that "
         "actually ran, not causal effects — attributes co-vary with budget, bidding and "
         "placement.</footer>"
     )

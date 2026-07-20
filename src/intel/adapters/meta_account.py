@@ -78,6 +78,7 @@ INSIGHT_FIELDS = [
     "ad_id", "ad_name", "campaign_id", "campaign_name", "adset_id", "adset_name",
     "impressions", "spend", "clicks", "ctr", "cpc", "cpm", "reach", "frequency",
     "actions", "action_values", "purchase_roas",
+    "video_play_actions",
     "video_thruplay_watched_actions", "video_p25_watched_actions",
     "video_p50_watched_actions", "video_p75_watched_actions",
     "video_p100_watched_actions",
@@ -240,6 +241,20 @@ def normalize_insight(row: dict[str, Any]) -> dict[str, Any]:
         "purchases": purchases,
         "revenue": revenue,
         "roas": roas_v,
+        # Scroll-stop / hook rate inputs.
+        #
+        # The numerator is 3-second video views, which Meta reports as the
+        # `video_view` action. Two nearby fields are wrong for this and were
+        # measured before choosing:
+        #   * `video_continuous_2_sec_watched_actions` returns 0 across these
+        #     accounts — it simply isn't populated, so a 2-second definition
+        #     would silently read as "no one stopped".
+        #   * `video_play_actions` counts autoplay initiations and runs at ~92%
+        #     of impressions, which would render a meaningless ~90% "hook rate".
+        # It is kept anyway, as the flag for "this ad served video at all" —
+        # that's what makes the denominator honest (see video_impressions).
+        "video_3s": _action_value(actions, ("video_view",)),
+        "video_plays": _action_value(row.get("video_play_actions"), ("video_view",)),
         "thruplays": _action_value(row.get("video_thruplay_watched_actions"), ("video_view",)),
         "video_p25": _action_value(row.get("video_p25_watched_actions"), ("video_view",)),
         "video_p50": _action_value(row.get("video_p50_watched_actions"), ("video_view",)),

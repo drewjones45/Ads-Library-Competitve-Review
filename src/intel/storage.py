@@ -469,6 +469,16 @@ def _migrate_analytics_tables(conn: sqlite3.Connection) -> None:
     """)
 
 
+def _migrate_ad_performance_video_columns(conn: sqlite3.Connection) -> None:
+    """Add the scroll-stop columns to ad_performance on pre-existing databases."""
+    have = {r[1] for r in conn.execute("PRAGMA table_info(ad_performance)").fetchall()}
+    if not have:
+        return
+    for col in ("video_3s", "video_plays"):
+        if col not in have:
+            conn.execute(f"ALTER TABLE ad_performance ADD COLUMN {col} REAL")
+
+
 def _migrate_owned_audience_columns(conn: sqlite3.Connection) -> None:
     """Add audience facets to owned_ads on databases that predate them.
 
@@ -552,6 +562,8 @@ def _migrate_owned_perf_tables(conn: sqlite3.Connection) -> None:
       ctr REAL, cpc REAL, cpm REAL, reach REAL, frequency REAL,
       link_clicks REAL, purchases REAL, revenue REAL, roas REAL,
       thruplays REAL, video_p25 REAL, video_p50 REAL, video_p75 REAL, video_p100 REAL,
+      video_3s REAL,      -- 3-second views: the scroll-stop / hook-rate numerator
+      video_plays REAL,   -- autoplay initiations; flags "this ad served video at all"
       extra_json TEXT,
       fetched_at TEXT,
       UNIQUE(platform_ad_id, date_start, date_stop)
@@ -560,6 +572,7 @@ def _migrate_owned_perf_tables(conn: sqlite3.Connection) -> None:
     CREATE INDEX IF NOT EXISTS idx_ad_perf_ad ON ad_performance(platform_ad_id);
     """)
     _migrate_owned_audience_columns(conn)
+    _migrate_ad_performance_video_columns(conn)
 
 
 @contextmanager
@@ -1178,8 +1191,9 @@ def upsert_ad_performance(
         "INSERT INTO ad_performance(platform_ad_id, competitor_id, account_id, "
         "  date_start, date_stop, impressions, spend, clicks, ctr, cpc, cpm, reach, "
         "  frequency, link_clicks, purchases, revenue, roas, thruplays, "
-        "  video_p25, video_p50, video_p75, video_p100, extra_json, fetched_at) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+        "  video_p25, video_p50, video_p75, video_p100, video_3s, video_plays, "
+        "  extra_json, fetched_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
         "ON CONFLICT(platform_ad_id, date_start, date_stop) DO UPDATE SET "
         "  competitor_id=excluded.competitor_id, account_id=excluded.account_id, "
         "  impressions=excluded.impressions, spend=excluded.spend, clicks=excluded.clicks, "
@@ -1188,7 +1202,8 @@ def upsert_ad_performance(
         "  purchases=excluded.purchases, revenue=excluded.revenue, roas=excluded.roas, "
         "  thruplays=excluded.thruplays, video_p25=excluded.video_p25, "
         "  video_p50=excluded.video_p50, video_p75=excluded.video_p75, "
-        "  video_p100=excluded.video_p100, extra_json=excluded.extra_json, "
+        "  video_p100=excluded.video_p100, video_3s=excluded.video_3s, "
+        "  video_plays=excluded.video_plays, extra_json=excluded.extra_json, "
         "  fetched_at=excluded.fetched_at",
         (
             row.get("platform_ad_id"), competitor_id, account_id,
@@ -1198,6 +1213,7 @@ def upsert_ad_performance(
             row.get("frequency"), row.get("link_clicks"), row.get("purchases"),
             row.get("revenue"), row.get("roas"), row.get("thruplays"),
             row.get("video_p25"), row.get("video_p50"), row.get("video_p75"),
-            row.get("video_p100"), row.get("extra_json"), utcnow(),
+            row.get("video_p100"), row.get("video_3s"), row.get("video_plays"),
+            row.get("extra_json"), utcnow(),
         ),
     )
