@@ -66,6 +66,15 @@ def ingest_account(
         ad_ids = [p["platform_ad_id"] for p in perf if p.get("platform_ad_id")]
         meta_by_id = ma.fetch_ad_meta(account_id, ad_ids, client=client)
 
+        # Audience facets come from the adset, not the ad. Fetch only the adsets
+        # these ads actually reference — the accounts hold thousands, and asking
+        # for the whole edge with targeting expanded trips a Graph 500.
+        adset_ids = [p.get("adset_id") for p in perf if p.get("adset_id")]
+        adsets = ma.fetch_adsets(account_id, adset_ids, client=client)
+        audience_by_adset = {
+            aid: ma.classify_audience(node) for aid, node in adsets.items()
+        }
+
         summary_rows: list[dict[str, Any]] = []
         preview_jobs: list[tuple[str, Path]] = []
         preview_targets: list[tuple[str, str, Path]] = []  # (ad_id, creative_id, dest)
@@ -119,6 +128,7 @@ def ingest_account(
                     "product_set_id": creative.get("product_set_id"),
                     "effective_object_story_id": creative.get("effective_object_story_id"),
                     "created_time": node.get("created_time"),
+                    **audience_by_adset.get(row.get("adset_id") or "", {}),
                     "raw": {"creative": creative, "ad_name": row.get("ad_name")},
                 },
             )
@@ -179,7 +189,12 @@ def ingest_account(
                     assets_written += 1
 
         coverage = ma.spend_coverage(summary_rows)
+        stages: dict[str, int] = {}
+        for a in audience_by_adset.values():
+            s = a.get("audience_stage") or "unknown"
+            stages[s] = stages.get(s, 0) + 1
         return {
+            "audience_stages": stages,
             "account_id": account_id, "account_name": account_name,
             "competitor_id": competitor_id,
             "ads": len(perf), "assets": assets_written,

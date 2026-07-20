@@ -95,6 +95,8 @@ def _fetch(conn: sqlite3.Connection, competitor_ids: list[str] | None) -> list[d
         SELECT oa.platform_ad_id, oa.competitor_id, oa.account_name, oa.ad_name,
                oa.campaign_name, oa.creative_class, oa.object_type, oa.cta_type,
                oa.title, oa.body,
+               oa.audience_stage, oa.audience_gender, oa.audience_age,
+               oa.audience_geo, oa.audience_name, oa.optimization_goal,
                SUM(p.impressions) AS impressions, SUM(p.spend) AS spend,
                SUM(p.clicks) AS clicks, SUM(p.link_clicks) AS link_clicks,
                SUM(p.purchases) AS purchases, SUM(p.revenue) AS revenue,
@@ -288,8 +290,46 @@ def _metadata_table(rows: list[dict], min_impressions: int) -> list[dict]:
         tables.append({"label": label, "entries": entries[:25], "baseline": base})
     return tables
 
-
 # ------------------------------------------------------------------ render ---
+# Everything below ships DATA to the browser and computes the tables there.
+#
+# Why client-side: the audience filter has to recompute every bucket, baseline
+# and index. Pre-rendering a table per filter combination is combinatorial
+# (stage x gender x geo x age x account), and recomputing server-side would mean
+# a round trip on a static host. One pass of per-ad records — 623 rows here — is
+# small enough to aggregate instantly in JS, and it keeps a single definition of
+# the aggregation instead of one in Python and one in JavaScript.
+
+# Cap on cards rendered per expanded bucket. Announced in the drill-down header
+# whenever it bites — a silently truncated list reads as "these are all the ads".
+MAX_CARDS_PER_BUCKET = 60
+
+# Facets offered in the filter bar: (field, label).
+FILTERS = [
+    ("b", "Brand"),
+    ("ac", "Ad account"),
+    ("stage", "Funnel stage"),
+    ("gen", "Gender targeting"),
+    ("geo", "Geo scope"),
+    ("age", "Age band"),
+    ("cl", "Creative class"),
+]
+
+# Metadata attributes are known for every ad; vision attributes only for ads
+# with a readable creative analysis.
+META_SPECS = [
+    ("cta", "Call to action", "scalar"),
+    ("ot", "Ad object type", "scalar"),
+    ("cl", "Creative class", "scalar"),
+    ("stage", "Audience — funnel stage", "scalar"),
+    ("geo", "Audience — geo scope", "scalar"),
+    ("age", "Audience — age band", "scalar"),
+    ("gen", "Audience — gender targeting", "scalar"),
+    ("opt", "Delivery optimisation goal", "scalar"),
+    ("an", "Ad set (audience)", "scalar"),
+    ("cp", "Campaign", "scalar"),
+    ("ac", "Ad account", "scalar"),
+]
 
 CSS = """
 /* Dark is the DEFAULT here, not a prefers-color-scheme branch: this dashboard is
@@ -310,39 +350,52 @@ font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 -webkit-font-smoothing:antialiased}
 .wrap{max-width:1320px;margin:0 auto;padding:32px 20px 80px}
 h1{font-size:26px;margin:0 0 4px}
-h2{font-size:18px;margin:36px 0 12px;display:flex;align-items:baseline;gap:10px}
-.sub{color:var(--dim);margin-bottom:24px}
+h2{font-size:18px;margin:34px 0 12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h3.grp{font-size:15px;margin:44px 0 4px;text-transform:uppercase;letter-spacing:.08em;
+color:var(--dim);font-weight:600}
+.sub{color:var(--dim);margin-bottom:20px}
 .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
 .toggle{background:var(--panel);border:1px solid var(--line);color:var(--fg);
 border-radius:8px;padding:7px 13px;cursor:pointer;font-size:13px;white-space:nowrap}
 .toggle:hover{border-color:var(--accent);color:var(--accent)}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin:18px 0}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;
 box-shadow:var(--shadow)}
 .card .k{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
 .card .v{font-size:22px;font-weight:600;margin-top:4px}
+/* --- filter bar --- */
+.filters{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+padding:14px;margin:18px 0;box-shadow:var(--shadow)}
+.frow{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:150px}
+.fld label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim)}
+.fld select{background:var(--panel2);color:var(--fg);border:1px solid var(--line);
+border-radius:7px;padding:7px 9px;font-size:13px;min-width:150px}
+.fld select:focus{outline:none;border-color:var(--accent)}
+.fbtn{background:var(--panel2);border:1px solid var(--line);color:var(--dim);
+border-radius:7px;padding:7px 12px;cursor:pointer;font-size:12.5px}
+.fbtn:hover{border-color:var(--accent);color:var(--accent)}
+.fstat{color:var(--dim);font-size:12.5px;margin-top:10px}
+.fstat b{color:var(--fg)}
 .note{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--warn);
 border-radius:8px;padding:12px 14px;margin:16px 0;font-size:13px;color:var(--fg)}
 .note b{color:var(--warn)}
 .tblwrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);
-border-radius:10px;margin-bottom:20px;box-shadow:var(--shadow)}
+border-radius:10px;margin-bottom:18px;box-shadow:var(--shadow)}
 table{border-collapse:collapse;width:100%;min-width:820px;font-size:13px}
 th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
 th:first-child,td:first-child{text-align:left;white-space:normal;min-width:200px}
 th{color:var(--dim);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
-tbody tr.sum:last-child td{border-bottom:none}
 tbody tr.sum{cursor:pointer}
-tbody tr.sum:hover{background:var(--panel2)}
-tbody tr.sum.open{background:var(--panel2)}
+tbody tr.sum:hover,tbody tr.sum.open{background:var(--panel2)}
 .caret{display:inline-block;width:11px;color:var(--dim);transition:transform .15s ease;
 margin-right:6px;font-size:10px}
 tr.sum.open .caret{transform:rotate(90deg);color:var(--accent)}
 .idx{font-weight:600}
 .up{color:var(--good)} .down{color:var(--bad)} .flat{color:var(--dim)}
-.n{color:var(--dim);font-size:12px}
+.n{color:var(--dim);font-size:12px;font-weight:400}
 .bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:4px;max-width:280px}
 .bar>i{display:block;height:100%;background:var(--accent)}
-/* --- drill-down --- */
 tr.detail>td{padding:0;border-bottom:1px solid var(--line);background:var(--bg)}
 .drill{padding:14px}
 .drillhead{color:var(--dim);font-size:12px;margin-bottom:10px;display:flex;
@@ -362,131 +415,215 @@ display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hi
 padding:1.5px 0;color:var(--dim)}
 .asset .mrow b{color:var(--fg);font-weight:600}
 .pill{display:inline-block;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;
-padding:1.5px 6px;border-radius:99px;border:1px solid var(--line);color:var(--dim);margin-bottom:6px}
+padding:1.5px 6px;border-radius:99px;border:1px solid var(--line);color:var(--dim);
+margin:0 4px 6px 0}
 .pill.dpa{border-color:var(--warn);color:var(--warn)}
+.pill.aud{border-color:var(--accent);color:var(--accent)}
+.empty{color:var(--dim);padding:24px;text-align:center;background:var(--panel);
+border:1px solid var(--line);border-radius:10px}
 footer{color:var(--dim);font-size:12px;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
 @media(max-width:640px){.wrap{padding:20px 12px 60px}
-.assets{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
+.assets{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.fld,.fld select{min-width:130px}}
 """
 
-
-def _idx_cell(v: float) -> str:
-    if not v:
-        return '<span class="flat">—</span>'
-    cls = "up" if v >= 105 else ("down" if v <= 95 else "flat")
-    return f'<span class="idx {cls}">{v:.0f}</span>'
-
-
-def _render_table(t: dict, tid: str) -> str:
-    """One attribute table. Each value row is clickable and expands a hidden
-    sibling row that JS fills with the ads in that bucket.
-
-    The ad cards are NOT emitted inline per bucket: an ad belongs to many buckets
-    (one per attribute), so inlining would repeat the same markup dozens of times
-    and balloon the file. Instead each row carries just its ad ids and the cards
-    are rendered on demand from a single shared JSON blob.
-    """
-    maxi = max((e["impressions"] for e in t["entries"]), default=0) or 1
-    rows = []
-    for i, e in enumerate(t["entries"]):
-        pct = 100.0 * e["impressions"] / maxi
-        ids = ",".join(e.get("ad_ids") or [])
-        rid = f"{tid}-{i}"
-        rows.append(
-            f'<tr class="sum" data-target="{rid}" data-ads="{html.escape(ids)}">'
-            f'<td><span class="caret">&#9654;</span>{html.escape(e["value"])}'
-            f'<div class="bar"><i style="width:{pct:.0f}%"></i></div></td>'
-            f'<td class="n">{int(e["ads"])}</td>'
-            f'<td>{e["impressions"]:,.0f}</td>'
-            f'<td>${e["spend"]:,.0f}</td>'
-            f'<td>{e["ctr"]:.2f}%</td>'
-            f"<td>{_idx_cell(e['ctr_index'])}</td>"
-            f'<td>${e["cpm"]:,.2f}</td>'
-            f'<td>{e["roas"]:.2f}</td>'
-            f"<td>{_idx_cell(e['roas_index'])}</td></tr>"
-            f'<tr class="detail" id="{rid}" hidden><td colspan="9">'
-            f'<div class="drill"></div></td></tr>'
-        )
-    b = t["baseline"]
-    return (
-        f"<h2>{html.escape(t['label'])}"
-        f'<span class="n" style="font-weight:400">click a row to see its ads</span></h2>'
-        f'<div class="tblwrap"><table><thead><tr>'
-        f"<th>{html.escape(t['label'])}</th><th>ads</th><th>impressions</th><th>spend</th>"
-        f"<th>CTR</th><th>CTR idx</th><th>CPM</th><th>ROAS</th><th>ROAS idx</th>"
-        f"</tr></thead><tbody>{''.join(rows)}</tbody>"
-        f'<tfoot><tr><td class="n">baseline (all ads in scope)</td>'
-        f'<td class="n">{int(b["ads"])}</td><td class="n">{b["impressions"]:,.0f}</td>'
-        f'<td class="n">${b["spend"]:,.0f}</td><td class="n">{b["ctr"]:.2f}%</td>'
-        f'<td class="n">100</td><td class="n">${b["cpm"]:,.2f}</td>'
-        f'<td class="n">{b["roas"]:.2f}</td><td class="n">100</td></tr></tfoot>'
-        f"</table></div>"
-    )
-
-
-# Cap on cards rendered per expanded bucket. Announced in the drill-down header
-# whenever it bites — a silently truncated list reads as "these are all the ads".
-MAX_CARDS_PER_BUCKET = 60
-
-JS = """
+JS = r"""
 (function(){
   var root=document.documentElement;
-  var saved=null;
-  try{saved=localStorage.getItem('perfdash-theme');}catch(e){}
-  root.setAttribute('data-theme', saved || 'dark');
-  var btn=document.getElementById('themeToggle');
-  function label(){btn.textContent=root.getAttribute('data-theme')==='dark'?'\u2600 Light':'\u263E Dark';}
-  label();
-  btn.addEventListener('click',function(){
-    var next=root.getAttribute('data-theme')==='dark'?'light':'dark';
-    root.setAttribute('data-theme',next);
-    try{localStorage.setItem('perfdash-theme',next);}catch(e){}
-    label();
+  try{root.setAttribute('data-theme', localStorage.getItem('perfdash-theme')||'dark');}catch(e){}
+  var tbtn=document.getElementById('themeToggle');
+  function tlabel(){tbtn.textContent=root.getAttribute('data-theme')==='dark'?'☀ Light':'☾ Dark';}
+  tlabel();
+  tbtn.addEventListener('click',function(){
+    var nx=root.getAttribute('data-theme')==='dark'?'light':'dark';
+    root.setAttribute('data-theme',nx);
+    try{localStorage.setItem('perfdash-theme',nx);}catch(e){}
+    tlabel();
   });
 
   var money=function(n){return '$'+(n||0).toLocaleString(undefined,{maximumFractionDigits:0});};
   var num=function(n){return (n||0).toLocaleString(undefined,{maximumFractionDigits:0});};
+  var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
 
+  // --- aggregation (single definition, used for buckets and baselines) ---
+  function agg(list){
+    var im=0,sp=0,ck=0,pu=0,rv=0;
+    for(var i=0;i<list.length;i++){var a=list[i];
+      im+=a.im||0; sp+=a.sp||0; ck+=a.ck||0; pu+=a.pu||0; rv+=a.rv||0;}
+    return {ads:list.length,im:im,sp:sp,ck:ck,pu:pu,rv:rv,
+      ctr:im?100*ck/im:0, cpm:im?1000*sp/im:0, roas:sp?rv/sp:0};
+  }
+  function idxCell(v){
+    if(!v||!isFinite(v)) return '<span class="flat">&mdash;</span>';
+    var c=v>=105?'up':(v<=95?'down':'flat');
+    return '<span class="idx '+c+'">'+v.toFixed(0)+'</span>';
+  }
+
+  // --- filtering ---
+  var state={};
+  FILTERS.forEach(function(f){state[f[0]]='';});
+  function passes(a){
+    for(var k in state){ if(state[k] && String(a[k]||'')!==state[k]) return false; }
+    return true;
+  }
+
+  function buildFilterBar(){
+    var host=document.getElementById('filterFields');
+    host.innerHTML=FILTERS.map(function(f){
+      var key=f[0];
+      var vals={};
+      ADS.forEach(function(a){var v=a[key]; if(v!==undefined&&v!==null&&v!=='') vals[v]=(vals[v]||0)+1;});
+      var opts=Object.keys(vals).sort(function(x,y){return vals[y]-vals[x];});
+      if(opts.length<2) return '';
+      return '<div class="fld"><label>'+esc(f[1])+'</label><select data-k="'+key+'">'+
+        '<option value="">All ('+opts.length+')</option>'+
+        opts.map(function(o){return '<option value="'+esc(o)+'">'+esc(o)+' &middot; '+vals[o]+'</option>';}).join('')+
+        '</select></div>';
+    }).join('');
+    host.querySelectorAll('select').forEach(function(sel){
+      sel.addEventListener('change',function(){state[sel.dataset.k]=sel.value;render();});
+    });
+  }
+
+  // --- card rendering for the drill-down ---
   function card(a){
-    if(!a) return '';
-    var img = a.img
-      ? '<img class="thumb" loading="lazy" src="'+a.img+'" alt="">'
-      : '<div class="noimg">no fixed creative<br>(catalog / dynamic ad)</div>';
-    var pill = a.cls==='analyzable'
-      ? '<span class="pill">'+(a.at||'creative')+'</span>'
-      : '<span class="pill dpa">'+a.cls+'</span>';
-    return '<div class="asset">'+img+'<div class="body">'+pill+
-      '<div class="nm" title="'+(a.nm||'').replace(/"/g,'&quot;')+'">'+(a.nm||'(unnamed)')+'</div>'+
+    var img=a.img?'<img class="thumb" loading="lazy" src="'+esc(a.img)+'" alt="">'
+      :'<div class="noimg">no fixed creative<br>(catalog / dynamic ad)</div>';
+    var pills='<span class="pill'+(a.cl==='analyzable'?'':' dpa')+'">'+esc(a.cl==='analyzable'?(a.at||'creative'):a.cl)+'</span>';
+    if(a.stage) pills+='<span class="pill aud">'+esc(a.stage)+'</span>';
+    return '<div class="asset">'+img+'<div class="body">'+pills+
+      '<div class="nm" title="'+esc(a.nm)+'">'+esc(a.nm||'(unnamed)')+'</div>'+
       '<div class="mrow"><span>spend</span><b>'+money(a.sp)+'</b></div>'+
       '<div class="mrow"><span>impr.</span><b>'+num(a.im)+'</b></div>'+
-      '<div class="mrow"><span>CTR</span><b>'+(a.ctr||0).toFixed(2)+'%</b></div>'+
-      '<div class="mrow"><span>CPM</span><b>$'+(a.cpm||0).toFixed(2)+'</b></div>'+
-      '<div class="mrow"><span>ROAS</span><b>'+(a.roas||0).toFixed(2)+'</b></div>'+
+      '<div class="mrow"><span>CTR</span><b>'+(a.im?100*a.ck/a.im:0).toFixed(2)+'%</b></div>'+
+      '<div class="mrow"><span>CPM</span><b>$'+(a.im?1000*a.sp/a.im:0).toFixed(2)+'</b></div>'+
+      '<div class="mrow"><span>ROAS</span><b>'+(a.sp?a.rv/a.sp:0).toFixed(2)+'</b></div>'+
       '<div class="mrow"><span>purch.</span><b>'+num(a.pu)+'</b></div>'+
       '</div></div>';
   }
 
-  document.querySelectorAll('tr.sum').forEach(function(tr){
-    tr.addEventListener('click',function(){
-      var det=document.getElementById(tr.dataset.target);
-      if(!det) return;
-      var open=!det.hidden;
-      if(open){det.hidden=true;tr.classList.remove('open');return;}
-      var host=det.querySelector('.drill');
-      if(!host.dataset.filled){
-        var ids=(tr.dataset.ads||'').split(',').filter(Boolean);
-        var total=ids.length;
-        var shown=ids.slice(0,MAXC);
-        var head='<div class="drillhead"><span>'+total+' ad'+(total===1?'':'s')+
-          ' in this bucket, highest spend first</span>'+
-          (total>shown.length?'<span>showing top '+shown.length+' of '+total+'</span>':'')+
-          '</div>';
-        host.innerHTML=head+'<div class="assets">'+shown.map(function(id){return card(ADS[id]);}).join('')+'</div>';
-        host.dataset.filled='1';
-      }
-      det.hidden=false;tr.classList.add('open');
+  // --- one attribute table ---
+  function tableHTML(spec, pool, base, tid){
+    var key=spec[0], label=spec[1], kind=spec[2], vision=spec[3];
+    var buckets={};
+    pool.forEach(function(a){
+      var v = vision ? (a.A?a.A[key]:undefined) : a[key];
+      if(v===undefined||v===null||v==='') return;
+      if(kind==='list'){ if(!Array.isArray(v)) return;
+        v.forEach(function(x){ if(x===''||x==null) return; (buckets[x]=buckets[x]||[]).push(a); }); }
+      else { (buckets[v]=buckets[v]||[]).push(a); }
     });
+    var ents=[];
+    for(var v in buckets){
+      var st=agg(buckets[v]);
+      if(st.im<MINIMP) continue;
+      st.value=v; st.ads_list=buckets[v];
+      ents.push(st);
+    }
+    if(ents.length<2) return '';
+    ents.sort(function(x,y){return y.im-x.im;});
+    var maxi=ents[0].im||1;
+    var rows=ents.map(function(e,i){
+      var rid=tid+'-'+i;
+      var ctrIdx=base.ctr?100*e.ctr/base.ctr:0, roasIdx=base.roas?100*e.roas/base.roas:0;
+      DRILL[rid]=e.ads_list;
+      return '<tr class="sum" data-target="'+rid+'">'+
+        '<td><span class="caret">&#9654;</span>'+esc(e.value)+
+        '<div class="bar"><i style="width:'+(100*e.im/maxi).toFixed(0)+'%"></i></div></td>'+
+        '<td class="n">'+e.ads+'</td><td>'+num(e.im)+'</td><td>'+money(e.sp)+'</td>'+
+        '<td>'+e.ctr.toFixed(2)+'%</td><td>'+idxCell(ctrIdx)+'</td>'+
+        '<td>$'+e.cpm.toFixed(2)+'</td><td>'+e.roas.toFixed(2)+'</td><td>'+idxCell(roasIdx)+'</td></tr>'+
+        '<tr class="detail" id="'+rid+'" hidden><td colspan="9"><div class="drill"></div></td></tr>';
+    }).join('');
+    return '<h2>'+esc(label)+'<span class="n">click a row to see its ads</span></h2>'+
+      '<div class="tblwrap"><table><thead><tr><th>'+esc(label)+'</th><th>ads</th>'+
+      '<th>impressions</th><th>spend</th><th>CTR</th><th>CTR idx</th><th>CPM</th>'+
+      '<th>ROAS</th><th>ROAS idx</th></tr></thead><tbody>'+rows+'</tbody>'+
+      '<tfoot><tr><td class="n">baseline (current filter)</td><td class="n">'+base.ads+'</td>'+
+      '<td class="n">'+num(base.im)+'</td><td class="n">'+money(base.sp)+'</td>'+
+      '<td class="n">'+base.ctr.toFixed(2)+'%</td><td class="n">100</td>'+
+      '<td class="n">$'+base.cpm.toFixed(2)+'</td><td class="n">'+base.roas.toFixed(2)+'</td>'+
+      '<td class="n">100</td></tr></tfoot></table></div>';
+  }
+
+  var DRILL={};
+
+  function render(){
+    var pool=ADS.filter(passes);
+    var readable=pool.filter(function(a){return a.A;});
+    DRILL={};
+
+    // headline cards
+    var all=agg(pool), rd=agg(readable);
+    document.getElementById('cards').innerHTML=[
+      ['Ads', num(all.ads)],['Spend', money(all.sp)],['Impressions', num(all.im)],
+      ['CTR', all.ctr.toFixed(2)+'%'],['CPM','$'+all.cpm.toFixed(2)],
+      ['ROAS', all.roas.toFixed(2)],['Purchases', num(all.pu)],
+      ['Analyzed', num(rd.ads)]
+    ].map(function(c){return '<div class="card"><div class="k">'+c[0]+'</div><div class="v">'+c[1]+'</div></div>';}).join('');
+
+    var pct=all.sp?100*rd.sp/all.sp:0;
+    document.getElementById('cov').innerHTML='<b>Coverage:</b> vision-attribute tables cover <b>'+
+      rd.ads+'</b> of '+all.ads+' ads in the current filter &mdash; <b>'+money(rd.sp)+'</b> of '+
+      money(all.sp)+' spend ('+pct.toFixed(0)+'%). The rest is mostly catalog/dynamic-product ads, '+
+      'whose creative is assembled per product at serve time, so there is no fixed image to analyze. '+
+      'Those ads still appear in the audience &amp; metadata tables, which cover 100% of the filtered spend. '+
+      'Figures are impression-weighted; buckets under '+num(MINIMP)+' impressions are dropped as too thin to read.';
+
+    if(!pool.length){
+      document.getElementById('tables').innerHTML='<div class="empty">No ads match this filter.</div>';
+      document.getElementById('fstat').innerHTML='';
+      return;
+    }
+    var active=FILTERS.filter(function(f){return state[f[0]];})
+      .map(function(f){return f[1]+': <b>'+esc(state[f[0]])+'</b>';});
+    document.getElementById('fstat').innerHTML= active.length
+      ? 'Filtered to <b>'+all.ads+'</b> ads &middot; '+money(all.sp)+' &mdash; '+active.join(' &middot; ')
+      : 'Showing all <b>'+all.ads+'</b> ads &middot; '+money(all.sp);
+
+    var html='<h3 class="grp">Audience &amp; metadata &mdash; all ads (100% of filtered spend)</h3>';
+    META_SPECS.forEach(function(s,i){ html+=tableHTML(s, pool, all, 'm'+i); });
+    if(readable.length){
+      html+='<h3 class="grp">Creative attributes &mdash; analyzable ads only ('+pct.toFixed(0)+'% of filtered spend)</h3>';
+      VISION_SPECS.forEach(function(s,i){ html+=tableHTML(s, readable, rd, 'v'+i); });
+    }else{
+      html+='<div class="note">No creative-attribute tables for this filter &mdash; none of the '+
+        'matching ads have a readable creative analysis (catalog ads have no fixed creative).</div>';
+    }
+    document.getElementById('tables').innerHTML=html;
+    wireRows();
+  }
+
+  function wireRows(){
+    document.querySelectorAll('tr.sum').forEach(function(tr){
+      tr.addEventListener('click',function(){
+        var det=document.getElementById(tr.dataset.target);
+        if(!det) return;
+        if(!det.hidden){det.hidden=true;tr.classList.remove('open');return;}
+        var host=det.querySelector('.drill');
+        if(!host.dataset.filled){
+          var list=(DRILL[tr.dataset.target]||[]).slice().sort(function(a,b){return (b.sp||0)-(a.sp||0);});
+          var shown=list.slice(0,MAXC);
+          host.innerHTML='<div class="drillhead"><span>'+list.length+' ad'+(list.length===1?'':'s')+
+            ' in this bucket, highest spend first</span>'+
+            (list.length>shown.length?'<span>showing top '+shown.length+' of '+list.length+'</span>':'')+
+            '</div><div class="assets">'+shown.map(card).join('')+'</div>';
+          host.dataset.filled='1';
+        }
+        det.hidden=false;tr.classList.add('open');
+      });
+    });
+  }
+
+  document.getElementById('resetFilters').addEventListener('click',function(){
+    FILTERS.forEach(function(f){state[f[0]]='';});
+    document.querySelectorAll('#filterFields select').forEach(function(s){s.value='';});
+    render();
   });
+
+  buildFilterBar();
+  render();
 })();
 """
 
@@ -502,113 +639,106 @@ def build_performance_dashboard(
     if not rows:
         return None
 
-    total_spend = sum(r.get("spend") or 0 for r in rows)
-    total_imp = sum(r.get("impressions") or 0 for r in rows)
-    analyzed = [r for r in rows if r.get("analysis")]
-    analyzable = [r for r in rows if r.get("creative_class") == "analyzable"]
-    an_spend = sum(r.get("spend") or 0 for r in analyzed)
-    brands = sorted({r["competitor_id"] for r in rows if r.get("competitor_id")})
-
-    overall = _bucket_stats(rows)
-    meta_tables = _metadata_table(rows, min_impressions)
-    attr_tables = _attribute_table(rows, min_impressions)
-
-    cov_pct = (100.0 * an_spend / total_spend) if total_spend else 0.0
-    coverage_note = (
-        f'<div class="note"><b>Coverage:</b> creative-attribute tables below cover '
-        f'<b>{len(analyzed)}</b> of {len(rows)} ads — <b>${an_spend:,.0f}</b> of '
-        f'${total_spend:,.0f} spend ({cov_pct:.0f}%). The remainder is mostly '
-        f'catalog/dynamic-product ads, whose creative is assembled per product at '
-        f'serve time, so there is no fixed image to analyze. Those ads are still '
-        f'included in the metadata tables (CTA, object type, campaign), which cover '
-        f'100% of spend. Attribute figures are impression-weighted; buckets under '
-        f'{min_impressions:,} impressions are dropped as too thin to read.</div>'
+    # Vision attribute specs shipped to the client: (key, label, kind, is_vision)
+    vision_specs = (
+        [(k, lab, "scalar", True) for k, lab in SCALAR_ATTRS]
+        + [(k, lab, "scalar", True) for k, lab in NESTED_ATTRS]
+        + [(k, lab, "list", True) for k, lab in LIST_ATTRS]
     )
+    meta_specs = [(k, lab, kind, False) for k, lab, kind in META_SPECS]
 
-    cards = "".join(
-        f'<div class="card"><div class="k">{k}</div><div class="v">{v}</div></div>'
-        for k, v in [
-            ("Brands", str(len(brands))),
-            ("Ads", f"{len(rows):,}"),
-            ("Spend", f"${total_spend:,.0f}"),
-            ("Impressions", f"{total_imp:,.0f}"),
-            ("Blended CTR", f'{overall["ctr"]:.2f}%'),
-            ("Blended ROAS", f'{overall["roas"]:.2f}'),
-            ("Analyzed creatives", f"{len(analyzed):,}"),
-        ]
-    )
-
-    # One shared record per ad, keyed by platform ad id. Emitted once and reused
-    # by every bucket's drill-down (an ad appears in many buckets).
-    ads_blob = {}
+    ads: list[dict[str, Any]] = []
     for r in rows:
-        imp = r.get("impressions") or 0
-        spend = r.get("spend") or 0
-        clicks = r.get("clicks") or 0
-        ads_blob[r["platform_ad_id"]] = {
+        rec: dict[str, Any] = {
             "nm": r.get("ad_name") or r.get("title") or "",
-            "cls": r.get("creative_class") or "unknown",
+            "b": r.get("competitor_id") or "",
+            "ac": r.get("account_name") or "",
+            "cp": r.get("campaign_name") or "",
+            "cta": r.get("cta_type") or "",
+            "ot": r.get("object_type") or "",
+            "cl": r.get("creative_class") or "unknown",
+            "stage": r.get("audience_stage") or "",
+            "gen": r.get("audience_gender") or "",
+            "age": r.get("audience_age") or "",
+            "geo": r.get("audience_geo") or "",
+            "an": r.get("audience_name") or "",
+            "opt": r.get("optimization_goal") or "",
             "at": r.get("asset_type") or "",
             "img": r.get("asset_path") or "",
-            "sp": round(spend, 2),
-            "im": imp,
-            "ctr": (100.0 * clicks / imp) if imp else 0.0,
-            "cpm": (1000.0 * spend / imp) if imp else 0.0,
-            # Recomputed from summed revenue/spend rather than averaging Meta's
-            # per-window roas figures, which would weight windows equally.
-            "roas": ((r.get("revenue") or 0) / spend) if spend else 0.0,
+            "sp": round(r.get("spend") or 0, 2),
+            "im": r.get("impressions") or 0,
+            "ck": r.get("clicks") or 0,
             "pu": r.get("purchases") or 0,
+            "rv": round(r.get("revenue") or 0, 2),
         }
+        # Only readable analyses contribute vision attributes — see
+        # MIN_ANALYSIS_CONFIDENCE for why unreadable ones are dropped entirely.
+        if r.get("analysis") and _is_readable(r):
+            a = r["analysis"]
+            attrs: dict[str, Any] = {}
+            for k, _lab in SCALAR_ATTRS:
+                v = _norm(a.get(k))
+                if v:
+                    attrs[k] = v
+            for k, _lab in NESTED_ATTRS:
+                v = _norm(_dig(a, k))
+                if v:
+                    attrs[k] = v
+            for k, _lab in LIST_ATTRS:
+                vals = a.get(k)
+                if isinstance(vals, list):
+                    clean = [_norm(x) for x in vals]
+                    clean = [x for x in clean if x]
+                    if clean:
+                        attrs[k] = clean
+            if attrs:
+                rec["A"] = attrs
+        ads.append(rec)
 
-    body = [
+    total_spend = sum(a["sp"] for a in ads)
+    analyzed = [a for a in ads if a.get("A")]
+    brands = sorted({a["b"] for a in ads if a["b"]})
+
+    filt_json = json.dumps(FILTERS)
+    body = (
         '<div class="topbar"><div>'
         "<h1>Creative performance — owned Meta accounts</h1>"
         f'<div class="sub">{", ".join(html.escape(b) for b in brands)} · '
-        "first-party spend joined to creative attributes on ad id</div></div>"
-        '<button class="toggle" id="themeToggle" type="button">Theme</button></div>',
-        f'<div class="cards">{cards}</div>',
-        coverage_note,
-    ]
-    if meta_tables:
-        body.append("<h2 style='margin-top:40px'>All ads — metadata attributes "
-                    "<span class='n'>(100% of spend)</span></h2>")
-        body.extend(_render_table(tb, f"m{i}") for i, tb in enumerate(meta_tables))
-    if attr_tables:
-        body.append("<h2 style='margin-top:40px'>Analyzable creative — vision attributes "
-                    f"<span class='n'>({cov_pct:.0f}% of spend)</span></h2>")
-        body.extend(_render_table(tb, f"a{i}") for i, tb in enumerate(attr_tables))
-    else:
-        body.append(
-            '<div class="note">No vision-attribute tables yet — the analyzable '
-            "creatives have not been vision-analyzed. Run the creative analysis "
-            "pass, then rebuild.</div>"
-        )
-    body.append(
-        "<footer>CTR/ROAS index: 100 = the scope baseline. Above 100 is better than "
-        "average, below is worse. These are correlations across existing ads, not "
-        "causal effects — attributes co-vary with targeting, placement and budget."
-        "</footer>"
+        "first-party spend joined to creative attributes and audience targeting, on ad id"
+        "</div></div>"
+        '<button class="toggle" id="themeToggle" type="button">Theme</button></div>'
+        '<div class="filters"><div class="frow" id="filterFields"></div>'
+        '<div class="frow" style="margin-top:12px">'
+        '<button class="fbtn" id="resetFilters" type="button">Reset filters</button>'
+        '<div class="fstat" id="fstat" style="margin:0"></div></div></div>'
+        '<div class="cards" id="cards"></div>'
+        '<div class="note" id="cov"></div>'
+        '<div id="tables"></div>'
+        "<footer>CTR/ROAS index: 100 = the baseline for the <em>current filter</em>, so "
+        "indices re-base as you narrow. Above 100 is better than that baseline, below is "
+        "worse. Audience facets are derived from each ad set's targeting spec (custom "
+        "audiences, age, gender, geo); funnel stage is inferred, since Meta exposes no "
+        "explicit prospecting/retargeting flag. These are correlations across ads that "
+        "actually ran, not causal effects — attributes co-vary with budget, bidding and "
+        "placement.</footer>"
     )
 
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / "index.html"
-    # data-theme is stamped on <html> up front so the dark default paints on the
-    # first frame; the inline script then restores any saved preference. Without
-    # it the page flashes unstyled-light before JS runs.
     path.write_text(
         "<!doctype html><html lang='en' data-theme='dark'><head><meta charset='utf-8'>"
         "<meta name='viewport' content='width=device-width,initial-scale=1'>"
         "<title>Creative performance — owned Meta accounts</title>"
-        f"<style>{CSS}</style></head><body><div class='wrap'>"
-        f"{''.join(body)}</div>"
-        f"<script>var ADS={json.dumps(ads_blob)};"
-        f"var MAXC={MAX_CARDS_PER_BUCKET};</script>"
-        f"<script>{JS}</script>"
-        "</body></html>",
+        f"<style>{CSS}</style></head><body><div class='wrap'>{body}</div>"
+        f"<script>var ADS={json.dumps(ads, separators=(',', ':'))};"
+        f"var FILTERS={filt_json};"
+        f"var META_SPECS={json.dumps(meta_specs)};"
+        f"var VISION_SPECS={json.dumps(vision_specs)};"
+        f"var MINIMP={int(min_impressions)};var MAXC={MAX_CARDS_PER_BUCKET};</script>"
+        f"<script>{JS}</script></body></html>",
         encoding="utf-8",
     )
     return {
-        "path": str(path), "brands": len(brands), "ads": len(rows),
+        "path": str(path), "brands": len(brands), "ads": len(ads),
         "spend": total_spend, "analyzed": len(analyzed),
-        "analyzable": len(analyzable), "coverage_pct": cov_pct,
     }

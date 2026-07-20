@@ -469,6 +469,23 @@ def _migrate_analytics_tables(conn: sqlite3.Connection) -> None:
     """)
 
 
+def _migrate_owned_audience_columns(conn: sqlite3.Connection) -> None:
+    """Add audience facets to owned_ads on databases that predate them.
+
+    Kept separate from the CREATE TABLE so an existing deployment picks the
+    columns up without a rebuild; every one is nullable, so rows ingested before
+    audience classification simply read as unknown.
+    """
+    have = {r[1] for r in conn.execute("PRAGMA table_info(owned_ads)").fetchall()}
+    if not have:
+        return  # table not created yet; the CREATE above will include them
+    for col in ("audience_stage", "audience_gender", "audience_age",
+                "audience_geo", "audience_name", "audience_custom",
+                "optimization_goal"):
+        if col not in have:
+            conn.execute(f"ALTER TABLE owned_ads ADD COLUMN {col} TEXT")
+
+
 def _migrate_owned_perf_tables(conn: sqlite3.Connection) -> None:
     """Create the owned-ad-account performance tables. Additive + idempotent.
 
@@ -504,10 +521,21 @@ def _migrate_owned_perf_tables(conn: sqlite3.Connection) -> None:
       product_set_id TEXT,
       effective_object_story_id TEXT,
       created_time TEXT,
+      -- Audience facets derived from the adset's targeting spec (see
+      -- meta_account.classify_audience). Denormalised onto the ad because an ad
+      -- belongs to exactly one adset, and the dashboard filters ads directly.
+      audience_stage TEXT,      -- retargeting | lookalike | interest | prospecting_broad | ...
+      audience_gender TEXT,     -- all | men | women | mixed
+      audience_age TEXT,        -- e.g. '18-65'
+      audience_geo TEXT,        -- national | dma | local_radius | regional | ...
+      audience_name TEXT,       -- raw adset name
+      audience_custom TEXT,     -- attached custom-audience names
+      optimization_goal TEXT,
       raw_json TEXT,
       ingested_at TEXT
     );
     CREATE INDEX IF NOT EXISTS idx_owned_ads_comp ON owned_ads(competitor_id);
+    CREATE INDEX IF NOT EXISTS idx_owned_ads_stage ON owned_ads(audience_stage);
     CREATE INDEX IF NOT EXISTS idx_owned_ads_class ON owned_ads(creative_class);
     CREATE INDEX IF NOT EXISTS idx_owned_ads_account ON owned_ads(account_id);
 
@@ -531,6 +559,7 @@ def _migrate_owned_perf_tables(conn: sqlite3.Connection) -> None:
     CREATE INDEX IF NOT EXISTS idx_ad_perf_comp ON ad_performance(competitor_id);
     CREATE INDEX IF NOT EXISTS idx_ad_perf_ad ON ad_performance(platform_ad_id);
     """)
+    _migrate_owned_audience_columns(conn)
 
 
 @contextmanager
@@ -1092,8 +1121,10 @@ def upsert_owned_ad(
         "INSERT INTO owned_ads(platform_ad_id, competitor_id, account_id, account_name, "
         "  ad_db_id, ad_name, campaign_id, campaign_name, adset_id, adset_name, "
         "  creative_id, object_type, creative_class, title, body, cta_type, link_url, "
-        "  product_set_id, effective_object_story_id, created_time, raw_json, ingested_at) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+        "  product_set_id, effective_object_story_id, created_time, "
+        "  audience_stage, audience_gender, audience_age, audience_geo, "
+        "  audience_name, audience_custom, optimization_goal, raw_json, ingested_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
         "ON CONFLICT(platform_ad_id) DO UPDATE SET "
         "  competitor_id=excluded.competitor_id, account_id=excluded.account_id, "
         "  account_name=excluded.account_name, ad_db_id=COALESCE(excluded.ad_db_id, owned_ads.ad_db_id), "
@@ -1104,8 +1135,15 @@ def upsert_owned_ad(
         "  title=excluded.title, body=excluded.body, cta_type=excluded.cta_type, "
         "  link_url=excluded.link_url, product_set_id=excluded.product_set_id, "
         "  effective_object_story_id=excluded.effective_object_story_id, "
-        "  created_time=excluded.created_time, raw_json=excluded.raw_json, "
-        "  ingested_at=excluded.ingested_at",
+        "  created_time=excluded.created_time, "
+        "  audience_stage=COALESCE(excluded.audience_stage, owned_ads.audience_stage), "
+        "  audience_gender=COALESCE(excluded.audience_gender, owned_ads.audience_gender), "
+        "  audience_age=COALESCE(excluded.audience_age, owned_ads.audience_age), "
+        "  audience_geo=COALESCE(excluded.audience_geo, owned_ads.audience_geo), "
+        "  audience_name=COALESCE(excluded.audience_name, owned_ads.audience_name), "
+        "  audience_custom=COALESCE(excluded.audience_custom, owned_ads.audience_custom), "
+        "  optimization_goal=COALESCE(excluded.optimization_goal, owned_ads.optimization_goal), "
+        "  raw_json=excluded.raw_json, ingested_at=excluded.ingested_at",
         (
             platform_ad_id, competitor_id, account_id, account_name, ad_db_id,
             meta.get("ad_name"), meta.get("campaign_id"), meta.get("campaign_name"),
@@ -1114,6 +1152,10 @@ def upsert_owned_ad(
             meta.get("body"), meta.get("cta_type"), meta.get("link_url"),
             meta.get("product_set_id"), meta.get("effective_object_story_id"),
             meta.get("created_time"),
+            meta.get("audience_stage"), meta.get("audience_gender"),
+            meta.get("audience_age"), meta.get("audience_geo"),
+            meta.get("audience_name"), meta.get("audience_custom"),
+            meta.get("optimization_goal"),
             json.dumps(meta.get("raw")) if meta.get("raw") else None,
             utcnow(),
         ),

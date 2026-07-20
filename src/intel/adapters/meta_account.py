@@ -480,3 +480,148 @@ def spend_coverage(rows: Iterable[dict[str, Any]]) -> dict[str, Any]:
         "analyzable_spend": analyzable,
         "analyzable_pct": (100.0 * analyzable / total) if total else 0.0,
     }
+
+
+# ---------------------------------------------------------------- audience ---
+# "Audience" isn't one field in Meta — it's the adset's targeting spec. These
+# accounts encode strategy in adset names too ("Advantage+ | PRO | DMAs",
+# "90d_Site Visitors", "US - W - 13-65"), so classification uses both: the
+# structured targeting spec first, falling back to name patterns.
+
+ADSET_FIELDS = (
+    "id,name,optimization_goal,"
+    "targeting{age_min,age_max,genders,geo_locations,custom_audiences,"
+    "excluded_custom_audiences,flexible_spec}"
+)
+
+# Custom-audience name fragments that imply the user already engaged with the
+# brand. Site-visitor / cart / purchaser lists are retargeting; lookalikes are
+# modelled off them but still point at strangers, so they rank as prospecting.
+_RETARGET_HINTS = ("site visitor", "visitors", "cart", "purchase", "purchaser",
+                   "engaged", "engagers", "viewers", "add to cart", "atc",
+                   "retarget", "rtg", "existing", "customer", "email", "crm",
+                   "app users", "ig engagement", "fb engagement", "dpa_")
+_LOOKALIKE_HINTS = ("lookalike", "lal_", "lal ", "(us,", "%)")
+_INTEREST_HINTS = ("interest", "wv_", "affinity", "behaviou", "behavior")
+
+
+def _names(audiences: Any) -> list[str]:
+    out = []
+    for a in (audiences or []):
+        if isinstance(a, dict):
+            out.append(str(a.get("name") or a.get("id") or ""))
+        else:
+            out.append(str(a))
+    return out
+
+
+def classify_audience(adset: dict[str, Any]) -> dict[str, Any]:
+    """Derive filterable audience facets from one adset.
+
+    Returns funnel stage, gender, age band, geo scope and the raw adset name.
+    Every facet is a plain string so the dashboard can filter on it directly.
+
+    Funnel stage is the judgement call: Meta has no "is this retargeting" flag,
+    so it is inferred from whether the attached custom audiences describe people
+    who already touched the brand. Anything unclassifiable stays 'unknown' rather
+    than being defaulted into prospecting, which would silently inflate it.
+    """
+    t = adset.get("targeting") or {}
+    name = (adset.get("name") or "")
+    lname = name.lower()
+    ca = _names(t.get("custom_audiences"))
+    ca_l = " ".join(ca).lower()
+
+    # --- funnel stage ---
+    if ca and any(h in ca_l for h in _RETARGET_HINTS):
+        stage = "retargeting"
+    elif ca and any(h in ca_l for h in _LOOKALIKE_HINTS):
+        stage = "lookalike"
+    elif any(h in lname for h in _RETARGET_HINTS):
+        stage = "retargeting"
+    elif any(h in lname for h in _LOOKALIKE_HINTS):
+        stage = "lookalike"
+    elif any(h in lname for h in _INTEREST_HINTS) or t.get("flexible_spec"):
+        stage = "interest"
+    elif "advantage" in lname or "broad" in lname or "pro" in lname:
+        stage = "prospecting_broad"
+    elif ca:
+        stage = "custom_audience_other"
+    elif t.get("age_min") or t.get("geo_locations"):
+        stage = "prospecting_broad"
+    else:
+        stage = "unknown"
+
+    # --- gender: Meta encodes 1=male, 2=female; empty/None = all ---
+    g = t.get("genders")
+    if g == [1] or " - m - " in lname or lname.endswith(" - m"):
+        gender = "men"
+    elif g == [2] or " - w - " in lname or lname.endswith(" - w"):
+        gender = "women"
+    elif not g:
+        gender = "all"
+    else:
+        gender = "mixed"
+
+    amin, amax = t.get("age_min"), t.get("age_max")
+    age = f"{amin}-{amax}" if amin and amax else "unspecified"
+
+    # --- geo scope ---
+    geo = t.get("geo_locations") or {}
+    keys = set(geo.keys())
+    if "geo_markets" in keys or "dma" in lname:
+        geo_scope = "dma"
+    elif {"custom_locations", "places"} & keys or "miles" in lname or "radius" in lname:
+        geo_scope = "local_radius"
+    elif "regions" in keys or "cities" in keys or "zips" in keys:
+        geo_scope = "regional"
+    elif "countries" in keys:
+        geo_scope = "national"
+    else:
+        geo_scope = "unspecified"
+
+    return {
+        "audience_stage": stage,
+        "audience_gender": gender,
+        "audience_age": age,
+        "audience_geo": geo_scope,
+        "audience_name": name,
+        "audience_custom": "; ".join(ca[:4]),
+        "optimization_goal": adset.get("optimization_goal"),
+    }
+
+
+def fetch_adsets(
+    account_id: str,
+    adset_ids: list[str],
+    *,
+    client: httpx.Client | None = None,
+) -> dict[str, dict[str, Any]]:
+    """Fetch targeting for specific adsets, chunked.
+
+    Deliberately fetches only the adsets referenced by ingested ads — these
+    accounts hold thousands of adsets (2,225 in one) while only a few hundred
+    delivered in a given window, and listing the whole edge with targeting
+    expanded trips Meta's "reduce the amount of data" 500.
+    """
+    owns = client is None
+    c = client or httpx.Client(timeout=120)
+    out: dict[str, dict[str, Any]] = {}
+    ids = [i for i in dict.fromkeys(adset_ids) if i]
+    try:
+        for i in range(0, len(ids), ID_CHUNK):
+            chunk = ids[i:i + ID_CHUNK]
+            try:
+                data = _get(c, f"{GRAPH}/", {
+                    "access_token": _token(),
+                    "ids": ",".join(chunk),
+                    "fields": ADSET_FIELDS,
+                })
+            except MetaAccountError as exc:
+                log.warning("adset chunk %d failed: %s", i, exc)
+                continue
+            out.update(data)
+    finally:
+        if owns:
+            c.close()
+    return out
