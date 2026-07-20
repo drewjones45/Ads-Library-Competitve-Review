@@ -1119,6 +1119,49 @@ JS = r"""
   // curve and rising scale curve — an ad is only called when its spend is
   // enough to distinguish it from the target.
   var SK_K=2.0, SK_METRIC='cpa', SK_TARGET=null, SK_FRAME=null, SK_PLAYING=false, SK_TIMER=null;
+  var SK_LAUNCH='';
+
+  // Launch date is the ad's CREATION date, not the first day it delivered in
+  // this window. The distinction matters: 166 of these ads were built before
+  // the window opened, so an ad first seen spending on day 1 may be a
+  // long-running asset rather than a new one. Filtering on first-delivery would
+  // label every one of those a fresh launch.
+  function skLaunchPass(a){
+    if(!SK_LAUNCH) return true;
+    var cr=a.cr||'';
+    if(!cr) return false;                       // unknown creation date
+    if(SK_LAUNCH==='__new__')  return DAYS.length ? cr>=DAYS[0] : true;
+    if(SK_LAUNCH==='__prior__')return DAYS.length ? cr< DAYS[0] : false;
+    return cr.slice(0,7)===SK_LAUNCH;           // a month cohort
+  }
+
+  function fillLaunchSelect(pool){
+    var el=document.getElementById('skLaunch');
+    var months={}, nNew=0, nPrior=0, nUnknown=0;
+    var w0=DAYS.length?DAYS[0]:null;
+    pool.forEach(function(a){
+      var cr=a.cr||'';
+      if(!cr){nUnknown++;return;}
+      months[cr.slice(0,7)]=(months[cr.slice(0,7)]||0)+1;
+      if(w0){ if(cr>=w0) nNew++; else nPrior++; }
+    });
+    var keys=Object.keys(months).sort().reverse();
+    var html='<option value="">Launched: any date</option>';
+    if(nNew)   html+='<option value="__new__">Launched: new in this window · '+nNew+'</option>';
+    if(nPrior) html+='<option value="__prior__">Launched: before this window · '+nPrior+'</option>';
+    keys.forEach(function(k){
+      html+='<option value="'+esc(k)+'">Launched: '+esc(k)+' · '+months[k]+'</option>';
+    });
+    el.innerHTML=html;
+    // A cohort can vanish when the main filter bar narrows the pool; fall back
+    // to "any" rather than silently showing an empty chart.
+    var valid=(SK_LAUNCH==='')||(SK_LAUNCH==='__new__'&&nNew)||
+              (SK_LAUNCH==='__prior__'&&nPrior)||months[SK_LAUNCH];
+    if(!valid) SK_LAUNCH='';
+    el.value=SK_LAUNCH;
+    el.closest('.chip').classList.toggle('set', !!SK_LAUNCH);
+    return {unknown:nUnknown};
+  }
 
   function skBand(sp,target){
     var n=target>0?sp/target:0;
@@ -1174,7 +1217,10 @@ JS = r"""
 
   function renderSK(pool){
     var host=document.getElementById('skPlot');
-    var withDaily=pool.filter(function(a){return a.D&&a.D.length;});
+    var hasDaily=pool.filter(function(a){return a.D&&a.D.length;});
+    var launchInfo=fillLaunchSelect(hasDaily);
+    var withDaily=hasDaily.filter(skLaunchPass);
+    var launchHidden=hasDaily.length-withDaily.length;
     if(!DAYS.length||!withDaily.length){
       host.innerHTML='<div class="empty">No daily data for this filter — run '+
         '<code>intel perf-series --increment 1</code> to populate it.</div>';
@@ -1298,6 +1344,16 @@ JS = r"""
 
     var wrong=buckets.k.reduce(function(s,t){return s+t.sp;},0);
     var isAuto=!(SK_TARGET!==null&&SK_TARGET>0);
+    var lbl={'__new__':'launched during this window',
+             '__prior__':'launched before this window'}[SK_LAUNCH] ||
+             (SK_LAUNCH?('launched in '+SK_LAUNCH):'');
+    // A cohort filter changes the population every number below describes, so
+    // it is stated up front rather than left to be inferred from the chip.
+    var launchLine = SK_LAUNCH
+      ? '<b>Cohort:</b> showing only assets <b>'+esc(lbl)+'</b> — '+withDaily.length+
+        ' of '+hasDaily.length+' ads ('+launchHidden+' hidden). Spend, zones and the '+
+        'timeline below all describe this cohort only.<br><br>'
+      : '';
     // The default target is the population's OWN blended rate, so roughly half
     // the spend sits on the wrong side of it by construction. Calling that
     // "underperforming" would be a sleight of hand — against a self-referential
@@ -1314,7 +1370,13 @@ JS = r"""
         ' clearing the scale line · '+buckets.k.length+' in kill · <b>'+money(wrong)+
         '</b> ('+(100*wrong/totSp).toFixed(0)+'% of spend in view) sitting in the wrong zone '+
         'against your target of '+(SK_METRIC==='cpa'?money2(target):target.toFixed(2)+'x')+'.';
-    document.getElementById('skNote').innerHTML= readLine +
+    document.getElementById('skNote').innerHTML= launchLine + readLine +
+      '<br><br><b>Launch date</b> is when the asset was created in the ad account, not when '+
+      'it first delivered inside this window — '+
+      'an ad can be built months before it starts spending, so first-delivery would label '+
+      'long-running assets as new launches. '+
+      (launchInfo.unknown?'<b>'+launchInfo.unknown+'</b> ad'+(launchInfo.unknown===1?'':'s')+
+        ' carry no creation date and drop out of every cohort. ':'')+
       '<br><br><b>How the zones are drawn:</b> they are a confidence band, not a fixed '+
       'threshold. An ad with $50 of spend and one conversion has a CPA you cannot trust; '+
       'one with $50,000 and 900 conversions has a CPA you can. Both boundaries are '+
@@ -1795,6 +1857,13 @@ JS = r"""
   document.getElementById('skReset').addEventListener('click',function(){
     SK_TARGET=null; renderSK(ADS.filter(passes));
   });
+  document.getElementById('skLaunch').addEventListener('change',function(){
+    SK_LAUNCH=this.value;
+    // The open drill-down may belong to an ad this cohort excludes.
+    document.getElementById('adPanel').innerHTML='';
+    stopPlay();
+    renderSK(ADS.filter(passes));
+  });
 
   buildFilterBar();
   render();
@@ -2009,6 +2078,8 @@ def build_performance_dashboard(
         "</span>"
         '<span class="flabel tgt">Target</span>'
         '<input class="tin" id="skTarget" type="number" step="0.01" min="0">'
+        '<span class="flabel tgt">Launched</span>'
+        '<span class="chip"><select id="skLaunch"></select></span>'
         '<span class="spacer"></span>'
         '<button class="fbtn" id="skReset" type="button">Reset target</button>'
         "</div>"
