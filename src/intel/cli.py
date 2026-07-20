@@ -1313,3 +1313,126 @@ def analytics_import_cmd(competitor_id: str, in_path: str, dataset_label: str | 
 
 if __name__ == "__main__":
     cli()
+
+
+# ----------------------------------------------------------------------------
+# Owned Meta ad-account performance
+# ----------------------------------------------------------------------------
+
+@cli.command("perf-ingest")
+@click.option("--account", "account_id", required=True,
+              help="Meta ad account id (numeric, no 'act_' prefix)")
+@click.option("--competitor", "competitor_id", required=True,
+              help="brand id in the competitor set to attribute this account to")
+@click.option("--account-name", "account_name", default=None,
+              help="human label for the account (shown in the dashboard)")
+@click.option("--days", "days", default=90, show_default=True,
+              help="lookback window in days")
+@click.option("--since", "since", default=None, help="explicit start date YYYY-MM-DD")
+@click.option("--until", "until", default=None, help="explicit end date YYYY-MM-DD")
+@click.option("--no-previews", is_flag=True, default=False,
+              help="skip rendering ad previews (much faster; loses the best creative asset)")
+@click.option("--max-previews", "max_previews", default=0, show_default=True,
+              help="cap preview renders (0 = no cap). Highest-spend ads render first.")
+def perf_ingest_cmd(account_id: str, competitor_id: str, account_name: str | None,
+                    days: int, since: str | None, until: str | None,
+                    no_previews: bool, max_previews: int) -> None:
+    """Ingest first-party performance + creative from an owned Meta ad account.
+
+    Unlike the Ad Library lane (which can only see that an ad exists), this brings
+    back spend, CTR, ROAS and conversions keyed on the account's native ad id, and
+    pairs each ad with whatever creative asset can actually be retrieved.
+
+    Ads land in `ads`/`creatives` under source='meta_owned', so the normal vision
+    pipeline can analyze them; existing competitor reports are untouched because
+    every report path filters to an explicit source set that excludes it.
+    """
+    from datetime import date, timedelta
+    from .adapters.meta_account_ingest import ingest_account
+    from .adapters.meta_account import MetaAccountError
+    from .config import DATA_DIR
+
+    if not since and not until:
+        until = date.today().isoformat()
+        since = (date.today() - timedelta(days=days)).isoformat()
+
+    console.print(
+        f"[bold]ingesting[/bold] account {account_id} "
+        f"({account_name or 'unnamed'}) → brand [bold]{competitor_id}[/bold] "
+        f"[dim]{since} → {until}[/dim]"
+    )
+    try:
+        with connect() as conn:
+            res = ingest_account(
+                conn,
+                account_id=account_id,
+                account_name=account_name,
+                competitor_id=competitor_id,
+                data_dir=Path(DATA_DIR),
+                since=since, until=until,
+                render_previews=not no_previews,
+                max_previews=max_previews,
+            )
+    except MetaAccountError as exc:
+        console.print(f"[red]✗ {exc}[/red]")
+        raise SystemExit(1)
+
+    cov = res["coverage"]
+    console.print(
+        f"[green]✓[/green] {res['ads']} ads · {res['assets']} assets · "
+        f"{res['previews']}/{res['preview_attempted']} previews rendered"
+    )
+    if cov["total_spend"]:
+        console.print(
+            f"  spend ${cov['total_spend']:,.0f} · "
+            f"[bold]{cov['analyzable_pct']:.0f}%[/bold] on creative that can be "
+            f"vision-analyzed"
+        )
+        for cls, b in sorted(cov["by_class"].items(), key=lambda kv: -kv[1]["spend"]):
+            console.print(
+                f"    {cls:11} {int(b['ads']):4} ads  ${b['spend']:>12,.0f}"
+            )
+        if cov["analyzable_pct"] < 60:
+            console.print(
+                "  [yellow]note:[/yellow] most spend is on catalog/DPA ads whose creative is "
+                "assembled per-product at serve time. Those have no fixed image to "
+                "analyze, so creative-attribute rollups cover the analyzable subset only."
+            )
+
+
+@cli.command("perf-dashboard")
+@click.option("--competitor", "competitor_ids", multiple=True,
+              help="brand id(s) to include; repeat the flag. Default: every brand with data.")
+@click.option("--out", "out_dir", required=True, type=click.Path(),
+              help="output directory for the dashboard")
+@click.option("--min-impressions", "min_impressions", default=1000, show_default=True,
+              help="drop attribute buckets thinner than this many impressions")
+@click.option("--open", "open_after", is_flag=True, default=False, help="open when done")
+def perf_dashboard_cmd(competitor_ids: tuple[str, ...], out_dir: str,
+                       min_impressions: int, open_after: bool) -> None:
+    """Build the creative-performance dashboard for owned ad accounts.
+
+    Cross-tabulates first-party performance against the vision-derived creative
+    attributes, so you can see which attributes actually correlate with CTR/ROAS
+    rather than just which creatives exist.
+    """
+    from .synthesis.performance_dashboard import build_performance_dashboard
+
+    out = Path(out_dir)
+    with connect() as conn:
+        res = build_performance_dashboard(
+            conn, out_dir=out,
+            competitor_ids=list(competitor_ids) or None,
+            min_impressions=min_impressions,
+        )
+    if not res:
+        console.print("[yellow]no owned-account performance data — run `intel perf-ingest` first[/yellow]")
+        return
+    console.print(
+        f"[green]wrote[/green] {res['path']}  "
+        f"({res['brands']} brand(s) · {res['ads']} ads · ${res['spend']:,.0f} spend · "
+        f"{res['analyzed']} analyzed creatives)"
+    )
+    if open_after:
+        import webbrowser
+        webbrowser.open(f"file://{Path(res['path']).resolve()}")

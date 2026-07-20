@@ -84,6 +84,12 @@ class CreativeRecord:
     source: str = "meta"
 
 
+# Ad platforms collected from PUBLIC sources (Ad Library scrape, Google ATC,
+# iSpot). Deliberately excludes 'meta_owned', which is first-party owned-account
+# data and belongs to the performance dashboard, not competitive readouts.
+PUBLIC_SOURCES = {"meta", "google", "tv"}
+
+
 @dataclass
 class AttributeTallies:
     """Counts per attribute. Each is a Counter[str → number]. When weight_fn
@@ -120,7 +126,17 @@ def pull_analyzed_creatives(
     window_days filters by ad first_seen for paid-ad creatives; standalone
     creatives use creatives.analyzed_at as the recency proxy (they have no
     first_seen). When window_days is None, all analyzed creatives are returned.
+
+    `sources` scopes to ad platforms. When it is None the scope defaults to the
+    PUBLIC platforms only — deliberately excluding 'meta_owned'. Owned-account
+    ads are the same brand advertising to its own customers with first-party
+    metrics attached; folding them into a competitive readout would double-count
+    the subject brand and mix two different collection methods in one
+    distribution. They have their own dashboard (`intel perf-dashboard`). This
+    default also keeps every pre-existing report byte-identical, since those DBs
+    only ever contained the public sources.
     """
+    sources = sources or PUBLIC_SOURCES
     q = (
         "SELECT COALESCE(a.competitor_id, cr.competitor_id) AS competitor_id, "
         "       comp.name AS comp_name, a.id AS ad_id, "

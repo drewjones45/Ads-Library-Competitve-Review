@@ -1,0 +1,81 @@
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+                                Ingestion report                                
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┓
+┃ competitor ┃ source     ┃ ok ┃ changed ┃ sev  ┃ new_ads ┃ offers ┃ summary   ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━┩
+│ philo      │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 5         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ chrome_d… │
+│            │            │    │         │      │         │        │ hero_ima… │
+│            │            │    │         │      │         │        │ html_pa   │
+│ philo      │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 95      │ 0      │ 2         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ active_a… │
+│            │            │    │         │      │         │        │ ad_count  │
+│ philo      │ google_ad… │ ✓  │ yes     │ 1.00 │ 123     │ 0      │ 2         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ active_a… │
+│            │            │    │         │      │         │        │ format_c… │
+│ frndly     │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 5         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ hero_ima… │
+│            │            │    │         │      │         │        │ html_pat… │
+│            │            │    │         │      │         │        │ regions,  │
+│            │            │    │         │      │         │        │ scr       │
+│ frndly     │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 45      │ 0      │ 2         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ active_a… │
+│            │            │    │         │      │         │        │ ad_count  │
+│ sling      │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 6         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ chrome_d… │
+│            │            │    │         │      │         │        │ hero_ima… │
+│            │            │    │         │      │         │        │ html_pa   │
+│ sling      │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 18      │ 0      │ 2         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ active_a… │
+│            │            │    │         │      │         │        │ ad_count  │
+│ fubo       │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 6         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ chrome_d… │
+│            │            │    │         │      │         │        │ hero_ima… │
+│            │            │    │         │      │         │        │ html_pa   │
+│ fubo       │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 4       │ 0      │ 2         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ active_a… │
+│            │            │    │         │      │         │        │ ad_count  │
+│ hulu       │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 4         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ hero_ima… │
+│            │            │    │         │      │         │        │ html_pat… │
+│            │            │    │         │      │         │        │ screensh… │
+│ hulu       │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 136     │ 0      │ 1         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ active_a… │
+│ amcplus    │ website|h… │ ✓  │ no      │ 0.00 │ 0       │ 0      │           │
+│ amcplus    │ meta_ads|… │ ✓  │ no      │ 0.00 │ 0       │ 0      │           │
+│ youtube_tv │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ 5         │
+│            │            │    │         │      │         │        │ field(s)  │
+│            │            │    │         │      │         │        │ changed:  │
+│            │            │    │         │      │         │        │ hero_ima… │
+│            │            │    │         │      │         │        │ html_pat… │
+│            │            │    │         │      │         │        │ regions,  │
+│            │            │    │         │      │         │        │ scr       │
+└────────────┴────────────┴────┴─────────┴──────┴─────────┴────────┴───────────┘

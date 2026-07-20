@@ -1,0 +1,72 @@
+{
+  "duration_sec": 18.77,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_00_t00200.jpg",
+      "t_sec": 0.2,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_01_t00800.jpg",
+      "t_sec": 0.8,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_02_t01200.jpg",
+      "t_sec": 1.2,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_03_t01400.jpg",
+      "t_sec": 1.4,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_04_t01533.jpg",
+      "t_sec": 1.533,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_05_t03933.jpg",
+      "t_sec": 3.933,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_06_t06333.jpg",
+      "t_sec": 6.333,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_07_t08633.jpg",
+      "t_sec": 8.633,
+      "idx": 7
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_08_t09367.jpg",
+      "t_sec": 9.367,
+      "idx": 8
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_09_t10967.jpg",
+      "t_sec": 10.967,
+      "idx": 9
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_10_t13300.jpg",
+      "t_sec": 13.3,
+      "idx": 10
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/frame_11_t15700.jpg",
+      "t_sec": 15.7,
+      "idx": 11
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-20T02:14:01+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/2099059961028477/video.mp4"
+}

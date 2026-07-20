@@ -1,0 +1,72 @@
+{
+  "duration_sec": 44.5,
+  "width": 360,
+  "height": 640,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_00_t00167.jpg",
+      "t_sec": 0.167,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_01_t01792.jpg",
+      "t_sec": 1.792,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_02_t06000.jpg",
+      "t_sec": 6.0,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_03_t10875.jpg",
+      "t_sec": 10.875,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_04_t12958.jpg",
+      "t_sec": 12.958,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_05_t15042.jpg",
+      "t_sec": 15.042,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_06_t19500.jpg",
+      "t_sec": 19.5,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_07_t22958.jpg",
+      "t_sec": 22.958,
+      "idx": 7
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_08_t26250.jpg",
+      "t_sec": 26.25,
+      "idx": 8
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_09_t30292.jpg",
+      "t_sec": 30.292,
+      "idx": 9
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_10_t33000.jpg",
+      "t_sec": 33.0,
+      "idx": 10
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/frame_11_t37542.jpg",
+      "t_sec": 37.542,
+      "idx": 11
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-20T02:20:47+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1003031582359507/video.mp4"
+}

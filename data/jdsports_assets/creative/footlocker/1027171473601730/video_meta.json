@@ -1,0 +1,32 @@
+{
+  "duration_sec": 4.12,
+  "width": 360,
+  "height": 640,
+  "has_audio": false,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/1027171473601730/frame_00_t00820.jpg",
+      "t_sec": 0.82,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/1027171473601730/frame_01_t01650.jpg",
+      "t_sec": 1.65,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/1027171473601730/frame_02_t02470.jpg",
+      "t_sec": 2.47,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/1027171473601730/frame_03_t03300.jpg",
+      "t_sec": 3.3,
+      "idx": 3
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-20T02:13:44+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/footlocker/1027171473601730/video.mp4"
+}

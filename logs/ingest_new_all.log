@@ -1,0 +1,25 @@
+===== INGEST netflix @ 09:16:44 =====
+  netflix done in ~80s
+  netflix ads in db: 107
+===== INGEST hbomax @ 09:18:04 =====
+  hbomax done in ~80s
+  hbomax ads in db: 69
+===== INGEST peacock @ 09:19:24 =====
+  peacock done in ~160s
+  peacock ads in db: 200
+===== INGEST starz @ 09:22:04 =====
+  starz done in ~120s
+  starz ads in db: 200
+===== INGEST mgmplus @ 09:24:05 =====
+  mgmplus done in ~30s
+  mgmplus ads in db: 9
+===== INGEST paramountplus @ 09:24:35 =====
+  paramountplus done in ~90s
+  paramountplus ads in db: 200
+===== INGEST appletv @ 09:26:05 =====
+  appletv done in ~160s
+  appletv ads in db: 200
+===== INGEST fxnow @ 09:28:45 =====
+  fxnow done in ~60s
+  fxnow ads in db: 0
+===== ALL NEW INGESTS COMPLETE @ 09:29:45 =====

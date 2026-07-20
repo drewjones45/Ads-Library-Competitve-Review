@@ -1,0 +1,210 @@
+[1m[1/9] preflight (JDSPORTS deployment)[0m
+[2m────────────────────────────────────────────────────────────[0m
+[32m  ✓ venv present[0m
+[32m  ✓ INTEL_DB_PATH          = /Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports.db[0m
+[32m  ✓ INTEL_DATA_DIR         = /Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets[0m
+[32m  ✓ INTEL_COMPETITORS_FILE = /Users/andrewjones/Documents/Ads Library Competitve Review/config/competitors_jdsports.yaml[0m
+[33m  ⚠ ANTHROPIC_API_KEY missing — vision analysis runs via Claude Code subagents (see header)[0m
+[32m  ✓ META_AD_LIBRARY_ACCESS_TOKEN set[0m
+[32m  ✓ writing reports to: reports/jdsports/2026-07-20/[0m
+
+[1m[2/9] init db (jdsports.db)[0m
+[2m────────────────────────────────────────────────────────────[0m
+ok registered 5 competitors
+  - jdsports (JD Sports) — 3 sources
+  - finishline (Finish Line) — 2 sources
+  - footlocker (Foot Locker) — 3 sources
+  - champs (Champs Sports) — 2 sources
+  - snipes (SNIPES USA) — 2 sources
+
+[1m[3/9] ingest[0m
+[2m────────────────────────────────────────────────────────────[0m
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+                                Ingestion report                                
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┓
+┃ competitor ┃ source     ┃ ok ┃ changed ┃ sev  ┃ new_ads ┃ offers ┃ summary   ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━┩
+│ jdsports   │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ jdsports   │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 118     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ jdsports   │ google_ad… │ ✓  │ yes     │ 1.00 │ 240     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ finishline │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ finishline │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 32      │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ footlocker │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ footlocker │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 200     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ footlocker │ google_ad… │ ✓  │ yes     │ 1.00 │ 240     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ champs     │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ champs     │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 200     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ snipes     │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ snipes     │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 73      │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+└────────────┴────────────┴────┴─────────┴──────┴─────────┴────────┴───────────┘
+
+[1m[4/9] capture landing pages[0m
+[2m────────────────────────────────────────────────────────────[0m
+  captured  https://champssports.com/category/back-to-school.html
+  captured  https://champssports.com/category/sport/soccer/inspired/all.html
+  captured  https://champssports.com/category/brands/new-balance.html
+  captured  
+https://champssports.com/category/sport/running/shoes/performance.html
+  captured  https://champssports.com/en/category/brands/newbalance.html
+  captured  https://champssports.com/product/~/014ALBST.html
+  captured  https://champssports.com/product/~/00D3HW00.html
+chunk screenshot failed at y=0: Page.screenshot: Timeout 10000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+
+chunk screenshot failed at y=900: Page.screenshot: Timeout 10000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+
+chunk screenshot failed at y=1800: Page.screenshot: Timeout 10000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+
+chunk screenshot failed at y=2700: Page.screenshot: Timeout 10000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+
+landing screenshot failed for https://champssports.com/product/~/02372006.html: Page.screenshot: Timeout 30000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+
+  skip https://champssports.com/product/~/02372006.html (screenshot failed: 
+TimeoutError: Page.screenshot: Timeout 30000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+)
+  captured  https://snipesusa.com/
+  captured  http://snipesusa.com/
+  captured  https://footlocker.com/category/sport/running.html
+  captured  https://footlocker.com/en/category/collection/trending
+  captured  https://footlocker.com/category/shoes/nike/air-force-1.html
+  captured  https://footlocker.com/en/category/collection/court-classics
+  captured  https://footlocker.com/category/brands/on.html
+  captured  https://footlocker.com/product/~/00151181.html
+  captured  https://footlocker.com/product/~/00D9JBKO.html
+  captured  https://footlocker.com/product/~/10256256.html
+landing goto failed for https://jdsports.com/: Page.goto: Timeout 45000ms exceeded.
+Call log:
+  - navigating to "https://jdsports.com/", waiting until "domcontentloaded"
+
+  skip https://jdsports.com/ (goto failed: TimeoutError: Page.goto: Timeout 
+45000ms exceeded.
+Call log:
+  - navigating to "https://jdsports.com/", waiting until "domcontentloaded"
+)
+ Brand          Selected  Captured  Blocked/err 
+ Champs Sports         8         7            1 
+ SNIPES USA            2         2            0 
+ Foot Locker           8         8            0 
+ JD Sports             1         0            1 
+next: intel analyze-creatives  (analyzes the new landing screenshots)
+
+[1m[5/9] vision-analyze creatives[0m
+[2m────────────────────────────────────────────────────────────[0m
+[33m  no ANTHROPIC_API_KEY — run vision analysis via Claude Code subagents[0m
+[33m  (writes creatives.analysis_json) BEFORE the readout/dashboard steps.[0m
+
+[1m[6/9] per-brand creative readouts[0m
+[2m────────────────────────────────────────────────────────────[0m
+                           Creative readout — champs                            
+
+No analyzed creatives yet. Run intel analyze-creatives --competitor champs      
+first.                                                                          
+
+wrote reports/jdsports/2026-07-20/by-brand/champs.md
+                         Creative readout — finishline                          
+
+No analyzed creatives yet. Run intel analyze-creatives --competitor finishline  
+first.                                                                          
+
+wrote reports/jdsports/2026-07-20/by-brand/finishline.md
+                         Creative readout — footlocker                          
+
+No analyzed creatives yet. Run intel analyze-creatives --competitor footlocker  
+first.                                                                          
+
+wrote reports/jdsports/2026-07-20/by-brand/footlocker.md
+                          Creative readout — jdsports                           
+
+No analyzed creatives yet. Run intel analyze-creatives --competitor jdsports    
+first.                                                                          
+
+wrote reports/jdsports/2026-07-20/by-brand/jdsports.md
+                           Creative readout — snipes                            
+
+No analyzed creatives yet. Run intel analyze-creatives --competitor snipes      
+first.                                                                          
+
+wrote reports/jdsports/2026-07-20/by-brand/snipes.md
+  → champs → reports/jdsports/2026-07-20/by-brand/champs.md
+  → finishline → reports/jdsports/2026-07-20/by-brand/finishline.md
+  → footlocker → reports/jdsports/2026-07-20/by-brand/footlocker.md
+  → jdsports → reports/jdsports/2026-07-20/by-brand/jdsports.md
+  → snipes → reports/jdsports/2026-07-20/by-brand/snipes.md
+
+[1m[7/9] cross-set comparison[0m
+[2m────────────────────────────────────────────────────────────[0m
+                Cross-competitor creative comparison (last 14d)                 
+
+No analyzed creatives in the window — run intel analyze-creatives first.        
+
+wrote reports/jdsports/2026-07-20/creative_comparison.md
+
+[1m[8/9] briefing[0m
+[2m────────────────────────────────────────────────────────────[0m
+[32m  using deterministic (no-LLM) briefing[0m
+  wrote reports/jdsports/2026-07-20/briefing.md
+
+[1m[9/9] HTML dashboard[0m
+[2m────────────────────────────────────────────────────────────[0m
+wrote reports/jdsports/2026-07-20/dashboard/index.html  (5 brands · 0 analyzed 
+creatives · 456 KB)
+wrote reports/jdsports/2026-07-20/dashboard-v2/index.html  (5 brands · 0 
+analyzed creatives · 427 KB)
+wrote reports/jdsports/2026-07-20/with-google/dashboard/index.html  (5 brands · 
+0 analyzed creatives · 642 KB)
+wrote reports/jdsports/2026-07-20/with-google/dashboard-v2/index.html  (5 brands
+· 0 analyzed creatives · 590 KB)
+
+[1mdone (JDSPORTS)[0m
+[2m────────────────────────────────────────────────────────────[0m
+outputs:
+  reports/jdsports/2026-07-20/briefing.md
+  reports/jdsports/2026-07-20/by-brand/champs.md
+  reports/jdsports/2026-07-20/by-brand/finishline.md
+  reports/jdsports/2026-07-20/by-brand/footlocker.md
+  reports/jdsports/2026-07-20/by-brand/jdsports.md
+  reports/jdsports/2026-07-20/by-brand/snipes.md
+  reports/jdsports/2026-07-20/creative_comparison.md
+  reports/jdsports/2026-07-20/dashboard-v2/index.html
+  reports/jdsports/2026-07-20/dashboard/index.html
+  reports/jdsports/2026-07-20/ingest.log
+  reports/jdsports/2026-07-20/landing_capture.log
+
+[32mview a report:[0m
+    open reports/jdsports/2026-07-20/dashboard/index.html        ← single-page HTML dashboard
+    open reports/jdsports/2026-07-20/creative_comparison.md
+    open reports/jdsports/2026-07-20/by-brand/jdsports.md
+    open reports/jdsports/2026-07-20/briefing.md

@@ -53,6 +53,9 @@ VARIANT_LABELS = {
     "with-google-dashboard-v2": "Dashboard + Google ATC (v2)",
     "with-tv-dashboard": "Dashboard + Google + TV",
     "with-tv-dashboard-v2": "Dashboard + Google + TV (v2)",
+    # Owned-account creative performance (first-party spend/ROAS joined to
+    # creative attributes). Self-contained HTML — no asset refs to rewrite.
+    "performance-dashboard": "Creative performance (owned accounts)",
 }
 
 
@@ -128,9 +131,36 @@ def rewrite_html(idx: Path, dest_dir: Path, assets_dir: Path) -> tuple[int, int,
     for raw in sorted(seen, key=len, reverse=True):
         text = text.replace(raw, seen[raw])
 
+    text = inject_noindex(text)
+
     dest_dir.mkdir(parents=True, exist_ok=True)
     (dest_dir / "index.html").write_text(text, encoding="utf-8")
     return len(seen), copied, missing
+
+
+# Belt-and-braces with the X-Robots-Tag header in netlify.toml: the header is
+# authoritative, but the meta tag travels with the file, so a page that gets
+# copied, mirrored or opened from disk still declares itself un-indexable.
+NOINDEX_META = (
+    '<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">'
+    '<meta name="googlebot" content="noindex, nofollow">'
+)
+_HEAD_RE = re.compile(r"<head[^>]*>", re.IGNORECASE)
+
+
+def inject_noindex(text: str) -> str:
+    """Insert the robots meta tags right after <head>, idempotently.
+
+    These dashboards hold client competitive analysis and first-party ad spend,
+    and the host has no auth — so nothing here should ever land in a search
+    index. Falls back to prepending when a document has no <head> at all.
+    """
+    if 'name="robots"' in text:
+        return text
+    m = _HEAD_RE.search(text)
+    if m:
+        return text[: m.end()] + NOINDEX_META + text[m.end():]
+    return NOINDEX_META + text
 
 
 def _copy_strategy(date_root: Path, dest: Path) -> int:
@@ -147,7 +177,16 @@ def _copy_strategy(date_root: Path, dest: Path) -> int:
         for f in sorted(strat.iterdir()):
             if f.is_file() and f.suffix.lower() in (".html", ".pdf"):
                 dest.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(f, dest / f.name)
+                if f.suffix.lower() == ".html":
+                    # Stamp the robots meta in rather than copying verbatim, so
+                    # strategy docs carry the same no-index declaration as the
+                    # dashboards. (PDFs can't carry a meta tag — the
+                    # X-Robots-Tag header in netlify.toml is what covers those.)
+                    (dest / f.name).write_text(
+                        inject_noindex(f.read_text(encoding="utf-8")), encoding="utf-8"
+                    )
+                else:
+                    shutil.copy2(f, dest / f.name)
                 copied += 1
     return copied
 
@@ -186,6 +225,22 @@ footer { color: var(--muted); font-size: 12px; margin-top: 40px; border-top:1px 
 """
 
 
+def write_robots(out: Path) -> None:
+    """Blanket crawl disallow for the deployed site.
+
+    Third line of defence after the X-Robots-Tag header and the per-page meta
+    tag. Well-behaved crawlers read this before requesting anything, so it stops
+    the fetch rather than just the indexing. `Disallow: /` applies to every
+    user-agent, including the AI crawlers that honour robots.txt.
+    """
+    (out / "robots.txt").write_text(
+        "# Client competitive analysis + first-party ad performance. Not for indexing.\n"
+        "User-agent: *\n"
+        "Disallow: /\n",
+        encoding="utf-8",
+    )
+
+
 def build_landing(site: dict, out: Path, generated_for: str) -> None:
     deps_order = [d for d in ["philo", "bobs", "trex", "revlon"] if d in site]
     deps_order += [d for d in site if d not in deps_order]
@@ -210,6 +265,7 @@ def build_landing(site: dict, out: Path, generated_for: str) -> None:
     doc = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Competitive Intelligence — Dashboards</title>
+{NOINDEX_META}
 <style>{LANDING_CSS}</style></head>
 <body><div class="wrap">
 <h1>Competitive Intelligence Dashboards</h1>
@@ -277,6 +333,7 @@ def main() -> None:
                     print(f"  {dep}/{date}/strategy: {n} file(s) copied")
 
     build_landing(site, out, args.date_label)
+    write_robots(out)
     size_mb = sum(f.stat().st_size for f in out.rglob("*") if f.is_file()) / (1024 * 1024)
     print(
         f"\nbuilt {total_dash} dashboard(s) across {len(site)} deployment(s) → {out}\n"

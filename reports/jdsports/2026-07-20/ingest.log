@@ -1,0 +1,34 @@
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+                                Ingestion report                                
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┓
+┃ competitor ┃ source     ┃ ok ┃ changed ┃ sev  ┃ new_ads ┃ offers ┃ summary   ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━┩
+│ jdsports   │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ jdsports   │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 118     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ jdsports   │ google_ad… │ ✓  │ yes     │ 1.00 │ 240     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ finishline │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ finishline │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 32      │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ footlocker │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ footlocker │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 200     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ footlocker │ google_ad… │ ✓  │ yes     │ 1.00 │ 240     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ champs     │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ champs     │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 200     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ snipes     │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ snipes     │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 73      │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+└────────────┴────────────┴────┴─────────┴──────┴─────────┴────────┴───────────┘

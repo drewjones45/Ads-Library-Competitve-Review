@@ -1,0 +1,57 @@
+{
+  "duration_sec": 24.97,
+  "width": 360,
+  "height": 450,
+  "has_audio": true,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1224112566453117/frame_00_t00267.jpg",
+      "t_sec": 0.267,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1224112566453117/frame_01_t00967.jpg",
+      "t_sec": 0.967,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1224112566453117/frame_02_t07967.jpg",
+      "t_sec": 7.967,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1224112566453117/frame_03_t09600.jpg",
+      "t_sec": 9.6,
+      "idx": 3
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1224112566453117/frame_04_t12067.jpg",
+      "t_sec": 12.067,
+      "idx": 4
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1224112566453117/frame_05_t13033.jpg",
+      "t_sec": 13.033,
+      "idx": 5
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1224112566453117/frame_06_t14800.jpg",
+      "t_sec": 14.8,
+      "idx": 6
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1224112566453117/frame_07_t16033.jpg",
+      "t_sec": 16.033,
+      "idx": 7
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1224112566453117/frame_08_t18967.jpg",
+      "t_sec": 18.967,
+      "idx": 8
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-20T02:20:17+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1224112566453117/video.mp4"
+}

@@ -1,0 +1,174 @@
+# Source registry for the JD SPORTS (US) sneaker/athleisure competitive set.
+#
+# JD Sports positioning: mall-and-street sneaker & athletic-fashion retailer,
+# youth/streetwear-led, heavy Nike/adidas/Jordan allocation, "King of Trainers"
+# brand voice. Subject brand of this deployment. US-market scope (jdsports.com).
+#
+# Competitive set (client named JD Sports + Finish Line; the other three were
+# selected 2026-07-19 as JD's nearest US head-to-head rivals):
+#   - Finish Line  — named by the client. NOTE: Finish Line is JD-OWNED (acquired
+#                    2018) and now runs largely as a JD banner + Macy's shop-in-shop.
+#                    Read it as a sibling/portfolio banner, not an external rival —
+#                    overlap in creative and offers is expected, not a competitive
+#                    signal.
+#   - Foot Locker  — THE head-to-head rival. Category leader, same malls, same
+#                    Nike/Jordan allocation fight, same sneakerhead audience.
+#   - Champs Sports— Foot Locker, Inc. banner. Distinct brand voice (more
+#                    performance/team-sport skewed than Foot Locker) but competes
+#                    for the identical mall footfall and teen wallet. Included as
+#                    the second Foot Locker-family lens.
+#   - SNIPES USA   — the closest pure streetwear/sneaker-culture positioning to JD.
+#                    European (Deichmann) parent, aggressive US store expansion,
+#                    community/artist-led creative. The clearest "brand voice"
+#                    competitor even where its ad volume is lower.
+#
+# Deliberately EXCLUDED and why:
+#   Hibbett, Shoe Palace, DTLR — all JD Sports-owned US banners. Adding them would
+#   have padded the set with JD's own portfolio rather than external competition.
+#   Dick's Sporting Goods, Shoe Carnival — real overlap but different shopper
+#   missions (broad sporting goods / family value footwear) rather than
+#   sneaker-culture retail.
+#
+# -----------------------------------------------------------------------------
+# Meta Ad Library page_id resolution (resolved + VERIFIED 2026-07-19).
+#
+# Resolution method (worth recording — the usual paths BOTH failed here):
+#   1. MCP/Graph free-text `search_terms` is spam-ranked and surfaced almost
+#      nothing for this vertical (a "Foot Locker" search returned ~866k results
+#      topped by unrelated affiliate spam). Do NOT trust it for page discovery.
+#   2. Graph `ads_archive` with `search_page_ids` reports 0 ACTIVE US ads for most
+#      of these pages — the known Graph commercial-ads coverage gap. Do NOT use it
+#      to conclude a brand has no Meta presence.
+#   3. What worked: load the brand's public facebook.com/<slug> page in Playwright
+#      and read the numeric id out of the embedded "delegate_page" JSON, then
+#      CONFIRM by running the real ingest path (meta_ads_scrape.scrape_page_ads)
+#      against that id. Every id below returned live ad cards that way.
+#   Cross-check: this method independently reproduced the client-supplied Finish
+#   Line id (55146470857), which is what gives confidence in the rest.
+#
+#   jdsports    → 2140630076185020  VERIFIED ("JD Sports US"; scrape returns live
+#                 cards; Graph also corroborates ~20+ active US ads).
+#                 ⚠ NOT the id the client supplied. The client gave 108909479716,
+#                 which IS a real "JD Sports" page but is the UK/global page — it
+#                 bills in GBP, carries ~6,656 ads, and returns ZERO US-reached
+#                 ads. Using it would have produced a UK creative set benchmarked
+#                 against US retailers. The US entity page is 2140630076185020
+#                 (jdsports.com / facebook.com/jdsportsus) and is used here.
+#                 To add the UK page as a separate global-creative lens, wire it
+#                 as its own competitor id with country: GB.
+#   finishline  → 55146470857       VERIFIED ("Finish Line") — client-supplied,
+#                 independently confirmed.
+#   footlocker  → 67997232685       VERIFIED ("Foot Locker")
+#   champs      → 8338596957        VERIFIED ("Champs Sports"; Graph corroborates
+#                 ~32 active US ads)
+#   snipes      → 80379486838       VERIFIED ("SNIPES USA")
+#
+# Google Ads Transparency Center: wired for the two brands whose advertiser
+# entity resolved cleanly to a direct retailer (agencies/resellers rejected),
+# via SerpApi domain search, region 2840:
+#   jdsports   → AR02394050230040395777 ("THE FINISH LINE USA, INC.") VERIFIED.
+#                ⚠ Important read: jdsports.com AND finishline.com both resolve to
+#                this SAME advertiser entity — JD's US legal entity is still named
+#                Finish Line USA. Google ATC therefore CANNOT separate JD Sports
+#                from Finish Line creative. It is attached to `jdsports` only, so
+#                the shared pool is counted once; treat any Google-sourced ad in
+#                this deployment as "JD US portfolio", not strictly JD-branded.
+#   footlocker → AR15274203602197938177 ("Foot Locker, Inc.") VERIFIED. Same
+#                caveat in reverse: champssports.com resolves to this same entity,
+#                so it is attached to `footlocker` only and covers both banners.
+#   snipes     → NOT wired. snipesusa.com resolved to "Jako Enterprises, Ltd", an
+#                indirect/holding entity rather than a clean SNIPES advertiser —
+#                rejected on the same grounds as the Wegmans competitor AR-ids.
+
+competitors:
+  - id: jdsports
+    name: JD Sports
+    vertical: athletic_footwear_retail
+    priority: high            # subject brand
+    sources:
+      - type: website
+        url: https://www.jdsports.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "2140630076185020"        # JD Sports US — VERIFIED via delegate_page + live scrape
+        page_name: JD Sports US
+        country: US
+        cadence: daily
+        method: scrape
+      - type: google_ads
+        advertiser_id: "AR02394050230040395777"   # THE FINISH LINE USA, INC. — JD's US entity (shared with Finish Line)
+        page_name: JD Sports
+        country: US                                # mapped to geo code 2840 on the SerpApi path
+        cadence: daily
+        method: api
+
+  - id: finishline
+    name: Finish Line
+    vertical: athletic_footwear_retail
+    priority: high            # client-named; JD-owned sibling banner
+    sources:
+      - type: website
+        url: https://www.finishline.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "55146470857"             # Finish Line — client-supplied, VERIFIED
+        page_name: Finish Line
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: footlocker
+    name: Foot Locker
+    vertical: athletic_footwear_retail
+    priority: high            # closest external head-to-head rival
+    sources:
+      - type: website
+        url: https://www.footlocker.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "67997232685"             # Foot Locker — VERIFIED via delegate_page + live scrape
+        page_name: Foot Locker
+        country: US
+        cadence: daily
+        method: scrape
+      - type: google_ads
+        advertiser_id: "AR15274203602197938177"   # Foot Locker, Inc. — covers the Champs banner too
+        page_name: Foot Locker
+        country: US
+        cadence: daily
+        method: api
+
+  - id: champs
+    name: Champs Sports
+    vertical: athletic_footwear_retail
+    priority: medium
+    sources:
+      - type: website
+        url: https://www.champssports.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "8338596957"              # Champs Sports — VERIFIED via delegate_page + live scrape
+        page_name: Champs Sports
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: snipes
+    name: SNIPES USA
+    vertical: athletic_footwear_retail
+    priority: medium
+    sources:
+      - type: website
+        url: https://www.snipesusa.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "80379486838"             # SNIPES USA — VERIFIED via delegate_page + live scrape
+        page_name: SNIPES USA
+        country: US
+        cadence: daily
+        method: scrape

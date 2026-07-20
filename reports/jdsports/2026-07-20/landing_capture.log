@@ -1,0 +1,64 @@
+  captured  https://champssports.com/category/back-to-school.html
+  captured  https://champssports.com/category/sport/soccer/inspired/all.html
+  captured  https://champssports.com/category/brands/new-balance.html
+  captured  
+https://champssports.com/category/sport/running/shoes/performance.html
+  captured  https://champssports.com/en/category/brands/newbalance.html
+  captured  https://champssports.com/product/~/014ALBST.html
+  captured  https://champssports.com/product/~/00D3HW00.html
+chunk screenshot failed at y=0: Page.screenshot: Timeout 10000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+
+chunk screenshot failed at y=900: Page.screenshot: Timeout 10000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+
+chunk screenshot failed at y=1800: Page.screenshot: Timeout 10000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+
+chunk screenshot failed at y=2700: Page.screenshot: Timeout 10000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+
+landing screenshot failed for https://champssports.com/product/~/02372006.html: Page.screenshot: Timeout 30000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+
+  skip https://champssports.com/product/~/02372006.html (screenshot failed: 
+TimeoutError: Page.screenshot: Timeout 30000ms exceeded.
+Call log:
+  - taking page screenshot
+  - waiting for fonts to load...
+)
+  captured  https://snipesusa.com/
+  captured  http://snipesusa.com/
+  captured  https://footlocker.com/category/sport/running.html
+  captured  https://footlocker.com/en/category/collection/trending
+  captured  https://footlocker.com/category/shoes/nike/air-force-1.html
+  captured  https://footlocker.com/en/category/collection/court-classics
+  captured  https://footlocker.com/category/brands/on.html
+  captured  https://footlocker.com/product/~/00151181.html
+  captured  https://footlocker.com/product/~/00D9JBKO.html
+  captured  https://footlocker.com/product/~/10256256.html
+landing goto failed for https://jdsports.com/: Page.goto: Timeout 45000ms exceeded.
+Call log:
+  - navigating to "https://jdsports.com/", waiting until "domcontentloaded"
+
+  skip https://jdsports.com/ (goto failed: TimeoutError: Page.goto: Timeout 
+45000ms exceeded.
+Call log:
+  - navigating to "https://jdsports.com/", waiting until "domcontentloaded"
+)
+ Brand          Selected  Captured  Blocked/err 
+ Champs Sports         8         7            1 
+ SNIPES USA            2         2            0 
+ Foot Locker           8         8            0 
+ JD Sports             1         0            1 
+next: intel analyze-creatives  (analyzes the new landing screenshots)

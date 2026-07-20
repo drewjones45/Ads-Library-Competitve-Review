@@ -469,6 +469,70 @@ def _migrate_analytics_tables(conn: sqlite3.Connection) -> None:
     """)
 
 
+def _migrate_owned_perf_tables(conn: sqlite3.Connection) -> None:
+    """Create the owned-ad-account performance tables. Additive + idempotent.
+
+    These back the Meta owned-account feature: first-party spend/ROAS joined to
+    creative. Keyed on `platform_ad_id` — the ad account's native `ad.id` — which
+    is NOT the same identifier as the Ad Library's `ad_archive_id`, so these
+    tables never join to scraped competitor ads. The owned ads themselves live in
+    the normal `ads`/`creatives` tables under source='meta_owned'; only the
+    account-specific metadata and the metrics live here.
+    """
+    conn.executescript("""
+    -- One row per owned ad: account/campaign placement + creative classification.
+    -- `creative_class` is load-bearing: 'dpa' ads have no fixed creative to look
+    -- at, so they must be excluded from any vision-attribute rollup.
+    CREATE TABLE IF NOT EXISTS owned_ads (
+      platform_ad_id TEXT PRIMARY KEY,       -- ad account's native ad.id
+      competitor_id TEXT REFERENCES competitors(id),
+      account_id TEXT,
+      account_name TEXT,
+      ad_db_id INTEGER REFERENCES ads(id),   -- link into the shared ads table
+      ad_name TEXT,
+      campaign_id TEXT,
+      campaign_name TEXT,
+      adset_id TEXT,
+      adset_name TEXT,
+      creative_id TEXT,
+      object_type TEXT,
+      creative_class TEXT,                   -- analyzable | dpa | no_asset
+      title TEXT,
+      body TEXT,
+      cta_type TEXT,
+      link_url TEXT,
+      product_set_id TEXT,
+      effective_object_story_id TEXT,
+      created_time TEXT,
+      raw_json TEXT,
+      ingested_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_owned_ads_comp ON owned_ads(competitor_id);
+    CREATE INDEX IF NOT EXISTS idx_owned_ads_class ON owned_ads(creative_class);
+    CREATE INDEX IF NOT EXISTS idx_owned_ads_account ON owned_ads(account_id);
+
+    -- Metrics per ad per reporting window. Re-running the same window overwrites
+    -- rather than double-counting, so ingest is safely repeatable.
+    CREATE TABLE IF NOT EXISTS ad_performance (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      platform_ad_id TEXT NOT NULL,
+      competitor_id TEXT,
+      account_id TEXT,
+      date_start TEXT,
+      date_stop TEXT,
+      impressions REAL, spend REAL, clicks REAL,
+      ctr REAL, cpc REAL, cpm REAL, reach REAL, frequency REAL,
+      link_clicks REAL, purchases REAL, revenue REAL, roas REAL,
+      thruplays REAL, video_p25 REAL, video_p50 REAL, video_p75 REAL, video_p100 REAL,
+      extra_json TEXT,
+      fetched_at TEXT,
+      UNIQUE(platform_ad_id, date_start, date_stop)
+    );
+    CREATE INDEX IF NOT EXISTS idx_ad_perf_comp ON ad_performance(competitor_id);
+    CREATE INDEX IF NOT EXISTS idx_ad_perf_ad ON ad_performance(platform_ad_id);
+    """)
+
+
 @contextmanager
 def connect(db_path: Path | None = None) -> Iterator[sqlite3.Connection]:
     p = Path(db_path or DB_PATH)
@@ -482,6 +546,7 @@ def connect(db_path: Path | None = None) -> Iterator[sqlite3.Connection]:
     _migrate_ads_table(conn)
     _migrate_source_column(conn)
     _migrate_analytics_tables(conn)
+    _migrate_owned_perf_tables(conn)
     conn.commit()
     try:
         yield conn
@@ -1001,3 +1066,96 @@ def replace_segment_analytics(
         )
         n += 1
     return n
+
+
+# ----------------------------------------------------------------------------
+# Owned Meta ad-account performance (first-party spend/ROAS joined to creative)
+# ----------------------------------------------------------------------------
+
+def upsert_owned_ad(
+    conn: sqlite3.Connection,
+    *,
+    platform_ad_id: str,
+    competitor_id: str | None,
+    account_id: str,
+    account_name: str | None,
+    ad_db_id: int | None,
+    meta: dict[str, Any],
+) -> None:
+    """Store one owned ad's account/campaign placement + creative classification.
+
+    Idempotent on `platform_ad_id` so re-ingesting a window refreshes metadata
+    (creative_class in particular can change if an ad is edited) rather than
+    duplicating.
+    """
+    conn.execute(
+        "INSERT INTO owned_ads(platform_ad_id, competitor_id, account_id, account_name, "
+        "  ad_db_id, ad_name, campaign_id, campaign_name, adset_id, adset_name, "
+        "  creative_id, object_type, creative_class, title, body, cta_type, link_url, "
+        "  product_set_id, effective_object_story_id, created_time, raw_json, ingested_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+        "ON CONFLICT(platform_ad_id) DO UPDATE SET "
+        "  competitor_id=excluded.competitor_id, account_id=excluded.account_id, "
+        "  account_name=excluded.account_name, ad_db_id=COALESCE(excluded.ad_db_id, owned_ads.ad_db_id), "
+        "  ad_name=excluded.ad_name, campaign_id=excluded.campaign_id, "
+        "  campaign_name=excluded.campaign_name, adset_id=excluded.adset_id, "
+        "  adset_name=excluded.adset_name, creative_id=excluded.creative_id, "
+        "  object_type=excluded.object_type, creative_class=excluded.creative_class, "
+        "  title=excluded.title, body=excluded.body, cta_type=excluded.cta_type, "
+        "  link_url=excluded.link_url, product_set_id=excluded.product_set_id, "
+        "  effective_object_story_id=excluded.effective_object_story_id, "
+        "  created_time=excluded.created_time, raw_json=excluded.raw_json, "
+        "  ingested_at=excluded.ingested_at",
+        (
+            platform_ad_id, competitor_id, account_id, account_name, ad_db_id,
+            meta.get("ad_name"), meta.get("campaign_id"), meta.get("campaign_name"),
+            meta.get("adset_id"), meta.get("adset_name"), meta.get("creative_id"),
+            meta.get("object_type"), meta.get("creative_class"), meta.get("title"),
+            meta.get("body"), meta.get("cta_type"), meta.get("link_url"),
+            meta.get("product_set_id"), meta.get("effective_object_story_id"),
+            meta.get("created_time"),
+            json.dumps(meta.get("raw")) if meta.get("raw") else None,
+            utcnow(),
+        ),
+    )
+
+
+def upsert_ad_performance(
+    conn: sqlite3.Connection,
+    *,
+    competitor_id: str | None,
+    account_id: str,
+    row: dict[str, Any],
+) -> None:
+    """Store metrics for one ad in one reporting window.
+
+    Unique on (platform_ad_id, date_start, date_stop): re-running the same window
+    overwrites in place, so repeated ingests never double-count spend.
+    """
+    conn.execute(
+        "INSERT INTO ad_performance(platform_ad_id, competitor_id, account_id, "
+        "  date_start, date_stop, impressions, spend, clicks, ctr, cpc, cpm, reach, "
+        "  frequency, link_clicks, purchases, revenue, roas, thruplays, "
+        "  video_p25, video_p50, video_p75, video_p100, extra_json, fetched_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+        "ON CONFLICT(platform_ad_id, date_start, date_stop) DO UPDATE SET "
+        "  competitor_id=excluded.competitor_id, account_id=excluded.account_id, "
+        "  impressions=excluded.impressions, spend=excluded.spend, clicks=excluded.clicks, "
+        "  ctr=excluded.ctr, cpc=excluded.cpc, cpm=excluded.cpm, reach=excluded.reach, "
+        "  frequency=excluded.frequency, link_clicks=excluded.link_clicks, "
+        "  purchases=excluded.purchases, revenue=excluded.revenue, roas=excluded.roas, "
+        "  thruplays=excluded.thruplays, video_p25=excluded.video_p25, "
+        "  video_p50=excluded.video_p50, video_p75=excluded.video_p75, "
+        "  video_p100=excluded.video_p100, extra_json=excluded.extra_json, "
+        "  fetched_at=excluded.fetched_at",
+        (
+            row.get("platform_ad_id"), competitor_id, account_id,
+            row.get("date_start"), row.get("date_stop"),
+            row.get("impressions"), row.get("spend"), row.get("clicks"),
+            row.get("ctr"), row.get("cpc"), row.get("cpm"), row.get("reach"),
+            row.get("frequency"), row.get("link_clicks"), row.get("purchases"),
+            row.get("revenue"), row.get("roas"), row.get("thruplays"),
+            row.get("video_p25"), row.get("video_p50"), row.get("video_p75"),
+            row.get("video_p100"), row.get("extra_json"), utcnow(),
+        ),
+    )

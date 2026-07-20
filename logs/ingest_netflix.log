@@ -1,0 +1,10 @@
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+                                Ingestion report                                
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┓
+┃ competitor ┃ source     ┃ ok ┃ changed ┃ sev  ┃ new_ads ┃ offers ┃ summary   ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━┩
+│ netflix    │ website|h… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+│ netflix    │ meta_ads|… │ ✓  │ yes     │ 1.00 │ 107     │ 0      │ first     │
+│            │            │    │         │      │         │        │ observat… │
+└────────────┴────────────┴────┴─────────┴──────┴─────────┴────────┴───────────┘

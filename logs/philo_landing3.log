@@ -1,0 +1,24 @@
+  captured  http://hulu.com/
+  captured  https://netflix.com/
+  captured  https://netflix.com/tudum/articles/vacation-romance-movies
+  captured  https://netflix.com/tudum/articles/best-romantic-comedies-to-watch
+  captured  
+https://netflix.com/tudum/articles/shows-movies-like-little-house-on-the-prairie
+  captured  
+https://netflix.com/tudum/articles/thriller-book-adaptations-movies-shows
+  captured  https://netflix.com/tudum/articles/shows-based-on-books-netflix
+  captured  https://paramountplus.com/
+  captured  https://peacocktv.com/
+  captured  https://peacocktv.com/collections/bravo
+  captured  https://join.frndlytv.com/
+  captured  https://frndlytv.com/
+  captured  https://try.frndlytv.com/
+  captured  https://sling.com/
+ Brand           Selected  Captured  Blocked/err 
+ Hulu + Live TV         1         1            0 
+ Netflix                6         6            0 
+ Paramount+             1         1            0 
+ Peacock                2         2            0 
+ Frndly TV              3         3            0 
+ Sling TV               1         1            0 
+next: intel analyze-creatives  (analyzes the new landing screenshots)

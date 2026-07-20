@@ -45,6 +45,10 @@ ASSET_TYPE_TO_CONTEXT = {
     "landing_page_image": "landing_page",
     "text_ad": "google_text_ad",
     "tv_spot": "tv_ad",
+    # Owned-account lane: a rendered screenshot of the ad exactly as served
+    # (creative + copy + social proof composited). Same analysis schema as a
+    # scraped meta ad — the surrounding Facebook chrome is the only difference.
+    "ad_preview": "meta_ad",
 }
 
 

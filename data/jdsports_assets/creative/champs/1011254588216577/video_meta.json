@@ -1,0 +1,32 @@
+{
+  "duration_sec": 4.1,
+  "width": 360,
+  "height": 360,
+  "has_audio": false,
+  "frames": [
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1011254588216577/frame_00_t00820.jpg",
+      "t_sec": 0.82,
+      "idx": 0
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1011254588216577/frame_01_t01640.jpg",
+      "t_sec": 1.64,
+      "idx": 1
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1011254588216577/frame_02_t02460.jpg",
+      "t_sec": 2.46,
+      "idx": 2
+    },
+    {
+      "path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1011254588216577/frame_03_t03280.jpg",
+      "t_sec": 3.28,
+      "idx": 3
+    }
+  ],
+  "transcript_full": null,
+  "transcript_quality": "skipped",
+  "scraped_at": "2026-07-20T02:20:25+00:00",
+  "video_path": "/Users/andrewjones/Documents/Ads Library Competitve Review/data/jdsports_assets/creative/champs/1011254588216577/video.mp4"
+}

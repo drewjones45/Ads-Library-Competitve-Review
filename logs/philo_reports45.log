@@ -1,0 +1,2670 @@
+[1m[1/9] preflight (PHILO deployment)[0m
+[2m────────────────────────────────────────────────────────────[0m
+[32m  ✓ venv present[0m
+[32m  ✓ INTEL_DB_PATH          = /Users/andrewjones/Documents/Ads Library Competitve Review/data/philo.db[0m
+[32m  ✓ INTEL_DATA_DIR         = /Users/andrewjones/Documents/Ads Library Competitve Review/data/philo_assets[0m
+[32m  ✓ INTEL_COMPETITORS_FILE = /Users/andrewjones/Documents/Ads Library Competitve Review/config/competitors_philo.yaml[0m
+[33m  ⚠ ANTHROPIC_API_KEY missing — vision analysis runs via Claude Code subagents (see header)[0m
+[32m  ✓ META_AD_LIBRARY_ACCESS_TOKEN set[0m
+[32m  ✓ writing reports to: reports/philo/2026-07-14/[0m
+
+[1m[2/9] init db (philo.db)[0m
+[2m────────────────────────────────────────────────────────────[0m
+ok registered 7 competitors
+  - philo (Philo) — 3 sources
+  - frndly (Frndly TV) — 2 sources
+  - sling (Sling TV) — 2 sources
+  - fubo (Fubo) — 2 sources
+  - hulu (Hulu + Live TV) — 2 sources
+  - amcplus (AMC+) — 2 sources
+  - youtube_tv (YouTube TV) — 1 sources
+
+[1m[3/9] ingest[0m
+[2m────────────────────────────────────────────────────────────[0m
+[33m  skipped (--skip-ingest)[0m
+
+[1m[4/9] capture landing pages[0m
+[2m────────────────────────────────────────────────────────────[0m
+[33m  skipped (--skip-ingest)[0m
+
+[1m[5/9] vision-analyze creatives[0m
+[2m────────────────────────────────────────────────────────────[0m
+[33m  no ANTHROPIC_API_KEY — run vision analysis via Claude Code subagents[0m
+[33m  (writes creatives.analysis_json) BEFORE the readout/dashboard steps.[0m
+
+[1m[6/9] per-brand creative readouts[0m
+[2m────────────────────────────────────────────────────────────[0m
+                       Creative readout — AMC+ (amcplus)                        
+
+Window: ads first_seen in last 45 day(s).                                       
+
+ • Total analyzed creatives: 238                                                
+ • Net new (in window): 238                                                     
+
+Net-new creatives in window                                                     
+
+ • ad 864095512827359 — AMC+ promotes Anne Rice's The Vampire Lestat with       
+   high-contrast black-and-white key art and a hot-pink title lockup driving    
+   tune-in for all-                                                             
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/amcplus/864095512827359/image_0.jpg     
+ • ad 1983884068976157 — AMC+ promotes Anne Rice's The Vampire Lestat with a    
+   bloody cinematic key-art poster and an 'ALL NEW SUNDAYS 9P / EXCLUSIVELY ON  
+   AMC+' tune-i                                                                 
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/amcplus/1983884068976157/image_0.jpg    
+ • ad 1738610733941141 — AMC+ opens on an eerie, empty checkerboard-tiled       
+   corridor with a partially animated white title card, using atmosphere and    
+   mystery to tease                                                             
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/amcplus/1738610733941141/image_0.jpg    
+ • ad 1738610733941141 — AMC+ runs a polished horror trailer for The Mortuary   
+   Assistant with persistent Shudder | AMC+ co-branding to drive streaming      
+   sign-ups.                                                                    
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/amcplus/1738610733941141/video.mp4      
+ • ad 1548685063476261 — AMC+ runs an unbranded, textless vertical cinematic    
+   still of a blurred concert crowd, leaning purely on mood and atmosphere      
+   rather than any                                                              
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/amcplus/1548685063476261/image_0.jpg    
+ • ad 1548685063476261 — AMC+ runs a cinematic vertical trailer for Anne Rice's 
+   The Vampire Lestat, positioning it as part of Anne Rice's Immortal Universe  
+   and closi                                                                    
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/amcplus/1548685063476261/video.mp4      
+ • ad 1666431881324032 — AMC+ runs a subtitled scene clip from Anne Rice's The  
+   Vampire Lestat as a narrative show promo with AMC/AMC+ co-branding.          
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/amcplus/1666431881324032/image_0.jpg    
+ • ad 1666431881324032 — AMC+ promotes Anne Rice's The Vampire Lestat with a    
+   subtitled cast-commentary clip cut over series footage, branded with AMC and 
+   AMC+ bugs.                                                                   
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/amcplus/1666431881324032/video.mp4      
+ • ad 2171887983668186 — AMC+ promotes the horror series Tales from the Crypt on
+   Shudder with a Crypt Keeper key-art card and a STREAM NOW call to action.    
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/amcplus/2171887983668186/image_0.jpg    
+ • ad 4144264992530759 — AMC+ runs an atmospheric vertical scene still from Anne
+   Rice's The Vampire Lestat with only a corner title lockup and AMC/AMC+ logos,
+   sellin                                                                       
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/amcplus/4144264992530759/image_0.jpg    
+ • … and 228 more                                                               
+
+Attribute distribution (all analyzed)                                           
+
+photography_style (n=238)                                                       
+
+ • cinematic_still: 169  (71%)                                                  
+ • lifestyle: 45  (19%)                                                         
+ • screenshot: 16  (7%)                                                         
+ • illustration: 4  (2%)                                                        
+ • studio: 4  (2%)                                                              
+
+production_style (n=238)                                                        
+
+ • polished_brand: 175  (74%)                                                   
+ • ugc_creator_style: 34  (14%)                                                 
+ • graphic_design: 28  (12%)                                                    
+ • stock: 1  (0%)                                                               
+
+product_emphasis (n=238)                                                        
+
+ • lifestyle_forward: 128  (54%)                                                
+ • product_forward: 63  (26%)                                                   
+ • balanced: 33  (14%)                                                          
+ • offer_forward: 14  (6%)                                                      
+
+hook_style (n=238)                                                              
+
+ • curiosity: 89  (37%)                                                         
+ • narrative: 66  (28%)                                                         
+ • aesthetic: 50  (21%)                                                         
+ • offer: 14  (6%)                                                              
+ • testimonial: 10  (4%)                                                        
+ • shock: 9  (4%)                                                               
+
+emotional_vs_rational (n=238)                                                   
+
+ • emotional: 216  (91%)                                                        
+ • mixed: 22  (9%)                                                              
+
+aspect_ratio_guess (n=238)                                                      
+
+ • 9:16: 147  (62%)                                                             
+ • 4:5: 79  (33%)                                                               
+ • 1:1: 9  (4%)                                                                 
+ • 16:9: 3  (1%)                                                                
+
+background_color (n=238)                                                        
+
+ • black: 32  (13%)                                                             
+ • dark navy: 28  (12%)                                                         
+ • warm brown: 22  (9%)                                                         
+ • dark blue: 16  (7%)                                                          
+ • red: 12  (5%)                                                                
+ • dark brown: 11  (5%)                                                         
+
+model_gender (n=238)                                                            
+
+ • male: 69  (29%)                                                              
+ • mixed: 63  (26%)                                                             
+ • female: 59  (25%)                                                            
+ • none: 47  (20%)                                                              
+
+product_in_use (n=238)                                                          
+
+ • n/a: 238  (100%)                                                             
+
+creative_context (n=238)                                                        
+
+ • meta_ad: 238  (100%)                                                         
+
+product_grouping (n=238)                                                        
+
+ • single: 162  (68%)                                                           
+ • n/a: 54  (23%)                                                               
+ • multi: 22  (9%)                                                              
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 182  (76%)                                                             
+ • false: 56  (24%)                                                             
+
+before_after_present (true / false / unknown)                                   
+
+ • false: 238  (100%)                                                           
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 238  (100%)                                                         
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 238  (100%)                                                         
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 238  (100%)                                                         
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 204  (86%)                                                             
+ • false: 34  (14%)                                                             
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 29  (12%)                                                              
+ • false: 209  (88%)                                                            
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 202  (85%)                                                             
+ • false: 36  (15%)                                                             
+
+products_visible (top values across 238 creatives)                              
+
+ • amc+: 110                                                                    
+ • anne rice's the vampire lestat: 96                                           
+ • amc+ streaming service: 81                                                   
+ • amc: 35                                                                      
+ • anne rice's immortal universe: 18                                            
+ • shudder: 16                                                                  
+ • tales from the crypt: 10                                                     
+ • the walking dead: 10                                                         
+
+key_features (top values across 238 creatives)                                  
+
+ • brand_logo: 184                                                              
+ • show_artwork: 170                                                            
+ • model_present: 119                                                           
+ • lifestyle_setting: 69                                                        
+ • creator_face: 47                                                             
+ • text_only_card: 30                                                           
+ • price_callout: 14                                                            
+ • channel_logos: 12                                                            
+
+value_props (top values across 238 creatives)                                   
+
+ • novelty: 170                                                                 
+ • exclusivity: 149                                                             
+ • quality: 126                                                                 
+ • selection: 38                                                                
+ • social_proof: 28                                                             
+ • price: 15                                                                    
+
+seasonal_tags (top values across 238 creatives)                                 
+
+ • halloween: 13                                                                
+
+Distribution among net-new only                                                 
+
+photography_style (n=238)                                                       
+
+ • cinematic_still: 169  (71%)                                                  
+ • lifestyle: 45  (19%)                                                         
+ • screenshot: 16  (7%)                                                         
+ • illustration: 4  (2%)                                                        
+ • studio: 4  (2%)                                                              
+
+production_style (n=238)                                                        
+
+ • polished_brand: 175  (74%)                                                   
+ • ugc_creator_style: 34  (14%)                                                 
+ • graphic_design: 28  (12%)                                                    
+ • stock: 1  (0%)                                                               
+
+product_emphasis (n=238)                                                        
+
+ • lifestyle_forward: 128  (54%)                                                
+ • product_forward: 63  (26%)                                                   
+ • balanced: 33  (14%)                                                          
+ • offer_forward: 14  (6%)                                                      
+
+hook_style (n=238)                                                              
+
+ • curiosity: 89  (37%)                                                         
+ • narrative: 66  (28%)                                                         
+ • aesthetic: 50  (21%)                                                         
+ • offer: 14  (6%)                                                              
+ • testimonial: 10  (4%)                                                        
+ • shock: 9  (4%)                                                               
+
+emotional_vs_rational (n=238)                                                   
+
+ • emotional: 216  (91%)                                                        
+ • mixed: 22  (9%)                                                              
+
+aspect_ratio_guess (n=238)                                                      
+
+ • 9:16: 147  (62%)                                                             
+ • 4:5: 79  (33%)                                                               
+ • 1:1: 9  (4%)                                                                 
+ • 16:9: 3  (1%)                                                                
+
+background_color (n=238)                                                        
+
+ • black: 32  (13%)                                                             
+ • dark navy: 28  (12%)                                                         
+ • warm brown: 22  (9%)                                                         
+ • dark blue: 16  (7%)                                                          
+ • red: 12  (5%)                                                                
+ • dark brown: 11  (5%)                                                         
+
+model_gender (n=238)                                                            
+
+ • male: 69  (29%)                                                              
+ • mixed: 63  (26%)                                                             
+ • female: 59  (25%)                                                            
+ • none: 47  (20%)                                                              
+
+product_in_use (n=238)                                                          
+
+ • n/a: 238  (100%)                                                             
+
+creative_context (n=238)                                                        
+
+ • meta_ad: 238  (100%)                                                         
+
+product_grouping (n=238)                                                        
+
+ • single: 162  (68%)                                                           
+ • n/a: 54  (23%)                                                               
+ • multi: 22  (9%)                                                              
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 182  (76%)                                                             
+ • false: 56  (24%)                                                             
+
+before_after_present (true / false / unknown)                                   
+
+ • false: 238  (100%)                                                           
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 238  (100%)                                                         
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 238  (100%)                                                         
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 238  (100%)                                                         
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 204  (86%)                                                             
+ • false: 34  (14%)                                                             
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 29  (12%)                                                              
+ • false: 209  (88%)                                                            
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 202  (85%)                                                             
+ • false: 36  (15%)                                                             
+
+products_visible (top values across 238 creatives)                              
+
+ • amc+: 110                                                                    
+ • anne rice's the vampire lestat: 96                                           
+ • amc+ streaming service: 81                                                   
+ • amc: 35                                                                      
+ • anne rice's immortal universe: 18                                            
+ • shudder: 16                                                                  
+ • tales from the crypt: 10                                                     
+ • the walking dead: 10                                                         
+
+key_features (top values across 238 creatives)                                  
+
+ • brand_logo: 184                                                              
+ • show_artwork: 170                                                            
+ • model_present: 119                                                           
+ • lifestyle_setting: 69                                                        
+ • creator_face: 47                                                             
+ • text_only_card: 30                                                           
+ • price_callout: 14                                                            
+ • channel_logos: 12                                                            
+
+value_props (top values across 238 creatives)                                   
+
+ • novelty: 170                                                                 
+ • exclusivity: 149                                                             
+ • quality: 126                                                                 
+ • selection: 38                                                                
+ • social_proof: 28                                                             
+ • price: 15                                                                    
+
+seasonal_tags (top values across 238 creatives)                                 
+
+ • halloween: 13                                                                
+
+Top dominant colors (pooled across all creatives)                               
+
+ • #f0e6d8 — 27 creative(s)                                                     
+ • #f2f2f2 — 19 creative(s)                                                     
+ • #3a2a22 — 18 creative(s)                                                     
+ • #d94f6a — 18 creative(s)                                                     
+ • #a8cbdd — 18 creative(s)                                                     
+ • #2a2a2a — 18 creative(s)                                                     
+
+wrote reports/philo/2026-07-14/by-brand/amcplus.md
+                     Creative readout — Frndly TV (frndly)                      
+
+Window: ads first_seen in last 45 day(s).                                       
+
+ • Total analyzed creatives: 86                                                 
+ • Net new (in window): 86                                                      
+
+Net-new creatives in window                                                     
+
+ • ad 1697315644306958 — Frndly TV UGC-style ad with man speaking directly to   
+   camera in casual setting                                                     
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/frndly/1697315644306958/image_0.jpg     
+ • ad 1697315644306958 — Frndly TV ad featuring UGC-style creator content with  
+   reality show personalities to drive sign-ups                                 
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/frndly/1697315644306958/video.mp4       
+ • ad 4151908255130620 — Frndly TV ad with AI-performed elderly man frustrated  
+   with TV using remote                                                         
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/frndly/4151908255130620/image_0.jpg     
+ • ad 4151908255130620 — Frndly TV showcases AI-generated diverse testimonial   
+   characters pitching channel variety and value                                
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/frndly/4151908255130620/video.mp4       
+ • ad 10061717823949958 — Frndly TV ad with AI-performed man in kitchen         
+   addressing TV frustrations                                                   
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/frndly/10061717823949958/image_0.jpg    
+ • ad 10061717823949958 — Frndly TV uses AI-generated diverse testimonial cast  
+   to pitch broad channel lineup and on-demand value                            
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/frndly/10061717823949958/video.mp4      
+ • ad 776709758398599 — Frndly TV ad showing 9 channel logos with 50+ channels  
+   starting at $6.99/month                                                      
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/frndly/776709758398599/image_0.jpg      
+ • ad 721884270755270 — Frndly TV ad featuring History Channel show Curse of Oak
+   Island with 50+ channels at $6.99                                            
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/frndly/721884270755270/image_0.jpg      
+ • ad 2225607171216880 — Frndly TV channel lineup ad showing 20+ channel logos  
+   on dark purple background                                                    
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/frndly/2225607171216880/image_0.jpg     
+ • ad 2225607171216880 — Frndly TV ad features older woman testimonial closing  
+   on price offer of 50+ channels at $6.99/month                                
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/frndly/2225607171216880/video.mp4       
+ • … and 76 more                                                                
+
+Attribute distribution (all analyzed)                                           
+
+photography_style (n=86)                                                        
+
+ • lifestyle: 25  (29%)                                                         
+ • cinematic_still: 16  (19%)                                                   
+ • studio: 13  (15%)                                                            
+ • mixed: 11  (13%)                                                             
+ • text_only: 7  (8%)                                                           
+ • illustration: 7  (8%)                                                        
+
+production_style (n=86)                                                         
+
+ • polished_brand: 52  (60%)                                                    
+ • graphic_design: 27  (31%)                                                    
+ • ugc_creator_style: 4  (5%)                                                   
+
+product_emphasis (n=86)                                                         
+
+ • balanced: 39  (45%)                                                          
+ • lifestyle_forward: 22  (26%)                                                 
+ • product_forward: 16  (19%)                                                   
+ • offer_forward: 6  (7%)                                                       
+
+hook_style (n=86)                                                               
+
+ • aesthetic: 23  (27%)                                                         
+ • offer: 20  (23%)                                                             
+ • narrative: 12  (14%)                                                         
+ • demo: 10  (12%)                                                              
+ • curiosity: 7  (8%)                                                           
+ • problem_solution: 6  (7%)                                                    
+
+emotional_vs_rational (n=86)                                                    
+
+ • mixed: 36  (42%)                                                             
+ • emotional: 32  (37%)                                                         
+ • rational: 15  (17%)                                                          
+
+aspect_ratio_guess (n=86)                                                       
+
+ • 1:1: 56  (65%)                                                               
+ • 16:9: 23  (27%)                                                              
+ • 9:16: 4  (5%)                                                                
+
+background_color (n=86)                                                         
+
+ • green: 57  (66%)                                                             
+ • n/a: 5  (6%)                                                                 
+ • light gray: 5  (6%)                                                          
+ • brown: 4  (5%)                                                               
+ • gradient: 4  (5%)                                                            
+ • black: 2  (2%)                                                               
+
+model_gender (n=86)                                                             
+
+ • mixed: 46  (53%)                                                             
+ • male: 18  (21%)                                                              
+ • not_visible: 10  (12%)                                                       
+ • none: 7  (8%)                                                                
+ • female: 2  (2%)                                                              
+
+product_in_use (n=86)                                                           
+
+ • n/a: 69  (80%)                                                               
+ • displayed_only: 8  (9%)                                                      
+ • in_use: 4  (5%)                                                              
+ • channel lineup displayed on a television screen mockup: 1  (1%)              
+ • man using TV remote in living room: 1  (1%)                                  
+
+creative_context (n=86)                                                         
+
+ • meta_ad: 83  (97%)                                                           
+ • landing_page: 3  (3%)                                                        
+
+product_grouping (n=86)                                                         
+
+ • single: 40  (47%)                                                            
+ • collection: 15  (17%)                                                        
+ • n/a: 14  (16%)                                                               
+ • multi: 14  (16%)                                                             
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 76  (88%)                                                              
+ • false: 7  (8%)                                                               
+ • unknown: 3  (3%)                                                             
+
+before_after_present (true / false / unknown)                                   
+
+ • false: 83  (97%)                                                             
+ • unknown: 3  (3%)                                                             
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 86  (100%)                                                          
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 86  (100%)                                                          
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 86  (100%)                                                          
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 71  (83%)                                                              
+ • false: 12  (14%)                                                             
+ • unknown: 3  (3%)                                                             
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 21  (24%)                                                              
+ • false: 62  (72%)                                                             
+ • unknown: 3  (3%)                                                             
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 66  (77%)                                                              
+ • false: 17  (20%)                                                             
+ • unknown: 3  (3%)                                                             
+
+products_visible (top values across 86 creatives)                               
+
+ • frndly tv: 36                                                                
+ • hallmark channel: 20                                                         
+ • live tv streaming subscription: 16                                           
+ • a&e: 14                                                                      
+ • streaming tv service: 12                                                     
+ • lifetime: 11                                                                 
+ • history: 11                                                                  
+ • live tv subscription: 7                                                      
+
+key_features (top values across 86 creatives)                                   
+
+ • brand_logo: 77                                                               
+ • model_present: 54                                                            
+ • channel_logos: 38                                                            
+ • show_artwork: 37                                                             
+ • price_callout: 34                                                            
+ • lifestyle_setting: 29                                                        
+ • price_visible: 23                                                            
+ • multi_product_collage: 16                                                    
+
+value_props (top values across 86 creatives)                                    
+
+ • price: 59                                                                    
+ • selection: 40                                                                
+ • novelty: 38                                                                  
+ • convenience: 36                                                              
+ • efficacy: 16                                                                 
+ • quality: 14                                                                  
+ • social_proof: 12                                                             
+ • exclusivity: 5                                                               
+
+seasonal_tags (top values across 86 creatives)                                  
+
+ • christmas: 3                                                                 
+ • christmas_in_july: 3                                                         
+ • spring: 2                                                                    
+ • holiday: 2                                                                   
+ • valentines: 1                                                                
+ • valentine's day: 1                                                           
+ • summer: 1                                                                    
+
+Distribution among net-new only                                                 
+
+photography_style (n=86)                                                        
+
+ • lifestyle: 25  (29%)                                                         
+ • cinematic_still: 16  (19%)                                                   
+ • studio: 13  (15%)                                                            
+ • mixed: 11  (13%)                                                             
+ • text_only: 7  (8%)                                                           
+ • illustration: 7  (8%)                                                        
+
+production_style (n=86)                                                         
+
+ • polished_brand: 52  (60%)                                                    
+ • graphic_design: 27  (31%)                                                    
+ • ugc_creator_style: 4  (5%)                                                   
+
+product_emphasis (n=86)                                                         
+
+ • balanced: 39  (45%)                                                          
+ • lifestyle_forward: 22  (26%)                                                 
+ • product_forward: 16  (19%)                                                   
+ • offer_forward: 6  (7%)                                                       
+
+hook_style (n=86)                                                               
+
+ • aesthetic: 23  (27%)                                                         
+ • offer: 20  (23%)                                                             
+ • narrative: 12  (14%)                                                         
+ • demo: 10  (12%)                                                              
+ • curiosity: 7  (8%)                                                           
+ • problem_solution: 6  (7%)                                                    
+
+emotional_vs_rational (n=86)                                                    
+
+ • mixed: 36  (42%)                                                             
+ • emotional: 32  (37%)                                                         
+ • rational: 15  (17%)                                                          
+
+aspect_ratio_guess (n=86)                                                       
+
+ • 1:1: 56  (65%)                                                               
+ • 16:9: 23  (27%)                                                              
+ • 9:16: 4  (5%)                                                                
+
+background_color (n=86)                                                         
+
+ • green: 57  (66%)                                                             
+ • n/a: 5  (6%)                                                                 
+ • light gray: 5  (6%)                                                          
+ • brown: 4  (5%)                                                               
+ • gradient: 4  (5%)                                                            
+ • black: 2  (2%)                                                               
+
+model_gender (n=86)                                                             
+
+ • mixed: 46  (53%)                                                             
+ • male: 18  (21%)                                                              
+ • not_visible: 10  (12%)                                                       
+ • none: 7  (8%)                                                                
+ • female: 2  (2%)                                                              
+
+product_in_use (n=86)                                                           
+
+ • n/a: 69  (80%)                                                               
+ • displayed_only: 8  (9%)                                                      
+ • in_use: 4  (5%)                                                              
+ • channel lineup displayed on a television screen mockup: 1  (1%)              
+ • man using TV remote in living room: 1  (1%)                                  
+
+creative_context (n=86)                                                         
+
+ • meta_ad: 83  (97%)                                                           
+ • landing_page: 3  (3%)                                                        
+
+product_grouping (n=86)                                                         
+
+ • single: 40  (47%)                                                            
+ • collection: 15  (17%)                                                        
+ • n/a: 14  (16%)                                                               
+ • multi: 14  (16%)                                                             
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 76  (88%)                                                              
+ • false: 7  (8%)                                                               
+ • unknown: 3  (3%)                                                             
+
+before_after_present (true / false / unknown)                                   
+
+ • false: 83  (97%)                                                             
+ • unknown: 3  (3%)                                                             
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 86  (100%)                                                          
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 86  (100%)                                                          
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 86  (100%)                                                          
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 71  (83%)                                                              
+ • false: 12  (14%)                                                             
+ • unknown: 3  (3%)                                                             
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 21  (24%)                                                              
+ • false: 62  (72%)                                                             
+ • unknown: 3  (3%)                                                             
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 66  (77%)                                                              
+ • false: 17  (20%)                                                             
+ • unknown: 3  (3%)                                                             
+
+products_visible (top values across 86 creatives)                               
+
+ • frndly tv: 36                                                                
+ • hallmark channel: 20                                                         
+ • live tv streaming subscription: 16                                           
+ • a&e: 14                                                                      
+ • streaming tv service: 12                                                     
+ • lifetime: 11                                                                 
+ • history: 11                                                                  
+ • live tv subscription: 7                                                      
+
+key_features (top values across 86 creatives)                                   
+
+ • brand_logo: 77                                                               
+ • model_present: 54                                                            
+ • channel_logos: 38                                                            
+ • show_artwork: 37                                                             
+ • price_callout: 34                                                            
+ • lifestyle_setting: 29                                                        
+ • price_visible: 23                                                            
+ • multi_product_collage: 16                                                    
+
+value_props (top values across 86 creatives)                                    
+
+ • price: 59                                                                    
+ • selection: 40                                                                
+ • novelty: 38                                                                  
+ • convenience: 36                                                              
+ • efficacy: 16                                                                 
+ • quality: 14                                                                  
+ • social_proof: 12                                                             
+ • exclusivity: 5                                                               
+
+seasonal_tags (top values across 86 creatives)                                  
+
+ • christmas: 3                                                                 
+ • christmas_in_july: 3                                                         
+ • spring: 2                                                                    
+ • holiday: 2                                                                   
+ • valentines: 1                                                                
+ • valentine's day: 1                                                           
+ • summer: 1                                                                    
+
+Top dominant colors (pooled across all creatives)                               
+
+ • #ffffff — 56 creative(s)                                                     
+ • #1a1a1a — 19 creative(s)                                                     
+ • #2db832 — 15 creative(s)                                                     
+ • #1dbf57 — 15 creative(s)                                                     
+ • #22c55e — 11 creative(s)                                                     
+ • #f5a623 — 7 creative(s)                                                      
+
+wrote reports/philo/2026-07-14/by-brand/frndly.md
+                         Creative readout — Fubo (fubo)                         
+
+Window: ads first_seen in last 45 day(s).                                       
+
+ • Total analyzed creatives: 42                                                 
+ • Net new (in window): 42                                                      
+
+Net-new creatives in window                                                     
+
+ • ad 1332270055665552 — Fubo TV ad promoting Mexico World Cup match schedule   
+   with Save $20 badge                                                          
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/fubo/1332270055665552/image_0.jpg       
+ • ad 27217959211221573 — Fubo Latino Copa Mundial FIFA 2026 watch live ad      
+   featuring soccer stars                                                       
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/fubo/27217959211221573/image_0.jpg      
+ • ad 843493118480469 — Fubo TV World Soccer 2026 every match live ad with Save 
+   $20 offer                                                                    
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/fubo/843493118480469/image_0.jpg        
+ • ad 1324862272943652 — Fubo TV FIFA World Cup 2026 all matches live June 11 to
+   July 19 ad                                                                   
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/fubo/1324862272943652/image_0.jpg       
+ • ad 1693121908680240 — Fubo Latino ad for Mexico vs South Korea World Cup     
+   match at $9.99/month                                                         
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/fubo/1693121908680240/image_0.jpg       
+ • ad 1242724767784143 — Overhead lifestyle scene of woman near birthday cake   
+   with no visible branding                                                     
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/fubo/1242724767784143/image_0.jpg       
+ • ad 1242724767784143 — fuboTV brand ambassador holds soccer ball on rooftop   
+   endorsing fubo for World Cup                                                 
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/fubo/1242724767784143/video.mp4         
+ • ad 979274928069768 — Fubo TV ad promoting Brazil World Cup match schedule    
+   with Save $20 badge                                                          
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/fubo/979274928069768/image_0.jpg        
+ • ad 1532413995191223 — Fubo Latino ad for Uruguay vs Spain World Cup match at 
+   $9.99/month                                                                  
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/fubo/1532413995191223/image_0.jpg       
+ • ad 1667752181146200 — Fubo Latino ad for Colombia World Cup match schedule at
+   $9.99/month                                                                  
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/fubo/1667752181146200/image_0.jpg       
+ • … and 32 more                                                                
+
+Attribute distribution (all analyzed)                                           
+
+photography_style (n=42)                                                        
+
+ • illustration: 16  (38%)                                                      
+ • text_only: 12  (29%)                                                         
+ • screenshot_ui: 4  (10%)                                                      
+ • mixed: 4  (10%)                                                              
+ • lifestyle: 4  (10%)                                                          
+ • cinematic_still: 2  (5%)                                                     
+
+production_style (n=42)                                                         
+
+ • polished_brand: 22  (52%)                                                    
+ • graphic_design: 17  (40%)                                                    
+ • ugc_creator_style: 3  (7%)                                                   
+
+product_emphasis (n=42)                                                         
+
+ • lifestyle_forward: 18  (43%)                                                 
+ • offer_forward: 18  (43%)                                                     
+ • product_forward: 6  (14%)                                                    
+
+hook_style (n=42)                                                               
+
+ • offer: 18  (43%)                                                             
+ • urgency: 17  (40%)                                                           
+ • demo: 3  (7%)                                                                
+ • testimonial: 2  (5%)                                                         
+ • unknown: 1  (2%)                                                             
+ • aesthetic: 1  (2%)                                                           
+
+emotional_vs_rational (n=42)                                                    
+
+ • rational: 32  (76%)                                                          
+ • emotional: 6  (14%)                                                          
+ • mixed: 4  (10%)                                                              
+
+aspect_ratio_guess (n=42)                                                       
+
+ • 1:1: 38  (90%)                                                               
+ • 9:16: 4  (10%)                                                               
+
+background_color (n=42)                                                         
+
+ • black: 34  (81%)                                                             
+ • red: 2  (5%)                                                                 
+ • multi: 1  (2%)                                                               
+ • brown: 1  (2%)                                                               
+ • n/a: 1  (2%)                                                                 
+ • blue: 1  (2%)                                                                
+
+model_gender (n=42)                                                             
+
+ • not_visible: 17  (40%)                                                       
+ • none: 16  (38%)                                                              
+ • male: 6  (14%)                                                               
+ • mixed: 2  (5%)                                                               
+ • female: 1  (2%)                                                              
+
+product_in_use (n=42)                                                           
+
+ • n/a: 41  (98%)                                                               
+ • in_use: 1  (2%)                                                              
+
+creative_context (n=42)                                                         
+
+ • meta_ad: 42  (100%)                                                          
+
+product_grouping (n=42)                                                         
+
+ • n/a: 22  (52%)                                                               
+ • single: 12  (29%)                                                            
+ • multi: 8  (19%)                                                              
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 40  (95%)                                                              
+ • false: 2  (5%)                                                               
+
+before_after_present (true / false / unknown)                                   
+
+ • false: 42  (100%)                                                            
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 42  (100%)                                                          
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 42  (100%)                                                          
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 42  (100%)                                                          
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 39  (93%)                                                              
+ • false: 3  (7%)                                                               
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 23  (55%)                                                              
+ • false: 19  (45%)                                                             
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 9  (21%)                                                               
+ • false: 33  (79%)                                                             
+
+products_visible (top values across 42 creatives)                               
+
+ • live tv streaming service: 12                                                
+ • fubo latino: 10                                                              
+ • streaming tv service: 8                                                      
+ • live sports streaming: 8                                                     
+ • fubo: 8                                                                      
+ • fox: 7                                                                       
+ • fs1: 7                                                                       
+ • telemundo: 6                                                                 
+
+key_features (top values across 42 creatives)                                   
+
+ • brand_logo: 41                                                               
+ • price_visible: 18                                                            
+ • discount_badge: 18                                                           
+ • price_callout: 18                                                            
+ • text_only_card: 17                                                           
+ • channel_logos: 14                                                            
+ • model_present: 9                                                             
+ • lifestyle_setting: 4                                                         
+
+value_props (top values across 42 creatives)                                    
+
+ • price: 36                                                                    
+ • convenience: 28                                                              
+ • selection: 17                                                                
+ • exclusivity: 12                                                              
+ • efficacy: 8                                                                  
+ • inclusivity: 2                                                               
+ • social_proof: 2                                                              
+ • novelty: 2                                                                   
+
+seasonal_tags (top values across 42 creatives)                                  
+
+ • summer: 9                                                                    
+ • june soccer fixture window: 2                                                
+ • world cup 2026: 1                                                            
+ • world cup / summer soccer schedule: 1                                        
+ • 2026 world soccer / world cup: 1                                             
+ • fifa world cup: 1                                                            
+ • world cup semifinals: 1                                                      
+
+Distribution among net-new only                                                 
+
+photography_style (n=42)                                                        
+
+ • illustration: 16  (38%)                                                      
+ • text_only: 12  (29%)                                                         
+ • screenshot_ui: 4  (10%)                                                      
+ • mixed: 4  (10%)                                                              
+ • lifestyle: 4  (10%)                                                          
+ • cinematic_still: 2  (5%)                                                     
+
+production_style (n=42)                                                         
+
+ • polished_brand: 22  (52%)                                                    
+ • graphic_design: 17  (40%)                                                    
+ • ugc_creator_style: 3  (7%)                                                   
+
+product_emphasis (n=42)                                                         
+
+ • lifestyle_forward: 18  (43%)                                                 
+ • offer_forward: 18  (43%)                                                     
+ • product_forward: 6  (14%)                                                    
+
+hook_style (n=42)                                                               
+
+ • offer: 18  (43%)                                                             
+ • urgency: 17  (40%)                                                           
+ • demo: 3  (7%)                                                                
+ • testimonial: 2  (5%)                                                         
+ • unknown: 1  (2%)                                                             
+ • aesthetic: 1  (2%)                                                           
+
+emotional_vs_rational (n=42)                                                    
+
+ • rational: 32  (76%)                                                          
+ • emotional: 6  (14%)                                                          
+ • mixed: 4  (10%)                                                              
+
+aspect_ratio_guess (n=42)                                                       
+
+ • 1:1: 38  (90%)                                                               
+ • 9:16: 4  (10%)                                                               
+
+background_color (n=42)                                                         
+
+ • black: 34  (81%)                                                             
+ • red: 2  (5%)                                                                 
+ • multi: 1  (2%)                                                               
+ • brown: 1  (2%)                                                               
+ • n/a: 1  (2%)                                                                 
+ • blue: 1  (2%)                                                                
+
+model_gender (n=42)                                                             
+
+ • not_visible: 17  (40%)                                                       
+ • none: 16  (38%)                                                              
+ • male: 6  (14%)                                                               
+ • mixed: 2  (5%)                                                               
+ • female: 1  (2%)                                                              
+
+product_in_use (n=42)                                                           
+
+ • n/a: 41  (98%)                                                               
+ • in_use: 1  (2%)                                                              
+
+creative_context (n=42)                                                         
+
+ • meta_ad: 42  (100%)                                                          
+
+product_grouping (n=42)                                                         
+
+ • n/a: 22  (52%)                                                               
+ • single: 12  (29%)                                                            
+ • multi: 8  (19%)                                                              
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 40  (95%)                                                              
+ • false: 2  (5%)                                                               
+
+before_after_present (true / false / unknown)                                   
+
+ • false: 42  (100%)                                                            
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 42  (100%)                                                          
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 42  (100%)                                                          
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 42  (100%)                                                          
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 39  (93%)                                                              
+ • false: 3  (7%)                                                               
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 23  (55%)                                                              
+ • false: 19  (45%)                                                             
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 9  (21%)                                                               
+ • false: 33  (79%)                                                             
+
+products_visible (top values across 42 creatives)                               
+
+ • live tv streaming service: 12                                                
+ • fubo latino: 10                                                              
+ • streaming tv service: 8                                                      
+ • live sports streaming: 8                                                     
+ • fubo: 8                                                                      
+ • fox: 7                                                                       
+ • fs1: 7                                                                       
+ • telemundo: 6                                                                 
+
+key_features (top values across 42 creatives)                                   
+
+ • brand_logo: 41                                                               
+ • price_visible: 18                                                            
+ • discount_badge: 18                                                           
+ • price_callout: 18                                                            
+ • text_only_card: 17                                                           
+ • channel_logos: 14                                                            
+ • model_present: 9                                                             
+ • lifestyle_setting: 4                                                         
+
+value_props (top values across 42 creatives)                                    
+
+ • price: 36                                                                    
+ • convenience: 28                                                              
+ • selection: 17                                                                
+ • exclusivity: 12                                                              
+ • efficacy: 8                                                                  
+ • inclusivity: 2                                                               
+ • social_proof: 2                                                              
+ • novelty: 2                                                                   
+
+seasonal_tags (top values across 42 creatives)                                  
+
+ • summer: 9                                                                    
+ • june soccer fixture window: 2                                                
+ • world cup 2026: 1                                                            
+ • world cup / summer soccer schedule: 1                                        
+ • 2026 world soccer / world cup: 1                                             
+ • fifa world cup: 1                                                            
+ • world cup semifinals: 1                                                      
+
+Top dominant colors (pooled across all creatives)                               
+
+ • #ffffff — 41 creative(s)                                                     
+ • #0d0d0d — 12 creative(s)                                                     
+ • #ff4500 — 12 creative(s)                                                     
+ • #e8401c — 11 creative(s)                                                     
+ • #3a3a3a — 11 creative(s)                                                     
+ • #0d0d12 — 10 creative(s)                                                     
+
+wrote reports/philo/2026-07-14/by-brand/fubo.md
+                    Creative readout — Hulu + Live TV (hulu)                    
+
+Window: ads first_seen in last 45 day(s).                                       
+
+ • Total analyzed creatives: 92                                                 
+ • Net new (in window): 92                                                      
+
+Net-new creatives in window                                                     
+
+ • ad 2060651601426736 — Hulu + Live TV advertises 95+ channels with free trial 
+   CTA on bright green background                                               
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/hulu/2060651601426736/image_0.jpg       
+ • ad 1335356668486325 — Hulu promotes Springsteen Deliver Me From Nowhere film 
+   with dramatic actor close-up                                                 
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/hulu/1335356668486325/image_0.jpg       
+ • ad 941904078173613 — Hulu ad promoting 9-1-1 TV show with dramatic space     
+   scene featuring female astronaut                                             
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/hulu/941904078173613/image_0.jpg        
+ • ad 741996424928454 — Hulu + Live TV vertical ad promoting 95+ channels with  
+   show thumbnails and free trial CTA                                           
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/hulu/741996424928454/image_0.jpg        
+ • ad 1640486270530185 — Hulu promotes Springsteen Deliver Me From Nowhere film 
+   with dramatic actor close-up                                                 
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/hulu/1640486270530185/image_0.jpg       
+ • ad 1262558726019419 — Hulu ad promoting FX series The Beauty with dramatic   
+   male portrait by Ryan Murphy                                                 
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/hulu/1262558726019419/image_0.jpg       
+ • ad 2279487132557623 — Hulu + Live TV promotes watching soccer live with      
+   multiple sports channel logos and free trial                                 
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/hulu/2279487132557623/image_0.jpg       
+ • ad 1911562446063798 — Hulu + Live TV vertical ad showing 95+ live channels   
+   grid with free trial button                                                  
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/hulu/1911562446063798/image_0.jpg       
+ • ad 970335968827955 — Hulu teases Paradise TV show with stark black background
+   and minimal text                                                             
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/hulu/970335968827955/image_0.jpg        
+ • ad 970335968827955 — Hulu promotes dramatic thriller series Paradise with    
+   cinematic close-up character footage                                         
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/hulu/970335968827955/video.mp4          
+ • … and 82 more                                                                
+
+Attribute distribution (all analyzed)                                           
+
+photography_style (n=92)                                                        
+
+ • cinematic_still: 36  (39%)                                                   
+ • lifestyle: 26  (28%)                                                         
+ • screenshot: 13  (14%)                                                        
+ • text_only: 6  (7%)                                                           
+ • mixed: 4  (4%)                                                               
+ • studio: 3  (3%)                                                              
+
+production_style (n=92)                                                         
+
+ • polished_brand: 76  (83%)                                                    
+ • graphic_design: 15  (16%)                                                    
+ • meme_graphic: 1  (1%)                                                        
+
+product_emphasis (n=92)                                                         
+
+ • lifestyle_forward: 58  (63%)                                                 
+ • product_forward: 22  (24%)                                                   
+ • offer_forward: 9  (10%)                                                      
+ • balanced: 3  (3%)                                                            
+
+hook_style (n=92)                                                               
+
+ • curiosity: 27  (29%)                                                         
+ • aesthetic: 26  (28%)                                                         
+ • narrative: 17  (18%)                                                         
+ • offer: 11  (12%)                                                             
+ • problem_solution: 6  (7%)                                                    
+ • meme: 5  (5%)                                                                
+
+emotional_vs_rational (n=92)                                                    
+
+ • emotional: 71  (77%)                                                         
+ • rational: 15  (16%)                                                          
+ • mixed: 6  (7%)                                                               
+
+aspect_ratio_guess (n=92)                                                       
+
+ • 1:1: 43  (47%)                                                               
+ • 9:16: 43  (47%)                                                              
+ • 4:5: 6  (7%)                                                                 
+
+background_color (n=92)                                                         
+
+ • black: 30  (33%)                                                             
+ • dark teal-black: 10  (11%)                                                   
+ • gray: 6  (7%)                                                                
+ • dark navy-black: 6  (7%)                                                     
+ • gradient: 4  (4%)                                                            
+ • green: 3  (3%)                                                               
+
+model_gender (n=92)                                                             
+
+ • mixed: 36  (39%)                                                             
+ • male: 20  (22%)                                                              
+ • female: 17  (18%)                                                            
+ • not_visible: 15  (16%)                                                       
+ • none: 4  (4%)                                                                
+
+product_in_use (n=92)                                                           
+
+ • n/a: 92  (100%)                                                              
+
+creative_context (n=92)                                                         
+
+ • meta_ad: 92  (100%)                                                          
+
+product_grouping (n=92)                                                         
+
+ • single: 54  (59%)                                                            
+ • n/a: 23  (25%)                                                               
+ • multi: 9  (10%)                                                              
+ • collection: 6  (7%)                                                          
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 90  (98%)                                                              
+ • false: 2  (2%)                                                               
+
+before_after_present (true / false / unknown)                                   
+
+ • false: 92  (100%)                                                            
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 92  (100%)                                                          
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 92  (100%)                                                          
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 92  (100%)                                                          
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 91  (99%)                                                              
+ • false: 1  (1%)                                                               
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 11  (12%)                                                              
+ • false: 81  (88%)                                                             
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 73  (79%)                                                              
+ • false: 19  (21%)                                                             
+
+products_visible (top values across 92 creatives)                               
+
+ • hulu: 55                                                                     
+ • paradise: 20                                                                 
+ • disney+: 18                                                                  
+ • hulu streaming service: 9                                                    
+ • disney+ streaming service: 6                                                 
+ • malcolm in the middle: life's still unfair: 6                                
+ • malcolm in the middle: 6                                                     
+ • scrubs: 5                                                                    
+
+key_features (top values across 92 creatives)                                   
+
+ • brand_logo: 92                                                               
+ • model_present: 57                                                            
+ • show_artwork: 54                                                             
+ • lifestyle_setting: 14                                                        
+ • text_only_card: 12                                                           
+ • price_callout: 11                                                            
+ • cta_button_in_image: 9                                                       
+ • multi_product_collage: 5                                                     
+
+value_props (top values across 92 creatives)                                    
+
+ • novelty: 75                                                                  
+ • exclusivity: 32                                                              
+ • quality: 31                                                                  
+ • selection: 22                                                                
+ • convenience: 21                                                              
+ • price: 16                                                                    
+ • social_proof: 6                                                              
+ • no_contract: 2                                                               
+
+seasonal_tags (top values across 92 creatives)                                  
+
+ • mlb season: 1                                                                
+
+awards_or_rankings (top values across 92 creatives)                             
+
+ • emmy award winner sterling k. brown: 1                                       
+ • emmy award winner julianne nicholson: 1                                      
+ • emmy award nominee shailene woodley: 1                                       
+
+Distribution among net-new only                                                 
+
+photography_style (n=92)                                                        
+
+ • cinematic_still: 36  (39%)                                                   
+ • lifestyle: 26  (28%)                                                         
+ • screenshot: 13  (14%)                                                        
+ • text_only: 6  (7%)                                                           
+ • mixed: 4  (4%)                                                               
+ • studio: 3  (3%)                                                              
+
+production_style (n=92)                                                         
+
+ • polished_brand: 76  (83%)                                                    
+ • graphic_design: 15  (16%)                                                    
+ • meme_graphic: 1  (1%)                                                        
+
+product_emphasis (n=92)                                                         
+
+ • lifestyle_forward: 58  (63%)                                                 
+ • product_forward: 22  (24%)                                                   
+ • offer_forward: 9  (10%)                                                      
+ • balanced: 3  (3%)                                                            
+
+hook_style (n=92)                                                               
+
+ • curiosity: 27  (29%)                                                         
+ • aesthetic: 26  (28%)                                                         
+ • narrative: 17  (18%)                                                         
+ • offer: 11  (12%)                                                             
+ • problem_solution: 6  (7%)                                                    
+ • meme: 5  (5%)                                                                
+
+emotional_vs_rational (n=92)                                                    
+
+ • emotional: 71  (77%)                                                         
+ • rational: 15  (16%)                                                          
+ • mixed: 6  (7%)                                                               
+
+aspect_ratio_guess (n=92)                                                       
+
+ • 1:1: 43  (47%)                                                               
+ • 9:16: 43  (47%)                                                              
+ • 4:5: 6  (7%)                                                                 
+
+background_color (n=92)                                                         
+
+ • black: 30  (33%)                                                             
+ • dark teal-black: 10  (11%)                                                   
+ • gray: 6  (7%)                                                                
+ • dark navy-black: 6  (7%)                                                     
+ • gradient: 4  (4%)                                                            
+ • green: 3  (3%)                                                               
+
+model_gender (n=92)                                                             
+
+ • mixed: 36  (39%)                                                             
+ • male: 20  (22%)                                                              
+ • female: 17  (18%)                                                            
+ • not_visible: 15  (16%)                                                       
+ • none: 4  (4%)                                                                
+
+product_in_use (n=92)                                                           
+
+ • n/a: 92  (100%)                                                              
+
+creative_context (n=92)                                                         
+
+ • meta_ad: 92  (100%)                                                          
+
+product_grouping (n=92)                                                         
+
+ • single: 54  (59%)                                                            
+ • n/a: 23  (25%)                                                               
+ • multi: 9  (10%)                                                              
+ • collection: 6  (7%)                                                          
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 90  (98%)                                                              
+ • false: 2  (2%)                                                               
+
+before_after_present (true / false / unknown)                                   
+
+ • false: 92  (100%)                                                            
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 92  (100%)                                                          
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 92  (100%)                                                          
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 92  (100%)                                                          
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 91  (99%)                                                              
+ • false: 1  (1%)                                                               
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 11  (12%)                                                              
+ • false: 81  (88%)                                                             
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 73  (79%)                                                              
+ • false: 19  (21%)                                                             
+
+products_visible (top values across 92 creatives)                               
+
+ • hulu: 55                                                                     
+ • paradise: 20                                                                 
+ • disney+: 18                                                                  
+ • hulu streaming service: 9                                                    
+ • disney+ streaming service: 6                                                 
+ • malcolm in the middle: life's still unfair: 6                                
+ • malcolm in the middle: 6                                                     
+ • scrubs: 5                                                                    
+
+key_features (top values across 92 creatives)                                   
+
+ • brand_logo: 92                                                               
+ • model_present: 57                                                            
+ • show_artwork: 54                                                             
+ • lifestyle_setting: 14                                                        
+ • text_only_card: 12                                                           
+ • price_callout: 11                                                            
+ • cta_button_in_image: 9                                                       
+ • multi_product_collage: 5                                                     
+
+value_props (top values across 92 creatives)                                    
+
+ • novelty: 75                                                                  
+ • exclusivity: 32                                                              
+ • quality: 31                                                                  
+ • selection: 22                                                                
+ • convenience: 21                                                              
+ • price: 16                                                                    
+ • social_proof: 6                                                              
+ • no_contract: 2                                                               
+
+seasonal_tags (top values across 92 creatives)                                  
+
+ • mlb season: 1                                                                
+
+awards_or_rankings (top values across 92 creatives)                             
+
+ • emmy award winner sterling k. brown: 1                                       
+ • emmy award winner julianne nicholson: 1                                      
+ • emmy award nominee shailene woodley: 1                                       
+
+Top dominant colors (pooled across all creatives)                               
+
+ • #ffffff — 50 creative(s)                                                     
+ • #000000 — 37 creative(s)                                                     
+ • #1ce783 — 25 creative(s)                                                     
+ • #1b2a33 — 16 creative(s)                                                     
+ • #0d1114 — 10 creative(s)                                                     
+ • #3d4a50 — 10 creative(s)                                                     
+
+wrote reports/philo/2026-07-14/by-brand/hulu.md
+                        Creative readout — Philo (philo)                        
+
+Window: ads first_seen in last 45 day(s).                                       
+
+ • Total analyzed creatives: 507                                                
+ • Net new (in window): 507                                                     
+
+Net-new creatives in window                                                     
+
+ • ad 1356883973168499 — Philo streaming promoted via UGC-style selfie video of 
+   woman addressing audience directly                                           
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/philo/1356883973168499/image_0.jpg      
+ • ad 1356883973168499 — Philo pairs a Love & Hip Hop Atlanta (MTV) clip with an
+   'Unlimited DVR' feature chip and a philo.tv sign-up CTA, with no price shown.
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/philo/1356883973168499/frame_00_t06010.j
+      pg                                                                        
+ • ad 1314461604130441 — Philo positions itself as cheapest live TV option      
+   versus Sling, Fubo, YouTubeTV, DirecTV, Hulu at $25/mo                       
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/philo/1314461604130441/image_0.jpg      
+ • ad 1685500099021382 — Philo streaming promoted via reality or unscripted show
+   close-up of woman speaking                                                   
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/philo/1685500099021382/image_0.jpg      
+ • ad 1685500099021382 — Philo runs a licensed Jersey Shore: Family Vacation    
+   (MTV) clip under a persistent 'Watch this on philo / Sign up now at philo.tv'
+   bar, with                                                                    
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/philo/1685500099021382/frame_00_t00000.j
+      pg                                                                        
+ • ad 1332572035422193 — Philo streaming promoted via moody TV show still with  
+   logo overlay of cabin night scene                                            
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/philo/1332572035422193/image_0.jpg      
+ • ad 1332572035422193 — Philo promotes Dutton Ranch show with cinematic western
+   imagery and celebrity cast credentials                                       
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/philo/1332572035422193/frame_00_t00000.j
+      pg                                                                        
+ • ad 2043514206586755 — Philo streaming service promoted via lifestyle video   
+   thumbnail of woman driving                                                   
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/philo/2043514206586755/image_0.jpg      
+ • ad 2043514206586755 — Philo promotes Tyler Perry's Sistas via dramatic show  
+   clips with feature callouts                                                  
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/philo/2043514206586755/video.mp4        
+ • ad 1008794205002330 — Philo streaming promoted via close-up reality or drama 
+   show still of young man                                                      
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/philo/1008794205002330/image_0.jpg      
+ • … and 497 more                                                               
+
+Attribute distribution (all analyzed)                                           
+
+photography_style (n=507)                                                       
+
+ • lifestyle: 90  (18%)                                                         
+ • cinematic_still: 76  (15%)                                                   
+ • text_only: 34  (7%)                                                          
+ • illustration: 24  (5%)                                                       
+ • mixed: 2  (0%)                                                               
+ • screenshot: 1  (0%)                                                          
+
+production_style (n=507)                                                        
+
+ • polished_brand: 158  (31%)                                                   
+ • ugc_creator_style: 40  (8%)                                                  
+ • graphic_design: 25  (5%)                                                     
+ • meme_graphic: 3  (1%)                                                        
+ • stock: 1  (0%)                                                               
+
+product_emphasis (n=507)                                                        
+
+ • lifestyle_forward: 98  (19%)                                                 
+ • product_forward: 65  (13%)                                                   
+ • offer_forward: 36  (7%)                                                      
+ • balanced: 28  (6%)                                                           
+
+hook_style (n=507)                                                              
+
+ • problem_solution: 159  (31%)                                                 
+ • offer: 92  (18%)                                                             
+ • aesthetic: 76  (15%)                                                         
+ • narrative: 68  (13%)                                                         
+ • unknown: 45  (9%)                                                            
+ • testimonial: 29  (6%)                                                        
+
+emotional_vs_rational (n=507)                                                   
+
+ • rational: 264  (52%)                                                         
+ • mixed: 126  (25%)                                                            
+ • emotional: 117  (23%)                                                        
+
+aspect_ratio_guess (n=507)                                                      
+
+ • 9:16: 207  (41%)                                                             
+ • 4:5: 13  (3%)                                                                
+ • 1:1: 7  (1%)                                                                 
+
+background_color (n=507)                                                        
+
+ • black: 175  (35%)                                                            
+ • beige: 24  (5%)                                                              
+ • brown: 7  (1%)                                                               
+ • dark gray: 7  (1%)                                                           
+ • pink: 4  (1%)                                                                
+ • off-white: 4  (1%)                                                           
+
+model_gender (n=507)                                                            
+
+ • female: 86  (17%)                                                            
+ • mixed: 73  (14%)                                                             
+ • not_visible: 28  (6%)                                                        
+ • none: 24  (5%)                                                               
+ • male: 16  (3%)                                                               
+
+product_in_use (n=507)                                                          
+
+ • n/a: 143  (28%)                                                              
+ • Philo streaming of MTV's Love & Hip Hop Atlanta: 18  (4%)                    
+ • Philo streaming of MTV's Jersey Shore: Family Vacation: 12  (2%)             
+ • Philo used to watch Tyler Perry's Sistas on BET: 10  (2%)                    
+ • Philo Essential live-TV app browsed on a wall-mounted TV and tablet: 8  (2%) 
+ • Philo used to watch the ALLBLK original film Deb is Boss: 8  (2%)            
+
+creative_context (n=507)                                                        
+
+ • google_text_ad: 280  (55%)                                                   
+ • meta_ad: 227  (45%)                                                          
+
+product_grouping (n=507)                                                        
+
+ • single: 112  (22%)                                                           
+ • n/a: 73  (14%)                                                               
+ • multi: 41  (8%)                                                              
+ • collection: 1  (0%)                                                          
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 164  (32%)                                                             
+ • false: 63  (12%)                                                             
+ • unknown: 280  (55%)                                                          
+
+before_after_present (true / false / unknown)                                   
+
+ • true: 5  (1%)                                                                
+ • false: 222  (44%)                                                            
+ • unknown: 280  (55%)                                                          
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 507  (100%)                                                         
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 507  (100%)                                                         
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 507  (100%)                                                         
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 195  (38%)                                                             
+ • false: 32  (6%)                                                              
+ • unknown: 280  (55%)                                                          
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 272  (54%)                                                             
+ • false: 235  (46%)                                                            
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 176  (35%)                                                             
+ • false: 51  (10%)                                                             
+ • unknown: 280  (55%)                                                          
+
+products_visible (top values across 507 creatives)                              
+
+ • philo: 107                                                                   
+ • mtv: 34                                                                      
+ • philo streaming service: 33                                                  
+ • love & hip hop atlanta: 21                                                   
+ • hbo max: 16                                                                  
+ • amc+: 16                                                                     
+ • discovery+: 16                                                               
+ • bet: 16                                                                      
+
+key_features (top values across 507 creatives)                                  
+
+ • brand_logo: 165                                                              
+ • model_present: 126                                                           
+ • channel_logos: 97                                                            
+ • lifestyle_setting: 94                                                        
+ • show_artwork: 84                                                             
+ • creator_face: 68                                                             
+ • price_callout: 53                                                            
+ • cta_button_in_image: 45                                                      
+
+value_props (top values across 507 creatives)                                   
+
+ • convenience: 327                                                             
+ • price: 316                                                                   
+ • selection: 274                                                               
+ • no_contract: 117                                                             
+ • novelty: 86                                                                  
+ • social_proof: 43                                                             
+ • quality: 38                                                                  
+ • exclusivity: 20                                                              
+
+awards_or_rankings (top values across 507 creatives)                            
+
+ • academy award nominee annette bening: 2                                      
+ • academy award nominee ed harris: 2                                           
+ • academy award nominee: 2                                                     
+
+Distribution among net-new only                                                 
+
+photography_style (n=507)                                                       
+
+ • lifestyle: 90  (18%)                                                         
+ • cinematic_still: 76  (15%)                                                   
+ • text_only: 34  (7%)                                                          
+ • illustration: 24  (5%)                                                       
+ • mixed: 2  (0%)                                                               
+ • screenshot: 1  (0%)                                                          
+
+production_style (n=507)                                                        
+
+ • polished_brand: 158  (31%)                                                   
+ • ugc_creator_style: 40  (8%)                                                  
+ • graphic_design: 25  (5%)                                                     
+ • meme_graphic: 3  (1%)                                                        
+ • stock: 1  (0%)                                                               
+
+product_emphasis (n=507)                                                        
+
+ • lifestyle_forward: 98  (19%)                                                 
+ • product_forward: 65  (13%)                                                   
+ • offer_forward: 36  (7%)                                                      
+ • balanced: 28  (6%)                                                           
+
+hook_style (n=507)                                                              
+
+ • problem_solution: 159  (31%)                                                 
+ • offer: 92  (18%)                                                             
+ • aesthetic: 76  (15%)                                                         
+ • narrative: 68  (13%)                                                         
+ • unknown: 45  (9%)                                                            
+ • testimonial: 29  (6%)                                                        
+
+emotional_vs_rational (n=507)                                                   
+
+ • rational: 264  (52%)                                                         
+ • mixed: 126  (25%)                                                            
+ • emotional: 117  (23%)                                                        
+
+aspect_ratio_guess (n=507)                                                      
+
+ • 9:16: 207  (41%)                                                             
+ • 4:5: 13  (3%)                                                                
+ • 1:1: 7  (1%)                                                                 
+
+background_color (n=507)                                                        
+
+ • black: 175  (35%)                                                            
+ • beige: 24  (5%)                                                              
+ • brown: 7  (1%)                                                               
+ • dark gray: 7  (1%)                                                           
+ • pink: 4  (1%)                                                                
+ • off-white: 4  (1%)                                                           
+
+model_gender (n=507)                                                            
+
+ • female: 86  (17%)                                                            
+ • mixed: 73  (14%)                                                             
+ • not_visible: 28  (6%)                                                        
+ • none: 24  (5%)                                                               
+ • male: 16  (3%)                                                               
+
+product_in_use (n=507)                                                          
+
+ • n/a: 143  (28%)                                                              
+ • Philo streaming of MTV's Love & Hip Hop Atlanta: 18  (4%)                    
+ • Philo streaming of MTV's Jersey Shore: Family Vacation: 12  (2%)             
+ • Philo used to watch Tyler Perry's Sistas on BET: 10  (2%)                    
+ • Philo Essential live-TV app browsed on a wall-mounted TV and tablet: 8  (2%) 
+ • Philo used to watch the ALLBLK original film Deb is Boss: 8  (2%)            
+
+creative_context (n=507)                                                        
+
+ • google_text_ad: 280  (55%)                                                   
+ • meta_ad: 227  (45%)                                                          
+
+product_grouping (n=507)                                                        
+
+ • single: 112  (22%)                                                           
+ • n/a: 73  (14%)                                                               
+ • multi: 41  (8%)                                                              
+ • collection: 1  (0%)                                                          
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 164  (32%)                                                             
+ • false: 63  (12%)                                                             
+ • unknown: 280  (55%)                                                          
+
+before_after_present (true / false / unknown)                                   
+
+ • true: 5  (1%)                                                                
+ • false: 222  (44%)                                                            
+ • unknown: 280  (55%)                                                          
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 507  (100%)                                                         
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 507  (100%)                                                         
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 507  (100%)                                                         
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 195  (38%)                                                             
+ • false: 32  (6%)                                                              
+ • unknown: 280  (55%)                                                          
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 272  (54%)                                                             
+ • false: 235  (46%)                                                            
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 176  (35%)                                                             
+ • false: 51  (10%)                                                             
+ • unknown: 280  (55%)                                                          
+
+products_visible (top values across 507 creatives)                              
+
+ • philo: 107                                                                   
+ • mtv: 34                                                                      
+ • philo streaming service: 33                                                  
+ • love & hip hop atlanta: 21                                                   
+ • hbo max: 16                                                                  
+ • amc+: 16                                                                     
+ • discovery+: 16                                                               
+ • bet: 16                                                                      
+
+key_features (top values across 507 creatives)                                  
+
+ • brand_logo: 165                                                              
+ • model_present: 126                                                           
+ • channel_logos: 97                                                            
+ • lifestyle_setting: 94                                                        
+ • show_artwork: 84                                                             
+ • creator_face: 68                                                             
+ • price_callout: 53                                                            
+ • cta_button_in_image: 45                                                      
+
+value_props (top values across 507 creatives)                                   
+
+ • convenience: 327                                                             
+ • price: 316                                                                   
+ • selection: 274                                                               
+ • no_contract: 117                                                             
+ • novelty: 86                                                                  
+ • social_proof: 43                                                             
+ • quality: 38                                                                  
+ • exclusivity: 20                                                              
+
+awards_or_rankings (top values across 507 creatives)                            
+
+ • academy award nominee annette bening: 2                                      
+ • academy award nominee ed harris: 2                                           
+ • academy award nominee: 2                                                     
+
+Top dominant colors (pooled across all creatives)                               
+
+ • #0d0d0d — 92 creative(s)                                                     
+ • #ffffff — 84 creative(s)                                                     
+ • #e6006e — 36 creative(s)                                                     
+ • #000000 — 28 creative(s)                                                     
+ • #0a0a0a — 25 creative(s)                                                     
+ • #e63875 — 24 creative(s)                                                     
+
+wrote reports/philo/2026-07-14/by-brand/philo.md
+                      Creative readout — Sling TV (sling)                       
+
+Window: ads first_seen in last 45 day(s).                                       
+
+ • Total analyzed creatives: 130                                                
+ • Net new (in window): 130                                                     
+
+Net-new creatives in window                                                     
+
+ • ad 2141016083415788 — Sling TV creator-style ad featuring smiling woman      
+   holding papers with Sling logo on chest                                      
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/sling/2141016083415788/image_0.jpg      
+ • ad 2141016083415788 — Sling TV UGC-style creator compares Sling favorably    
+   against YouTube TV                                                           
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/sling/2141016083415788/video.mp4        
+ • ad 1743620393467905 — Blurred gradient background image with no visible      
+   content or text, likely a video thumbnail frame                              
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/sling/1743620393467905/image_0.jpg      
+ • ad 1743620393467905 — Sling TV animation showcases sports channels and       
+   $19.99/mo price point                                                        
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/sling/1743620393467905/video.mp4        
+ • ad 1019071547527396 — Sling TV UGC-style ad with soccer coach creator hook   
+   about a message for parents                                                  
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/sling/1019071547527396/image_0.jpg      
+ • ad 1019071547527396 — Sling TV meme-style UGC: soccer coach character        
+   delivers humorous message for parents                                        
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/sling/1019071547527396/frame_00_t11260.j
+      pg                                                                        
+ • ad 1495671709020321 — Pastel gradient background image only, no visible      
+   content or text, likely video thumbnail frame                                
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/sling/1495671709020321/image_0.jpg      
+ • ad 1495671709020321 — Sling TV promotes FIFA World Cup 2026 live streaming on
+   FOX and FS1                                                                  
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/sling/1495671709020321/frame_00_t02000.j
+      pg                                                                        
+ • ad 26398808149794600 — Sling TV day pass offer showing ESPN CNN TNT and more 
+   channels starting at $4.99/day                                               
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/sling/26398808149794600/image_0.jpg     
+ • ad 2258243018249296 — Sling TV live news promotion with FOX News MSNBC CNN   
+   starting at $45.99/mo                                                        
+    • /Users/andrewjones/Documents/Ads Library Competitve                       
+      Review/data/philo_assets/creative/sling/2258243018249296/image_0.jpg      
+ • … and 120 more                                                               
+
+Attribute distribution (all analyzed)                                           
+
+photography_style (n=130)                                                       
+
+ • lifestyle: 39  (30%)                                                         
+ • illustration: 23  (18%)                                                      
+ • text_only: 22  (17%)                                                         
+ • ugc_creator_style: 9  (7%)                                                   
+ • mixed: 9  (7%)                                                               
+ • cinematic_still: 9  (7%)                                                     
+
+production_style (n=130)                                                        
+
+ • polished_brand: 69  (53%)                                                    
+ • graphic_design: 33  (25%)                                                    
+ • ugc_creator_style: 26  (20%)                                                 
+ • stock: 1  (1%)                                                               
+
+product_emphasis (n=130)                                                        
+
+ • product_forward: 45  (35%)                                                   
+ • lifestyle_forward: 36  (28%)                                                 
+ • offer_forward: 27  (21%)                                                     
+ • balanced: 21  (16%)                                                          
+
+hook_style (n=130)                                                              
+
+ • aesthetic: 32  (25%)                                                         
+ • demo: 27  (21%)                                                              
+ • offer: 25  (19%)                                                             
+ • testimonial: 15  (12%)                                                       
+ • unknown: 9  (7%)                                                             
+ • meme: 9  (7%)                                                                
+
+emotional_vs_rational (n=130)                                                   
+
+ • rational: 54  (42%)                                                          
+ • emotional: 47  (36%)                                                         
+ • mixed: 28  (22%)                                                             
+
+aspect_ratio_guess (n=130)                                                      
+
+ • 9:16: 116  (89%)                                                             
+ • 16:9: 11  (8%)                                                               
+ • 1:1: 2  (2%)                                                                 
+
+background_color (n=130)                                                        
+
+ • black: 39  (30%)                                                             
+ • gradient: 14  (11%)                                                          
+ • dark gray: 12  (9%)                                                          
+ • white: 9  (7%)                                                               
+ • beige: 7  (5%)                                                               
+ • teal: 5  (4%)                                                                
+
+model_gender (n=130)                                                            
+
+ • male: 49  (38%)                                                              
+ • not_visible: 27  (21%)                                                       
+ • none: 26  (20%)                                                              
+ • mixed: 20  (15%)                                                             
+ • female: 7  (5%)                                                              
+
+product_in_use (n=130)                                                          
+
+ • n/a: 88  (68%)                                                               
+ • displayed_only: 30  (23%)                                                    
+ • in_use: 6  (5%)                                                              
+ • Sling TV news lineup displayed on a living-room television: 2  (2%)          
+ • browsing a Sling channel/content grid: 2  (2%)                               
+ • watching live sport on a computer/TV while working from home: 1  (1%)        
+
+creative_context (n=130)                                                        
+
+ • meta_ad: 129  (99%)                                                          
+ • landing_page: 1  (1%)                                                        
+
+product_grouping (n=130)                                                        
+
+ • n/a: 68  (52%)                                                               
+ • single: 34  (26%)                                                            
+ • multi: 22  (17%)                                                             
+ • collection: 5  (4%)                                                          
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 91  (70%)                                                              
+ • false: 38  (29%)                                                             
+ • unknown: 1  (1%)                                                             
+
+before_after_present (true / false / unknown)                                   
+
+ • false: 129  (99%)                                                            
+ • unknown: 1  (1%)                                                             
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 130  (100%)                                                         
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 130  (100%)                                                         
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 130  (100%)                                                         
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 111  (85%)                                                             
+ • false: 18  (14%)                                                             
+ • unknown: 1  (1%)                                                             
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 28  (22%)                                                              
+ • false: 101  (78%)                                                            
+ • unknown: 1  (1%)                                                             
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 76  (58%)                                                              
+ • false: 53  (41%)                                                             
+ • unknown: 1  (1%)                                                             
+
+products_visible (top values across 130 creatives)                              
+
+ • sling tv: 49                                                                 
+ • streaming tv service: 39                                                     
+ • sling tv streaming service: 13                                               
+ • fs1: 10                                                                      
+ • cnn: 9                                                                       
+ • sling day pass: 8                                                            
+ • fox news: 8                                                                  
+ • fox: 8                                                                       
+
+key_features (top values across 130 creatives)                                  
+
+ • brand_logo: 94                                                               
+ • model_present: 52                                                            
+ • lifestyle_setting: 37                                                        
+ • price_visible: 30                                                            
+ • channel_logos: 28                                                            
+ • price_callout: 27                                                            
+ • creator_face: 24                                                             
+ • multi_product_collage: 22                                                    
+
+value_props (top values across 130 creatives)                                   
+
+ • convenience: 76                                                              
+ • price: 55                                                                    
+ • novelty: 34                                                                  
+ • selection: 34                                                                
+ • social_proof: 14                                                             
+ • exclusivity: 12                                                              
+ • efficacy: 9                                                                  
+ • no_contract: 8                                                               
+
+seasonal_tags (top values across 130 creatives)                                 
+
+ • summer: 18                                                                   
+ • world cup 2026: 6                                                            
+ • fifa world cup 2026: 3                                                       
+ • sports: 2                                                                    
+ • world cup: 1                                                                 
+ • fifa world cup: 1                                                            
+
+Distribution among net-new only                                                 
+
+photography_style (n=130)                                                       
+
+ • lifestyle: 39  (30%)                                                         
+ • illustration: 23  (18%)                                                      
+ • text_only: 22  (17%)                                                         
+ • ugc_creator_style: 9  (7%)                                                   
+ • mixed: 9  (7%)                                                               
+ • cinematic_still: 9  (7%)                                                     
+
+production_style (n=130)                                                        
+
+ • polished_brand: 69  (53%)                                                    
+ • graphic_design: 33  (25%)                                                    
+ • ugc_creator_style: 26  (20%)                                                 
+ • stock: 1  (1%)                                                               
+
+product_emphasis (n=130)                                                        
+
+ • product_forward: 45  (35%)                                                   
+ • lifestyle_forward: 36  (28%)                                                 
+ • offer_forward: 27  (21%)                                                     
+ • balanced: 21  (16%)                                                          
+
+hook_style (n=130)                                                              
+
+ • aesthetic: 32  (25%)                                                         
+ • demo: 27  (21%)                                                              
+ • offer: 25  (19%)                                                             
+ • testimonial: 15  (12%)                                                       
+ • unknown: 9  (7%)                                                             
+ • meme: 9  (7%)                                                                
+
+emotional_vs_rational (n=130)                                                   
+
+ • rational: 54  (42%)                                                          
+ • emotional: 47  (36%)                                                         
+ • mixed: 28  (22%)                                                             
+
+aspect_ratio_guess (n=130)                                                      
+
+ • 9:16: 116  (89%)                                                             
+ • 16:9: 11  (8%)                                                               
+ • 1:1: 2  (2%)                                                                 
+
+background_color (n=130)                                                        
+
+ • black: 39  (30%)                                                             
+ • gradient: 14  (11%)                                                          
+ • dark gray: 12  (9%)                                                          
+ • white: 9  (7%)                                                               
+ • beige: 7  (5%)                                                               
+ • teal: 5  (4%)                                                                
+
+model_gender (n=130)                                                            
+
+ • male: 49  (38%)                                                              
+ • not_visible: 27  (21%)                                                       
+ • none: 26  (20%)                                                              
+ • mixed: 20  (15%)                                                             
+ • female: 7  (5%)                                                              
+
+product_in_use (n=130)                                                          
+
+ • n/a: 88  (68%)                                                               
+ • displayed_only: 30  (23%)                                                    
+ • in_use: 6  (5%)                                                              
+ • Sling TV news lineup displayed on a living-room television: 2  (2%)          
+ • browsing a Sling channel/content grid: 2  (2%)                               
+ • watching live sport on a computer/TV while working from home: 1  (1%)        
+
+creative_context (n=130)                                                        
+
+ • meta_ad: 129  (99%)                                                          
+ • landing_page: 1  (1%)                                                        
+
+product_grouping (n=130)                                                        
+
+ • n/a: 68  (52%)                                                               
+ • single: 34  (26%)                                                            
+ • multi: 22  (17%)                                                             
+ • collection: 5  (4%)                                                          
+
+logo_visible (true / false / unknown)                                           
+
+ • true: 91  (70%)                                                              
+ • false: 38  (29%)                                                             
+ • unknown: 1  (1%)                                                             
+
+before_after_present (true / false / unknown)                                   
+
+ • false: 129  (99%)                                                            
+ • unknown: 1  (1%)                                                             
+
+hero_banner_present (true / false / unknown)                                    
+
+ • unknown: 130  (100%)                                                         
+
+category_nav_visible (true / false / unknown)                                   
+
+ • unknown: 130  (100%)                                                         
+
+shoppable_imagery (true / false / unknown)                                      
+
+ • unknown: 130  (100%)                                                         
+
+text_overlay.present (true / false / unknown)                                   
+
+ • true: 111  (85%)                                                             
+ • false: 18  (14%)                                                             
+ • unknown: 1  (1%)                                                             
+
+urgency_cues.present (true / false / unknown)                                   
+
+ • true: 28  (22%)                                                              
+ • false: 101  (78%)                                                            
+ • unknown: 1  (1%)                                                             
+
+casting.people_visible (true / false / unknown)                                 
+
+ • true: 76  (58%)                                                              
+ • false: 53  (41%)                                                             
+ • unknown: 1  (1%)                                                             
+
+products_visible (top values across 130 creatives)                              
+
+ • sling tv: 49                                                                 
+ • streaming tv service: 39                                                     
+ • sling tv streaming service: 13                                               
+ • fs1: 10                                                                      
+ • cnn: 9                                                                       
+ • sling day pass: 8                                                            
+ • fox news: 8                                                                  
+ • fox: 8                                                                       
+
+key_features (top values across 130 creatives)                                  
+
+ • brand_logo: 94                                                               
+ • model_present: 52                                                            
+ • lifestyle_setting: 37                                                        
+ • price_visible: 30                                                            
+ • channel_logos: 28                                                            
+ • price_callout: 27                                                            
+ • creator_face: 24                                                             
+ • multi_product_collage: 22                                                    
+
+value_props (top values across 130 creatives)                                   
+
+ • convenience: 76                                                              
+ • price: 55                                                                    
+ • novelty: 34                                                                  
+ • selection: 34                                                                
+ • social_proof: 14                                                             
+ • exclusivity: 12                                                              
+ • efficacy: 9                                                                  
+ • no_contract: 8                                                               
+
+seasonal_tags (top values across 130 creatives)                                 
+
+ • summer: 18                                                                   
+ • world cup 2026: 6                                                            
+ • fifa world cup 2026: 3                                                       
+ • sports: 2                                                                    
+ • world cup: 1                                                                 
+ • fifa world cup: 1                                                            
+
+Top dominant colors (pooled across all creatives)                               
+
+ • #ffffff — 90 creative(s)                                                     
+ • #1a1a1a — 25 creative(s)                                                     
+ • #f5a623 — 19 creative(s)                                                     
+ • #cc1111 — 12 creative(s)                                                     
+ • #1a1a2e — 12 creative(s)                                                     
+ • #3a3a3a — 11 creative(s)                                                     
+
+wrote reports/philo/2026-07-14/by-brand/sling.md
+                         Creative readout — youtube_tv                          
+
+No analyzed creatives yet. Run intel analyze-creatives --competitor youtube_tv  
+first.                                                                          
+
+wrote reports/philo/2026-07-14/by-brand/youtube_tv.md
+  → amcplus → reports/philo/2026-07-14/by-brand/amcplus.md
+  → frndly → reports/philo/2026-07-14/by-brand/frndly.md
+  → fubo → reports/philo/2026-07-14/by-brand/fubo.md
+  → hulu → reports/philo/2026-07-14/by-brand/hulu.md
+  → philo → reports/philo/2026-07-14/by-brand/philo.md
+  → sling → reports/philo/2026-07-14/by-brand/sling.md
+  → youtube_tv → reports/philo/2026-07-14/by-brand/youtube_tv.md
+
+[1m[7/9] cross-set comparison[0m
+[2m────────────────────────────────────────────────────────────[0m
+                      Cross-competitor creative comparison                      
+
+Window: ads first_seen in last 45d · 1095 analyzed creatives across 6 brands.   
+
+Brand sample sizes                                                              
+
+ • philo: 507 analyzed creative(s)                                              
+ • amcplus: 238 analyzed creative(s)                                            
+ • sling: 130 analyzed creative(s)                                              
+ • hulu: 92 analyzed creative(s)                                                
+ • frndly: 86 analyzed creative(s)                                              
+ • fubo: 42 analyzed creative(s)                                                
+
+Set-wide attribute popularity                                                   
+
+photography_style                                                               
+
+                                                                                
+ brand    cinematic_still  lifestyle  text_only  illustration  screenshot  n    
+ ────────────────────────────────────────────────────────────────────────────── 
+ amcplus  71%              19%        0%         2%            7%          238  
+ frndly   19%              29%        8%         8%            5%          86   
+ fubo     5%               10%        29%        38%           0%          42   
+ hulu     39%              28%        7%         2%            14%         92   
+ philo    15%              18%        7%         5%            0%          507  
+ sling    7%               30%        17%        18%           5%          130  
+ set      28%              21%        7%         7%            4%          1095 
+                                                                                
+
+production_style                                                                
+
+                                                                                
+ brand    polished_bra…  graphic_des…  ugc_creator_…  meme_graphic  stock  n    
+ ────────────────────────────────────────────────────────────────────────────── 
+ amcplus  74%            12%           14%            0%            0%     238  
+ frndly   60%            31%           5%             0%            0%     86   
+ fubo     52%            40%           7%             0%            0%     42   
+ hulu     83%            16%           0%             1%            0%     92   
+ philo    31%            5%            8%             1%            0%     507  
+ sling    53%            25%           20%            0%            1%     130  
+ set      50%            13%           10%            0%            0%     1095 
+                                                                                
+
+product_emphasis                                                                
+
+                                                                            
+ brand    lifestyle_forward  product_forward  balanced  offer_forward  n    
+ ────────────────────────────────────────────────────────────────────────── 
+ amcplus  54%                26%              14%       6%             238  
+ frndly   26%                19%              45%       7%             86   
+ fubo     43%                14%              0%        43%            42   
+ hulu     63%                24%              3%        10%            92   
+ philo    19%                13%              6%        7%             507  
+ sling    28%                35%              16%       21%            130  
+ set      33%                20%              11%       10%            1095 
+                                                                            
+
+hook_style                                                                      
+
+                                                                         
+ brand    aesthetic  offer  problem_solution  narrative  curiosity  n    
+ ─────────────────────────────────────────────────────────────────────── 
+ amcplus  21%        6%     0%                28%        37%        238  
+ frndly   27%        23%    7%                14%        8%         86   
+ fubo     2%         43%    0%                0%         0%         42   
+ hulu     28%        12%    7%                18%        29%        92   
+ philo    15%        18%    31%               13%        5%         507  
+ sling    25%        19%    1%                3%         2%         130  
+ set      19%        16%    16%               15%        14%        1095 
+                                                                         
+
+emotional_vs_rational                                                           
+
+                                           
+ brand    emotional  rational  mixed  n    
+ ───────────────────────────────────────── 
+ amcplus  91%        0%        9%     238  
+ frndly   37%        17%       42%    86   
+ fubo     14%        76%       10%    42   
+ hulu     77%        16%       7%     92   
+ philo    23%        52%       25%    507  
+ sling    36%        42%       22%    130  
+ set      45%        35%       20%    1095 
+                                           
+
+aspect_ratio_guess                                                              
+
+                                     
+ brand    9:16  1:1  4:5  16:9  n    
+ ─────────────────────────────────── 
+ amcplus  62%   4%   33%  1%    238  
+ frndly   5%    65%  0%   27%   86   
+ fubo     10%   90%  0%   0%    42   
+ hulu     47%   47%  7%   0%    92   
+ philo    41%   1%   3%   0%    507  
+ sling    89%   2%   0%   8%    130  
+ set      48%   14%  9%   3%    1095 
+                                     
+
+background_color                                                                
+
+                                                           
+ brand    black  green  beige  dark navy  warm brown  n    
+ ───────────────────────────────────────────────────────── 
+ amcplus  13%    4%     2%     12%        9%          238  
+ frndly   2%     66%    2%     0%         0%          86   
+ fubo     81%    0%     0%     0%         0%          42   
+ hulu     33%    3%     2%     0%         1%          92   
+ philo    35%    1%     5%     0%         0%          507  
+ sling    30%    2%     5%     0%         0%          130  
+ set      28%    7%     4%     3%         2%          1095 
+                                                           
+
+model_gender                                                                    
+
+                                                       
+ brand    mixed  male  female  none  not_visible  n    
+ ───────────────────────────────────────────────────── 
+ amcplus  26%    29%   25%     20%   0%           238  
+ frndly   53%    21%   2%      8%    12%          86   
+ fubo     5%     14%   2%      38%   40%          42   
+ hulu     39%    22%   18%     4%    16%          92   
+ philo    14%    3%    17%     5%    6%           507  
+ sling    15%    38%   5%      20%   21%          130  
+ set      22%    16%   16%     11%   9%           1095 
+                                                       
+
+product_in_use                                                                  
+
+                                                                                
+                                                 Philo streaming                
+                                Philo streaming  of MTV's Jersey                
+                                of MTV's Love &  Shore: Family                  
+ brand    n/a   displayed_only  Hip Hop Atlanta  Vacation          in_use  n    
+ ────────────────────────────────────────────────────────────────────────────── 
+ amcplus  100%  0%              0%               0%                0%      238  
+ frndly   80%   9%              0%               0%                5%      86   
+ fubo     98%   0%              0%               0%                2%      42   
+ hulu     100%  0%              0%               0%                0%      92   
+ philo    28%   0%              4%               2%                0%      507  
+ sling    68%   23%             0%               0%                5%      130  
+ set      61%   4%              2%               1%                1%      1095 
+                                                                                
+
+creative_context                                                                
+
+                                                      
+ brand    meta_ad  google_text_ad  landing_page  n    
+ ──────────────────────────────────────────────────── 
+ amcplus  100%     0%              0%            238  
+ frndly   97%      0%              3%            86   
+ fubo     100%     0%              0%            42   
+ hulu     100%     0%              0%            92   
+ philo    45%      55%             0%            507  
+ sling    99%      0%              1%            130  
+ set      74%      26%             0%            1095 
+                                                      
+
+product_grouping                                                                
+
+                                               
+ brand    single  n/a  multi  collection  n    
+ ───────────────────────────────────────────── 
+ amcplus  68%     23%  9%     0%          238  
+ frndly   47%     16%  16%    17%         86   
+ fubo     29%     52%  19%    0%          42   
+ hulu     59%     25%  10%    7%          92   
+ philo    22%     14%  8%     0%          507  
+ sling    26%     52%  17%    4%          130  
+ set      38%     23%  11%    2%          1095 
+                                               
+
+products_visible (top values, % of creatives containing)                        
+
+                                                                                
+                       anne                                                     
+                       rice's the  amc+                                         
+                       vampire     streaming   streaming                        
+ brand    amc+  philo  lestat      service     tv service  hulu  sling tv  n    
+ ────────────────────────────────────────────────────────────────────────────── 
+ amcplus  46%   0%     40%         34%         0%          0%    0%        238  
+ frndly   0%    0%     0%          0%          14%         0%    0%        86   
+ fubo     0%    0%     0%          0%          19%         0%    0%        42   
+ hulu     0%    0%     0%          0%          4%          60%   0%        92   
+ philo    3%    21%    0%          0%          1%          0%    1%        507  
+ sling    0%    0%     0%          0%          30%         0%    38%       130  
+ set      12%   10%    9%          7%          6%          5%    5%        1095 
+                                                                                
+
+key_features (top values, % of creatives containing)                            
+
+                                                                                
+ brand    brand_…  model_…  show_a…  lifesty…  channe…  price_c…  creato…  n    
+ ────────────────────────────────────────────────────────────────────────────── 
+ amcplus  77%      50%      71%      29%       5%       6%        20%      238  
+ frndly   90%      63%      43%      34%       44%      40%       9%       86   
+ fubo     98%      21%      2%       10%       33%      43%       5%       42   
+ hulu     100%     62%      59%      15%       5%       12%       5%       92   
+ philo    33%      25%      17%      19%       19%      10%       13%      507  
+ sling    72%      40%      14%      28%       22%      21%       18%      130  
+ set      60%      38%      33%      23%       18%      14%       14%      1095 
+                                                                                
+
+value_props (top values, % of creatives containing)                             
+
+                                                                                
+ brand    price  conveni…  selecti…  novelty  exclusi…  quality  no_cont…  n    
+ ────────────────────────────────────────────────────────────────────────────── 
+ amcplus  6%     0%        16%       71%      63%       53%      0%        238  
+ frndly   69%    42%       47%       44%      6%        16%      0%        86   
+ fubo     86%    67%       40%       5%       29%       2%       0%        42   
+ hulu     17%    23%       24%       82%      35%       34%      2%        92   
+ philo    62%    64%       54%       17%      4%        7%       23%       507  
+ sling    42%    58%       26%       26%      9%        3%       6%        130  
+ set      45%    45%       39%       37%      21%       20%      12%       1095 
+                                                                                
+
+seasonal_tags (top values, % of creatives containing)                           
+
+                                                                                
+                                      fifa                                      
+                            world     world                                     
+ brand    summer  hallowe…  cup 2026  cup 2026  christ…  christm…  spring  n    
+ ────────────────────────────────────────────────────────────────────────────── 
+ amcplus  0%      5%        0%        0%        0%       0%        0%      238  
+ frndly   1%      0%        0%        0%        3%       3%        2%      86   
+ fubo     21%     0%        2%        0%        0%       0%        0%      42   
+ hulu     0%      0%        0%        0%        0%       0%        0%      92   
+ philo    0%      0%        0%        0%        0%       0%        0%      507  
+ sling    14%     0%        5%        2%        0%       0%        0%      130  
+ set      3%      1%        1%        0%        0%       0%        0%      1095 
+                                                                                
+
+awards_or_rankings (top values, % of creatives containing)                      
+
+                                                                                
+          academy                          emmy       emmy       emmy           
+          award      academy               award      award      award          
+          nominee    award      academy    winner     winner     nominee        
+          annette    nominee    award      sterling   julianne   shailene       
+ brand    bening     ed harris  nominee    k. brown   nicholson  woodley   n    
+ ────────────────────────────────────────────────────────────────────────────── 
+ amcplus  0%         0%         0%         0%         0%         0%        238  
+ frndly   0%         0%         0%         0%         0%         0%        86   
+ fubo     0%         0%         0%         0%         0%         0%        42   
+ hulu     0%         0%         0%         1%         1%         1%        92   
+ philo    0%         0%         0%         0%         0%         0%        507  
+ sling    0%         0%         0%         0%         0%         0%        130  
+ set      0%         0%         0%         0%         0%         0%        1095 
+                                                                                
+
+Distinctiveness — where each brand over-indexes vs the set                      
+
+                                                                               
+ brand    attribute              value           brand share  set share  delta 
+ ───────────────────────────────────────────────────────────────────────────── 
+ fubo     aspect_ratio_guess     1:1             90%          14%        +76%  
+ frndly   background_color       green           66%          7%         +59%  
+ hulu     products_visible       hulu            60%          5%         +55%  
+ amcplus  emotional_vs_rational  emotional       91%          45%        +46%  
+ sling    aspect_ratio_guess     9:16            89%          48%        +42%  
+ philo    creative_context       google_text_ad  55%          26%        +30%  
+                                                                               
+
+Per-brand whitespace — top set values this brand has 0% of                      
+
+amcplus — present in the set, absent for this brand:                            
+
+ • value_props = convenience (used by 45% of set)                               
+ • emotional_vs_rational = rational (used by 35% of set)                        
+ • creative_context = google_text_ad (used by 26% of set)                       
+
+frndly — present in the set, absent for this brand:                             
+
+ • creative_context = google_text_ad (used by 26% of set)                       
+
+fubo — present in the set, absent for this brand:                               
+
+ • creative_context = google_text_ad (used by 26% of set)                       
+
+hulu — present in the set, absent for this brand:                               
+
+ • creative_context = google_text_ad (used by 26% of set)                       
+
+sling — present in the set, absent for this brand:                              
+
+ • creative_context = google_text_ad (used by 26% of set)                       
+
+wrote reports/philo/2026-07-14/creative_comparison.md
+
+[1m[8/9] briefing[0m
+[2m────────────────────────────────────────────────────────────[0m
+[32m  using deterministic (no-LLM) briefing[0m
+  wrote reports/philo/2026-07-14/briefing.md
+
+[1m[8b] capture Philo creative UTMs[0m
+[2m────────────────────────────────────────────────────────────[0m
+captured 959 creatives for philo (674 with UTM params)
+
+[1m[9/9] HTML dashboard[0m
+[2m────────────────────────────────────────────────────────────[0m
+wrote reports/philo/2026-07-14/dashboard/index.html  (7 brands · 633 analyzed 
+creatives · 2249 KB)
+wrote reports/philo/2026-07-14/dashboard-v2/index.html  (7 brands · 633 analyzed
+creatives · 2221 KB)
+wrote reports/philo/2026-07-14/with-google/dashboard/index.html  (7 brands · 633
+analyzed creatives · 2379 KB)
+wrote reports/philo/2026-07-14/with-google/dashboard-v2/index.html  (7 brands · 
+633 analyzed creatives · 2340 KB)
+
+[1mdone (PHILO)[0m
+[2m────────────────────────────────────────────────────────────[0m
+outputs:
+  reports/philo/2026-07-14/briefing.md
+  reports/philo/2026-07-14/by-brand/amcplus.md
+  reports/philo/2026-07-14/by-brand/frndly.md
+  reports/philo/2026-07-14/by-brand/fubo.md
+  reports/philo/2026-07-14/by-brand/hulu.md
+  reports/philo/2026-07-14/by-brand/philo.md
+  reports/philo/2026-07-14/by-brand/sling.md
+  reports/philo/2026-07-14/by-brand/youtube_tv.md
+  reports/philo/2026-07-14/creative_comparison.md
+  reports/philo/2026-07-14/dashboard-v2/index.html
+  reports/philo/2026-07-14/dashboard/index.html
+
+[32mview a report:[0m
+    open reports/philo/2026-07-14/dashboard/index.html        ← single-page HTML dashboard
+    open reports/philo/2026-07-14/creative_comparison.md
+    open reports/philo/2026-07-14/by-brand/philo.md
+    open reports/philo/2026-07-14/briefing.md

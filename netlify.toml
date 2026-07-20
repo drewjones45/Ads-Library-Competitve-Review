@@ -35,3 +35,17 @@
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+# Keep the whole site out of search engines and AI crawlers. These dashboards
+# carry client competitive analysis and first-party ad-account performance
+# (spend/ROAS/revenue); the site has no auth, so the URL is the only thing
+# keeping it private and it must never be indexed or surfaced in a search result.
+#
+# Applied as an HTTP header (not just a <meta> tag) because it covers every
+# response type — non-HTML assets included — and because crawlers honour
+# X-Robots-Tag even when they never parse the document body. `noarchive` and
+# `nosnippet` additionally stop cached copies and text excerpts being retained.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex"

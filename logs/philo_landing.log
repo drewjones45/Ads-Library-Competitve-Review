@@ -1,0 +1,10 @@
+  captured  http://hulu.com/
+  captured  https://join.frndlytv.com/
+  captured  https://frndlytv.com/
+  captured  https://try.frndlytv.com/
+  captured  https://sling.com/
+ Brand           Selected  Captured  Blocked/err 
+ Hulu + Live TV         1         1            0 
+ Frndly TV              3         3            0 
+ Sling TV               1         1            0 
+next: intel analyze-creatives  (analyzes the new landing screenshots)
