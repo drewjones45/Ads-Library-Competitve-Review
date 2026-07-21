@@ -1152,7 +1152,8 @@ JS = r"""
   // curve and rising scale curve — an ad is only called when its spend is
   // enough to distinguish it from the target.
   var SK_K=2.0, SK_METRIC='cpa', SK_TARGET=null, SK_FRAME=null, SK_PLAYING=false, SK_TIMER=null;
-  var SK_LAUNCH='', SK_ZONE='';   // '' = every zone listed
+  var SK_LAUNCH='', SK_ZONE='k';   // default to the kill list; '' = every zone
+
 
   // Launch date is the ad's CREATION date, not the first day it delivered in
   // this window. The distinction matters: 166 of these ads were built before
