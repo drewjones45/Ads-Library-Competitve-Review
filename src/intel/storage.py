@@ -500,6 +500,12 @@ def _migrate_ad_performance_funnel_columns(conn: sqlite3.Connection) -> None:
     for col in ("quality_ranking", "engagement_rate_ranking", "conversion_rate_ranking"):
         if col not in have:
             conn.execute(f"ALTER TABLE ad_performance ADD COLUMN {col} TEXT")
+    # Per-window conversion breakout as JSON: {window: {pu,rv,atc,ic,lpv,vc}}.
+    # A blob, not columns — the dashboard ships it to the browser and re-weights
+    # client-side, and a flat schema would be 6 metrics x 6 windows of columns.
+    # Nullable: rows from a pre-attribution ingest read as "default only".
+    if "attribution_json" not in have:
+        conn.execute("ALTER TABLE ad_performance ADD COLUMN attribution_json TEXT")
 
 
 def _migrate_ad_daily_table(conn: sqlite3.Connection) -> None:
@@ -1262,8 +1268,8 @@ def upsert_ad_performance(
         "  video_p25, video_p50, video_p75, video_p100, video_3s, video_plays, "
         "  landing_page_views, view_content, add_to_cart, initiate_checkout, "
         "  quality_ranking, engagement_rate_ranking, conversion_rate_ranking, "
-        "  extra_json, fetched_at) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+        "  attribution_json, extra_json, fetched_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
         "ON CONFLICT(platform_ad_id, date_start, date_stop) DO UPDATE SET "
         "  competitor_id=excluded.competitor_id, account_id=excluded.account_id, "
         "  impressions=excluded.impressions, spend=excluded.spend, clicks=excluded.clicks, "
@@ -1280,6 +1286,7 @@ def upsert_ad_performance(
         "  quality_ranking=excluded.quality_ranking, "
         "  engagement_rate_ranking=excluded.engagement_rate_ranking, "
         "  conversion_rate_ranking=excluded.conversion_rate_ranking, "
+        "  attribution_json=excluded.attribution_json, "
         "  extra_json=excluded.extra_json, "
         "  fetched_at=excluded.fetched_at",
         (
@@ -1295,6 +1302,7 @@ def upsert_ad_performance(
             row.get("add_to_cart"), row.get("initiate_checkout"),
             row.get("quality_ranking"), row.get("engagement_rate_ranking"),
             row.get("conversion_rate_ranking"),
+            row.get("attribution_json"),
             row.get("extra_json"), utcnow(),
         ),
     )

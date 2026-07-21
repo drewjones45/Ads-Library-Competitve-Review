@@ -156,6 +156,7 @@ def fetch_insights(
     since: str | None = None,
     until: str | None = None,
     date_preset: str = "last_90d",
+    attribution_windows: list[str] | None = None,
     client: httpx.Client | None = None,
 ) -> list[dict[str, Any]]:
     """Ad-level insights for one account. Returns one row per ad in the window.
@@ -163,6 +164,11 @@ def fetch_insights(
     Ads with no delivery in the window simply do not appear — that is Meta's
     behaviour, not a bug, and it means `len()` here is "ads that ran", not "ads
     that exist".
+
+    `attribution_windows` (e.g. ATTR_WINDOWS, or ['dda']) adds
+    `action_attribution_windows` to the request, so each conversion action comes
+    back broken out by window. Omitted, the account's default attribution is all
+    that's returned — which is the historical behaviour.
     """
     owns = client is None
     c = client or httpx.Client(timeout=120)
@@ -170,8 +176,14 @@ def fetch_insights(
         "access_token": _token(),
         "level": "ad",
         "fields": ",".join(INSIGHT_FIELDS),
-        "limit": "500",
+        # Per-window breakout multiplies the conversion payload per row, and a
+        # 500-row page then trips Meta's synchronous-query size guard ("please
+        # reduce the amount of data") on the larger accounts. A 100-row page
+        # stays under it — measured — and just paginates a few more times.
+        "limit": "100" if attribution_windows else "500",
     }
+    if attribution_windows:
+        params["action_attribution_windows"] = json.dumps(attribution_windows)
     if since and until:
         params["time_range"] = json.dumps({"since": since, "until": until})
     else:
@@ -195,16 +207,65 @@ def fetch_insights(
 
 def _action_value(actions: Any, wanted: Iterable[str]) -> float:
     """Pull the first matching action type out of Meta's list-of-dicts shape."""
+    return _action_window(actions, wanted, "value")
+
+
+def _action_window(actions: Any, wanted: Iterable[str], window: str) -> float:
+    """Like `_action_value`, but read a specific attribution-window key.
+
+    When `action_attribution_windows` is requested, each action dict carries the
+    default under `value` plus one key per window (`1d_view`, `7d_click`, …). A
+    window absent from an action means zero credit in that window, not missing
+    data. `window='value'` reproduces `_action_value` exactly, so the columns
+    built from it stay byte-identical to a pre-attribution ingest.
+    """
     if not isinstance(actions, list):
         return 0.0
     want = set(wanted)
     for a in actions:
         if a.get("action_type") in want:
             try:
-                return float(a.get("value") or 0)
+                return float(a.get(window) or 0)
             except (TypeError, ValueError):
                 return 0.0
     return 0.0
+
+
+# Attribution windows these accounts actually return. 7d/28d view-through were
+# removed by Meta after iOS 14 and never come back in the response — only 1-day
+# view survives — so requesting them would just add empty keys. Click windows
+# are cumulative (1d ⊆ 7d ⊆ 28d), verified across the live sample. DDA
+# (data-driven) is fetched separately: it does not break out alongside these.
+ATTR_WINDOWS = ["1d_view", "1d_click", "7d_click", "28d_click"]
+
+# The conversion metrics that attribution re-weights. Spend, impressions and
+# clicks are NOT attributed and never vary by window. Purchases/revenue read the
+# same omni_* first-match the default columns use, so `default` == the columns.
+_ATTR_METRICS = {
+    "pu": ("omni_purchase", "purchase", "offsite_conversion.fb_pixel_purchase"),
+    "atc": ("omni_add_to_cart", "add_to_cart"),
+    "ic": ("omni_initiated_checkout", "initiate_checkout"),
+    "lpv": ("omni_landing_page_view", "landing_page_view"),
+    "vc": ("omni_view_content", "view_content"),
+}
+_ATTR_REVENUE = ("omni_purchase", "purchase", "offsite_conversion.fb_pixel_purchase")
+
+
+def build_attribution(actions: Any, values: Any) -> dict[str, dict[str, float]]:
+    """Per-window conversion components for one insights row.
+
+    Returns {window_label: {pu, rv, atc, ic, lpv, vc}} for the account default
+    plus every window in ATTR_WINDOWS. `default` is keyed off Meta's `value`
+    field, so it equals the flat columns exactly. DDA is merged in later by the
+    ingest, since it needs its own request.
+    """
+    out: dict[str, dict[str, float]] = {}
+    for win_key, label in [("value", "default"), *[(w, w) for w in ATTR_WINDOWS]]:
+        rec = {m: _action_window(actions, names, win_key)
+               for m, names in _ATTR_METRICS.items()}
+        rec["rv"] = _action_window(values, _ATTR_REVENUE, win_key)
+        out[label] = rec
+    return out
 
 
 def normalize_insight(row: dict[str, Any]) -> dict[str, Any]:
@@ -282,6 +343,10 @@ def normalize_insight(row: dict[str, Any]) -> dict[str, Any]:
         "quality_ranking": row.get("quality_ranking"),
         "engagement_rate_ranking": row.get("engagement_rate_ranking"),
         "conversion_rate_ranking": row.get("conversion_rate_ranking"),
+        # Per-window conversion breakout. Empty {} when the request didn't ask
+        # for windows, so a default ingest carries no attribution and the
+        # dashboard falls back to the flat columns. DDA is merged by the ingest.
+        "attribution": build_attribution(actions, values),
         # Scroll-stop / hook rate inputs.
         #
         # The numerator is 3-second video views, which Meta reports as the

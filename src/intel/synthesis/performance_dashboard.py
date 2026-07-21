@@ -139,7 +139,10 @@ def _fetch(conn: sqlite3.Connection, competitor_ids: list[str] | None) -> list[d
                SUM(p.view_content) AS view_content,
                SUM(p.add_to_cart) AS add_to_cart,
                SUM(p.initiate_checkout) AS initiate_checkout,
-               MAX(p.frequency) AS frequency
+               MAX(p.frequency) AS frequency,
+               -- One row per ad in the scoped window, so MAX just picks that
+               -- ad's blob; NULL for ads ingested before attribution existed.
+               MAX(p.attribution_json) AS attribution_json
         FROM owned_ads oa
         LEFT JOIN ad_performance p
           ON p.platform_ad_id = oa.platform_ad_id{join_extra}
@@ -340,7 +343,8 @@ def _fetch_prior(conn: sqlite3.Connection, prior: tuple[str, str] | None,
                oa.audience_stage, oa.audience_gender, oa.audience_age, oa.audience_geo,
                SUM(p.impressions) im, SUM(p.spend) sp, SUM(p.clicks) ck,
                SUM(p.purchases) pu, SUM(p.revenue) rv,
-               SUM(p.video_3s) v3, SUM(p.video_plays) vp
+               SUM(p.video_3s) v3, SUM(p.video_plays) vp,
+               MAX(p.attribution_json) attribution_json
         FROM owned_ads oa
         JOIN ad_performance p ON p.platform_ad_id = oa.platform_ad_id
         WHERE {' AND '.join(where)}
@@ -821,11 +825,56 @@ JS = r"""
   var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
 
+  // --- attribution -----------------------------------------------------------
+  // Which window credits conversions. Only conversions move: spend, impressions,
+  // clicks, CTR, CPM and scroll-stop are not attributed and never change. cv()
+  // is the one read-point — every purchase/revenue/cart/checkout number on the
+  // reporting surfaces goes through it, so switching the window re-weights them
+  // all at once. `default` == the flat payload fields (the account's own
+  // attribution setting), so it is byte-identical to the pre-feature dashboard.
+  var ATTR='default';
+  function cv(a,m){
+    if(ATTR==='default'||!a.attr) return a[m]||0;
+    var w=a.attr[ATTR];
+    return (w && w[m]!=null) ? w[m] : (a[m]||0);
+  }
+  var ATTR_LABEL={'default':'account default','1d_view':'1-day view',
+    '1d_click':'1-day click','7d_click':'7-day click','28d_click':'28-day click'};
+  var HAS_ATTR=ADS.some(function(a){return a.attr;});
+
+  function renderAttrNote(all){
+    var el=document.getElementById('attrNote'); if(!el) return;
+    if(!HAS_ATTR){ el.style.display='none'; return; }
+    el.style.display='';
+    var base='<b>Attribution:</b> conversions credited on the <b>'+ATTR_LABEL[ATTR]+
+      '</b> window. Only conversions move with this — purchases, revenue, ROAS, CVR '+
+      'and the funnel’s cart/checkout/purchase steps. Spend, impressions, clicks, CTR, '+
+      'CPM and scroll-stop are not attributed and never change.';
+    // Meta stopped reporting 7- and 28-day VIEW-through after iOS 14, so only
+    // 1-day view is offered; the account default is typically 7-day click plus
+    // 1-day view. State it, since a missing option otherwise reads as an omission.
+    var caveat=' Meta only returns 1-day view-through (7- and 28-day view were '+
+      'retired after iOS 14); the click windows are cumulative. The '+
+      '<b>scale/kill</b> chart and the tile <b>sparklines</b> read the account default '+
+      'attribution regardless of this setting — they are built on the daily/weekly series, '+
+      'which isn’t stored per window.';
+    var extra='';
+    if(ATTR==='1d_click'||ATTR==='1d_view'){
+      extra=' At <b>'+ATTR_LABEL[ATTR]+'</b>, credit is at its strictest, so ROAS and '+
+        'purchases read lower than the account default — that gap is the share of '+
+        'conversions the default window claims from '+(ATTR==='1d_click'?'view-through and longer click paths':'clicks and longer paths')+'.';
+    }else if(ATTR==='28d_click'){
+      extra=' At <b>28-day click</b>, the longest window, credit is at its most generous — '+
+        'ROAS reads highest here because slow-converting click paths are all counted.';
+    }
+    el.innerHTML=base+extra+caveat;
+  }
+
   // --- aggregation (single definition, used for buckets and baselines) ---
   function agg(list){
     var im=0,sp=0,ck=0,pu=0,rv=0,v3=0,vim=0,vads=0;
     for(var i=0;i<list.length;i++){var a=list[i];
-      im+=a.im||0; sp+=a.sp||0; ck+=a.ck||0; pu+=a.pu||0; rv+=a.rv||0;
+      im+=a.im||0; sp+=a.sp||0; ck+=a.ck||0; pu+=cv(a,'pu'); rv+=cv(a,'rv');
       v3+=a.v3||0;
       // Scroll-stop rate is a VIDEO metric. Static and catalog-image ads can
       // never register a 3-second view, so counting their impressions in the
@@ -870,9 +919,11 @@ JS = r"""
   function funnelOf(list){
     var t={im:0,v3:0,tp:0,lc:0,atc:0,ic:0,pu:0,sp:0,rv:0,vim:0,vads:0};
     for(var i=0;i<list.length;i++){var a=list[i];
+      // Impressions → 3s → thruplay → link-click are NOT attributed and stay
+      // fixed across windows; cart, checkout, purchase and revenue re-weight.
       t.im+=a.im||0; t.v3+=a.v3||0; t.tp+=a.tp||0; t.lc+=a.lc||0;
-      t.atc+=a.atc||0; t.ic+=a.ic||0; t.pu+=a.pu||0;
-      t.sp+=a.sp||0; t.rv+=a.rv||0;
+      t.atc+=cv(a,'atc'); t.ic+=cv(a,'ic'); t.pu+=cv(a,'pu');
+      t.sp+=a.sp||0; t.rv+=cv(a,'rv');
       if((a.vp||0)>0){ t.vim+=a.im||0; t.vads++; }
     }
     t.ads=list.length;
@@ -1801,8 +1852,8 @@ JS = r"""
         var k=PFIELDS[i];
         if(state[k] && String(a[k]||'')!==state[k]) return;
       }
-      n++; im+=a.im||0; sp+=a.sp||0; ck+=a.ck||0; pu+=a.pu||0;
-      rv+=a.rv||0; v3+=a.v3||0;
+      n++; im+=a.im||0; sp+=a.sp||0; ck+=a.ck||0; pu+=cv(a,'pu');
+      rv+=cv(a,'rv'); v3+=a.v3||0;
       if((a.vp||0)>0) vim+=a.im||0;
     });
     if(!n) return null;
@@ -1916,6 +1967,7 @@ JS = r"""
     renderFunnel(pool);
     renderRank(pool);
     renderSK(pool);
+    renderAttrNote(all);
 
     var pct=all.sp?100*rd.sp/all.sp:0;
     document.getElementById('cov').innerHTML='<b>Coverage:</b> vision-attribute tables cover <b>'+
@@ -1988,6 +2040,12 @@ JS = r"""
     FN_B=this.value; renderFunnel(ADS.filter(passes));});
   document.getElementById('fnMode').addEventListener('change',function(){
     FN_MODE=this.value; renderFunnel(ADS.filter(passes));});
+
+  document.getElementById('attrSel').addEventListener('change',function(){
+    ATTR=this.value;
+    this.closest('.chip').classList.toggle('set', ATTR!=='default');
+    render();
+  });
 
   document.querySelectorAll('#rankSegs .seg').forEach(function(b){
     b.addEventListener('click',function(){
@@ -2093,6 +2151,14 @@ def build_performance_dashboard(
             # "how has this asset performed since launch" answerable.
             "cr": (r.get("created_time") or "")[:10],
         }
+        # Per-window conversion components. The dashboard re-weights purchases,
+        # revenue and the funnel conversion steps from this; `default` equals the
+        # flat fields above. Absent for ads ingested before attribution existed.
+        if r.get("attribution_json"):
+            try:
+                rec["attr"] = json.loads(r["attribution_json"])
+            except (json.JSONDecodeError, TypeError):
+                pass
         rk = r.get("_rank")
         if rk:
             rec["R"] = rk
@@ -2144,17 +2210,25 @@ def build_performance_dashboard(
     rank_window = rows[0].get("_rank_window") if rows else None
     days: list[str] = (rows[0].get("_days") or []) if rows else []
     prior_rows = _fetch_prior(conn, prior_window, competitor_ids)
-    pads = [
-        {"b": pr.get("competitor_id") or "", "ac": pr.get("account_name") or "",
-         "cl": pr.get("creative_class") or "unknown",
-         "stage": pr.get("audience_stage") or "", "gen": pr.get("audience_gender") or "",
-         "age": pr.get("audience_age") or "", "geo": pr.get("audience_geo") or "",
-         "im": pr.get("im") or 0, "sp": round(pr.get("sp") or 0, 2),
-         "ck": pr.get("ck") or 0, "pu": pr.get("pu") or 0,
-         "rv": round(pr.get("rv") or 0, 2),
-         "v3": pr.get("v3") or 0, "vp": pr.get("vp") or 0}
-        for pr in prior_rows
-    ]
+    def _prow(pr: dict) -> dict:
+        rec = {"b": pr.get("competitor_id") or "", "ac": pr.get("account_name") or "",
+               "cl": pr.get("creative_class") or "unknown",
+               "stage": pr.get("audience_stage") or "", "gen": pr.get("audience_gender") or "",
+               "age": pr.get("audience_age") or "", "geo": pr.get("audience_geo") or "",
+               "im": pr.get("im") or 0, "sp": round(pr.get("sp") or 0, 2),
+               "ck": pr.get("ck") or 0, "pu": pr.get("pu") or 0,
+               "rv": round(pr.get("rv") or 0, 2),
+               "v3": pr.get("v3") or 0, "vp": pr.get("vp") or 0}
+        # Prior-period attribution, so the comparison re-weights on the same
+        # window as the current period rather than reading a fixed default while
+        # the current side moves — which would make every delta meaningless.
+        if pr.get("attribution_json"):
+            try:
+                rec["attr"] = json.loads(pr["attribution_json"])
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return rec
+    pads = [_prow(pr) for pr in prior_rows]
 
     total_spend = sum(a["sp"] for a in ads)
     analyzed = [a for a in ads if a.get("A")]
@@ -2189,6 +2263,15 @@ def build_performance_dashboard(
         f'<button class="seg on" type="button" title="{html.escape(win_label)}">90D</button>'
         '</span>'
         '<span class="spacer"></span>'
+        '<span class="flabel">Attribution</span>'
+        '<span class="chip attr"><select id="attrSel" '
+        'title="Which attribution window credits conversions">'
+        '<option value="default">Account default</option>'
+        '<option value="1d_view">1-day view</option>'
+        '<option value="1d_click">1-day click</option>'
+        '<option value="7d_click">7-day click</option>'
+        '<option value="28d_click">28-day click</option>'
+        '</select></span>'
         '<span class="flabel">Compare</span>'
         '<span class="segs">'
         '<button class="seg on" type="button" '
@@ -2201,6 +2284,7 @@ def build_performance_dashboard(
         "</div>"
         '<div class="fstat" id="fstat"></div></div>'
         '<div class="kpis" id="kpis"></div>'
+        '<div class="note" id="attrNote"></div>'
         '<section class="viz" id="funnelSec">'
         '<h2>Conversion funnel <span class="h2sub">where the drop-off is</span></h2>'
         '<div class="vizbar">'

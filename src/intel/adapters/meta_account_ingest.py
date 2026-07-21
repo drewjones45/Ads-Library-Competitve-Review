@@ -54,7 +54,8 @@ def ingest_account(
     try:
         raw_rows = ma.fetch_insights(
             account_id, since=since, until=until,
-            date_preset=date_preset, client=client,
+            date_preset=date_preset, attribution_windows=ma.ATTR_WINDOWS,
+            client=client,
         )
         if not raw_rows:
             log.warning("account %s returned no delivering ads for the window", account_id)
@@ -63,6 +64,24 @@ def ingest_account(
                                  "analyzable_spend": 0.0, "analyzable_pct": 0.0}}
 
         perf = [ma.normalize_insight(r) for r in raw_rows]
+
+        # NOTE on data-driven attribution: measured on these accounts, a `dda`
+        # request returns a value byte-identical to the account default for every
+        # ad — the accounts are already configured on data-driven attribution, so
+        # `dda` is not a distinct number. It was therefore dropped: it added no
+        # information and the extra insights request per account doubled the load
+        # that trips Meta's app-level rate limit. True incrementality needs a
+        # conversion-lift holdout study, not an attribution window.
+        for p in perf:
+            p["attribution_json"] = json.dumps(p["attribution"])
+            # Pin the stored window to the REQUESTED range. Accounts sit in
+            # different timezones, so Meta echoes date_start/date_stop shifted by
+            # a day or two per account; left as-is, each account's data for "the
+            # same window" would land under a slightly different key and fail to
+            # overwrite the existing rows. The requested range is the one logical
+            # window the dashboard selects on.
+            if since and until:
+                p["date_start"], p["date_stop"] = since, until
         ad_ids = [p["platform_ad_id"] for p in perf if p.get("platform_ad_id")]
         meta_by_id = ma.fetch_ad_meta(account_id, ad_ids, client=client)
 
