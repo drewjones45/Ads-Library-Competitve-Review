@@ -1,0 +1,57 @@
+=== 2026-04-20 2026-07-19→ · 263673744705629 (jdsports) ===
+ingesting account 263673744705629 (JD Sports US Brand & COOP) → brand jdsports 
+2026-04-20 2026-07-19 → 
+✗ giving up after 3 tries: 500 {"error":{"code":1,"message":"Please reduce the 
+amount of data you're asking for, then retry your request"}}
+=== 2026-04-20 2026-07-19→ · 399719270800712 (jdsports) ===
+ingesting account 399719270800712 (JD Sports - US) → brand jdsports 2026-04-20 
+2026-07-19 → 
+✗ giving up after 3 tries: 500 {"error":{"code":1,"message":"Please reduce the 
+amount of data you're asking for, then retry your request"}}
+=== 2026-04-20 2026-07-19→ · 27213418 (finishline) ===
+ingesting account 27213418 (Finish Line Official) → brand finishline 2026-04-20 
+2026-07-19 → 
+✓ 122 ads · 0 assets · 0/0 previews rendered
+  spend $1,232,177 · 0% on creative that can be vision-analyzed
+    dpa          122 ads  $   1,232,177
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+=== 2026-04-20 2026-07-19→ · 627413344530702 (finishline) ===
+ingesting account 627413344530702 (Finish Line Brand & COOP) → brand finishline 
+2026-04-20 2026-07-19 → 
+✓ 8 ads · 0 assets · 0/0 previews rendered
+  spend $48,433 · 0% on creative that can be vision-analyzed
+    dpa            8 ads  $      48,433
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+=== 2026-01-21 2026-04-20→ · 263673744705629 (jdsports) ===
+ingesting account 263673744705629 (JD Sports US Brand & COOP) → brand jdsports 
+2026-01-21 2026-04-20 → 
+✗ giving up after 3 tries: 500 {"error":{"code":1,"message":"Please reduce the 
+amount of data you're asking for, then retry your request"}}
+=== 2026-01-21 2026-04-20→ · 399719270800712 (jdsports) ===
+ingesting account 399719270800712 (JD Sports - US) → brand jdsports 2026-01-21 
+2026-04-20 → 
+✗ giving up after 3 tries: 500 {"error":{"code":1,"message":"Please reduce the 
+amount of data you're asking for, then retry your request"}}
+=== 2026-01-21 2026-04-20→ · 27213418 (finishline) ===
+ingesting account 27213418 (Finish Line Official) → brand finishline 2026-01-21 
+2026-04-20 → 
+✓ 122 ads · 0 assets · 0/0 previews rendered
+  spend $1,232,177 · 0% on creative that can be vision-analyzed
+    dpa          122 ads  $   1,232,177
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+=== 2026-01-21 2026-04-20→ · 627413344530702 (finishline) ===
+ingesting account 627413344530702 (Finish Line Brand & COOP) → brand finishline 
+2026-01-21 2026-04-20 → 
+✓ 8 ads · 0 assets · 0/0 previews rendered
+  spend $48,433 · 0% on creative that can be vision-analyzed
+    dpa            8 ads  $      48,433
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+ALL DONE

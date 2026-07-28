@@ -1,0 +1,39 @@
+=== 2026-04-20 2026-07-19→ · 263673744705629 (jdsports) ===
+ingesting account 263673744705629 (JD Sports US Brand & COOP) → brand jdsports 
+2026-04-20 2026-07-19 → 
+✗ 403 {"error":{"message":"Application request limit 
+reached","type":"OAuthException","is_transient":true,"code":4,"error_subcode":15
+04022,"error_user_title":"Too many API requests","error_user_msg":"There have 
+been too many calls from this app. Wait a bit and try again. For more info, 
+please refer to htt
+=== 2026-04-20 2026-07-19→ · 399719270800712 (jdsports) ===
+ingesting account 399719270800712 (JD Sports - US) → brand jdsports 2026-04-20 
+2026-07-19 → 
+✓ 296 ads · 107 assets · 0/0 previews rendered
+  spend $1,959,066 · 10% on creative that can be vision-analyzed
+    dpa          190 ads  $   1,755,379
+    analyzable   106 ads  $     203,688
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+=== 2026-04-20 2026-07-19→ · 27213418 (finishline) ===
+ingesting account 27213418 (Finish Line Official) → brand finishline 2026-04-20 
+2026-07-19 → 
+✓ 122 ads · 0 assets · 0/0 previews rendered
+  spend $1,232,177 · 0% on creative that can be vision-analyzed
+    dpa          122 ads  $   1,232,177
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+=== 2026-04-20 2026-07-19→ · 627413344530702 (finishline) ===
+ingesting account 627413344530702 (Finish Line Brand & COOP) → brand finishline 
+2026-04-20 2026-07-19 → 
+✓ 8 ads · 0 assets · 0/0 previews rendered
+  spend $48,433 · 0% on creative that can be vision-analyzed
+    dpa            8 ads  $      48,433
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+=== 2026-01-21 2026-04-20→ · 263673744705629 (jdsports) ===
+ingesting account 263673744705629 (JD Sports US Brand & COOP) → brand jdsports 
+2026-01-21 2026-04-20 → 

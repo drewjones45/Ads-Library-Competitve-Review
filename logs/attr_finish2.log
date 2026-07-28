@@ -1,0 +1,67 @@
+cooldown 150s...
+=== 263673744705629 current ===
+ingesting account 263673744705629 (JD Sports US Brand & COOP) → brand jdsports 
+2026-04-20 → 2026-07-19
+✓ 369 ads · 338 assets · 0/0 previews rendered
+  spend $1,794,907 · 90% on creative that can be vision-analyzed
+    analyzable   339 ads  $   1,616,526
+    dpa           23 ads  $     165,045
+    no_asset       7 ads  $      13,336
+=== 263673744705629 (jdsports) prior ===
+ingesting account 263673744705629 (JD Sports US Brand & COOP) → brand jdsports 
+2026-01-21 → 2026-04-20
+✓ 355 ads · 290 assets · 0/0 previews rendered
+  spend $2,106,307 · 92% on creative that can be vision-analyzed
+    analyzable   323 ads  $   1,938,181
+    dpa           22 ads  $      97,942
+    no_asset      10 ads  $      70,184
+=== 399719270800712 (jdsports) prior ===
+ingesting account 399719270800712 (JD Sports - US) → brand jdsports 2026-01-21 →
+2026-04-20
+✓ 248 ads · 38 assets · 0/0 previews rendered
+  spend $1,739,806 · 3% on creative that can be vision-analyzed
+    dpa          211 ads  $   1,683,458
+    analyzable    37 ads  $      56,348
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+=== 27213418 (finishline) prior ===
+ingesting account 27213418 (Finish Line Official) → brand finishline 2026-01-21 
+→ 2026-04-20
+✓ 134 ads · 0 assets · 0/0 previews rendered
+  spend $1,088,584 · 0% on creative that can be vision-analyzed
+    dpa          134 ads  $   1,088,584
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+=== 627413344530702 (finishline) prior ===
+ingesting account 627413344530702 (Finish Line Brand & COOP) → brand finishline 
+2026-01-21 → 2026-04-20
+account 627413344530702 returned no delivering ads for the window
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/andrewjones/Documents/Ads Library Competitve Review/src/intel/cli.py", line 1515, in <module>
+    cli()
+    ~~~^^
+  File "/Users/andrewjones/Documents/Ads Library Competitve Review/.venv/lib/python3.13/site-packages/click/core.py", line 1524, in __call__
+    return self.main(*args, **kwargs)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/andrewjones/Documents/Ads Library Competitve Review/.venv/lib/python3.13/site-packages/click/core.py", line 1445, in main
+    rv = self.invoke(ctx)
+  File "/Users/andrewjones/Documents/Ads Library Competitve Review/.venv/lib/python3.13/site-packages/click/core.py", line 1912, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/andrewjones/Documents/Ads Library Competitve Review/.venv/lib/python3.13/site-packages/click/core.py", line 1308, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/andrewjones/Documents/Ads Library Competitve Review/.venv/lib/python3.13/site-packages/click/core.py", line 877, in invoke
+    return callback(*args, **kwargs)
+  File "/Users/andrewjones/Documents/Ads Library Competitve Review/src/intel/cli.py", line 1379, in perf_ingest_cmd
+    f"{res['previews']}/{res['preview_attempted']} previews rendered"
+                         ~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'preview_attempted'
+ALL DONE
+2026-01-21→2026-04-20|737|737
+2026-04-20→2026-07-19|800|800
+2026-06-20→2026-07-19|331|0

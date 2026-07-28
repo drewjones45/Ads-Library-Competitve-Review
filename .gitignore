@@ -14,3 +14,6 @@ build/
 
 # Local Netlify folder
 .netlify
+
+# Screen recordings dropped in as references (large binaries)
+*.mov
