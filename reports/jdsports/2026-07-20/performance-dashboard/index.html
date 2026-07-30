@@ -483,30 +483,53 @@ opacity:.8;padding:8px 8px 3px}
 
   // Segment options for the two funnel sides. Built from the CURRENT filtered
   // pool so the A/B choices always describe ads that are actually on screen.
+  //
+  // The axes are BRAND plus CREATIVE ATTRIBUTES (format/class/CTA and every
+  // vision attribute). Brand is kept because JD-vs-Finish-Line is the default
+  // comparison. Individual ads, campaigns, ad sets and audience targeting are
+  // intentionally excluded — the funnel is meant to answer "which brand / which
+  // creative treatment converts better", not "which line item spent more", so
+  // account structure and targeting would only muddy that read.
+  var SEG_CAP=8;   // top values per attribute offered as a funnel side
   function segOptions(pool){
     var out=[{id:'__all__',lab:'All ads in filter',list:pool}];
-    function group(key,label){
+    function group(key,label,vision,isList){
       var m={};
-      pool.forEach(function(a){var v=a[key]; if(v) (m[v]=m[v]||[]).push(a);});
+      pool.forEach(function(a){
+        var v = vision ? (a.A?a.A[key]:undefined) : a[key];
+        if(v===undefined||v===null||v==='') return;
+        if(isList){ if(!Array.isArray(v)) return;
+          v.forEach(function(x){ if(x!==''&&x!=null) (m[x]=m[x]||[]).push(a); }); }
+        else { (m[v]=m[v]||[]).push(a); }
+      });
       Object.keys(m).sort(function(x,y){
         return m[y].reduce(function(s,a){return s+(a.sp||0);},0)
              - m[x].reduce(function(s,a){return s+(a.sp||0);},0);
-      }).forEach(function(v){
-        if(m[v].length) out.push({id:key+'::'+v,lab:label+': '+v,list:m[v]});
+      }).filter(function(v){
+        // Drop thin values, exactly as the attribute tables do — a funnel built
+        // on a few hundred impressions is noise.
+        return m[v].reduce(function(s,a){return s+(a.im||0);},0)>=MINIMP;
+      // …then keep only each attribute's top values by spend. The list
+      // attributes (value props, key features) otherwise fan out into hundreds
+      // of high-impression tags and bury the dropdown; the scalar attributes sit
+      // well under this cap and are unaffected.
+      }).slice(0,SEG_CAP).forEach(function(v){
+        out.push({id:key+'::'+v,lab:label+': '+v,list:m[v]});
       });
     }
-    group('b','Brand'); group('cl','Creative class'); group('stage','Audience');
-    group('ot','Object type'); group('cta','CTA');
-    // Individual top spenders, so a single asset can be compared like the
-    // reference "Ad A vs Ad B" view.
-    pool.slice().sort(function(a,b){return (b.sp||0)-(a.sp||0);}).slice(0,40)
-      .forEach(function(a){
-        out.push({id:'ad::'+a.id,lab:'Ad: '+(a.nm||a.id).slice(0,70),list:[a]});
-      });
+    // Brand is the top-level axis and the default comparison…
+    group('b','Brand');
+    // …creative-descriptive metadata (known for every ad)…
+    group('cl','Creative class'); group('ot','Object type'); group('cta','CTA');
+    // …then every vision-derived creative attribute (analyzable ads only).
+    VISION_SPECS.forEach(function(s){ group(s[0], s[1], true, s[2]==='list'); });
     return out;
   }
 
-  var FN_A='__all__', FN_B='', FN_MODE='imp';
+  // Default the funnel to a brand-vs-brand read (JD Sports vs Finish Line). If
+  // either brand is filtered out of the current pool, fillSegSelects falls back
+  // to the first available option, so this is a preference, not a hard wire.
+  var FN_A='b::jdsports', FN_B='b::finishline', FN_MODE='imp';
 
   function fillSegSelects(pool){
     var opts=segOptions(pool);
