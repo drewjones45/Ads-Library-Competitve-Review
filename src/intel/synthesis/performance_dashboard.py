@@ -841,20 +841,30 @@ white-space:nowrap;font-size:12.5px}
 /* ---- collapsible right-hand section nav ---- */
 html{scroll-behavior:smooth}
 section[id]{scroll-margin-top:18px}
-.secnav{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:50;
+.attrsec{scroll-margin-top:18px}
+.attrsec h2{margin-top:30px}
+.attrtrends{margin:4px 0 14px}
+.attrbar .tcttl{margin-bottom:2px}
+.tcnote{font-size:9px;text-transform:none;letter-spacing:0;color:var(--dim);opacity:.7;font-weight:400}
+.secnav{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:50;
 display:flex;align-items:stretch}
-.secnav-tog{align-self:center;width:22px;height:56px;border:1px solid var(--line);
-border-right:none;border-radius:8px 0 0 8px;background:var(--panel);color:var(--dim);
+/* Panel sits flush-left; the toggle handle is on its right edge (order:2) so it
+   stays reachable at the screen edge once the panel slides away. */
+.secnav-tog{order:2;align-self:center;width:22px;height:56px;border:1px solid var(--line);
+border-left:none;border-radius:0 8px 8px 0;background:var(--panel);color:var(--dim);
 cursor:pointer;font-size:13px;box-shadow:var(--shadow);flex:none;padding:0}
 .secnav-tog:hover{color:var(--accent);border-color:var(--accent)}
-.secnav-tog:after{content:"\203A"}                 /* › when expanded → collapse */
-.secnav.collapsed .secnav-tog:after{content:"\2039"} /* ‹ when collapsed → expand */
-.secnav-inner{width:212px;background:color-mix(in srgb,var(--panel) 92%,transparent);
+.secnav-tog:after{content:"\2039"}                 /* ‹ when expanded → collapse */
+.secnav.collapsed .secnav-tog:after{content:"\203A"} /* › when collapsed → expand */
+.secnav-inner{order:1;width:224px;max-height:88vh;overflow-y:auto;
+background:color-mix(in srgb,var(--panel) 92%,transparent);
 backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-border:1px solid var(--line);border-radius:12px 0 0 12px;box-shadow:var(--shadow);
-padding:12px 10px;transition:transform .22s ease,opacity .22s ease}
-.secnav.collapsed .secnav-inner{transform:translateX(calc(100% + 24px));opacity:0;
-pointer-events:none}
+border:1px solid var(--line);border-radius:0 12px 12px 0;box-shadow:var(--shadow);
+padding:12px 10px;transition:transform .22s ease,opacity .22s ease,margin-left .22s ease}
+/* Slide the panel off the left edge AND reclaim its reserved width, so the
+   toggle handle lands at x=0 rather than floating 212px in. */
+.secnav.collapsed .secnav-inner{transform:translateX(-100%);opacity:0;
+pointer-events:none;margin-left:-212px}
 .secnav-hd{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);
 padding:2px 8px 8px}
 .secnav-inner a{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;
@@ -864,9 +874,15 @@ transition:background .15s ease,transform .15s ease}
 .secnav-inner a:hover{background:var(--panel2);color:var(--fg)}
 .secnav-inner a.active{color:var(--fg);font-weight:600;background:var(--panel2)}
 .secnav-inner a.active i{background:var(--accent);transform:scale(1.35)}
+/* dynamic attribute sub-links, grouped under their section headings */
+.secnav-sub{margin:2px 0 2px 6px;border-left:1px solid var(--line);padding-left:4px}
+.secnav-grp{font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);
+opacity:.8;padding:8px 8px 3px}
+.secnav-inner a.sub{padding:5px 8px;font-size:11.5px}
+.secnav-inner a.sub i{width:5px;height:5px}
 /* On wide screens, hold the content clear of the open drawer; below that it
    overlays and the user collapses it when it is in the way. */
-@media(min-width:1500px){body:not(.nav-collapsed) .wrap{margin-right:210px}}
+@media(min-width:1500px){body:not(.nav-collapsed) .wrap{margin-left:210px}}
 @media(max-width:720px){.secnav{display:none}}
 """
 
@@ -2117,7 +2133,61 @@ JS = r"""
     }).join('');
   }
 
-  function tableHTML(spec, pool, base, tid){
+  // One compact diverging bar chart for an attribute, indexing each value's
+  // metric against the current filter baseline (100 = the filter average). Same
+  // three metrics the scale/kill zones trend on — scroll-stop, CTR, ROAS — so
+  // the whole dashboard reads in one visual language. Single series each, so no
+  // legend; a value above 100 beat the baseline (green), below it lagged (red).
+  function attrBarChart(ents, mk){
+    var bv=mk.bv;
+    if(!bv) return '';
+    var rows=ents.map(function(e){
+      var val=mk.get(e);
+      return (val===null||val===undefined)?null:{v:e.value, idx:100*val/bv, sp:e.sp};
+    }).filter(function(r){return r&&isFinite(r.idx);});
+    if(rows.length<2) return '';
+    rows.sort(function(a,b){return b.idx-a.idx;});
+    rows=rows.slice(0,12);
+    var maxDev=Math.max(12,Math.max.apply(null,rows.map(function(r){return Math.abs(r.idx-100);})));
+    var lo=100-maxDev*1.2, hi=100+maxDev*1.2;
+    var W=360, RH=22, PT=16, PB=6, PL=120, PR=38;
+    var H=PT+PB+rows.length*RH;
+    var iw=W-PL-PR;
+    var xo=function(x){return PL+(Math.max(lo,Math.min(hi,x))-lo)/(hi-lo)*iw;};
+    var zx=xo(100);
+    var s='<figure class="tchart attrbar"><figcaption class="tcttl">'+esc(mk.lab)+
+      '<span class="tcnote">100 = filter avg</span></figcaption>'+
+      '<svg viewBox="0 0 '+W+' '+H+'" class="chart" role="img" aria-label="'+esc(mk.lab)+' by value">';
+    s+='<line x1="'+zx.toFixed(1)+'" x2="'+zx.toFixed(1)+'" y1="'+(PT-4)+'" y2="'+(H-PB)+
+       '" stroke="var(--fg)" stroke-dasharray="3 3" opacity=".45"/>';
+    rows.forEach(function(r,i){
+      var cy=PT+i*RH+RH/2;
+      var col=r.idx>=105?'var(--good)':(r.idx<=95?'var(--bad)':'var(--dim)');
+      var x1=Math.min(zx,xo(r.idx)), x2=Math.max(zx,xo(r.idx)), good=r.idx>=100;
+      s+='<text x="'+(PL-8)+'" y="'+(cy+3).toFixed(1)+'" text-anchor="end" '+
+         'style="font-size:10px;fill:var(--fg)">'+esc(String(r.v).slice(0,18))+'</text>'+
+         '<rect x="'+x1.toFixed(1)+'" y="'+(cy-6).toFixed(1)+'" width="'+Math.max(x2-x1,1).toFixed(1)+
+         '" height="12" rx="2.5" fill="'+col+'" fill-opacity=".82"><title>'+esc(String(r.v))+': '+
+         r.idx.toFixed(0)+' index · '+money(r.sp)+'</title></rect>'+
+         '<text x="'+(xo(r.idx)+(good?5:-5)).toFixed(1)+'" y="'+(cy+3).toFixed(1)+
+         '" text-anchor="'+(good?'start':'end')+'" style="font-size:9.5px;fill:var(--dim)">'+
+         r.idx.toFixed(0)+'</text>';
+    });
+    return s+'</svg></figure>';
+  }
+
+  function attrCharts(ents, base){
+    var c=attrBarChart(ents,{lab:'Scroll-stop index',bv:base.ssr,get:function(e){return e.ssr;}})+
+          attrBarChart(ents,{lab:'CTR index',bv:base.ctr,get:function(e){return e.ctr;}})+
+          attrBarChart(ents,{lab:'ROAS index',bv:base.roas,get:function(e){return e.roas;}});
+    return c?('<div class="ztrends attrtrends">'+c+'</div>'):'';
+  }
+
+  // Populated by tableHTML as it emits each section, consumed by updateAttrNav
+  // to build the left-nav sub-links for whichever tables actually rendered.
+  var NAVSECS=[];
+
+  function tableHTML(spec, pool, base, tid, group){
     var key=spec[0], label=spec[1], kind=spec[2], vision=spec[3];
     var buckets={};
     pool.forEach(function(a){
@@ -2151,7 +2221,11 @@ JS = r"""
         '<td>$'+e.cpm.toFixed(2)+'</td><td>'+e.roas.toFixed(2)+'</td><td>'+idxCell(roasIdx)+'</td></tr>'+
         '<tr class="detail" id="'+rid+'" hidden><td colspan="11"><div class="drill"></div></td></tr>';
     }).join('');
-    return '<h2>'+esc(label)+'<span class="n">click a row to see its ads</span></h2>'+
+    var secId='sec-'+tid;
+    NAVSECS.push({id:secId, label:label, group:group||''});
+    return '<section class="attrsec" id="'+secId+'">'+
+      '<h2>'+esc(label)+'<span class="n">click a row to see its ads</span></h2>'+
+      attrCharts(ents, base)+
       '<div class="tblwrap"><table><thead><tr><th>'+esc(label)+'</th><th>ads</th>'+
       '<th>impressions</th><th>spend</th>'+
       '<th title="3-second video views / impressions of video ads only">scroll-stop</th>'+
@@ -2162,7 +2236,7 @@ JS = r"""
       '<td class="n">'+(base.ssr===null?'&mdash;':base.ssr.toFixed(2)+'%')+'</td><td class="n">100</td>'+
       '<td class="n">'+base.ctr.toFixed(2)+'%</td><td class="n">100</td>'+
       '<td class="n">$'+base.cpm.toFixed(2)+'</td><td class="n">'+base.roas.toFixed(2)+'</td>'+
-      '<td class="n">100</td></tr></tfoot></table></div>';
+      '<td class="n">100</td></tr></tfoot></table></div></section>';
   }
 
   var DRILL={};
@@ -2171,6 +2245,7 @@ JS = r"""
     var pool=ADS.filter(passes);
     var readable=pool.filter(function(a){return a.A;});
     DRILL={};
+    NAVSECS=[];
 
     // headline KPI tiles
     var all=agg(pool), rd=agg(readable);
@@ -2192,6 +2267,7 @@ JS = r"""
     if(!pool.length){
       document.getElementById('tables').innerHTML='<div class="empty">No ads match this filter.</div>';
       document.getElementById('fstat').innerHTML='';
+      updateAttrNav();
       return;
     }
     var active=FILTERS.filter(function(f){return state[f[0]];})
@@ -2200,21 +2276,44 @@ JS = r"""
       ? 'Filtered to <b>'+all.ads+'</b> ads &middot; '+money(all.sp)+' &mdash; '+active.join(' &middot; ')
       : 'Showing all <b>'+all.ads+'</b> ads &middot; '+money(all.sp);
 
-    var html='<h3 class="grp">Audience &amp; metadata &mdash; all ads (100% of filtered spend)</h3>';
-    META_SPECS.forEach(function(s,i){ html+=tableHTML(s, pool, all, 'm'+i); });
+    var G_META='Audience & metadata', G_VIS='Creative attributes', G_ACCT='Account structure';
+    var html='<h3 class="grp" id="grp-meta">'+esc(G_META)+' &mdash; all ads (100% of filtered spend)</h3>';
+    META_SPECS.forEach(function(s,i){ html+=tableHTML(s, pool, all, 'm'+i, G_META); });
     if(readable.length){
-      html+='<h3 class="grp">Creative attributes &mdash; analyzable ads only ('+pct.toFixed(0)+'% of filtered spend)</h3>';
-      VISION_SPECS.forEach(function(s,i){ html+=tableHTML(s, readable, rd, 'v'+i); });
+      html+='<h3 class="grp" id="grp-vis">'+esc(G_VIS)+' &mdash; analyzable ads only ('+pct.toFixed(0)+'% of filtered spend)</h3>';
+      VISION_SPECS.forEach(function(s,i){ html+=tableHTML(s, readable, rd, 'v'+i, G_VIS); });
     }else{
       html+='<div class="note">No creative-attribute tables for this filter &mdash; none of the '+
         'matching ads have a readable creative analysis (catalog ads have no fixed creative).</div>';
     }
     // Account structure last — see TAIL_SPECS for why these sit apart from the
     // attribute tables rather than among them.
-    html+='<h3 class="grp">Account structure &mdash; all ads (100% of filtered spend)</h3>';
-    TAIL_SPECS.forEach(function(s,i){ html+=tableHTML(s, pool, all, 't'+i); });
+    html+='<h3 class="grp" id="grp-acct">'+esc(G_ACCT)+' &mdash; all ads (100% of filtered spend)</h3>';
+    TAIL_SPECS.forEach(function(s,i){ html+=tableHTML(s, pool, all, 't'+i, G_ACCT); });
     document.getElementById('tables').innerHTML=html;
+    updateAttrNav();
     wireRows();
+  }
+
+  // Rebuild the left-nav sub-links under "Creative attributes" from whatever
+  // tables the current filter actually rendered (thin buckets drop out, so the
+  // list is filter-dependent). Grouped under their section headings; each link
+  // smooth-scrolls to its table.
+  function updateAttrNav(){
+    var host=document.getElementById('secNavAttrs');
+    if(!host) return;
+    if(!NAVSECS.length){ host.innerHTML=''; return; }
+    var order=[], byGroup={};
+    NAVSECS.forEach(function(n){
+      if(!byGroup[n.group]){ byGroup[n.group]=[]; order.push(n.group); }
+      byGroup[n.group].push(n);
+    });
+    host.innerHTML=order.map(function(g){
+      return '<div class="secnav-grp">'+esc(g)+'</div>'+
+        byGroup[g].map(function(n){
+          return '<a class="sub" href="#'+n.id+'" data-sec="'+n.id+'"><i></i>'+esc(n.label)+'</a>';
+        }).join('');
+    }).join('');
   }
 
   function wireRows(){
@@ -2515,6 +2614,7 @@ def build_performance_dashboard(
         '<a href="#funnelSec" data-sec="funnelSec"><i></i>Conversion funnel</a>'
         '<a href="#skSec" data-sec="skSec"><i></i>Scale or kill</a>'
         '<a href="#tablesSec" data-sec="tablesSec"><i></i>Creative attributes</a>'
+        '<div id="secNavAttrs" class="secnav-sub"></div>'
         '<a href="#rankSec" data-sec="rankSec"><i></i>Meta rating vs ROAS</a>'
         '</div></nav>'
         '<div class="topbar"><div>'
