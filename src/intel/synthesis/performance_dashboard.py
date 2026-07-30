@@ -59,6 +59,95 @@ NESTED_ATTRS = [
     ("casting.people_visible", "People visible"),
 ]
 
+# What each creative tag MEANS and which values the vision taxonomy is allowed to
+# emit for it. Mirrors CREATIVE_TAXONOMY_PROMPT / VIDEO_TAXONOMY_PROMPT — the tag
+# manager in the dashboard edits this, and its export is what gets folded back
+# into those prompts. `opts` empty = open vocabulary (the model writes free text),
+# so the manager shows only what was actually observed.
+TAG_META: dict[str, dict[str, Any]] = {
+    "production_style": {
+        "desc": "How the ad was produced — brand-polished vs creator-style vs meme graphic.",
+        "opts": ["polished_brand", "ugc_creator_style", "meme_graphic", "mixed"],
+    },
+    "photography_style": {
+        "desc": "How the product or subject is shot or rendered.",
+        "opts": ["model_on_figure", "flat_lay", "lifestyle", "studio_product_only",
+                 "screenshot_ui", "text_only", "mixed"],
+    },
+    "product_emphasis": {
+        "desc": "Whether the frame sells the product itself or the lifestyle around it.",
+        "opts": ["product_forward", "lifestyle_forward", "balanced"],
+    },
+    "hook_style": {
+        "desc": "The persuasion device the creative leads with.",
+        "opts": ["problem_solution", "social_proof", "urgency", "founder_story", "demo",
+                 "testimonial", "meme", "aesthetic", "unknown"],
+    },
+    "emotional_vs_rational": {
+        "desc": "Whether the appeal is feeling-led or reason-led.",
+        "opts": ["emotional", "rational", "mixed"],
+    },
+    "aspect_ratio_guess": {
+        "desc": "Frame shape as judged from the rendered creative.",
+        "opts": ["1:1", "4:5", "9:16", "16:9", "other"],
+    },
+    "background_color": {
+        "desc": "Dominant background treatment behind the subject.",
+        "opts": ["white", "black", "gray", "beige", "brown", "red", "orange", "yellow",
+                 "green", "blue", "purple", "pink", "multi", "gradient", "n/a"],
+    },
+    "model_gender": {
+        "desc": "Presented gender of the people on screen, if any.",
+        "opts": ["male", "female", "mixed", "ambiguous", "not_visible"],
+    },
+    "logo_visible": {
+        "desc": "Whether a retailer or brand logo appears in the creative.",
+        "opts": ["yes", "no"],
+    },
+    "before_after_present": {
+        "desc": "Whether the creative shows a before/after comparison.",
+        "opts": ["yes", "no"],
+    },
+    "text_overlay.density": {
+        "desc": "How much type is burned into the creative.",
+        "opts": ["none", "light", "medium", "heavy"],
+    },
+    "text_overlay.copy_lean": {
+        "desc": "What the on-image copy leads with.",
+        "opts": ["offer_led", "benefit_led", "brand_led", "none"],
+    },
+    "urgency_cues.present": {
+        "desc": "Whether the creative uses scarcity or deadline cues.",
+        "opts": ["yes", "no"],
+    },
+    "casting.people_visible": {
+        "desc": "Whether any person appears in the creative.",
+        "opts": ["yes", "no"],
+    },
+    "value_props": {
+        "desc": "Benefits the ad argues for. Multi-select — an ad can carry several.",
+        "opts": ["efficacy", "price", "sustainability", "inclusivity", "convenience",
+                 "social_proof", "novelty"],
+    },
+    "key_features": {
+        "desc": "Visual elements present in the frame. Multi-select — an ad can carry several.",
+        "opts": ["price_visible", "discount_badge", "free_shipping_badge", "free_gift_badge",
+                 "brand_logo", "cta_button_in_image", "countdown_timer", "before_after",
+                 "star_rating_visible", "review_quote_overlay", "model_present", "creator_face",
+                 "lifestyle_setting", "product_close_up", "multi_product_collage",
+                 "video_thumbnail", "text_only_card", "price_compare", "limited_time_text",
+                 "shipping_callout"],
+    },
+    "products_visible": {
+        "desc": "Product types shown, as free-form noun phrases. Open vocabulary.",
+        "opts": [],
+    },
+    "seasonal_tags": {
+        "desc": "Seasonal or calendar hooks the creative leans on. Open vocabulary.",
+        "opts": [],
+    },
+}
+
 
 def _dig(d: dict, path: str) -> Any:
     cur: Any = d
@@ -902,6 +991,77 @@ font-variant-numeric:tabular-nums;margin-top:4px}
 .erlegend{display:flex;gap:18px;margin:0 0 8px;font-size:12.5px;color:var(--dim)}
 .erlegend i{display:inline-block;width:20px;height:3px;border-radius:2px;margin-right:6px;
 vertical-align:middle}
+
+/* ---- creative tag manager (taxonomy editor) ---- */
+.attrdesc{color:var(--dim);font-size:12px;margin:-4px 0 10px;max-width:820px}
+.editlink{font-size:11px;font-weight:500;text-transform:none;letter-spacing:0;
+color:var(--accent);text-decoration:none;margin-left:10px}
+.editlink:hover{text-decoration:underline}
+.tgstat{color:var(--dim);font-size:12.5px}
+.tgstat b{color:var(--fg)}
+.tgstat.dirty b{color:var(--warn)}
+.tagnew{background:var(--panel2);border:1px solid var(--accent);border-radius:10px;
+padding:14px 16px;margin:0 0 16px;display:flex;flex-direction:column;gap:10px}
+.tagnew[hidden]{display:none}
+.tagnew .r{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tgin{background:var(--panel);border:1px solid var(--line);color:var(--fg);border-radius:8px;
+padding:7px 10px;font-size:13px}
+.tgin:focus{outline:none;border-color:var(--accent)}
+.tgin.wide{flex:1;min-width:260px}
+.tagcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.tagcard.off{opacity:.55}
+.tagcard.new{border-left:3px solid var(--accent)}
+.tagcard .tchd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+/* Inline-editable fields read as text until touched; a dashed underline is what
+   says "you can type here" without turning every row into a form box. */
+.tagcard .tglab{background:transparent;border:1px solid transparent;color:var(--fg);
+border-bottom:1px dashed var(--line);
+font-size:15px;font-weight:650;border-radius:7px;padding:4px 7px;min-width:200px;flex:0 1 auto}
+.tagcard .tglab:hover{border-color:var(--line);background:var(--panel2)}
+.tagcard .tglab:focus{outline:none;border-color:var(--accent);background:var(--panel2)}
+.tagcard .tgkey{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;
+color:var(--dim)}
+.tagcard .tgcov{color:var(--dim);font-size:11.5px;font-variant-numeric:tabular-nums}
+.tagcard .spacer{flex:1}
+.tgsw{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--dim);
+cursor:pointer;white-space:nowrap}
+.tgsw input{accent-color:var(--accent);cursor:pointer}
+.tgdesc{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--fg);
+border-radius:8px;padding:8px 10px;font:inherit;font-size:12.5px;line-height:1.45;resize:vertical;
+min-height:46px}
+.tgdesc:focus{outline:none;border-color:var(--accent)}
+.tgvals{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.tgvhd{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);
+margin-bottom:8px}
+.tgv{display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap}
+.tgv+.tgv{border-top:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+.tgv.off .tgvname{text-decoration:line-through;color:var(--dim)}
+.tgv .tgvname{background:transparent;border:1px solid transparent;color:var(--fg);
+border-bottom:1px dashed var(--line);
+border-radius:6px;padding:4px 7px;font-size:12.5px;width:230px;flex:0 0 auto}
+.tgv.off .tgvname{border-bottom-color:transparent}
+.tgv .tgvname:hover{border-color:var(--line);background:var(--panel2)}
+.tgv .tgvname:focus{outline:none;border-color:var(--accent);background:var(--panel2)}
+.tgv .tgbar{flex:1;min-width:80px;max-width:220px;height:4px;background:var(--line);
+border-radius:2px;overflow:hidden}
+.tgv .tgbar>i{display:block;height:100%;background:var(--accent)}
+.tgv .tgvmeta{color:var(--dim);font-size:11.5px;font-variant-numeric:tabular-nums;
+width:190px;flex:0 0 auto;text-align:right}
+.tgv .was{color:var(--dim);font-size:11px;font-style:italic}
+.tgx{background:none;border:1px solid var(--line);color:var(--dim);border-radius:6px;
+padding:2px 8px;font-size:12px;cursor:pointer;line-height:1.5}
+.tgx:hover{border-color:var(--bad);color:var(--bad)}
+.tgx.restore:hover{border-color:var(--good);color:var(--good)}
+.tgadd{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.tgadd .tgin{width:230px}
+.tgmore{background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;
+padding:6px 0 0}
+.tgmore:hover{text-decoration:underline}
+.tgsrc{display:inline-block;font-size:9px;text-transform:uppercase;letter-spacing:.05em;
+padding:1.5px 6px;border-radius:99px;border:1px solid var(--line);color:var(--dim);flex:0 0 auto}
+.tgsrc.added{border-color:var(--accent);color:var(--accent)}
+.tgsrc.unused{opacity:.7}
 """
 
 
@@ -1065,13 +1225,13 @@ JS = r"""
   function segOptions(pool){
     var out=[{id:'__all__',lab:'All ads in filter',list:pool}];
     function group(key,label,vision,isList){
-      var m={};
+      var m={}, spec=[key,label,isList?'list':'scalar',!!vision];
       pool.forEach(function(a){
-        var v = vision ? (a.A?a.A[key]:undefined) : a[key];
-        if(v===undefined||v===null||v==='') return;
-        if(isList){ if(!Array.isArray(v)) return;
-          v.forEach(function(x){ if(x!==''&&x!=null) (m[x]=m[x]||[]).push(a); }); }
-        else { (m[v]=m[v]||[]).push(a); }
+        // Same override-aware lookup the attribute tables use, so a renamed or
+        // dropped tag value never lingers in the funnel dropdown.
+        var vs=specVals(a,spec);
+        if(!vs) return;
+        vs.forEach(function(x){ (m[x]=m[x]||[]).push(a); });
       });
       Object.keys(m).sort(function(x,y){
         return m[y].reduce(function(s,a){return s+(a.sp||0);},0)
@@ -1092,8 +1252,9 @@ JS = r"""
     group('b','Brand');
     // …creative-descriptive metadata (known for every ad)…
     group('cl','Creative class'); group('ot','Object type'); group('cta','CTA');
-    // …then every vision-derived creative attribute (analyzable ads only).
-    VISION_SPECS.forEach(function(s){ group(s[0], s[1], true, s[2]==='list'); });
+    // …then every vision-derived creative attribute (analyzable ads only),
+    // as the tag manager currently defines them.
+    visSpecs().forEach(function(s){ group(s[0], s[1], true, s[2]==='list'); });
     return out;
   }
 
@@ -2291,6 +2452,80 @@ JS = r"""
     return c?('<div class="ztrends attrtrends">'+c+'</div>'):'';
   }
 
+  // ===================================== creative tag overrides (taxonomy) ===
+  // The tag manager at the bottom of the page edits the creative taxonomy: tag
+  // labels and descriptions, which tags are shown, and which VALUES are kept,
+  // renamed (which merges buckets) or dropped. Everything that reads a vision
+  // attribute goes through specVals() so an edit is reflected everywhere at
+  // once — tables, charts, funnel axes and the left nav.
+  //
+  //   TAGS = {v:1, defs:{<key>:{label,desc,hidden,vals:{<raw>:{rename,hidden}},
+  //                             add:[<value>]}}, custom:[{key,label,desc,kind,vals:[]}]}
+  //
+  // State lives in localStorage (per browser). TAG_SAVED is the shipped baseline
+  // — a creative_tags.json sitting next to this file at build time — so an
+  // exported taxonomy can be checked in and become everyone's default.
+  var TAG_LS='intel.perf.creativeTags.v1';
+  function normTags(t){
+    t=t&&typeof t==='object'?t:{};
+    return {v:1, defs:(t.defs&&typeof t.defs==='object')?t.defs:{},
+            custom:Array.isArray(t.custom)?t.custom:[]};
+  }
+  var TAG_LOCAL=false;
+  var TAGS=(function(){
+    try{ var s=localStorage.getItem(TAG_LS);
+      if(s){ TAG_LOCAL=true; return normTags(JSON.parse(s)); } }catch(e){}
+    return normTags(typeof TAG_SAVED!=='undefined'?TAG_SAVED:{});
+  })();
+  function tdef(k){
+    var d=TAGS.defs[k]; if(!d) d=TAGS.defs[k]={};
+    if(!d.vals||typeof d.vals!=='object') d.vals={};
+    if(!Array.isArray(d.add)) d.add=[];
+    return d;
+  }
+  function tagLabel(k,fb){ var d=TAGS.defs[k]; return (d&&d.label)?d.label:fb; }
+  function tagDesc(k){
+    var d=TAGS.defs[k];
+    if(d&&typeof d.desc==='string') return d.desc;
+    return (TAG_META[k]&&TAG_META[k].desc)||'';
+  }
+  function tagHidden(k){ var d=TAGS.defs[k]; return !!(d&&d.hidden); }
+  // Raw value → what the dashboard should call it, or null when suppressed.
+  function valOut(key,v){
+    var d=TAGS.defs[key]; if(!d||!d.vals) return v;
+    var o=d.vals[v]; if(!o) return v;
+    if(o.hidden) return null;
+    return (o.rename&&o.rename!==v)?o.rename:v;
+  }
+  // Every value an ad contributes to one attribute, post-override. Always an
+  // array (scalar attributes yield one), or null when the ad has nothing to
+  // contribute. Renames can collapse two list values into one, so it dedupes.
+  function specVals(a,spec){
+    var key=spec[0], kind=spec[2], vision=spec[3];
+    var v = vision ? (a.A?a.A[key]:undefined) : a[key];
+    if(v===undefined||v===null||v==='') return null;
+    var arr = kind==='list' ? (Array.isArray(v)?v:null) : [v];
+    if(!arr) return null;
+    var out=[], seen={};
+    for(var i=0;i<arr.length;i++){
+      var x=arr[i]; if(x===''||x==null) continue;
+      x=String(x);
+      var m = vision ? valOut(key,x) : x;
+      if(m && !seen[m]){ seen[m]=1; out.push(m); }
+    }
+    return out.length?out:null;
+  }
+  // Vision specs as the dashboard should currently render them: hidden tags
+  // dropped, labels swapped for their overrides.
+  function visSpecs(){
+    var out=[];
+    VISION_SPECS.forEach(function(s){
+      if(tagHidden(s[0])) return;
+      out.push([s[0], tagLabel(s[0],s[1]), s[2], true]);
+    });
+    return out;
+  }
+
   // Populated by tableHTML as it emits each section, consumed by updateAttrNav
   // to build the left-nav sub-links for whichever tables actually rendered.
   var NAVSECS=[];
@@ -2299,11 +2534,9 @@ JS = r"""
     var key=spec[0], label=spec[1], kind=spec[2], vision=spec[3];
     var buckets={};
     pool.forEach(function(a){
-      var v = vision ? (a.A?a.A[key]:undefined) : a[key];
-      if(v===undefined||v===null||v==='') return;
-      if(kind==='list'){ if(!Array.isArray(v)) return;
-        v.forEach(function(x){ if(x===''||x==null) return; (buckets[x]=buckets[x]||[]).push(a); }); }
-      else { (buckets[v]=buckets[v]||[]).push(a); }
+      var vs=specVals(a,spec);
+      if(!vs) return;
+      vs.forEach(function(x){ (buckets[x]=buckets[x]||[]).push(a); });
     });
     var ents=[];
     for(var v in buckets){
@@ -2331,8 +2564,13 @@ JS = r"""
     }).join('');
     var secId='sec-'+tid;
     NAVSECS.push({id:secId, label:label, group:group||''});
+    // Vision tags carry the description the tag manager edits, so the meaning of
+    // a bucket is readable where it is being read rather than only in the editor.
+    var desc = vision ? tagDesc(key) : '';
     return '<section class="attrsec" id="'+secId+'">'+
-      '<h2>'+esc(label)+'<span class="n">click a row to see its ads</span></h2>'+
+      '<h2>'+esc(label)+'<span class="n">click a row to see its ads</span>'+
+      (vision?'<a class="editlink" href="#tagSec">edit tag</a>':'')+'</h2>'+
+      (desc?'<div class="attrdesc">'+esc(desc)+'</div>':'')+
       attrCharts(ents, base)+
       '<div class="tblwrap"><table><thead><tr><th>'+esc(label)+'</th><th>ads</th>'+
       '<th>impressions</th><th>spend</th>'+
@@ -2687,6 +2925,357 @@ JS = r"""
       'without assuming the relationship is a straight line.';
   }
 
+  // ============================================== creative tag manager (form) =
+  // A form view over the creative taxonomy itself. One card per tag, holding its
+  // label, its description and every value it can take — each value editable
+  // (rename = merge into that bucket), removable, and addable.
+  //
+  // What an edit does and does not do, stated plainly because the difference
+  // matters: it changes how THIS dashboard groups and names the tags already on
+  // the ads. It never re-tags an ad. A value added here is a definition for the
+  // next creative-analysis run, which is why the export exists.
+  var TAG_VCAP=12;            // values shown per tag before "show all"
+  var TAG_EXP={};             // key → expanded
+  var TAG_NEWOPEN=false;
+  var ADSA=ADS.filter(function(a){return !!a.A;});
+  var TAG_BUILTIN={};
+  VISION_SPECS.forEach(function(s){ TAG_BUILTIN[s[0]]={label:s[1], kind:s[2]}; });
+
+  function tagKind(key){
+    if(TAG_BUILTIN[key]) return TAG_BUILTIN[key].kind;
+    for(var i=0;i<TAGS.custom.length;i++) if(TAGS.custom[i].key===key) return TAGS.custom[i].kind;
+    return 'scalar';
+  }
+  // Per-tag value census over every analyzed ad in the dataset (NOT the filtered
+  // pool — this is a taxonomy editor, so the counts should not move when someone
+  // narrows the filter bar). Keyed by the RAW value, because that is what an
+  // override has to address; the rename is applied for display only.
+  function tagStats(key,kind){
+    var m={}, cov={ads:0,sp:0};
+    ADSA.forEach(function(a){
+      var v=a.A?a.A[key]:undefined;
+      if(v===undefined||v===null||v==='') return;
+      var arr = kind==='list' ? (Array.isArray(v)?v:[]) : [v];
+      var seen={}, any=false;
+      arr.forEach(function(x){
+        if(x===''||x==null) return;
+        x=String(x); if(seen[x]) return; seen[x]=1; any=true;
+        var e=m[x]||(m[x]={v:x,ads:0,sp:0,im:0});
+        e.ads++; e.sp+=a.sp||0; e.im+=a.im||0;
+      });
+      if(any){ cov.ads++; cov.sp+=a.sp||0; }
+    });
+    return {vals:m, cov:cov};
+  }
+  // Candidate rows for a tag: what the taxonomy allows (canonical), what the ads
+  // actually carry (observed), and what the user has added. Observed first by
+  // spend, then unused canonical values, then additions.
+  function tagRows(key,kind){
+    var st=tagStats(key,kind), d=tdef(key);
+    var opts=(TAG_META[key]&&TAG_META[key].opts)||[];
+    var rows=[], seen={};
+    Object.keys(st.vals).forEach(function(v){
+      seen[v]=1;
+      rows.push({v:v, ads:st.vals[v].ads, sp:st.vals[v].sp, src:opts.indexOf(v)>=0?'canonical':'observed'});
+    });
+    rows.sort(function(a,b){return b.sp-a.sp;});
+    var tail=[];
+    opts.forEach(function(v){ if(!seen[v]){ seen[v]=1; tail.push({v:v,ads:0,sp:0,src:'unused'}); } });
+    d.add.forEach(function(v){ if(!seen[v]){ seen[v]=1; tail.push({v:v,ads:0,sp:0,src:'added'}); } });
+    return {rows:rows.concat(tail), cov:st.cov, maxsp:rows.length?rows[0].sp:0};
+  }
+  function tagChanges(){
+    var n=TAGS.custom.length;
+    Object.keys(TAGS.defs).forEach(function(k){
+      var d=TAGS.defs[k]||{};
+      if(d.label) n++;
+      if(typeof d.desc==='string' && d.desc!==((TAG_META[k]&&TAG_META[k].desc)||'')) n++;
+      if(d.hidden) n++;
+      if(Array.isArray(d.add)) n+=d.add.length;
+      Object.keys(d.vals||{}).forEach(function(v){
+        var o=d.vals[v]||{};
+        if(o.hidden) n++;
+        else if(o.rename&&o.rename!==v) n++;
+      });
+    });
+    return n;
+  }
+  // Rendering a card touches tdef() for every tag, which leaves an empty record
+  // behind. Drop those (and no-op value entries) before anything persists or
+  // exports the state, so the saved file is the edits and nothing else.
+  function pruneTags(){
+    Object.keys(TAGS.defs).forEach(function(k){
+      var d=TAGS.defs[k]||{};
+      Object.keys(d.vals||{}).forEach(function(v){
+        var o=d.vals[v]||{};
+        if(!o.hidden && (!o.rename||o.rename===v)) delete d.vals[v];
+      });
+      if(TAGS.custom.some(function(c){return c.key===k;})) return;
+      var defDesc=(TAG_META[k]&&TAG_META[k].desc)||'';
+      var empty = !d.label && !d.hidden &&
+        (typeof d.desc!=='string' || d.desc===defDesc) &&
+        (!d.add||!d.add.length) && !Object.keys(d.vals||{}).length;
+      if(empty) delete TAGS.defs[k];
+    });
+  }
+  function saveTags(){
+    pruneTags();
+    try{ localStorage.setItem(TAG_LS, JSON.stringify(TAGS)); TAG_LOCAL=true; }catch(e){}
+    tagStatPaint();
+  }
+  // Says both how much has been changed and WHERE it lives — edits made in this
+  // browser read differently from a taxonomy the build shipped with.
+  function tagStatPaint(){
+    var el=document.getElementById('tagStat');
+    if(!el) return;
+    var n=tagChanges();
+    el.className='tgstat'+(n&&TAG_LOCAL?' dirty':'');
+    el.innerHTML = n
+      ? '<b>'+n+'</b> customisation'+(n===1?'':'s')+' &mdash; '+
+        (TAG_LOCAL?'stored in this browser, not yet exported'
+                 :'from the taxonomy this dashboard shipped with')
+      : 'No customisations &mdash; showing the taxonomy this dashboard shipped with';
+  }
+  var TAG_T=null;
+  function tagApply(){ clearTimeout(TAG_T); TAG_T=setTimeout(render, 300); }
+
+  function tagCard(key,kind,custom){
+    var d=tdef(key), r=tagRows(key,kind);
+    var label=tagLabel(key, TAG_BUILTIN[key]?TAG_BUILTIN[key].label:key);
+    var hidden=!!d.hidden, shown=0, over=0;
+    var rowsHTML=r.rows.map(function(v,i){
+      var o=(d.vals[v.v]||{}), off=!!o.hidden, name=(o.rename&&!off)?o.rename:v.v;
+      if(!TAG_EXP[key] && i>=TAG_VCAP && !off && v.src!=='added'){ over++; return ''; }
+      shown++;
+      var share=r.cov.sp?100*v.sp/r.cov.sp:0;
+      var meta = v.ads
+        ? v.ads+' ad'+(v.ads===1?'':'s')+' &middot; '+money(v.sp)+' &middot; '+share.toFixed(0)+'%'
+        : (v.src==='added'?'new &mdash; applies on the next analysis run':'never observed');
+      return '<div class="tgv'+(off?' off':'')+'" data-v="'+esc(v.v)+'">'+
+        '<input class="tgvname" data-k="'+esc(key)+'" data-v="'+esc(v.v)+'" value="'+esc(name)+'"'+
+          (off?' disabled':'')+' title="Rename this value. Renaming it to an existing value merges the two buckets.">'+
+        '<span class="tgsrc'+(v.src==='added'?' added':'')+(v.src==='unused'?' unused':'')+'">'+
+          esc(v.src==='canonical'?'in taxonomy':(v.src==='observed'?'observed':(v.src==='unused'?'unused':'added')))+'</span>'+
+        (name!==v.v?'<span class="was">was '+esc(v.v)+'</span>':'')+
+        '<span class="tgbar"><i style="width:'+(r.maxsp?100*v.sp/r.maxsp:0).toFixed(0)+'%"></i></span>'+
+        '<span class="tgvmeta">'+meta+'</span>'+
+        '<button class="tgx'+(off?' restore':'')+'" data-act="'+(off?'restore':'drop')+'" data-k="'+
+          esc(key)+'" data-v="'+esc(v.v)+'" type="button" title="'+
+          (off?'Put this value back':'Remove this value from the dashboard')+'">'+
+          (off?'restore':'&times;')+'</button></div>';
+    }).join('');
+    return '<div class="tagcard'+(hidden?' off':'')+(custom?' new':'')+'" data-k="'+esc(key)+'">'+
+      '<div class="tchd">'+
+        '<input class="tglab" data-k="'+esc(key)+'" value="'+esc(label)+'" title="Rename this tag">'+
+        '<span class="tgsrc">'+(kind==='list'?'multi-select':'single-select')+'</span>'+
+        '<span class="tgkey">'+esc(key)+'</span>'+
+        '<span class="tgcov">'+(r.cov.ads?r.cov.ads+' ads tagged &middot; '+money(r.cov.sp):'no ads tagged yet')+'</span>'+
+        '<span class="spacer"></span>'+
+        '<label class="tgsw"><input type="checkbox" class="tgshow" data-k="'+esc(key)+'"'+
+          (hidden?'':' checked')+'> show in dashboard</label>'+
+        (custom?'<button class="tgx" data-act="delTag" data-k="'+esc(key)+'" type="button">delete tag</button>':'')+
+      '</div>'+
+      '<textarea class="tgdesc" data-k="'+esc(key)+'" rows="2" '+
+        'placeholder="What this tag means, and how the analyst should apply it…">'+esc(tagDesc(key))+'</textarea>'+
+      '<div class="tgvals"><div class="tgvhd">values</div>'+
+        (rowsHTML||'<div class="tgvhd">no values defined yet</div>')+
+        (over?'<button class="tgmore" data-k="'+esc(key)+'" type="button">Show all '+
+          r.rows.length+' values</button>':'')+
+        '<div class="tgadd"><input class="tgin tgnew" data-k="'+esc(key)+'" type="text" '+
+          'placeholder="Add a value…"><button class="fbtn" data-act="addVal" data-k="'+esc(key)+
+          '" type="button">Add value</button></div>'+
+      '</div></div>';
+  }
+
+  function renderTags(){
+    var host=document.getElementById('tagList');
+    if(!host) return;
+    var html=VISION_SPECS.map(function(s){ return tagCard(s[0], s[2], false); }).join('');
+    if(TAGS.custom.length){
+      html+='<h3 class="grp">Tags you added</h3>'+
+        TAGS.custom.map(function(c){ return tagCard(c.key, c.kind, true); }).join('');
+    }
+    host.innerHTML=html;
+    tagStatPaint();
+    document.getElementById('tagNew').hidden=!TAG_NEWOPEN;
+  }
+
+  // Resolved taxonomy + the raw editor state. The first is what a human or the
+  // analysis prompt reads; the second is what re-import needs (a rename cannot
+  // be reconstructed from resolved values alone).
+  function tagExportObj(){
+    var tags=[];
+    function entry(key,kind,custom){
+      var d=tdef(key), r=tagRows(key,kind), vals=[], removed=[], seen={};
+      r.rows.forEach(function(v){
+        var o=d.vals[v.v]||{};
+        if(o.hidden){ removed.push(v.v); return; }
+        var name=(o.rename&&o.rename!==v.v)?o.rename:v.v;
+        if(!seen[name]){ seen[name]=1; vals.push(name); }
+      });
+      tags.push({key:key, label:tagLabel(key, TAG_BUILTIN[key]?TAG_BUILTIN[key].label:key),
+                 kind:kind==='list'?'multi':'single', description:tagDesc(key),
+                 enabled:!d.hidden, custom:!!custom, values:vals, removed_values:removed,
+                 ads_tagged:r.cov.ads});
+    }
+    VISION_SPECS.forEach(function(s){ entry(s[0], s[2], false); });
+    TAGS.custom.forEach(function(c){ entry(c.key, c.kind, true); });
+    pruneTags();
+    return {version:1,
+            tool:'intel performance dashboard — creative tag manager',
+            note:'`tags` is the resolved taxonomy: hand it to the creative-analysis '+
+                 'prompt. `overrides` is the raw editor state — keep it so this file '+
+                 'can be re-imported. Save as creative_tags.json beside the dashboard to '+
+                 'make it the default for everyone.',
+            tags:tags, overrides:TAGS};
+  }
+  function tagDownload(){
+    var blob=new Blob([JSON.stringify(tagExportObj(),null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download='creative_tags.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  }
+  function tagImport(obj){
+    if(obj&&obj.overrides){ TAGS=normTags(obj.overrides); }
+    else if(obj&&Array.isArray(obj.tags)){
+      // Rebuild what a resolved export can express: labels, descriptions, which
+      // tags are on, which values were removed, and any values added. Renames
+      // are not recoverable from this shape and are dropped.
+      TAGS=normTags({});
+      obj.tags.forEach(function(t){
+        if(!t||!t.key) return;
+        var bi=TAG_BUILTIN[t.key];
+        if(!bi){
+          TAGS.custom.push({key:t.key, kind:t.kind==='multi'?'list':'scalar'});
+        }
+        var d=tdef(t.key);
+        if(t.label && (!bi || t.label!==bi.label)) d.label=t.label;
+        if(typeof t.description==='string') d.desc=t.description;
+        if(t.enabled===false) d.hidden=true;
+        (t.removed_values||[]).forEach(function(v){ d.vals[v]={hidden:true}; });
+        var known={};
+        ((TAG_META[t.key]&&TAG_META[t.key].opts)||[]).forEach(function(v){known[v]=1;});
+        Object.keys(tagStats(t.key, bi?bi.kind:'scalar').vals).forEach(function(v){known[v]=1;});
+        (t.values||[]).forEach(function(v){ if(!known[v] && d.add.indexOf(v)<0) d.add.push(v); });
+      });
+    }else{ return false; }
+    saveTags(); renderTags(); render(); return true;
+  }
+
+  function wireTags(){
+    var host=document.getElementById('tagList');
+    if(!host) return;
+    // Text edits: save + re-render the dashboard, but do NOT rebuild the cards —
+    // that would yank focus out from under the cursor mid-word.
+    host.addEventListener('input', function(e){
+      var t=e.target, k=t.dataset.k;
+      if(t.classList.contains('tglab')){
+        var d=tdef(k), def=TAG_BUILTIN[k]?TAG_BUILTIN[k].label:k, v=t.value.trim();
+        if(!v||v===def) delete d.label; else d.label=v;
+        saveTags(); tagApply();
+      }else if(t.classList.contains('tgdesc')){
+        tdef(k).desc=t.value; saveTags(); tagApply();
+      }else if(t.classList.contains('tgvname')){
+        var raw=t.dataset.v, dd=tdef(k), nv=t.value.trim();
+        if(!nv||nv===raw){ if(dd.vals[raw]&&!dd.vals[raw].hidden) delete dd.vals[raw]; }
+        else { dd.vals[raw]=dd.vals[raw]||{}; dd.vals[raw].rename=nv; }
+        saveTags(); tagApply();
+      }
+    });
+    host.addEventListener('change', function(e){
+      var t=e.target;
+      if(!t.classList.contains('tgshow')) return;
+      var d=tdef(t.dataset.k);
+      if(t.checked) delete d.hidden; else d.hidden=true;
+      saveTags(); renderTags(); render();
+    });
+    host.addEventListener('click', function(e){
+      var t=e.target.closest ? e.target.closest('button') : null;
+      if(!t) return;
+      var k=t.dataset.k, act=t.dataset.act;
+      if(t.classList.contains('tgmore')){ TAG_EXP[k]=1; renderTags(); return; }
+      if(act==='drop'){
+        var d=tdef(k), v=t.dataset.v, i=d.add.indexOf(v);
+        // A value the user added themselves is deleted outright; a value that
+        // came from the taxonomy or from the data is only suppressed, so it can
+        // be restored and so the export can report it as removed.
+        if(i>=0){ d.add.splice(i,1); delete d.vals[v]; }
+        else { d.vals[v]=d.vals[v]||{}; d.vals[v].hidden=true; }
+        saveTags(); renderTags(); render(); return;
+      }
+      if(act==='restore'){
+        var dr=tdef(k); if(dr.vals[t.dataset.v]) delete dr.vals[t.dataset.v].hidden;
+        if(dr.vals[t.dataset.v] && !dr.vals[t.dataset.v].rename) delete dr.vals[t.dataset.v];
+        saveTags(); renderTags(); render(); return;
+      }
+      if(act==='addVal'){
+        var inp=host.querySelector('.tgnew[data-k="'+k+'"]');
+        var nv=inp?inp.value.trim():'';
+        if(!nv) return;
+        var da=tdef(k);
+        if(da.vals[nv]&&da.vals[nv].hidden) delete da.vals[nv].hidden;
+        else if(da.add.indexOf(nv)<0) da.add.push(nv);
+        TAG_EXP[k]=1;
+        if(inp) inp.value='';
+        saveTags(); renderTags(); return;
+      }
+      if(act==='delTag'){
+        TAGS.custom=TAGS.custom.filter(function(c){return c.key!==k;});
+        delete TAGS.defs[k];
+        saveTags(); renderTags(); render(); return;
+      }
+    });
+
+    document.getElementById('tagAdd').addEventListener('click', function(){
+      TAG_NEWOPEN=!TAG_NEWOPEN;
+      document.getElementById('tagNew').hidden=!TAG_NEWOPEN;
+      if(TAG_NEWOPEN) document.getElementById('ntLabel').focus();
+    });
+    document.getElementById('ntCancel').addEventListener('click', function(){
+      TAG_NEWOPEN=false; document.getElementById('tagNew').hidden=true;
+    });
+    document.getElementById('ntCreate').addEventListener('click', function(){
+      var lab=document.getElementById('ntLabel').value.trim();
+      var kind=document.getElementById('ntKind').value;
+      var desc=document.getElementById('ntDesc').value.trim();
+      if(!lab){ document.getElementById('ntLabel').focus(); return; }
+      var key=lab.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')||'tag';
+      var base=key, n=2;
+      while(TAG_BUILTIN[key] || TAGS.custom.some(function(c){return c.key===key;})){ key=base+'_'+(n++); }
+      TAGS.custom.push({key:key, kind:kind});
+      var d=tdef(key); d.label=lab; d.desc=desc;
+      document.getElementById('ntLabel').value=''; document.getElementById('ntDesc').value='';
+      TAG_NEWOPEN=false;
+      saveTags(); renderTags();
+      var card=document.querySelector('.tagcard[data-k="'+key+'"]');
+      if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
+    });
+    document.getElementById('tagExport').addEventListener('click', tagDownload);
+    document.getElementById('tagImport').addEventListener('click', function(){
+      document.getElementById('tagFile').click();
+    });
+    document.getElementById('tagFile').addEventListener('change', function(e){
+      var f=e.target.files&&e.target.files[0];
+      if(!f) return;
+      var rd=new FileReader();
+      rd.onload=function(){
+        var ok=false;
+        try{ ok=tagImport(JSON.parse(rd.result)); }catch(err){ ok=false; }
+        if(!ok) alert('That file is not a creative_tags.json export from this dashboard.');
+      };
+      rd.readAsText(f);
+      e.target.value='';
+    });
+    document.getElementById('tagReset').addEventListener('click', function(){
+      if(tagChanges() && !confirm('Discard your tag customisations and go back to the taxonomy this dashboard shipped with?')) return;
+      try{ localStorage.removeItem(TAG_LS); }catch(e){}
+      TAGS=normTags(typeof TAG_SAVED!=='undefined'?TAG_SAVED:{});
+      TAG_LOCAL=false; TAG_EXP={};
+      renderTags(); render();
+    });
+  }
+
   var DRILL={};
 
   function render(){
@@ -2729,8 +3318,9 @@ JS = r"""
     var html='<h3 class="grp" id="grp-meta">'+esc(G_META)+' &mdash; all ads (100% of filtered spend)</h3>';
     META_SPECS.forEach(function(s,i){ html+=tableHTML(s, pool, all, 'm'+i, G_META); });
     if(readable.length){
-      html+='<h3 class="grp" id="grp-vis">'+esc(G_VIS)+' &mdash; analyzable ads only ('+pct.toFixed(0)+'% of filtered spend)</h3>';
-      VISION_SPECS.forEach(function(s,i){ html+=tableHTML(s, readable, rd, 'v'+i, G_VIS); });
+      html+='<h3 class="grp" id="grp-vis">'+esc(G_VIS)+' &mdash; analyzable ads only ('+pct.toFixed(0)+
+        '% of filtered spend)<a class="editlink" href="#tagSec">Edit creative tags</a></h3>';
+      visSpecs().forEach(function(s,i){ html+=tableHTML(s, readable, rd, 'v'+i, G_VIS); });
     }else{
       html+='<div class="note">No creative-attribute tables for this filter &mdash; none of the '+
         'matching ads have a readable creative analysis (catalog ads have no fixed creative).</div>';
@@ -2889,6 +3479,8 @@ JS = r"""
 
   buildFilterBar();
   render();
+  renderTags();
+  wireTags();
 })();
 """
 
@@ -2912,6 +3504,19 @@ def build_performance_dashboard(
     )
     meta_specs = [(k, lab, kind, False) for k, lab, kind in META_SPECS]
     tail_specs = [(k, lab, kind, False) for k, lab, kind in TAIL_SPECS]
+
+    # Shipped taxonomy customisations. The tag manager exports a creative_tags.json;
+    # dropping it next to the dashboard makes those edits the default everyone sees
+    # here, instead of living only in the browser that made them.
+    saved_tags: dict[str, Any] = {}
+    tags_file = out_dir / "creative_tags.json"
+    if tags_file.is_file():
+        try:
+            raw = json.loads(tags_file.read_text(encoding="utf-8"))
+            saved_tags = raw.get("overrides") or {}
+            log.info("loaded creative tag overrides from %s", tags_file)
+        except (json.JSONDecodeError, OSError, AttributeError) as exc:
+            log.warning("ignoring unreadable %s: %s", tags_file, exc)
 
     ads: list[dict[str, Any]] = []
     for r in rows:
@@ -3068,6 +3673,7 @@ def build_performance_dashboard(
         '<div id="secNavAttrs" class="secnav-sub"></div>'
         '<a href="#rankSec" data-sec="rankSec"><i></i>Meta rating vs ROAS</a>'
         '<a href="#erSec" data-sec="erSec"><i></i>Early read vs scale</a>'
+        '<a href="#tagSec" data-sec="tagSec"><i></i>Creative tag manager</a>'
         '</div></nav>'
         '<div class="topbar"><div>'
         "<h1>Creative performance</h1>"
@@ -3185,6 +3791,48 @@ def build_performance_dashboard(
         '<div class="erhead" id="erHead"></div>'
         '<div id="erChart"></div>'
         '<div class="note" id="erNote"></div></section>'
+        '<section class="viz" id="tagSec">'
+        '<h2>Creative tag manager <span class="h2sub">the taxonomy every attribute '
+        "table above is built from</span></h2>"
+        '<div class="sub erhd2">Each tag below is one thing the creative analysis records '
+        'about an ad. Edit a tag\'s name or description, rename a value to merge it into '
+        'another bucket, drop values you do not want to see, or add values and whole new '
+        'tags for the next analysis run.</div>'
+        '<div class="vizbar">'
+        '<span class="tgstat" id="tagStat"></span>'
+        '<span class="spacer"></span>'
+        '<button class="fbtn" id="tagAdd" type="button">+ New tag</button>'
+        '<button class="fbtn" id="tagImport" type="button">Import JSON</button>'
+        '<button class="fbtn" id="tagExport" type="button">Export JSON</button>'
+        '<button class="fbtn" id="tagReset" type="button">Reset</button>'
+        '<input type="file" id="tagFile" accept="application/json,.json" hidden>'
+        "</div>"
+        '<div class="tagnew" id="tagNew" hidden>'
+        '<div class="r"><span class="flabel">Tag name</span>'
+        '<input class="tgin" id="ntLabel" type="text" placeholder="e.g. Hook length">'
+        '<span class="flabel">Type</span>'
+        '<select class="tgin" id="ntKind">'
+        '<option value="scalar">Single-select &mdash; one value per ad</option>'
+        '<option value="list">Multi-select &mdash; an ad can carry several</option>'
+        "</select></div>"
+        '<div class="r"><span class="flabel">Description</span>'
+        '<input class="tgin wide" id="ntDesc" type="text" '
+        'placeholder="What it means and how the analyst should apply it"></div>'
+        '<div class="r"><button class="fbtn" id="ntCreate" type="button">Create tag</button>'
+        '<button class="fbtn" id="ntCancel" type="button">Cancel</button>'
+        '<span class="tgstat">Values are added on the tag\'s card once it exists.</span>'
+        "</div></div>"
+        '<div id="tagList"></div>'
+        '<div class="note">Edits are stored <b>in this browser</b> and apply to every view on '
+        'this page at once &mdash; tables, charts, funnel axes and the left nav. They do not '
+        'retag any ad: renaming a value relabels and merges its bucket, dropping one removes '
+        'it from the views, and a value or tag you add is a <b>definition for the next '
+        'creative-analysis run</b>, which is why it shows no ads yet. <b>Export JSON</b> gives '
+        'you both the resolved taxonomy (hand it to the analysis prompt) and the raw edits '
+        '(re-importable). Saving that file as <b>creative_tags.json</b> next to this dashboard '
+        'makes it the default everyone sees on the next build. Audience and account-structure '
+        'attributes are not listed: they come from Meta\'s API, not from the creative analysis, '
+        'so they cannot be authored here.</div></section>'
         "<footer>The funnel, rating, scale/kill and early-read views all respond to the same "
         "filter bar as the attribute tables. Two of them deliberately use a different time "
         "window than the 90-day headline: Meta's quality rankings only exist for recent "
@@ -3217,6 +3865,8 @@ def build_performance_dashboard(
         f"var META_SPECS={json.dumps(meta_specs)};"
         f"var TAIL_SPECS={json.dumps(tail_specs)};"
         f"var VISION_SPECS={json.dumps(vision_specs)};"
+        f"var TAG_META={json.dumps(TAG_META)};"
+        f"var TAG_SAVED={json.dumps(saved_tags)};"
         f"var MINIMP={int(min_impressions)};var MAXC={MAX_CARDS_PER_BUCKET};"
         f"var BUCKETS={json.dumps(buckets)};"
         f"var DAYS={json.dumps(days)};"
