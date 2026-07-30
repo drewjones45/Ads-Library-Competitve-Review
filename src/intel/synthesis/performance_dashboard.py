@@ -311,7 +311,7 @@ def _fetch_daily(conn: sqlite3.Connection) -> tuple[dict[str, list], list[str]]:
     out: dict[str, list] = {}
     for r in conn.execute(
         "SELECT platform_ad_id, day, spend, purchases, revenue, "
-        "  impressions, video_3s, video_plays "
+        "  impressions, video_3s, video_plays, clicks "
         "FROM ad_daily WHERE spend > 0 OR purchases > 0 ORDER BY platform_ad_id, day"
     ):
         i = didx.get(r["day"])
@@ -321,6 +321,7 @@ def _fetch_daily(conn: sqlite3.Connection) -> tuple[dict[str, list], list[str]]:
             i, round(r["spend"] or 0, 2), round(r["purchases"] or 0),
             round(r["revenue"] or 0, 2), round(r["impressions"] or 0),
             round(r["video_3s"] or 0), round(r["video_plays"] or 0),
+            round(r["clicks"] or 0),
         ])
     return out, days
 
@@ -878,6 +879,29 @@ opacity:.8;padding:8px 8px 3px}
    the remaining width); hide the rail where the viewport is too narrow for it. */
 @media(min-width:861px){body{padding-left:238px}}
 @media(max-width:860px){.secnav{display:none}}
+
+/* ---- early read vs final scale ---- */
+.erhd2{margin:2px 0 14px}
+.erslider{flex:1;min-width:180px;max-width:400px;accent-color:var(--accent);cursor:pointer}
+.eropts{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+padding:12px 14px;margin:0 0 14px;display:flex;flex-direction:column;gap:10px}
+.erorow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.erin{background:var(--panel);border:1px solid var(--line);color:var(--fg);
+border-radius:8px;padding:6px 10px;font-size:12.5px;min-width:220px;flex:1;max-width:340px}
+.erin:focus{outline:none;border-color:var(--accent)}
+.ercard{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:var(--panel);
+border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;
+padding:16px 20px;margin:0 0 16px;box-shadow:var(--shadow)}
+.ercard .erstat{flex:none}
+.ercard .erstat .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.ercard .erstat .v{font-size:40px;font-weight:700;line-height:1;letter-spacing:-.02em;
+font-variant-numeric:tabular-nums;margin-top:4px}
+.ercard .ertext{min-width:240px}
+.ercard .ertext .erinterp{font-size:15px;font-weight:600}
+.ercard .ertext .ersub2{color:var(--dim);font-size:12.5px;margin-top:4px}
+.erlegend{display:flex;gap:18px;margin:0 0 8px;font-size:12.5px;color:var(--dim)}
+.erlegend i{display:inline-block;width:20px;height:3px;border-radius:2px;margin-right:6px;
+vertical-align:middle}
 """
 
 
@@ -2323,6 +2347,346 @@ JS = r"""
       '<td class="n">100</td></tr></tfoot></table></div></section>';
   }
 
+  // ============================================== early read vs final scale ===
+  // Does an ad's EARLY efficiency (its signal over the first N delivering days)
+  // predict how much it ultimately SCALES? Answered with a Spearman rank
+  // correlation shown three ways — a scatter, a sensitivity sweep over the
+  // opening window (1→30d), and quintiles of the early signal. All computed from
+  // the same daily series the scale/kill timeline uses; the daily row layout is
+  // [dayIdx, spend, purchases, revenue, impressions, video_3s, video_plays, clicks].
+  var ER_WINDOW=7, ER_SIGNAL='cpc', ER_OUTCOME='final', ER_MINCLK=10,
+      ER_VIEW='scatter', ER_CAMP='', ER_OPTS=false;
+  var ER_SIGNALS={
+    cpc:{lab:'CPC', low:true,  log:true,  fmt:function(v){return money2(v);},
+         get:function(e){return e.ck?e.sp/e.ck:null;}},
+    cpm:{lab:'CPM', low:true,  log:true,  fmt:function(v){return money2(v);},
+         get:function(e){return e.im?1000*e.sp/e.im:null;}},
+    ctr:{lab:'CTR', low:false, log:false, fmt:function(v){return v.toFixed(2)+'%';},
+         get:function(e){return e.im?100*e.ck/e.im:null;}},
+    cvr:{lab:'CVR', low:false, log:false, fmt:function(v){return v.toFixed(2)+'%';},
+         get:function(e){return e.ck?100*e.pu/e.ck:null;}},
+    roas:{lab:'ROAS',low:false, log:true,  fmt:function(v){return v.toFixed(2)+'x';},
+         get:function(e){return e.sp?e.rv/e.sp:null;}}
+  };
+  var ER_OUTLAB={final:'final spend', post:'post-window spend'};
+
+  // Per-ad early-window sums + final/post-window spend, for the ads that clear
+  // the minimum-early-clicks bar. "Early" = each ad's first N days from its first
+  // delivering day within the loaded data (creation may predate the data, same
+  // caveat as the scale/kill launch date).
+  function erRows(pool, N){
+    var camp=ER_CAMP.trim().toLowerCase(), out=[];
+    for(var i=0;i<pool.length;i++){
+      var a=pool[i], d=a.D; if(!d||!d.length) continue;
+      if(camp && (a.cp||'').toLowerCase().indexOf(camp)<0) continue;
+      var first=d[0][0], cut=first+N-1;
+      var sp=0,ck=0,im=0,pu=0,rv=0,fSp=0;
+      for(var j=0;j<d.length;j++){
+        fSp+=d[j][1];
+        if(d[j][0]<=cut){ sp+=d[j][1]; pu+=d[j][2]; rv+=d[j][3]; im+=d[j][4]||0; ck+=d[j][7]||0; }
+      }
+      if(ck<ER_MINCLK) continue;
+      var sig=ER_SIGNALS[ER_SIGNAL].get({sp:sp,ck:ck,im:im,pu:pu,rv:rv});
+      if(sig===null||!isFinite(sig)) continue;
+      out.push({a:a, x:sig, yF:fSp, yP:Math.max(fSp-sp,0), eSp:sp, eCk:ck});
+    }
+    return out;
+  }
+  function erY(r){ return ER_OUTCOME==='post'? r.yP : r.yF; }
+
+  // Average-rank (ties averaged) → Pearson on the ranks = Spearman ρ.
+  function erRank(vals){
+    var idx=vals.map(function(v,i){return [v,i];}).sort(function(a,b){return a[0]-b[0];});
+    var r=new Array(vals.length), i=0;
+    while(i<idx.length){
+      var j=i; while(j+1<idx.length && idx[j+1][0]===idx[i][0]) j++;
+      var avg=(i+j)/2+1;
+      for(var k=i;k<=j;k++) r[idx[k][1]]=avg;
+      i=j+1;
+    }
+    return r;
+  }
+  function erSpearman(xs, ys){
+    var n=xs.length; if(n<4) return null;
+    var rx=erRank(xs), ry=erRank(ys), mx=0,my=0, i;
+    for(i=0;i<n;i++){ mx+=rx[i]; my+=ry[i]; } mx/=n; my/=n;
+    var num=0,dx=0,dy=0;
+    for(i=0;i<n;i++){ var a=rx[i]-mx,b=ry[i]-my; num+=a*b; dx+=a*a; dy+=b*b; }
+    return (dx>0&&dy>0)? num/Math.sqrt(dx*dy) : null;
+  }
+  function erRho(rows, which){
+    var xs=[],ys=[];
+    rows.forEach(function(r){
+      var y=(which==='post')?r.yP:(which==='final')?r.yF:erY(r);
+      if(y>0){ xs.push(r.x); ys.push(y); }
+    });
+    return {rho:erSpearman(xs,ys), n:xs.length};
+  }
+  function erInterp(rho){
+    var s=Math.abs(rho), sig=ER_SIGNALS[ER_SIGNAL].lab.toLowerCase(), out=ER_OUTLAB[ER_OUTCOME];
+    if(s<0.1) return 'no reliable link — early '+sig+' did not rank-order '+out+'.';
+    var strength=s<0.3?'a weak':(s<0.5?'a moderate':'a strong');
+    return strength+' '+(rho<0?'negative':'positive')+' link — '+(rho<0?'lower':'higher')+
+      ' early '+sig+' ads reached higher '+out+'.';
+  }
+
+  function renderER(){
+    var pool=ADS.filter(passes).filter(function(a){return a.D&&a.D.length;});
+    var def=ER_SIGNALS[ER_SIGNAL], sig=def.lab.toLowerCase();
+    // subtitle + options panel
+    var sub=(ER_VIEW==='sensitivity')
+      ? 'How the early <b>'+sig+'</b> ↔ spend rank correlation shifts as the opening window '+
+        'widens from 1 to 30 days, with the shared early dollars kept in (final spend) vs '+
+        'stripped out (post-window).'
+      : (ER_VIEW==='quintiles')
+      ? 'Ads split into five equal groups by early <b>'+sig+'</b> (Q1 lowest), and the median '+
+        '<b>'+ER_OUTLAB[ER_OUTCOME]+'</b> each group reached.'
+      : 'Each dot is an ad: its early <b>'+sig+'</b> over the first '+ER_WINDOW+' day'+
+        (ER_WINDOW===1?'':'s')+' vs how much it ultimately spent.';
+    document.getElementById('erSub').innerHTML=sub;
+    renderEROpts();
+    var rows=erRows(pool, ER_WINDOW);
+    var rr=erRho(rows);
+    renderERHead(rr);
+    if(ER_VIEW==='sensitivity') renderERSensitivity(pool);
+    else if(ER_VIEW==='quintiles') renderERQuintiles(rows);
+    else renderERScatter(rows, rr);
+  }
+
+  function renderEROpts(){
+    var host=document.getElementById('erOpts');
+    document.getElementById('erAdjust').textContent=ER_OPTS?'Hide options':'Adjust';
+    if(!ER_OPTS){ host.style.display='none'; return; }
+    host.style.display='';
+    if(host.dataset.built) { // just refresh 'on' states
+      host.querySelectorAll('[data-sig]').forEach(function(b){b.classList.toggle('on',b.dataset.sig===ER_SIGNAL);});
+      host.querySelectorAll('[data-out]').forEach(function(b){b.classList.toggle('on',b.dataset.out===ER_OUTCOME);});
+      host.querySelectorAll('[data-mc]').forEach(function(b){b.classList.toggle('on',+b.dataset.mc===ER_MINCLK);});
+      return;
+    }
+    var sigBtns=['cpc','cpm','ctr','cvr','roas'].map(function(k){
+      return '<button class="seg'+(k===ER_SIGNAL?' on':'')+'" data-sig="'+k+'" type="button">'+
+        ER_SIGNALS[k].lab+'</button>';}).join('');
+    var outBtns=[['final','Final spend'],['post','Post-window']].map(function(o){
+      return '<button class="seg'+(o[0]===ER_OUTCOME?' on':'')+'" data-out="'+o[0]+'" type="button">'+o[1]+'</button>';}).join('');
+    var mcBtns=[5,10,25,50].map(function(m){
+      return '<button class="seg'+(m===ER_MINCLK?' on':'')+'" data-mc="'+m+'" type="button">'+m+'</button>';}).join('');
+    host.innerHTML=
+      '<div class="erorow"><span class="flabel">Early signal</span><span class="segs">'+sigBtns+'</span>'+
+      '<span class="flabel" style="margin-left:14px">Outcome</span><span class="segs">'+outBtns+'</span></div>'+
+      '<div class="erorow"><span class="flabel">Min early clicks</span><span class="segs">'+mcBtns+'</span>'+
+      '<input class="erin" id="erCamp" type="text" placeholder="Scope to campaign (contains)…" value="'+esc(ER_CAMP)+'"></div>';
+    host.querySelectorAll('[data-sig]').forEach(function(b){b.addEventListener('click',function(){
+      ER_SIGNAL=b.dataset.sig; renderER();});});
+    host.querySelectorAll('[data-out]').forEach(function(b){b.addEventListener('click',function(){
+      ER_OUTCOME=b.dataset.out; renderER();});});
+    host.querySelectorAll('[data-mc]').forEach(function(b){b.addEventListener('click',function(){
+      ER_MINCLK=+b.dataset.mc; renderER();});});
+    var ci=document.getElementById('erCamp');
+    ci.addEventListener('input',function(){ ER_CAMP=ci.value; renderER(); });
+    host.dataset.built='1';
+  }
+
+  function renderERHead(rr){
+    var host=document.getElementById('erHead');
+    if(rr.rho===null){
+      host.innerHTML='<div class="ercard"><div class="ertext"><div class="erinterp">'+
+        'Not enough ads clear the minimum early clicks for a correlation.</div>'+
+        '<div class="ersub2">Lower the threshold, widen the window, or broaden the filter — '+
+        'only '+rr.n+' qualifying ad'+(rr.n===1?'':'s')+' at this setting.</div></div></div>';
+      return;
+    }
+    var rho=rr.rho;
+    host.innerHTML='<div class="ercard"><div class="erstat">'+
+      '<div class="k">SPEARMAN ρ (RANK)</div>'+
+      '<div class="v">'+(rho<0?'−':'')+Math.abs(rho).toFixed(2)+'</div></div>'+
+      '<div class="ertext"><div class="erinterp">'+erInterp(rho)+'</div>'+
+      '<div class="ersub2">'+rr.n+' ads · Spearman rank correlation · opening window '+
+      ER_WINDOW+' day'+(ER_WINDOW===1?'':'s')+' · min '+ER_MINCLK+' early clicks</div></div></div>';
+  }
+
+  // ---- scatter: early signal (x) vs outcome spend (y, log) -------------------
+  function renderERScatter(rows, rr){
+    var host=document.getElementById('erChart');
+    var def=ER_SIGNALS[ER_SIGNAL];
+    var pts=rows.filter(function(r){return erY(r)>0 && r.x>0;});
+    if(pts.length<4){ host.innerHTML='<div class="empty">Fewer than 4 qualifying ads — nothing to correlate here.</div>'; return; }
+    var W=980,H=440,PL=74,PR=24,PT=16,PB=52, iw=W-PL-PR, ih=H-PT-PB;
+    var xlog=def.log;
+    var tx=function(v){ return xlog?Math.log10(Math.max(v,1e-9)):v; };
+    var xs=pts.map(function(p){return tx(p.x);});
+    var xmin=Math.min.apply(null,xs), xmax=Math.max.apply(null,xs);
+    if(xmax<=xmin){ xmax=xmin+1; } var xpad=(xmax-xmin)*0.06; xmin-=xpad; xmax+=xpad;
+    var ys=pts.map(function(p){return erY(p);});
+    var yTop=Math.pow(10,Math.ceil(Math.log10(Math.max.apply(null,ys)))), yBot=10;
+    var ty=function(v){return Math.log10(Math.max(v,1));};
+    var X=function(v){return PL+(tx(v)-xmin)/(xmax-xmin)*iw;};
+    var Y=function(v){return PT+ih-(ty(v)-ty(yBot))/(ty(yTop)-ty(yBot))*ih;};
+    var ckMax=Math.max.apply(null,pts.map(function(p){return p.eCk;}))||1;
+
+    var s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Early '+
+      esc(def.lab)+' vs '+esc(ER_OUTLAB[ER_OUTCOME])+'">';
+    // y gridlines (powers of 10)
+    for(var yy=yBot; yy<=yTop+1; yy*=10){
+      var gy=Y(yy);
+      s+='<line class="gridln" x1="'+PL+'" x2="'+(W-PR)+'" y1="'+gy.toFixed(1)+'" y2="'+gy.toFixed(1)+'"/>'+
+         '<text x="'+(PL-9)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end">'+
+         (yy>=1e6?'$'+(yy/1e6)+'M':yy>=1e3?'$'+(yy/1e3)+'k':'$'+yy)+'</text>';
+    }
+    // x ticks
+    var xticks=[];
+    if(xlog){ for(var e=Math.floor(xmin);e<=Math.ceil(xmax);e++) xticks.push(Math.pow(10,e)); }
+    else { for(var t=0;t<=4;t++) xticks.push(xmin+(xmax-xmin)*t/4); }
+    xticks.forEach(function(v){ var X0=xlog?X(v):PL+(v-xmin)/(xmax-xmin)*iw;
+      if(X0<PL-1||X0>W-PR+1) return;
+      s+='<line class="gridln" x1="'+X0.toFixed(1)+'" x2="'+X0.toFixed(1)+'" y1="'+PT+'" y2="'+(PT+ih)+'"/>'+
+         '<text x="'+X0.toFixed(1)+'" y="'+(PT+ih+20)+'" text-anchor="middle">'+def.fmt(v)+'</text>';
+    });
+    s+='<text x="'+(PL+iw/2)+'" y="'+(H-10)+'" text-anchor="middle">EARLY '+esc(def.lab.toUpperCase())+
+       (xlog?' (LOG)':'')+'</text>'+
+       '<text x="16" y="'+(PT+ih/2)+'" text-anchor="middle" transform="rotate(-90 16 '+(PT+ih/2)+')">'+
+       esc(ER_OUTLAB[ER_OUTCOME].toUpperCase())+' (LOG)</text>';
+    // regression line (OLS in transformed space)
+    var n=pts.length, mtx=0,mty=0;
+    pts.forEach(function(p){ mtx+=tx(p.x); mty+=ty(erY(p)); }); mtx/=n; mty/=n;
+    var cov=0,vx=0;
+    pts.forEach(function(p){ var ax=tx(p.x)-mtx, ay=ty(erY(p))-mty; cov+=ax*ay; vx+=ax*ax; });
+    if(vx>0){ var b=cov/vx, a=mty-b*mtx;
+      var lx1=xmin+xpad*0.4, lx2=xmax-xpad*0.4;
+      var pv=function(txv){return Math.pow(10, a+b*txv);};
+      var xv1=xlog?Math.pow(10,lx1):lx1, xv2=xlog?Math.pow(10,lx2):lx2;
+      var Xa=PL+(lx1-xmin)/(xmax-xmin)*iw, Xb=PL+(lx2-xmin)/(xmax-xmin)*iw;
+      s+='<line x1="'+Xa.toFixed(1)+'" y1="'+Y(pv(lx1)).toFixed(1)+'" x2="'+Xb.toFixed(1)+
+         '" y2="'+Y(pv(lx2)).toFixed(1)+'" stroke="var(--fg)" stroke-width="2" opacity=".7"/>';
+    }
+    // dots, sized by early clicks
+    pts.forEach(function(p){
+      var X0=xlog?X(p.x):PL+(p.x-xmin)/(xmax-xmin)*iw;
+      s+='<circle class="rdot" cx="'+X0.toFixed(1)+'" cy="'+Y(erY(p)).toFixed(1)+
+         '" r="'+(3+7*Math.sqrt(p.eCk/ckMax)).toFixed(1)+'" fill="var(--sA)"><title>'+
+         esc((p.a.nm||p.a.id||'').slice(0,70))+'\nearly '+esc(def.lab)+' '+def.fmt(p.x)+
+         ' · '+ER_OUTLAB[ER_OUTCOME]+' '+money(erY(p))+' · '+num(p.eCk)+' early clicks</title></circle>';
+    });
+    s+='</svg>';
+    host.innerHTML=s;
+    document.getElementById('erNote').innerHTML=
+      '<b>Reading this:</b> each dot is an ad; the line is the ordinary-least-squares fit in '+
+      'log space, and the headline number is the <b>Spearman rank</b> correlation (robust to the '+
+      'log scale and to outliers). Dots are sized by early clicks — bigger dots carry more '+
+      'signal. This is correlation across ads that already survived budget decisions, not proof '+
+      'that hitting a given early '+esc(def.lab)+' <em>causes</em> more scale. Early window is each '+
+      'ad’s first '+ER_WINDOW+' delivering day'+(ER_WINDOW===1?'':'s')+' in the loaded data.';
+  }
+
+  // ---- sensitivity: ρ as the opening window widens 1→30d ---------------------
+  function renderERSensitivity(pool){
+    var host=document.getElementById('erChart');
+    var days=[], sF=[], sP=[];
+    for(var w=1; w<=30; w++){
+      var rows=erRows(pool, w);
+      var rf=erRho(rows,'final'), rp=erRho(rows,'post');
+      days.push(w); sF.push(rf.rho); sP.push(rp.rho);
+    }
+    var all=sF.concat(sP).filter(function(v){return v!==null&&isFinite(v);});
+    if(all.length<2){ host.innerHTML='<div class="empty">Not enough qualifying ads across the window to sweep.</div>'; return; }
+    var lo=Math.min.apply(null,all), hi=Math.max.apply(null,all);
+    lo=Math.min(lo,-0.05); hi=Math.max(hi,0.05); var pad=(hi-lo)*0.12; lo-=pad; hi+=pad;
+    var W=980,H=420,PL=64,PR=96,PT=18,PB=46, iw=W-PL-PR, ih=H-PT-PB;
+    var X=function(w){return PL+(w-1)/29*iw;};
+    var Y=function(v){return PT+ih-(v-lo)/(hi-lo)*ih;};
+    var s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Spearman correlation vs opening window">';
+    for(var g=0;g<=4;g++){ var gv=lo+(hi-lo)*g/4, gy=Y(gv);
+      s+='<line class="gridln" x1="'+PL+'" x2="'+(W-PR)+'" y1="'+gy.toFixed(1)+'" y2="'+gy.toFixed(1)+'"/>'+
+         '<text x="'+(PL-9)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end">'+gv.toFixed(2)+'</text>'; }
+    if(lo<0&&hi>0){ var z=Y(0); s+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+z.toFixed(1)+'" y2="'+z.toFixed(1)+
+      '" stroke="var(--fg)" stroke-width="1" opacity=".35"/>'; }
+    [1,3,5,7,10,14,21,30].forEach(function(w){ var X0=X(w);
+      s+='<text x="'+X0.toFixed(1)+'" y="'+(PT+ih+20)+'" text-anchor="middle">'+w+'</text>'; });
+    s+='<text x="'+(PL+iw/2)+'" y="'+(H-6)+'" text-anchor="middle">OPENING WINDOW (DAYS)</text>'+
+       '<text x="16" y="'+(PT+ih/2)+'" text-anchor="middle" transform="rotate(-90 16 '+(PT+ih/2)+')">SPEARMAN ρ</text>';
+    // current-window marker
+    var mx=X(ER_WINDOW);
+    s+='<line x1="'+mx.toFixed(1)+'" x2="'+mx.toFixed(1)+'" y1="'+PT+'" y2="'+(PT+ih)+
+       '" stroke="var(--dim)" stroke-width="1" stroke-dasharray="4 4"/>'+
+       '<text x="'+mx.toFixed(1)+'" y="'+(PT-4)+'" text-anchor="middle" style="fill:var(--dim)">'+ER_WINDOW+'d</text>';
+    function line(vals, col){
+      var d='', started=false, lastX=null,lastY=null,lastV=null;
+      vals.forEach(function(v,i){ if(v===null||!isFinite(v)){started=false;return;}
+        var x=X(days[i]), y=Y(v); d+=(started?' L':'M')+x.toFixed(1)+' '+y.toFixed(1);
+        started=true; lastX=x; lastY=y; lastV=v; });
+      return {path:d, lx:lastX, ly:lastY, lv:lastV, col:col};
+    }
+    var lf=line(sF,'var(--sA)'), lp=line(sP,'var(--sB)');
+    [lp,lf].forEach(function(L){ if(L.path) s+='<path d="'+L.path+'" fill="none" stroke="'+L.col+'" stroke-width="2" stroke-linejoin="round"/>'; });
+    // direct end labels
+    [{L:lf,t:'Final'},{L:lp,t:'Post-window'}].forEach(function(o){ if(o.L.lx!==null)
+      s+='<circle cx="'+o.L.lx.toFixed(1)+'" cy="'+o.L.ly.toFixed(1)+'" r="3" fill="'+o.L.col+
+         '" stroke="var(--panel)" stroke-width="2"/><text x="'+(o.L.lx+7).toFixed(1)+'" y="'+
+         (o.L.ly+4).toFixed(1)+'" style="fill:'+o.L.col+';font-weight:600">'+o.t+'</text>'; });
+    s+='</svg>';
+    host.innerHTML=
+      '<div class="erlegend"><span><i style="background:var(--sA)"></i>vs Final spend</span>'+
+      '<span><i style="background:var(--sB)"></i>vs Post-window spend</span></div>'+s;
+    document.getElementById('erNote').innerHTML=
+      '<b>Reading this:</b> the <b style="color:var(--sA)">Final spend</b> line keeps the early '+
+      'dollars in the outcome, so part of any correlation is mechanical (early spend is inside '+
+      'final spend). The <b style="color:var(--sB)">Post-window</b> line strips those shared '+
+      'dollars out — it is the honest test of whether the early read predicts <em>future</em> '+
+      'scale. Where post-window drifts toward zero as the window widens, the early signal is '+
+      'mostly re-describing spend already booked, not forecasting more.';
+  }
+
+  // ---- quintiles: median outcome spend by early-signal group -----------------
+  function renderERQuintiles(rows){
+    var host=document.getElementById('erChart');
+    var def=ER_SIGNALS[ER_SIGNAL];
+    var pts=rows.filter(function(r){return erY(r)>0;}).slice().sort(function(a,b){return a.x-b.x;});
+    if(pts.length<10){ host.innerHTML='<div class="empty">Need at least 10 qualifying ads to form quintiles.</div>'; return; }
+    var med=function(arr){ var a=arr.slice().sort(function(x,y){return x-y;}), m=a.length>>1;
+      return a.length%2?a[m]:(a[m-1]+a[m])/2; };
+    var bins=[];
+    for(var q=0;q<5;q++){
+      var a=Math.floor(q*pts.length/5), b=Math.floor((q+1)*pts.length/5);
+      var slice=pts.slice(a,b);
+      bins.push({q:q+1, n:slice.length,
+        xlo:slice[0].x, xhi:slice[slice.length-1].x,
+        m:med(slice.map(erY))});
+    }
+    var W=980,H=420,PL=74,PR=24,PT=20,PB=64, iw=W-PL-PR, ih=H-PT-PB;
+    var mx=Math.max.apply(null,bins.map(function(x){return x.m;}))*1.15||1;
+    var bw=iw/5;
+    var s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Median '+
+      esc(ER_OUTLAB[ER_OUTCOME])+' by early '+esc(def.lab)+' quintile">';
+    for(var g=0;g<=4;g++){ var gv=mx*g/4, gy=PT+ih-gv/mx*ih;
+      s+='<line class="gridln" x1="'+PL+'" x2="'+(W-PR)+'" y1="'+gy.toFixed(1)+'" y2="'+gy.toFixed(1)+'"/>'+
+         '<text x="'+(PL-9)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end">'+
+         (gv>=1e6?'$'+(gv/1e6).toFixed(1)+'M':gv>=1e3?'$'+Math.round(gv/1e3)+'k':'$'+Math.round(gv))+'</text>'; }
+    bins.forEach(function(bn,i){
+      var h=bn.m/mx*ih, x=PL+i*bw+bw*0.16, w=bw*0.68;
+      s+='<rect x="'+x.toFixed(1)+'" y="'+(PT+ih-h).toFixed(1)+'" width="'+w.toFixed(1)+
+         '" height="'+Math.max(h,0).toFixed(1)+'" rx="4" fill="var(--sA)" fill-opacity="'+
+         (0.5+0.1*i).toFixed(2)+'"><title>Q'+bn.q+' · early '+esc(def.lab)+' '+def.fmt(bn.xlo)+
+         ' – '+def.fmt(bn.xhi)+'\nmedian '+ER_OUTLAB[ER_OUTCOME]+' '+money(bn.m)+' · '+bn.n+' ads</title></rect>'+
+         '<text x="'+(x+w/2).toFixed(1)+'" y="'+(PT+ih-h-7).toFixed(1)+'" text-anchor="middle" '+
+         'style="fill:var(--fg);font-weight:600;font-size:12px">'+money(bn.m)+'</text>'+
+         '<text x="'+(x+w/2).toFixed(1)+'" y="'+(PT+ih+20)+'" text-anchor="middle" '+
+         'style="fill:var(--fg);font-weight:600">Q'+bn.q+'</text>'+
+         '<text x="'+(x+w/2).toFixed(1)+'" y="'+(PT+ih+37)+'" text-anchor="middle">'+
+         def.fmt(bn.xlo)+'–'+def.fmt(bn.xhi)+'</text>';
+    });
+    s+='<text x="'+(PL+iw/2)+'" y="'+(H-6)+'" text-anchor="middle">EARLY '+esc(def.lab.toUpperCase())+
+       ' QUINTILE  (Q1 = lowest)</text>'+
+       '<text x="16" y="'+(PT+ih/2)+'" text-anchor="middle" transform="rotate(-90 16 '+(PT+ih/2)+')">MEDIAN '+
+       esc(ER_OUTLAB[ER_OUTCOME].toUpperCase())+'</text></svg>';
+    host.innerHTML=s;
+    document.getElementById('erNote').innerHTML=
+      '<b>Reading this:</b> ads are split into five equal-sized groups by their early '+esc(def.lab)+
+      ' (Q1 the lowest, Q5 the highest), and each bar is that group’s <b>median</b> '+
+      esc(ER_OUTLAB[ER_OUTCOME])+' — the median, not the mean, so one runaway ad can’t carry a '+
+      'bar. A clean staircase across the quintiles is the same story the correlation tells, but '+
+      'without assuming the relationship is a straight line.';
+  }
+
   var DRILL={};
 
   function render(){
@@ -2338,6 +2702,7 @@ JS = r"""
     renderFunnel(pool);
     renderRank(pool);
     renderSK(pool);
+    renderER();
     renderAttrNote(all);
 
     var pct=all.sp?100*rd.sp/all.sp:0;
@@ -2485,6 +2850,22 @@ JS = r"""
     document.getElementById('adPanel').innerHTML='';
     stopPlay();
     renderSK(ADS.filter(passes));
+  });
+
+  // --- early read vs final scale controls ----------------------------------
+  document.getElementById('erWin').addEventListener('input',function(){
+    ER_WINDOW=+this.value;
+    document.getElementById('erWinLab').textContent=ER_WINDOW+(ER_WINDOW===1?' day':' days');
+    renderER();
+  });
+  document.querySelectorAll('#erView .seg').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('#erView .seg').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on'); ER_VIEW=b.dataset.v; renderER();
+    });
+  });
+  document.getElementById('erAdjust').addEventListener('click',function(){
+    ER_OPTS=!ER_OPTS; renderER();
   });
 
   // --- permanent left section nav (scroll-spy only) ------------------------
@@ -2686,6 +3067,7 @@ def build_performance_dashboard(
         '<a href="#tablesSec" data-sec="tablesSec"><i></i>Creative attributes</a>'
         '<div id="secNavAttrs" class="secnav-sub"></div>'
         '<a href="#rankSec" data-sec="rankSec"><i></i>Meta rating vs ROAS</a>'
+        '<a href="#erSec" data-sec="erSec"><i></i>Early read vs scale</a>'
         '</div></nav>'
         '<div class="topbar"><div>'
         "<h1>Creative performance</h1>"
@@ -2784,7 +3166,26 @@ def build_performance_dashboard(
         "</span></div>"
         '<div id="rankPlot"></div>'
         '<div class="note" id="rankNote"></div></section>'
-        "<footer>The funnel, rating and scale/kill views all respond to the same "
+        '<section class="viz" id="erSec">'
+        '<h2>Early read vs final scale <span class="h2sub">does an ad\'s first days '
+        "predict how far it scales?</span></h2>"
+        '<div class="sub erhd2" id="erSub"></div>'
+        '<div class="vizbar">'
+        '<span class="flabel">Opening window</span>'
+        '<input type="range" id="erWin" class="erslider" min="1" max="30" value="7">'
+        '<span class="win" id="erWinLab">7 days</span>'
+        '<span class="spacer"></span>'
+        '<button class="fbtn" id="erAdjust" type="button">Adjust</button>'
+        '<span class="segs" id="erView">'
+        '<button class="seg on" data-v="scatter" type="button">Scatter</button>'
+        '<button class="seg" data-v="sensitivity" type="button">Sensitivity</button>'
+        '<button class="seg" data-v="quintiles" type="button">Quintiles</button>'
+        "</span></div>"
+        '<div class="eropts" id="erOpts"></div>'
+        '<div class="erhead" id="erHead"></div>'
+        '<div id="erChart"></div>'
+        '<div class="note" id="erNote"></div></section>'
+        "<footer>The funnel, rating, scale/kill and early-read views all respond to the same "
         "filter bar as the attribute tables. Two of them deliberately use a different time "
         "window than the 90-day headline: Meta's quality rankings only exist for recent "
         "delivery, so the rating plot is scoped to the window where they are populated, and "
