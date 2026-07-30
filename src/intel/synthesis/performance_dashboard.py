@@ -792,6 +792,8 @@ border-radius:12px;padding:14px 16px}
 border-radius:8px;padding:5px 11px;cursor:pointer;font-size:13px}
 .pbtn.on{background:var(--zGood);border-color:var(--zGood);color:#fff}
 .pbtn:hover{border-color:var(--accent)}
+.tlspeed{display:inline-flex;gap:3px;align-items:center;margin-left:2px}
+.pbtn.spd{padding:5px 8px;font-size:12px;min-width:40px;text-align:center}
 #adPanel:empty{display:none}
 .adp{margin-top:16px;background:var(--panel);border:1px solid var(--line);
 border-left:3px solid var(--accent);border-radius:12px;padding:16px 18px}
@@ -838,7 +840,7 @@ white-space:nowrap;font-size:12.5px}
 .zsec tbody tr{cursor:pointer}
 .zsec tbody tr:hover{background:var(--panel2)}
 
-/* ---- collapsible right-hand section nav ---- */
+/* ---- permanent left-hand section nav ---- */
 html{scroll-behavior:smooth}
 section[id]{scroll-margin-top:18px}
 .attrsec{scroll-margin-top:18px}
@@ -846,25 +848,17 @@ section[id]{scroll-margin-top:18px}
 .attrtrends{margin:4px 0 14px}
 .attrbar .tcttl{margin-bottom:2px}
 .tcnote{font-size:9px;text-transform:none;letter-spacing:0;color:var(--dim);opacity:.7;font-weight:400}
+/* Fixed, always-visible sidebar. Vertically centred but capped at 88vh with its
+   own scroll, so a long attribute list never runs off-screen. Desktops reserve
+   left padding on <body> (below) so it never overlaps content; on small screens
+   there isn't room for a 224px rail, so it is hidden there. */
 .secnav{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:50;
 display:flex;align-items:stretch}
-/* Panel sits flush-left; the toggle handle is on its right edge (order:2) so it
-   stays reachable at the screen edge once the panel slides away. */
-.secnav-tog{order:2;align-self:center;width:22px;height:56px;border:1px solid var(--line);
-border-left:none;border-radius:0 8px 8px 0;background:var(--panel);color:var(--dim);
-cursor:pointer;font-size:13px;box-shadow:var(--shadow);flex:none;padding:0}
-.secnav-tog:hover{color:var(--accent);border-color:var(--accent)}
-.secnav-tog:after{content:"\2039"}                 /* ‹ when expanded → collapse */
-.secnav.collapsed .secnav-tog:after{content:"\203A"} /* › when collapsed → expand */
-.secnav-inner{order:1;width:224px;max-height:88vh;overflow-y:auto;
+.secnav-inner{width:224px;max-height:88vh;overflow-y:auto;
 background:color-mix(in srgb,var(--panel) 92%,transparent);
 backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-border:1px solid var(--line);border-radius:0 12px 12px 0;box-shadow:var(--shadow);
-padding:12px 10px;transition:transform .22s ease,opacity .22s ease,margin-left .22s ease}
-/* Slide the panel off the left edge AND reclaim its reserved width, so the
-   toggle handle lands at x=0 rather than floating 212px in. */
-.secnav.collapsed .secnav-inner{transform:translateX(-100%);opacity:0;
-pointer-events:none;margin-left:-212px}
+border:1px solid var(--line);border-left:none;border-radius:0 12px 12px 0;box-shadow:var(--shadow);
+padding:12px 10px}
 .secnav-hd{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);
 padding:2px 8px 8px}
 .secnav-inner a{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;
@@ -880,10 +874,10 @@ transition:background .15s ease,transform .15s ease}
 opacity:.8;padding:8px 8px 3px}
 .secnav-inner a.sub{padding:5px 8px;font-size:11.5px}
 .secnav-inner a.sub i{width:5px;height:5px}
-/* On wide screens, hold the content clear of the open drawer; below that it
-   overlays and the user collapses it when it is in the way. */
-@media(min-width:1500px){body:not(.nav-collapsed) .wrap{margin-left:210px}}
-@media(max-width:720px){.secnav{display:none}}
+/* Permanently hold the page clear of the fixed rail (content stays centred in
+   the remaining width); hide the rail where the viewport is too narrow for it. */
+@media(min-width:861px){body{padding-left:238px}}
+@media(max-width:860px){.secnav{display:none}}
 """
 
 
@@ -1314,6 +1308,7 @@ JS = r"""
   // curve and rising scale curve — an ad is only called when its spend is
   // enough to distinguish it from the target.
   var SK_K=2.0, SK_METRIC='cpa', SK_TARGET=null, SK_FRAME=null, SK_PLAYING=false, SK_TIMER=null;
+  var SK_SPEED=1;   // timeline playback speed multiplier (1× / 0.5× / 0.25×)
   var SK_LAUNCH='', SK_ZONE='k';   // default to the kill list; '' = every zone
   // Fractional reduction applied to the auto (account-average) target: 0 =
   // account average, 0.10 = a target 10% tougher than average, etc. This is the
@@ -1446,7 +1441,11 @@ JS = r"""
   }
   var SK_CPAPROXY=1;
 
-  function renderSK(pool){
+  // `light` is set on timeline animation frames: the scatter, zone bars and
+  // timeline still update, but the per-zone dashboard sections (three charts + a
+  // table each) are skipped, since rebuilding them ~9×/second is what made the
+  // animation stutter. They refresh in full the moment playback pauses or ends.
+  function renderSK(pool, light){
     var host=document.getElementById('skPlot');
     var hasDaily=pool.filter(function(a){return a.D&&a.D.length;});
     var launchInfo=fillLaunchSelect(hasDaily);
@@ -1547,6 +1546,14 @@ JS = r"""
     var vals=tot.map(skValue)
                 .filter(function(v){return v!==null&&isFinite(v);}).sort(function(a,b){return a-b;});
     var vMax=vals.length?Math.max(target*2, vals[Math.floor(0.95*(vals.length-1))]*1.1):target*2;
+    // A few pathological ads — most visibly a "video" ad with almost no 3-second
+    // views, whose cost per 3s view runs to thousands of dollars — otherwise drag
+    // a p95-based axis so high that the target line and the whole decision zone
+    // collapse onto the baseline. Cap the axis at a fixed multiple of target for
+    // the cost metrics; ads past the cap pin to the ceiling and are counted in
+    // the note. Normal CPA/CPM sit well under 10× target, so this only bites the
+    // pathological tail and leaves those charts unchanged.
+    if(lower) vMax=Math.min(vMax, target*10);
     var yOf=function(v){return PT+ih-Math.min(v,vMax)/vMax*ih;};
 
     var s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+
@@ -1619,7 +1626,7 @@ JS = r"""
 
     // --- timeline + per-zone dashboard sections -------------------------------
     renderTimeline(withDaily);
-    renderZoneSections(buckets,target);
+    if(!light) renderZoneSections(buckets,target);
 
     var wrong=buckets.k.reduce(function(s,t){return s+t.sp;},0);
     var isAuto=!(SK_TARGET!==null&&SK_TARGET>0) && SK_ADJ===0;
@@ -1839,45 +1846,99 @@ JS = r"""
     });
   }
 
+  // The timeline controls are built ONCE and then only updated in place. The old
+  // version rebuilt this whole block's innerHTML on every animation frame, which
+  // destroyed and recreated the play button ~9×/second — so a click's mousedown
+  // and mouseup landed on different button instances and no click event ever
+  // fired, i.e. Pause looked broken. Persisting the controls fixes that; only the
+  // bars, range value, label and button/speed state are mutated per frame.
+  var TL_BUILT=false;
+  var SK_SPEEDS=[[1,'1×'],[0.5,'0.5×'],[0.25,'0.25×']];
   function renderTimeline(pool){
-    // Daily spend across the filtered pool, as the scrub track.
+    var host=document.getElementById('skTl');
     var per=new Array(DAYS.length).fill(0);
-    pool.forEach(function(a){ (a.D||[]).forEach(function(d){ per[d[0]]+=d[1]; }); });
+    pool.forEach(function(a){ (a.D||[]).forEach(function(d){ if(d[0]<per.length) per[d[0]]+=d[1]; }); });
     var mx=Math.max.apply(null,per)||1;
     var bars=per.map(function(v,i){
       return '<i class="'+(i<=SK_FRAME?'on':'')+'" style="height:'+
         Math.max(2,100*v/mx).toFixed(1)+'%"></i>';}).join('');
-    document.getElementById('skTl').innerHTML=
-      '<div class="tlhd"><span class="flabel">Timeline</span>'+
-      '<span style="color:var(--dim);font-size:12px">Drag to replay how spend accumulated. '+
-      'Each ad enters when it first delivered.</span>'+
-      '<span class="rng">'+esc(DAYS[0])+' → '+esc(DAYS[SK_FRAME])+'</span></div>'+
-      '<div class="tlbars">'+bars+'</div>'+
-      '<div class="tlctl">'+
-      '<button class="pbtn'+(SK_PLAYING?' on':'')+'" id="skPlay" type="button">'+
-      (SK_PLAYING?'❚❚ Pause':'▶ Play')+'</button>'+
-      '<input type="range" id="skRange" min="0" max="'+(DAYS.length-1)+'" value="'+SK_FRAME+'">'+
-      '<button class="pbtn" id="skEnd" type="button">Full window</button></div>';
 
-    document.getElementById('skRange').addEventListener('input',function(){
-      SK_FRAME=+this.value; stopPlay(); renderSK(ADS.filter(passes));
-    });
-    document.getElementById('skPlay').addEventListener('click',function(){
-      if(SK_PLAYING){stopPlay();renderSK(ADS.filter(passes));return;}
-      SK_PLAYING=true;
-      if(SK_FRAME>=DAYS.length-1) SK_FRAME=0;
-      SK_TIMER=setInterval(function(){
-        SK_FRAME++;
-        if(SK_FRAME>=DAYS.length-1){SK_FRAME=DAYS.length-1;stopPlay();}
-        renderSK(ADS.filter(passes));
-      },110);
-      renderSK(ADS.filter(passes));
-    });
-    document.getElementById('skEnd').addEventListener('click',function(){
-      stopPlay(); SK_FRAME=DAYS.length-1; renderSK(ADS.filter(passes));
+    if(!TL_BUILT){
+      host.innerHTML=
+        '<div class="tlhd"><span class="flabel">Timeline</span>'+
+        '<span style="color:var(--dim);font-size:12px">Drag to replay how spend accumulated. '+
+        'Each ad enters when it first delivered.</span>'+
+        '<span class="rng" id="skRng"></span></div>'+
+        '<div class="tlbars" id="skBars"></div>'+
+        '<div class="tlctl">'+
+        '<button class="pbtn" id="skPlay" type="button">▶ Play</button>'+
+        '<input type="range" id="skRange" min="0" max="'+(DAYS.length-1)+'" value="'+SK_FRAME+'">'+
+        '<span class="tlspeed" id="skSpeed" title="Playback speed">'+
+        SK_SPEEDS.map(function(s){
+          return '<button class="pbtn spd" data-s="'+s[0]+'" type="button">'+s[1]+'</button>';
+        }).join('')+'</span>'+
+        '<button class="pbtn" id="skEnd" type="button">Full window</button></div>';
+      // Listeners bound ONCE to the persistent controls.
+      document.getElementById('skRange').addEventListener('input',function(){
+        SK_FRAME=+this.value; stopPlay(); renderSK(ADS.filter(passes));
+      });
+      document.getElementById('skPlay').addEventListener('click',skPlayToggle);
+      document.getElementById('skEnd').addEventListener('click',function(){
+        stopPlay(); SK_FRAME=DAYS.length-1; renderSK(ADS.filter(passes));
+      });
+      document.querySelectorAll('#skSpeed .spd').forEach(function(btn){
+        btn.addEventListener('click',function(){ setSpeed(+btn.dataset.s); });
+      });
+      TL_BUILT=true;
+    }
+
+    // Per-frame, in-place updates only — nothing here rebinds a listener.
+    document.getElementById('skBars').innerHTML=bars;
+    var rng=document.getElementById('skRange');
+    rng.max=DAYS.length-1;
+    if(document.activeElement!==rng) rng.value=SK_FRAME;
+    document.getElementById('skRng').textContent=DAYS[0]+' → '+DAYS[SK_FRAME];
+    updateTlControls();
+  }
+
+  function updateTlControls(){
+    var pb=document.getElementById('skPlay');
+    if(pb){ pb.textContent=SK_PLAYING?'❚❚ Pause':'▶ Play'; pb.classList.toggle('on',SK_PLAYING); }
+    document.querySelectorAll('#skSpeed .spd').forEach(function(b){
+      b.classList.toggle('on',(+b.dataset.s)===SK_SPEED);
     });
   }
-  function stopPlay(){SK_PLAYING=false; if(SK_TIMER){clearInterval(SK_TIMER);SK_TIMER=null;}}
+
+  function skStartTimer(){
+    if(SK_TIMER) clearInterval(SK_TIMER);
+    // Base 130ms at 1×; slower speeds lengthen the interval, which also gives the
+    // (heavier, post-zone-sections) render more breathing room per frame.
+    SK_TIMER=setInterval(function(){
+      SK_FRAME++;
+      if(SK_FRAME>=DAYS.length-1){ SK_FRAME=DAYS.length-1; stopPlay(); renderSK(ADS.filter(passes)); return; }
+      renderSK(ADS.filter(passes), true);   // light frame: skip the zone sections
+    }, Math.round(130/SK_SPEED));
+  }
+
+  function skPlayToggle(){
+    if(SK_PLAYING){ stopPlay(); renderSK(ADS.filter(passes)); return; }  // full render on pause
+    SK_PLAYING=true;
+    if(SK_FRAME>=DAYS.length-1) SK_FRAME=0;
+    skStartTimer();
+    updateTlControls();
+    renderSK(ADS.filter(passes), true);
+  }
+
+  function setSpeed(s){
+    SK_SPEED=s; updateTlControls();
+    if(SK_PLAYING) skStartTimer();   // apply the new cadence immediately
+  }
+
+  function stopPlay(){
+    SK_PLAYING=false;
+    if(SK_TIMER){clearInterval(SK_TIMER);SK_TIMER=null;}
+    updateTlControls();
+  }
 
   // --- per-ad drill-down: performance since launch --------------------------
   function showAd(id,target){
@@ -2426,22 +2487,10 @@ JS = r"""
     renderSK(ADS.filter(passes));
   });
 
-  // --- right-hand section nav ----------------------------------------------
+  // --- permanent left section nav (scroll-spy only) ------------------------
   (function(){
-    var nav=document.getElementById('secNav'), tog=document.getElementById('secNavTog');
-    if(!nav||!tog) return;
-    function setCollapsed(c){
-      nav.classList.toggle('collapsed',c);
-      document.body.classList.toggle('nav-collapsed',c);
-      tog.setAttribute('aria-expanded', String(!c));
-      try{localStorage.setItem('perfdash-nav', c?'closed':'open');}catch(e){}
-    }
-    // Default open on roomy viewports, collapsed on narrow ones where the drawer
-    // would sit over the content; a stored choice always wins.
-    var stored=null; try{stored=localStorage.getItem('perfdash-nav');}catch(e){}
-    setCollapsed(stored ? stored==='closed' : (window.innerWidth<1080));
-    tog.addEventListener('click',function(){ setCollapsed(!nav.classList.contains('collapsed')); });
-
+    var nav=document.getElementById('secNav');
+    if(!nav) return;
     var links=[].slice.call(nav.querySelectorAll('a[data-sec]'));
     var byId={}; links.forEach(function(a){ byId[a.dataset.sec]=a; });
     // Highlight the section nearest the top of the viewport as it scrolls.
@@ -2626,11 +2675,9 @@ def build_performance_dashboard(
     )
 
     body = (
-        # Collapsible right-hand section nav. Fixed to the viewport so it stays
-        # put while the long dashboard scrolls; the toggle persists its state.
+        # Permanent left-hand section nav. Fixed to the viewport so it stays put
+        # while the long dashboard scrolls.
         '<nav class="secnav" id="secNav" aria-label="Section navigation">'
-        '<button class="secnav-tog" id="secNavTog" type="button" aria-expanded="true" '
-        'aria-controls="secNavInner" title="Collapse / expand section navigation"></button>'
         '<div class="secnav-inner" id="secNavInner">'
         '<div class="secnav-hd">On this page</div>'
         '<a href="#kpiSec" data-sec="kpiSec"><i></i>Overview &amp; KPIs</a>'
