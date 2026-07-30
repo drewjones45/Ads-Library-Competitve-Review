@@ -1,0 +1,109 @@
+############ SUMMARY INGEST (2026-04-30 → 2026-07-29) ############
+=== JD Sports US Brand & COOP (263673744705629) → jdsports ===
+ingesting account 263673744705629 (JD Sports US Brand & COOP) → brand jdsports 
+2026-04-30 → 2026-07-29
+✓ 395 ads · 391 assets · 30/30 previews rendered
+  spend $1,928,021 · 90% on creative that can be vision-analyzed
+    analyzable   368 ads  $   1,739,796
+    dpa           20 ads  $     187,589
+    no_asset       7 ads  $         636
+--- cooldown 20s ---
+=== JD Sports - US (399719270800712) → jdsports ===
+ingesting account 399719270800712 (JD Sports - US) → brand jdsports 2026-04-30 →
+2026-07-29
+✓ 266 ads · 121 assets · 14/14 previews rendered
+  spend $2,033,381 · 9% on creative that can be vision-analyzed
+    dpa          160 ads  $   1,847,572
+    analyzable   106 ads  $     185,809
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+--- cooldown 20s ---
+=== Finish Line Official (27213418) → finishline ===
+ingesting account 27213418 (Finish Line Official) → brand finishline 2026-04-30 
+→ 2026-07-29
+✓ 108 ads · 0 assets · 0/0 previews rendered
+  spend $1,321,593 · 0% on creative that can be vision-analyzed
+    dpa          108 ads  $   1,321,593
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+--- cooldown 20s ---
+=== Finish Line Brand & COOP (627413344530702) → finishline ===
+ingesting account 627413344530702 (Finish Line Brand & COOP) → brand finishline 
+2026-04-30 → 2026-07-29
+✓ 8 ads · 0 assets · 0/0 previews rendered
+  spend $48,433 · 0% on creative that can be vision-analyzed
+    dpa            8 ads  $      48,433
+  note: most spend is on catalog/DPA ads whose creative is assembled per-product
+at serve time. Those have no fixed image to analyze, so creative-attribute 
+rollups cover the analyzable subset only.
+--- cooldown 20s ---
+############ WEEKLY SERIES (sparklines) ############
+=== JD Sports US Brand & COOP (263673744705629) → jdsports ===
+series account 263673744705629 → jdsports 2026-04-30 → 2026-07-29, 7-day buckets
+✓ 1325 rows → ad_performance_series
+--- cooldown 20s ---
+=== JD Sports - US (399719270800712) → jdsports ===
+series account 399719270800712 → jdsports 2026-04-30 → 2026-07-29, 7-day buckets
+✓ 1075 rows → ad_performance_series
+--- cooldown 20s ---
+=== Finish Line Official (27213418) → finishline ===
+series account 27213418 → finishline 2026-04-30 → 2026-07-29, 7-day buckets
+✓ 422 rows → ad_performance_series
+--- cooldown 20s ---
+=== Finish Line Brand & COOP (627413344530702) → finishline ===
+series account 627413344530702 → finishline 2026-04-30 → 2026-07-29, 7-day 
+buckets
+✓ 33 rows → ad_performance_series
+--- cooldown 20s ---
+############ DAILY SERIES (scale/kill timeline) ############
+=== JD Sports US Brand & COOP (263673744705629) → jdsports ===
+series account 263673744705629 → jdsports 2026-04-30 → 2026-07-29, 1-day 
+buckets, 15-day chunks
+  2026-04-30→2026-05-14: 1200 rows
+  2026-05-15→2026-05-29: 1477 rows
+  2026-05-30→2026-06-13: 1403 rows
+  2026-06-14→2026-06-28: 1138 rows
+  2026-06-29→2026-07-13: 662 rows
+  2026-07-14→2026-07-28: 1544 rows
+  2026-07-29→2026-07-29: 138 rows
+✓ 7562 rows → ad_daily
+--- cooldown 20s ---
+=== JD Sports - US (399719270800712) → jdsports ===
+series account 399719270800712 → jdsports 2026-04-30 → 2026-07-29, 1-day 
+buckets, 15-day chunks
+  2026-04-30→2026-05-14: 1333 rows
+  2026-05-15→2026-05-29: 1233 rows
+  2026-05-30→2026-06-13: 905 rows
+  2026-06-14→2026-06-28: 1026 rows
+  2026-06-29→2026-07-13: 988 rows
+  2026-07-14→2026-07-28: 605 rows
+  2026-07-29→2026-07-29: 23 rows
+✓ 6113 rows → ad_daily
+--- cooldown 20s ---
+=== Finish Line Official (27213418) → finishline ===
+series account 27213418 → finishline 2026-04-30 → 2026-07-29, 1-day buckets, 
+15-day chunks
+  2026-04-30→2026-05-14: 381 rows
+  2026-05-15→2026-05-29: 454 rows
+  2026-05-30→2026-06-13: 351 rows
+  2026-06-14→2026-06-28: 328 rows
+  2026-06-29→2026-07-13: 410 rows
+  2026-07-14→2026-07-28: 476 rows
+  2026-07-29→2026-07-29: 27 rows
+✓ 2427 rows → ad_daily
+--- cooldown 20s ---
+=== Finish Line Brand & COOP (627413344530702) → finishline ===
+series account 627413344530702 → finishline 2026-04-30 → 2026-07-29, 1-day 
+buckets, 15-day chunks
+  2026-04-30→2026-05-14: 44 rows
+  2026-05-15→2026-05-29: 96 rows
+  2026-05-30→2026-06-13: 48 rows
+  2026-06-14→2026-06-28: 0 rows
+  2026-06-29→2026-07-13: 0 rows
+  2026-07-14→2026-07-28: 0 rows
+  2026-07-29→2026-07-29: 0 rows
+✓ 188 rows → ad_daily
+--- cooldown 20s ---
+############ REFRESH COMPLETE ############

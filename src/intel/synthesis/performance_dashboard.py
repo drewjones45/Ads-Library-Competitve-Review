@@ -288,12 +288,14 @@ def _fetch_rankings(conn: sqlite3.Connection) -> dict[str, Any]:
 def _fetch_daily(conn: sqlite3.Connection) -> tuple[dict[str, list], list[str]]:
     """Per-ad daily metrics as a SPARSE series, plus the canonical day axis.
 
-    Sparse on purpose. A dense matrix would be 623 ads x 90 days x 3 metrics of
-    mostly zeros — roughly 170k numbers shipped to the browser so the timeline
-    can animate. Most ads deliver on only a handful of days, so each ad instead
-    carries [dayIndex, spend, purchases, revenue] only for days it actually ran,
-    and the browser accumulates. That is ~10x smaller and loses nothing: a day
-    absent from the list is a day with no delivery, which is exactly zero.
+    Sparse on purpose. A dense matrix would be 623 ads x 90 days x N metrics of
+    mostly zeros — a large payload shipped to the browser so the timeline can
+    animate. Most ads deliver on only a handful of days, so each ad instead
+    carries [dayIndex, spend, purchases, revenue, impressions, video_3s,
+    video_plays] only for days it actually ran, and the browser accumulates.
+    Impressions and 3-second views ride along so the scale/kill chart can judge
+    on CPM and cost-per-3s-view (upper-funnel metrics), not just CPA/ROAS.
+    A day absent from the list is a day with no delivery, which is exactly zero.
     """
     have = conn.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='ad_daily'"
@@ -308,7 +310,8 @@ def _fetch_daily(conn: sqlite3.Connection) -> tuple[dict[str, list], list[str]]:
 
     out: dict[str, list] = {}
     for r in conn.execute(
-        "SELECT platform_ad_id, day, spend, purchases, revenue "
+        "SELECT platform_ad_id, day, spend, purchases, revenue, "
+        "  impressions, video_3s, video_plays "
         "FROM ad_daily WHERE spend > 0 OR purchases > 0 ORDER BY platform_ad_id, day"
     ):
         i = didx.get(r["day"])
@@ -316,7 +319,8 @@ def _fetch_daily(conn: sqlite3.Connection) -> tuple[dict[str, list], list[str]]:
             continue
         out.setdefault(r["platform_ad_id"], []).append([
             i, round(r["spend"] or 0, 2), round(r["purchases"] or 0),
-            round(r["revenue"] or 0, 2),
+            round(r["revenue"] or 0, 2), round(r["impressions"] or 0),
+            round(r["video_3s"] or 0), round(r["video_plays"] or 0),
         ])
     return out, days
 
@@ -796,6 +800,74 @@ border-left:3px solid var(--accent);border-radius:12px;padding:16px 18px}
 .adp .apmet{display:flex;gap:22px;flex-wrap:wrap;margin:12px 0 4px}
 .adp .apmet div{font-size:12px;color:var(--dim)}
 .adp .apmet b{display:block;font-size:17px;color:var(--fg);font-variant-numeric:tabular-nums}
+
+/* ---- scale/kill target-reduction control ---- */
+#skAdj .seg{padding:5px 8px;font-size:11.5px}
+
+/* ---- per-zone dashboard sections (scale / wait / kill) ---- */
+.zsecs{margin-top:16px}
+.zseclead{color:var(--dim);font-size:12.5px;margin-bottom:12px}
+.zsec{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+padding:16px 18px;margin-bottom:16px;box-shadow:var(--shadow)}
+.zsec .zhd{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px;
+padding-bottom:10px;border-bottom:1px solid var(--line)}
+.zbadge{font-size:11px;font-weight:700;letter-spacing:.06em;color:#fff;
+padding:3px 9px;border-radius:6px;flex:none}
+.zsec .zhd b{font-size:14px}
+.zsec .zhd .zsp{color:var(--dim);font-variant-numeric:tabular-nums}
+.zsec .zhd .hint{color:var(--dim);font-size:12px;font-weight:400;margin-left:auto;
+max-width:520px;text-align:right}
+.ztrends{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;
+margin-bottom:14px}
+.tchart{margin:0;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+padding:10px 12px 6px}
+.tchart .tcttl{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:2px}
+.tchart .tcnow{font-size:14px;font-weight:700;letter-spacing:0;text-transform:none;
+font-variant-numeric:tabular-nums}
+.tchart .tcempty{color:var(--dim);font-size:12px;padding:24px 0;text-align:center}
+.zsec .tblwrap{max-height:360px;overflow-y:auto;margin-bottom:0}
+.zsec table{min-width:640px}
+.zsec thead th{position:sticky;top:0;background:var(--panel);z-index:1;
+box-shadow:inset 0 -1px 0 var(--line)}
+.zsec .zdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;
+vertical-align:middle;flex:none}
+.zsec .adnm{display:block;max-width:420px;overflow:hidden;text-overflow:ellipsis;
+white-space:nowrap;font-size:12.5px}
+.zsec .sub{color:var(--dim);font-size:11px;margin-top:2px}
+.zsec tbody tr{cursor:pointer}
+.zsec tbody tr:hover{background:var(--panel2)}
+
+/* ---- collapsible right-hand section nav ---- */
+html{scroll-behavior:smooth}
+section[id]{scroll-margin-top:18px}
+.secnav{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:50;
+display:flex;align-items:stretch}
+.secnav-tog{align-self:center;width:22px;height:56px;border:1px solid var(--line);
+border-right:none;border-radius:8px 0 0 8px;background:var(--panel);color:var(--dim);
+cursor:pointer;font-size:13px;box-shadow:var(--shadow);flex:none;padding:0}
+.secnav-tog:hover{color:var(--accent);border-color:var(--accent)}
+.secnav-tog:after{content:"\203A"}                 /* › when expanded → collapse */
+.secnav.collapsed .secnav-tog:after{content:"\2039"} /* ‹ when collapsed → expand */
+.secnav-inner{width:212px;background:color-mix(in srgb,var(--panel) 92%,transparent);
+backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+border:1px solid var(--line);border-radius:12px 0 0 12px;box-shadow:var(--shadow);
+padding:12px 10px;transition:transform .22s ease,opacity .22s ease}
+.secnav.collapsed .secnav-inner{transform:translateX(calc(100% + 24px));opacity:0;
+pointer-events:none}
+.secnav-hd{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);
+padding:2px 8px 8px}
+.secnav-inner a{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;
+color:var(--dim);text-decoration:none;font-size:12.5px;line-height:1.2}
+.secnav-inner a i{width:7px;height:7px;border-radius:50%;background:var(--line);flex:none;
+transition:background .15s ease,transform .15s ease}
+.secnav-inner a:hover{background:var(--panel2);color:var(--fg)}
+.secnav-inner a.active{color:var(--fg);font-weight:600;background:var(--panel2)}
+.secnav-inner a.active i{background:var(--accent);transform:scale(1.35)}
+/* On wide screens, hold the content clear of the open drawer; below that it
+   overlays and the user collapses it when it is in the way. */
+@media(min-width:1500px){body:not(.nav-collapsed) .wrap{margin-right:210px}}
+@media(max-width:720px){.secnav{display:none}}
 """
 
 
@@ -1204,6 +1276,34 @@ JS = r"""
   // enough to distinguish it from the target.
   var SK_K=2.0, SK_METRIC='cpa', SK_TARGET=null, SK_FRAME=null, SK_PLAYING=false, SK_TIMER=null;
   var SK_LAUNCH='', SK_ZONE='k';   // default to the kill list; '' = every zone
+  // Fractional reduction applied to the auto (account-average) target: 0 =
+  // account average, 0.10 = a target 10% tougher than average, etc. This is the
+  // "reduce by 5/10/15/20%" control. For the cost metrics (CPA, CPM, cost/3s
+  // view) reducing the number is a stricter goal; the READ note states the
+  // effective target so the direction is never ambiguous.
+  var SK_ADJ=0;
+  // Metric registry. `lower` marks a cost metric (smaller is better); ROAS is
+  // the one return metric. `video` restricts the population to ads that served
+  // video (a 3-second view is a video-only event). `num`/`den` compute the
+  // ratio from an accumulated totals object. CPM and cost/3s view are the
+  // upper-funnel / prospecting metrics the account team asked for.
+  var SK_MET={
+    cpa:{lab:'CPA',   lower:true,  video:false, val:function(t){return t.pu?t.sp/t.pu:null;}},
+    roas:{lab:'ROAS', lower:false, video:false, val:function(t){return t.sp?t.rv/t.sp:0;}},
+    cpm:{lab:'CPM',   lower:true,  video:false, val:function(t){return t.im?1000*t.sp/t.im:null;}},
+    cpv:{lab:'Cost / 3s view', lower:true, video:true, val:function(t){return t.v3?t.sp/t.v3:null;}}
+  };
+  function skDef(){ return SK_MET[SK_METRIC]; }
+  function skLower(){ return skDef().lower; }
+  function skValue(t){ return skDef().val(t); }
+  // Value formatter for the active metric. Cost-per-3s-view lives in cents, so
+  // it needs more precision than the whole-dollar-ish CPA/CPM.
+  function skFmt(v){
+    if(v===null||v===undefined||!isFinite(v)) return '—';
+    if(SK_METRIC==='roas') return v.toFixed(2)+'x';
+    if(SK_METRIC==='cpv')  return '$'+v.toFixed(3);
+    return money2(v);
+  }
 
 
   // Launch date is the ad's CREATION date, not the first day it delivered in
@@ -1261,20 +1361,23 @@ JS = r"""
   }
 
   // Cumulative totals for each ad up to and including day index `upto`.
+  // Daily row layout: [dayIdx, spend, purchases, revenue, impressions,
+  // video_3s, video_plays].
   function skTotals(pool,upto){
     var out=[];
     for(var i=0;i<pool.length;i++){
       var a=pool[i], d=a.D;
       if(!d||!d.length) continue;
-      var sp=0,pu=0,rv=0,first=null,last=null;
+      var sp=0,pu=0,rv=0,im=0,v3=0,vp=0,first=null,last=null;
       for(var j=0;j<d.length;j++){
         if(d[j][0]>upto) break;
         sp+=d[j][1]; pu+=d[j][2]; rv+=d[j][3];
+        im+=d[j][4]||0; v3+=d[j][5]||0; vp+=d[j][6]||0;
         if(first===null) first=d[j][0];
         last=d[j][0];
       }
       if(sp<=0) continue;
-      out.push({a:a,sp:sp,pu:pu,rv:rv,first:first,last:last,
+      out.push({a:a,sp:sp,pu:pu,rv:rv,im:im,v3:v3,vp:vp,first:first,last:last,
                 cpa:pu?sp/pu:null, roas:sp?rv/sp:0});
     }
     return out;
@@ -1288,14 +1391,18 @@ JS = r"""
   // conversions must have been missed before the call is made.
   var NOCONV_N=3;
   function skClassify(t,target){
-    var isC=SK_METRIC==='cpa';
-    var v=isC?t.cpa:t.roas;
-    if(isC && (v===null||!t.pu)){
+    var lower=skLower();
+    var v=skValue(t);
+    // A cost metric with a zero denominator (no purchases / no 3s views) has no
+    // ratio. For every cost metric, n = spend/target is the count of events
+    // expected at target, so the same "spent enough to have produced NOCONV_N
+    // and produced none → kill" rule applies uniformly.
+    if(lower && v===null){
       var expected=target>0?t.sp/target:0;
       return expected>=NOCONV_N?'k':'w';
     }
-    var b=isC?skBand(t.sp,target):skBandR(t.sp,target,SK_CPAPROXY);
-    if(isC) return v<=b.scale?'g':(v>=b.kill?'k':'w');
+    var b=lower?skBand(t.sp,target):skBandR(t.sp,target,SK_CPAPROXY);
+    if(lower) return v<=b.scale?'g':(v>=b.kill?'k':'w');
     return v>=b.scale?'g':(v<=b.kill?'k':'w');
   }
   var SK_CPAPROXY=1;
@@ -1306,9 +1413,24 @@ JS = r"""
     var launchInfo=fillLaunchSelect(hasDaily);
     var withDaily=hasDaily.filter(skLaunchPass);
     var launchHidden=hasDaily.length-withDaily.length;
+    // Cost-per-3s-view is a video-only event: an ad that never served video can
+    // never register one, so it is dropped from this metric's population rather
+    // than plotted at an infinite cost. The count is disclosed in the note.
+    var nonVideo=0;
+    if(skDef().video){
+      var vids=withDaily.filter(function(a){
+        var d=a.D; for(var j=0;j<d.length;j++){ if((d[j][6]||0)>0) return true; } return false;
+      });
+      nonVideo=withDaily.length-vids.length;
+      withDaily=vids;
+    }
     if(!DAYS.length||!withDaily.length){
-      host.innerHTML='<div class="empty">No daily data for this filter — run '+
-        '<code>intel perf-series --increment 1</code> to populate it.</div>';
+      host.innerHTML='<div class="empty">'+
+        (skDef().video&&nonVideo
+          ? 'No video ads in this filter — cost per 3-second view only applies to ads that '+
+            'served video.'
+          : 'No daily data for this filter — run '+
+            '<code>intel perf-series --increment 1</code> to populate it.')+'</div>';
       document.getElementById('skZones').innerHTML='';
       document.getElementById('skTl').style.display='none';
       document.getElementById('skNote').innerHTML='';
@@ -1319,18 +1441,31 @@ JS = r"""
     if(SK_FRAME===null) SK_FRAME=DAYS.length-1;
 
     var tot=skTotals(withDaily,SK_FRAME);
-    // Default target = the filtered population's own blended CPA/ROAS at the
-    // full window, so "target" means "the account's current average" until the
-    // user types a real business target.
+    // Default target = the filtered population's own blended value for the active
+    // metric at the full window, so "target" means "the account's current
+    // average" until the user types a real business target or dials in a
+    // reduction. CPM = cost per 1000 impressions; cost/3s view = spend per view.
     var full=skTotals(withDaily,DAYS.length-1);
     var fsp=full.reduce(function(s,t){return s+t.sp;},0);
     var fpu=full.reduce(function(s,t){return s+t.pu;},0);
     var frv=full.reduce(function(s,t){return s+t.rv;},0);
+    var fim=full.reduce(function(s,t){return s+t.im;},0);
+    var fv3=full.reduce(function(s,t){return s+t.v3;},0);
     SK_CPAPROXY=fpu?fsp/fpu:1;
-    var autoTarget=SK_METRIC==='cpa'?(fpu?fsp/fpu:0):(fsp?frv/fsp:0);
-    var target=(SK_TARGET!==null&&SK_TARGET>0)?SK_TARGET:autoTarget;
+    var autoTarget=({cpa:fpu?fsp/fpu:0, roas:fsp?frv/fsp:0,
+                     cpm:fim?1000*fsp/fim:0, cpv:fv3?fsp/fv3:0})[SK_METRIC];
+    // Base target is a typed value if present, else the account average; the
+    // reduction control then tightens it. Typing and the −% buttons are mutually
+    // exclusive (each clears the other), so this never compounds.
+    var base=(SK_TARGET!==null&&SK_TARGET>0)?SK_TARGET:autoTarget;
+    var target=base*(1-SK_ADJ);
     var tin=document.getElementById('skTarget');
-    if(document.activeElement!==tin) tin.value=target.toFixed(2);
+    tin.step=(SK_METRIC==='cpv')?'0.001':'0.01';
+    if(document.activeElement!==tin) tin.value=(SK_METRIC==='cpv')?target.toFixed(3):target.toFixed(2);
+    // Reflect the active reduction on the −% control.
+    document.querySelectorAll('#skAdj .seg').forEach(function(b){
+      b.classList.toggle('on', (+b.dataset.adj)===SK_ADJ);
+    });
 
     var buckets={g:[],w:[],k:[]};
     tot.forEach(function(t){ t.z=skClassify(t,target); buckets[t.z].push(t); });
@@ -1367,20 +1502,20 @@ JS = r"""
     // --- scatter -------------------------------------------------------------
     var W=980,H=420,PL=66,PR=110,PT=14,PB=54;
     var iw=W-PL-PR, ih=H-PT-PB;
+    var lower=skLower();
     var spMax=Math.max(100,Math.max.apply(null,full.map(function(t){return t.sp;})));
     var lx=function(sp){return PL+(Math.log10(Math.max(sp,10))-1)/(Math.log10(spMax)-1)*iw;};
-    var vals=tot.map(function(t){return SK_METRIC==='cpa'?t.cpa:t.roas;})
+    var vals=tot.map(skValue)
                 .filter(function(v){return v!==null&&isFinite(v);}).sort(function(a,b){return a-b;});
     var vMax=vals.length?Math.max(target*2, vals[Math.floor(0.95*(vals.length-1))]*1.1):target*2;
     var yOf=function(v){return PT+ih-Math.min(v,vMax)/vMax*ih;};
 
     var s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+
-      'Ads by cumulative spend and '+SK_METRIC.toUpperCase()+'">';
+      'Ads by cumulative spend and '+esc(skDef().lab)+'">';
     for(var i=0;i<=4;i++){
       var v=vMax*i/4,y=yOf(v);
       s+='<line class="gridln" x1="'+PL+'" x2="'+(W-PR)+'" y1="'+y+'" y2="'+y+'"/>'+
-         '<text x="'+(PL-9)+'" y="'+(y+4)+'" text-anchor="end">'+
-         (SK_METRIC==='cpa'?money2(v):v.toFixed(1)+'x')+'</text>';
+         '<text x="'+(PL-9)+'" y="'+(y+4)+'" text-anchor="end">'+skFmt(v)+'</text>';
     }
     [10,100,1000,10000,100000].forEach(function(t){
       if(t>spMax*1.4) return;
@@ -1392,25 +1527,25 @@ JS = r"""
     });
     s+='<text x="'+(PL+iw/2)+'" y="'+(H-12)+'" text-anchor="middle">CUMULATIVE SPEND (LOG)</text>'+
        '<text x="14" y="'+(PT+ih/2)+'" text-anchor="middle" transform="rotate(-90 14 '+
-       (PT+ih/2)+')">'+(SK_METRIC==='cpa'?'CPA':'ROAS')+'</text>';
+       (PT+ih/2)+')">'+esc(skDef().lab.toUpperCase())+'</text>';
 
     // zone bands, sampled across the log axis
     var killPts=[],scalePts=[];
     for(var px=0;px<=60;px++){
       var sp=Math.pow(10,1+(px/60)*(Math.log10(spMax)-1));
-      var b=SK_METRIC==='cpa'?skBand(sp,target):skBandR(sp,target,SK_CPAPROXY);
+      var b=lower?skBand(sp,target):skBandR(sp,target,SK_CPAPROXY);
       killPts.push([lx(sp),yOf(b.kill)]);
       scalePts.push([lx(sp),yOf(b.scale)]);
     }
     var path=function(p){return p.map(function(q,i){
       return (i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1);}).join('');};
     var topY=PT, botY=PT+ih;
-    // Kill region fills away from target: upward for CPA (high CPA is bad),
-    // downward for ROAS (low ROAS is bad).
-    var killFill=SK_METRIC==='cpa'
+    // Kill region fills away from target: upward for a cost metric (high cost is
+    // bad), downward for ROAS (low return is bad).
+    var killFill=lower
       ? path(killPts)+'L'+lx(spMax)+' '+topY+'L'+PL+' '+topY+'Z'
       : path(killPts)+'L'+lx(spMax)+' '+botY+'L'+PL+' '+botY+'Z';
-    var scaleFill=SK_METRIC==='cpa'
+    var scaleFill=lower
       ? path(scalePts)+'L'+lx(spMax)+' '+botY+'L'+PL+' '+botY+'Z'
       : path(scalePts)+'L'+lx(spMax)+' '+topY+'L'+PL+' '+topY+'Z';
     s+='<path d="'+killFill+'" fill="var(--zBad)" fill-opacity="0.10"/>'+
@@ -1421,21 +1556,21 @@ JS = r"""
        '" stroke="var(--fg)" stroke-width="1.5" stroke-dasharray="7 5" opacity=".55"/>'+
        '<text x="'+(W-PR+8)+'" y="'+(yOf(target)+4)+'" style="fill:var(--fg)">TARGET</text>'+
        '<text x="'+(W-PR+8)+'" y="'+(yOf(target)-16)+'" style="fill:var(--zBad)">'+
-       (SK_METRIC==='cpa'?'KILL':'SCALE')+'</text>'+
+       (lower?'KILL':'SCALE')+'</text>'+
        '<text x="'+(W-PR+8)+'" y="'+(yOf(target)+24)+'" style="fill:var(--zGood)">'+
-       (SK_METRIC==='cpa'?'SCALE':'KILL')+'</text>';
+       (lower?'SCALE':'KILL')+'</text>';
 
     var COL={g:'var(--zGood)',w:'var(--zWait)',k:'var(--zBad)'};
     var skClipped=0, skNoConv=0;
     tot.slice().sort(function(a,b){return a.sp-b.sp;}).forEach(function(t){
-      var v=SK_METRIC==='cpa'?t.cpa:t.roas;
-      if(v===null||!isFinite(v)){ v=SK_METRIC==='cpa'?vMax:0; skNoConv++; }
+      var v=skValue(t);
+      if(v===null||!isFinite(v)){ v=lower?vMax:0; skNoConv++; }
       else if(v>vMax) skClipped++;
       s+='<circle class="skdot" data-id="'+esc(t.a.id)+'" cx="'+lx(t.sp).toFixed(1)+
          '" cy="'+yOf(v).toFixed(1)+'" r="'+(4+4*Math.sqrt(t.sp/spMax)).toFixed(1)+
          '" fill="'+COL[t.z]+'" fill-opacity=".72"><title>'+
-         esc((t.a.nm||'').slice(0,80))+'\n'+money(t.sp)+' · '+
-         (t.cpa?money2(t.cpa)+' CPA':'no conversions')+' · '+t.roas.toFixed(2)+'x ROAS</title></circle>';
+         esc((t.a.nm||'').slice(0,80))+'\n'+money(t.sp)+' · '+esc(skDef().lab)+' '+
+         (skValue(t)===null?'—':skFmt(skValue(t)))+'</title></circle>';
     });
     s+='</svg>';
     host.innerHTML=s;
@@ -1443,12 +1578,16 @@ JS = r"""
       c.addEventListener('click',function(){showAd(c.dataset.id,target);});
     });
 
-    // --- timeline + action list ----------------------------------------------
+    // --- timeline + per-zone dashboard sections -------------------------------
     renderTimeline(withDaily);
-    renderSKList(buckets,target);
+    renderZoneSections(buckets,target);
 
     var wrong=buckets.k.reduce(function(s,t){return s+t.sp;},0);
-    var isAuto=!(SK_TARGET!==null&&SK_TARGET>0);
+    var isAuto=!(SK_TARGET!==null&&SK_TARGET>0) && SK_ADJ===0;
+    var lab=skDef().lab, mfmt=skFmt;
+    // The countable event behind each metric's confidence band, for the note.
+    var noun={cpa:'conversions', roas:'conversions',
+              cpm:'thousand impressions', cpv:'3-second views'}[SK_METRIC];
     var lbl={'__new__':'launched during this window',
              '__prior__':'launched before this window'}[SK_LAUNCH] ||
              (SK_LAUNCH?('launched in '+SK_LAUNCH):'');
@@ -1459,23 +1598,39 @@ JS = r"""
         ' of '+hasDaily.length+' ads ('+launchHidden+' hidden). Spend, zones and the '+
         'timeline below all describe this cohort only.<br><br>'
       : '';
+    // When the reduction control is engaged, the target is no longer the account
+    // average — say so and by how much, because otherwise "wrong zone" would read
+    // against a number the user can't see.
+    var adjLine = SK_ADJ>0
+      ? '<b>Target:</b> '+mfmt(target)+' — <b>'+(100*SK_ADJ).toFixed(0)+'% tighter</b> than '+
+        'this filter’s account average of '+mfmt(autoTarget)+'. '+
+        (lower
+          ? 'A lower '+lab+' is a stricter goal, so more ads fall into KILL than at the average.'
+          : 'Note a lower ROAS target is an <em>easier</em> goal, so more ads clear SCALE.')+
+        '<br><br>'
+      : '';
     // The default target is the population's OWN blended rate, so roughly half
     // the spend sits on the wrong side of it by construction. Calling that
     // "underperforming" would be a sleight of hand — against a self-referential
     // target the only honest claim is "worse than your own average".
     var readLine = isAuto
-      ? '<b>READ:</b> against this filter’s own blended '+(SK_METRIC==='cpa'?'CPA':'ROAS')+
-        ' ('+(SK_METRIC==='cpa'?money2(target):target.toFixed(2)+'x')+'), '+
+      ? '<b>READ:</b> against this filter’s own blended '+esc(lab)+
+        ' ('+mfmt(target)+'), '+
         buckets.g.length+' ad'+(buckets.g.length===1?'':'s')+' beat it with enough spend to '+
         'be confident and '+buckets.k.length+' trail it — <b>'+money(wrong)+'</b> ('+
         (100*wrong/totSp).toFixed(0)+'% of spend in view). Note this target is the average '+
         'of the ads being measured, so about half the spend sits below it by construction; '+
-        'set a real business target above to judge against something external.'
+        'type a real business target above, or tighten it with the −% control, to judge against '+
+        'something external.'
       : '<b>READ:</b> '+buckets.g.length+' ad'+(buckets.g.length===1?'':'s')+
         ' clearing the scale line · '+buckets.k.length+' in kill · <b>'+money(wrong)+
         '</b> ('+(100*wrong/totSp).toFixed(0)+'% of spend in view) sitting in the wrong zone '+
-        'against your target of '+(SK_METRIC==='cpa'?money2(target):target.toFixed(2)+'x')+'.';
-    document.getElementById('skNote').innerHTML= launchLine + readLine +
+        'against a target of '+mfmt(target)+'.';
+    document.getElementById('skNote').innerHTML= launchLine + adjLine + readLine +
+      (skDef().video&&nonVideo
+        ? '<br><br><b>'+nonVideo+'</b> non-video ad'+(nonVideo===1?'':'s')+' '+
+          (nonVideo===1?'is':'are')+' excluded — a 3-second view is a video-only event.'
+        : '')+
       '<br><br><b>Launch date</b> is when the asset was created in the ad account, not when '+
       'it first delivered inside this window — '+
       'an ad can be built months before it starts spending, so first-delivery would label '+
@@ -1483,121 +1638,163 @@ JS = r"""
       (launchInfo.unknown?'<b>'+launchInfo.unknown+'</b> ad'+(launchInfo.unknown===1?'':'s')+
         ' carry no creation date and drop out of every cohort. ':'')+
       '<br><br><b>How the zones are drawn:</b> they are a confidence band, not a fixed '+
-      'threshold. An ad with $50 of spend and one conversion has a CPA you cannot trust; '+
-      'one with $50,000 and 900 conversions has a CPA you can. Both boundaries are '+
-      'target × (1 ± '+SK_K.toFixed(0)+'/√n), with n the conversions expected at target, so '+
-      'they converge on the target as spend accumulates and an ad is only called once it has '+
-      'earned the call. That is why low-spend ads sit in WAIT almost regardless of their '+
-      'measured rate. '+
-      'An ad with no conversions has no CPA, so it stays in WAIT until it has spent enough '+
-      'to have expected at least '+NOCONV_N+' conversions at target — past that, producing '+
-      'none is itself the verdict, and it is called a kill. '+
+      'threshold. A low-spend ad has a '+esc(lab)+' you cannot trust; a high-spend one you '+
+      'can. Both boundaries are target × (1 ± '+SK_K.toFixed(0)+'/√n), with n the '+esc(noun)+
+      ' expected at target, so they converge on the target as spend accumulates and an ad is '+
+      'only called once it has earned the call. That is why low-spend ads sit in WAIT almost '+
+      'regardless of their measured rate. '+
+      (lower
+        ? 'An ad producing none of the '+esc(noun)+' has no '+esc(lab)+', so it stays in WAIT '+
+          'until it has spent enough to have expected at least '+NOCONV_N+' at target — past '+
+          'that, producing none is itself the verdict, and it is called a kill. '
+        : '')+
       (skClipped?'<b>'+skClipped+'</b> ad'+(skClipped===1?'':'s')+' beyond '+
-        (SK_METRIC==='cpa'?money2(vMax):vMax.toFixed(1)+'x')+' '+(skClipped===1?'is':'are')+
-        ' pinned to the top edge so the bulk stays readable — they are worse than they look. ':'')+
-      (skNoConv?'<b>'+skNoConv+'</b> ad'+(skNoConv===1?'':'s')+' with no conversions at all '+
-        (skNoConv===1?'is':'are')+' drawn at the ceiling, since '+(skNoConv===1?'it has':'they have')+
-        ' no CPA to plot. ':'')+
+        mfmt(vMax)+' '+(skClipped===1?'is':'are')+
+        ' pinned to the '+(lower?'top':'bottom')+' edge so the bulk stays readable. ':'')+
+      (skNoConv?'<b>'+skNoConv+'</b> ad'+(skNoConv===1?'':'s')+' with none of the '+esc(noun)+
+        ' at all '+(skNoConv===1?'is':'are')+' drawn at the '+(lower?'ceiling':'floor')+'. ':'')+
       'Dot position uses spend accumulated up to the selected day, so dragging the timeline '+
       'replays how each ad actually got where it is.';
   }
 
-  // The action list under the chart. Reads the same `buckets` the zone segments
-  // summarise, so the table can never disagree with the number on the segment
-  // that filtered it.
-  var SK_ROWS=60;
-
   // Money at stake against the target, in dollars — the quantity that makes one
   // ad more urgent than another.
   //
-  //   CPA mode:  what these conversions SHOULD have cost, minus what they did.
-  //   ROAS mode: what this spend SHOULD have returned, minus what it did.
+  //   Cost metric (CPA/CPM/cost-per-3s-view): what these EVENTS should have cost
+  //     at target, minus what they did cost.
+  //   ROAS: what this spend SHOULD have returned, minus what it did.
   //
   // Negative means the ad is behind target and the figure is how much it burned;
   // positive means it beat target and the figure is the surplus it produced.
   // Sorting on this rather than on raw spend is the difference between "biggest
-  // ad" and "biggest problem": a $95k ad a shade over target wastes far less
-  // than a $40k ad at triple the target CPA. An ad with no conversions scores
-  // -spend, which is correct — all of it was wasted.
+  // ad" and "biggest problem".
+  function skEvents(t){
+    return SK_METRIC==='cpa'?t.pu:(SK_METRIC==='cpm'?t.im/1000:(SK_METRIC==='cpv'?t.v3:t.pu));
+  }
   function skImpact(t,target){
-    return (SK_METRIC==='cpa') ? (t.pu*target - t.sp) : (t.rv - t.sp*target);
+    return (SK_METRIC==='roas') ? (t.rv - t.sp*target) : (skEvents(t)*target - t.sp);
   }
 
-  function renderSKList(buckets,target){
-    var ZL={g:['SCALE','var(--zGood)'],w:['WAIT','var(--zWait)'],k:['KILL','var(--zBad)']};
-    var order=SK_ZONE?[SK_ZONE]:['k','g','w'];   // worst first when unfiltered
-    var rows=[], shownBy={}, totalBy={};
-    order.forEach(function(z){
-      var b=buckets[z].map(function(t){ t.imp=skImpact(t,target); return t; });
-      // Priority differs by verdict, so each zone is ranked on its own terms and
-      // the zones are then concatenated in `order` — a single global sort would
-      // interleave "kill this first" with "scale this first", which is not a
-      // ranking anyone can act on.
-      if(z==='k')      b.sort(function(x,y){return x.imp-y.imp;});   // worst burn first
-      else if(z==='g') b.sort(function(x,y){return y.imp-x.imp;});   // biggest surplus first
-      else             b.sort(function(x,y){return y.sp-x.sp;});     // undecided: most at risk
-      // Unfiltered, cap EACH zone rather than the concatenated list. A flat
-      // top-60 over kill-then-scale-then-wait would be 60 kill rows and no
-      // scale row at all — the zones would silently vanish behind the cap.
-      var cap=SK_ZONE?SK_ROWS:Math.round(SK_ROWS/3);
-      b.slice(0,cap).forEach(function(t){ rows.push(t); });
-      shownBy[z]=Math.min(cap,b.length); totalBy[z]=b.length;
-    });
-    var shown=rows;
-    var host=document.getElementById('skTable');
-    if(!rows.length){ host.innerHTML=''; return; }
+  // A compact single-metric trend line over the weekly buckets. Follows the
+  // mark spec: 2px line, 10% area wash, recessive dashed grid, an emphasised
+  // end dot with a surface ring, and the latest value called out in the title —
+  // one series, so it is named rather than given a legend.
+  function trendChart(vals, label, fmt, hue){
+    var W=320,H=132,PL=44,PR=12,PT=30,PB=22;
+    var wrapOpen='<figure class="tchart"><figcaption class="tcttl">'+esc(label);
+    if(!vals || !vals.length){
+      return wrapOpen+'</figcaption><div class="tcempty">no weekly trend</div></figure>';
+    }
+    var n=vals.length;
+    var mx=Math.max.apply(null,vals), mn=Math.min.apply(null,vals);
+    if(!isFinite(mx)) mx=0; if(!isFinite(mn)) mn=0;
+    var top=(mx>0?mx*1.18:1), bot=Math.min(0,mn);
+    var iw=W-PL-PR, ih=H-PT-PB;
+    var xo=function(i){return PL+(n<2?iw/2:i*iw/(n-1));};
+    var yo=function(v){return PT+ih-((v-bot)/((top-bot)||1))*ih;};
+    var last=vals[n-1];
+    var s='<svg viewBox="0 0 '+W+' '+H+'" class="chart" role="img" aria-label="'+
+      esc(label)+' trend">';
+    for(var g=0;g<=2;g++){
+      var gv=bot+(top-bot)*g/2, gy=yo(gv);
+      s+='<line class="gridln" x1="'+PL+'" x2="'+(W-PR)+'" y1="'+gy.toFixed(1)+'" y2="'+gy.toFixed(1)+'"/>'+
+         '<text x="'+(PL-6)+'" y="'+(gy+3).toFixed(1)+'" text-anchor="end" style="font-size:9px">'+
+         fmt(gv)+'</text>';
+    }
+    var d='',area='';
+    for(var i=0;i<n;i++){ d+=(i?' L':'M')+xo(i).toFixed(1)+' '+yo(vals[i]).toFixed(1); }
+    area='M'+xo(0).toFixed(1)+' '+(PT+ih)+' L'+d.slice(1)+' L'+xo(n-1).toFixed(1)+' '+(PT+ih)+' Z';
+    s+='<path d="'+area+'" fill="'+hue+'" fill-opacity="0.10"/>'+
+       '<path d="'+d+'" fill="none" stroke="'+hue+'" stroke-width="2" '+
+       'stroke-linejoin="round" stroke-linecap="round"/>'+
+       '<circle cx="'+xo(n-1).toFixed(1)+'" cy="'+yo(last).toFixed(1)+'" r="3" fill="'+hue+
+       '" stroke="var(--panel)" stroke-width="2"/>';
+    if(BUCKETS.length){
+      s+='<text x="'+PL+'" y="'+(H-6)+'" style="font-size:9px">'+esc((BUCKETS[0]||'').slice(5))+'</text>'+
+         '<text x="'+(W-PR)+'" y="'+(H-6)+'" text-anchor="end" style="font-size:9px">'+
+         esc((BUCKETS[n-1]||'').slice(5))+'</text>';
+    }
+    s+='</svg>';
+    return wrapOpen+'<span class="tcnow" style="color:'+hue+'">'+fmt(last)+'</span>'+
+      '</figcaption>'+s+'</figure>';
+  }
 
-    // Counts describe the whole zone, not the capped page of it.
-    var nAll=0, spAll=0;
-    order.forEach(function(z){
-      nAll+=buckets[z].length;
-      buckets[z].forEach(function(t){ spAll+=t.sp; });
-    });
-    var head=SK_ZONE
-      ? '<b style="color:'+ZL[SK_ZONE][1]+'">'+ZL[SK_ZONE][0]+'</b> &mdash; '+nAll+
-        ' ad'+(nAll===1?'':'s')+' &middot; '+money(spAll)
-      : '<b>All ads in view</b> &mdash; '+nAll+' &middot; '+money(spAll);
-    var rank={
+  // Per-zone dashboard sections: for each classification in scope, a header, a
+  // row of key-metric trend charts (scroll-stop, CTR, ROAS) for the ads in that
+  // zone, then the ranked action table. Default is the KILL zone only (set by
+  // SK_ZONE); clearing the zone selection stacks all three.
+  var SK_ROWS_ZONE=40;
+  function renderZoneSections(buckets,target){
+    var ZL={g:['SCALE','var(--zGood)','g'],w:['WAIT','var(--zWait)','w'],k:['KILL','var(--zBad)','k']};
+    var order=SK_ZONE?[SK_ZONE]:['k','g','w'];   // worst first when unfiltered
+    var host=document.getElementById('skTable');
+    var metLab=skDef().lab, secLab=(SK_METRIC==='roas')?'CPA':'ROAS';
+    var secFmt=function(t){return (SK_METRIC==='roas')?(t.cpa?money2(t.cpa):'—'):t.roas.toFixed(2)+'x';};
+    var rankHint={
       k:'Ranked by money burned against target — act on the top row first.',
       g:'Ranked by surplus produced against target — the strongest case for more budget first.',
       w:'Ranked by spend at risk — these have not earned a verdict yet.'
-    }[SK_ZONE] || 'Grouped kill, then scale, then wait; each ranked by dollars at stake against target.';
-    var hint=rank+(SK_ZONE
-      ? ' Click the highlighted bar again to clear. Click a row for that ad’s history.'
-      : ' Click a bar above to list one zone. Click a row for that ad’s history.');
+    };
 
-    var body=shown.map(function(t){
-      var a=t.a, days=(t.last-t.first+1);
-      return '<tr data-id="'+esc(a.id)+'">'+
-        '<td><span class="zdot" style="background:'+ZL[t.z][1]+'"></span>'+
-          '<span class="adnm" title="'+esc(a.nm||a.id)+'">'+esc(a.nm||a.id)+'</span>'+
-          '<div class="sub">'+(a.cr?'launched '+esc(a.cr)+' &middot; ':'')+days+
-          ' day'+(days===1?'':'s')+' delivering'+(a.stage?' &middot; '+esc(a.stage):'')+'</div></td>'+
-        '<td>'+money(t.sp)+'</td>'+
-        '<td>'+(t.cpa?money2(t.cpa):'<span class="flat">&mdash;</span>')+'</td>'+
-        '<td>'+t.roas.toFixed(2)+'x</td>'+
-        '<td>'+num(t.pu)+'</td>'+
-        '<td style="color:'+(t.imp<0?'var(--zBad)':'var(--zGood)')+';font-weight:600" '+
-          'title="'+(t.imp<0
-            ? 'Spent '+money(-t.imp)+' more than these conversions should have cost at target'
-            : 'Produced '+money(t.imp)+' more value than target required')+'">'+
-          (t.imp<0?'-':'+')+money(Math.abs(t.imp))+'</td>'+
-        '<td style="color:'+ZL[t.z][1]+';font-weight:600">'+ZL[t.z][0]+'</td></tr>';
+    var out=order.map(function(z){
+      var b=buckets[z].map(function(t){ t.imp=skImpact(t,target); return t; });
+      if(!b.length) return '';
+      if(z==='k')      b.sort(function(x,y){return x.imp-y.imp;});   // worst burn first
+      else if(z==='g') b.sort(function(x,y){return y.imp-x.imp;});   // biggest surplus first
+      else             b.sort(function(x,y){return y.sp-x.sp;});     // undecided: most at risk
+      var spSum=b.reduce(function(s,t){return s+t.sp;},0);
+
+      // Trend charts aggregate the weekly series of THIS zone's ads only.
+      var S=poolSeries(b.map(function(t){return t.a;}));
+      var trends='<div class="ztrends">'+
+        trendChart(S&&S.ssr,'Scroll-stop rate',function(v){return v.toFixed(1)+'%';},'var(--sA)')+
+        trendChart(S&&S.ctr,'Click-through rate',function(v){return v.toFixed(2)+'%';},'var(--sA)')+
+        trendChart(S&&S.roas,'ROAS',function(v){return v.toFixed(2)+'x';},'var(--sA)')+
+        '</div>';
+
+      var shown=b.slice(0,SK_ROWS_ZONE);
+      var rows=shown.map(function(t){
+        var a=t.a, days=(t.last-t.first+1);
+        var vNow=skValue(t);
+        return '<tr data-id="'+esc(a.id)+'">'+
+          '<td><span class="zdot" style="background:'+ZL[z][1]+'"></span>'+
+            '<span class="adnm" title="'+esc(a.nm||a.id)+'">'+esc(a.nm||a.id)+'</span>'+
+            '<div class="sub">'+(a.cr?'launched '+esc(a.cr)+' &middot; ':'')+days+
+            ' day'+(days===1?'':'s')+' delivering'+(a.stage?' &middot; '+esc(a.stage):'')+'</div></td>'+
+          '<td>'+money(t.sp)+'</td>'+
+          '<td title="'+esc(metLab)+'">'+(vNow===null?'<span class="flat">&mdash;</span>':skFmt(vNow))+'</td>'+
+          '<td>'+secFmt(t)+'</td>'+
+          '<td style="color:'+(t.imp<0?'var(--zBad)':'var(--zGood)')+';font-weight:600" '+
+            'title="'+(t.imp<0
+              ? 'Spent '+money(-t.imp)+' more than these events should have cost at target'
+              : 'Produced '+money(t.imp)+' more value than target required')+'">'+
+            (t.imp<0?'-':'+')+money(Math.abs(t.imp))+'</td>'+
+          '<td style="color:'+ZL[z][1]+';font-weight:600">'+ZL[z][0]+'</td></tr>';
+      }).join('');
+
+      return '<section class="zsec" data-z="'+z+'">'+
+        '<div class="zhd"><span class="zbadge" style="background:'+ZL[z][1]+'">'+ZL[z][0]+'</span>'+
+        '<b>'+b.length+' ad'+(b.length===1?'':'s')+'</b><span class="zsp">'+money(spSum)+'</span>'+
+        '<span class="hint">'+rankHint[z]+'</span></div>'+
+        trends+
+        '<div class="tblwrap"><table><thead><tr><th>Ad</th><th>Spend</th>'+
+        '<th title="active scale/kill metric">'+esc(metLab)+'</th><th>'+esc(secLab)+'</th>'+
+        '<th title="Dollars gained or lost against the target — the sort key">vs target</th>'+
+        '<th>Verdict</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+        (b.length>shown.length
+          ? '<div class="hint" style="margin-top:6px">Showing the highest-priority '+
+            shown.length+' of '+b.length+' '+ZL[z][0].toLowerCase()+' ads.</div>' : '')+
+        '</section>';
     }).join('');
 
-    host.innerHTML='<div class="sklist"><div class="lhd">'+head+
-      '<span class="hint">'+hint+'</span></div>'+
-      (nAll>shown.length
-        ? '<div class="hint" style="color:var(--dim);font-size:12px;margin-bottom:6px">'+
-          'Showing the highest-priority '+
-          order.map(function(z){
-            return shownBy[z]+' of '+totalBy[z]+' '+ZL[z][0].toLowerCase();
-          }).join(' &middot; ')+'.</div>' : '')+
-      '<div class="tblwrap"><table><thead><tr><th>Ad</th><th>Spend</th><th>CPA</th>'+
-      '<th>ROAS</th><th>Purchases</th>'+
-      '<th title="Dollars gained or lost against the target — the sort key">'+
-      'vs target</th><th>Verdict</th></tr></thead><tbody>'+body+
-      '</tbody></table></div></div>';
+    if(!out){ host.innerHTML='<div class="empty">No ads in this selection.</div>'; return; }
+    host.innerHTML='<div class="zsecs">'+
+      '<div class="hint zseclead">'+(SK_ZONE
+        ? 'Showing the <b style="color:'+ZL[SK_ZONE][1]+'">'+ZL[SK_ZONE][0]+
+          '</b> section. Click the highlighted bar above again to see all three. Click a row for that ad’s history.'
+        : 'One section per verdict — kill, then scale, then wait. Click a bar above to isolate one. '+
+          'Trend charts are the weekly scroll-stop, CTR and ROAS for that zone’s ads; click a row for an ad’s history.')+
+      '</div>'+out+'</div>';
     host.querySelectorAll('tbody tr').forEach(function(tr){
       tr.addEventListener('click',function(){ showAd(tr.dataset.id,target); });
     });
@@ -1651,31 +1848,44 @@ JS = r"""
     if(!a||!a.D){host.innerHTML='';return;}
     var d=a.D;
     var firstIdx=d[0][0], lastIdx=d[d.length-1][0];
-    var sp=0,pu=0,rv=0;
-    d.forEach(function(x){sp+=x[1];pu+=x[2];rv+=x[3];});
-    var cpa=pu?sp/pu:null, roas=sp?rv/sp:0;
+    var sp=0,pu=0,rv=0,im=0,v3=0;
+    d.forEach(function(x){sp+=x[1];pu+=x[2];rv+=x[3];im+=x[4]||0;v3+=x[5]||0;});
+    var cpa=pu?sp/pu:null, roas=sp?rv/sp:0, cpm=im?1000*sp/im:null, cpv=v3?sp/v3:null;
 
-    // Daily spend and cumulative CPA are plotted as two stacked panels sharing
-    // one x-axis, NOT as two y-scales on one plot. Overlaying them would be a
-    // dual-axis chart: the visual crossings between a $500 bar and a $60 line
-    // would be pure artefacts of two independently-chosen scales, and reading
-    // "the line went above the bars" would mean nothing at all.
+    // The lower panel tracks the SAME metric the scale/kill chart is judging on
+    // (CPA / ROAS / CPM / cost per 3s view), so the drill-down explains the
+    // verdict the row carried. It shares the spend panel's x-axis but has its
+    // own y-scale — stacked, never overlaid: on one pair of axes the crossings
+    // between a spend bar and the metric line would be an artefact of two
+    // unrelated scales.
+    var metLab=skDef().lab;
     var W=940,PL=58,PR=58;
     var H1=140, H2=104, GAP=22, H=H1+GAP+H2+26;
     var iw=W-PL-PR, ih=H1-24, ih2=H2-22;
     var PT=12, PT2=H1+GAP;
     var n=lastIdx-firstIdx+1;
-    var byDay=new Array(n).fill(null).map(function(){return [0,0,0];});
-    d.forEach(function(x){var k=x[0]-firstIdx; byDay[k][0]+=x[1];byDay[k][1]+=x[2];byDay[k][2]+=x[3];});
+    // byDay row: [spend, purchases, revenue, impressions, video_3s].
+    var byDay=new Array(n).fill(null).map(function(){return [0,0,0,0,0];});
+    d.forEach(function(x){var k=x[0]-firstIdx;
+      byDay[k][0]+=x[1];byDay[k][1]+=x[2];byDay[k][2]+=x[3];byDay[k][3]+=x[4]||0;byDay[k][4]+=x[5]||0;});
     var spMaxD=Math.max.apply(null,byDay.map(function(x){return x[0];}))||1;
-    var cum=[],cs=0,cp=0;
-    byDay.forEach(function(x){cs+=x[0];cp+=x[1];cum.push(cp?cs/cp:null);});
-    var cpaVals=cum.filter(function(v){return v!==null&&isFinite(v);});
-    var cMax=Math.max(target*1.6, cpaVals.length?Math.max.apply(null,cpaVals)*1.1:target*1.6);
+    // Cumulative value of the active metric, day by day.
+    var cum=[],cs=0,cp=0,crv=0,cim=0,cv3=0;
+    byDay.forEach(function(x){cs+=x[0];cp+=x[1];crv+=x[2];cim+=x[3];cv3+=x[4];
+      var val;
+      if(SK_METRIC==='cpa')       val=cp?cs/cp:null;
+      else if(SK_METRIC==='roas') val=cs?crv/cs:null;
+      else if(SK_METRIC==='cpm')  val=cim?1000*cs/cim:null;
+      else                        val=cv3?cs/cv3:null;
+      cum.push(val);
+    });
+    var cumVals=cum.filter(function(v){return v!==null&&isFinite(v);});
+    var lowerM=skLower();
+    var cMax=Math.max(target*1.6, cumVals.length?Math.max.apply(null,cumVals)*1.1:target*1.6);
     var bw=iw/n;
 
     var s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" '+
-      'aria-label="Daily spend and cumulative CPA since launch, as two stacked panels">';
+      'aria-label="Daily spend and cumulative '+esc(metLab)+' since launch, as two stacked panels">';
     // --- panel 1: daily spend ---
     s+='<text x="'+PL+'" y="'+(PT-1)+'" style="fill:var(--fg);font-weight:600">Daily spend</text>';
     byDay.forEach(function(x,i){
@@ -1689,8 +1899,8 @@ JS = r"""
        '<text x="'+(PL-8)+'" y="'+(PT+10)+'" text-anchor="end">'+money(spMaxD)+'</text>'+
        '<text x="'+(PL-8)+'" y="'+(PT+ih)+'" text-anchor="end">$0</text>';
 
-    // --- panel 2: cumulative CPA, own scale, same x ---
-    s+='<text x="'+PL+'" y="'+(PT2-1)+'" style="fill:var(--fg);font-weight:600">Cumulative CPA</text>';
+    // --- panel 2: cumulative active metric, own scale, same x ---
+    s+='<text x="'+PL+'" y="'+(PT2-1)+'" style="fill:var(--fg);font-weight:600">Cumulative '+esc(metLab)+'</text>';
     var ty=PT2+ih2-Math.min(target,cMax)/cMax*ih2;
     s+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+ty+'" y2="'+ty+
        '" stroke="var(--fg)" stroke-width="1.2" stroke-dasharray="6 4" opacity=".5"/>'+
@@ -1707,8 +1917,8 @@ JS = r"""
          '" r="3.5" fill="var(--sB)" stroke="var(--panel)" stroke-width="2"/>';
     }
     s+='<line class="axline" x1="'+PL+'" x2="'+(W-PR)+'" y1="'+(PT2+ih2)+'" y2="'+(PT2+ih2)+'"/>'+
-       '<text x="'+(PL-8)+'" y="'+(PT2+10)+'" text-anchor="end">'+money2(cMax)+'</text>'+
-       '<text x="'+(PL-8)+'" y="'+(PT2+ih2)+'" text-anchor="end">$0</text>'+
+       '<text x="'+(PL-8)+'" y="'+(PT2+10)+'" text-anchor="end">'+skFmt(cMax)+'</text>'+
+       '<text x="'+(PL-8)+'" y="'+(PT2+ih2)+'" text-anchor="end">'+(lowerM?skFmt(0):'0x')+'</text>'+
        '<text x="'+PL+'" y="'+(H-6)+'">'+esc(DAYS[firstIdx])+'</text>'+
        '<text x="'+(W-PR)+'" y="'+(H-6)+'" text-anchor="end">'+esc(DAYS[lastIdx])+'</text>'+
        '</svg>';
@@ -1724,14 +1934,16 @@ JS = r"""
       '<div>Spend<b>'+money(sp)+'</b></div>'+
       '<div>CPA<b>'+(cpa?money2(cpa):'—')+'</b></div>'+
       '<div>ROAS<b>'+roas.toFixed(2)+'x</b></div>'+
+      '<div>CPM<b>'+(cpm?money2(cpm):'—')+'</b></div>'+
+      '<div>Cost/3s<b>'+(cpv?'$'+cpv.toFixed(3):'—')+'</b></div>'+
       '<div>Purchases<b>'+num(pu)+'</b></div>'+
       '<div>Revenue<b>'+money(rv)+'</b></div></div>'+
       '<div style="font-size:12px;color:var(--dim);margin:6px 0 4px">'+
       'Two panels on a shared date axis: daily spend above, '+
-      '<b style="color:var(--sB)">cumulative CPA</b> below — the latter is what the zone '+
-      'chart judges, and it steadies as conversions accumulate. They are stacked rather '+
-      'than overlaid on purpose: on one pair of axes the crossings between a spend bar and '+
-      'a CPA line would be an artefact of two unrelated scales.</div>'+
+      '<b style="color:var(--sB)">cumulative '+esc(metLab)+'</b> below — the latter is the '+
+      'metric the scale/kill chart is judging on, and it steadies as delivery accumulates. '+
+      'They are stacked rather than overlaid on purpose: on one pair of axes the crossings '+
+      'between a spend bar and the metric line would be an artefact of two unrelated scales.</div>'+
       s+'</div>';
     host.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
@@ -2068,11 +2280,21 @@ JS = r"""
   });
   document.getElementById('skTarget').addEventListener('change',function(){
     var v=parseFloat(this.value);
+    // An absolute target and a reduction-off-average are two ways of naming the
+    // same number, so typing one clears the other rather than compounding.
     SK_TARGET=(isFinite(v)&&v>0)?v:null;
+    SK_ADJ=0;
     renderSK(ADS.filter(passes));
   });
+  document.querySelectorAll('#skAdj .seg').forEach(function(b){
+    b.addEventListener('click',function(){
+      SK_ADJ=+b.dataset.adj;
+      SK_TARGET=null;                 // reduction is measured off the account average
+      renderSK(ADS.filter(passes));
+    });
+  });
   document.getElementById('skReset').addEventListener('click',function(){
-    SK_TARGET=null; renderSK(ADS.filter(passes));
+    SK_TARGET=null; SK_ADJ=0; renderSK(ADS.filter(passes));
   });
   document.getElementById('skLaunch').addEventListener('change',function(){
     SK_LAUNCH=this.value;
@@ -2081,6 +2303,37 @@ JS = r"""
     stopPlay();
     renderSK(ADS.filter(passes));
   });
+
+  // --- right-hand section nav ----------------------------------------------
+  (function(){
+    var nav=document.getElementById('secNav'), tog=document.getElementById('secNavTog');
+    if(!nav||!tog) return;
+    function setCollapsed(c){
+      nav.classList.toggle('collapsed',c);
+      document.body.classList.toggle('nav-collapsed',c);
+      tog.setAttribute('aria-expanded', String(!c));
+      try{localStorage.setItem('perfdash-nav', c?'closed':'open');}catch(e){}
+    }
+    // Default open on roomy viewports, collapsed on narrow ones where the drawer
+    // would sit over the content; a stored choice always wins.
+    var stored=null; try{stored=localStorage.getItem('perfdash-nav');}catch(e){}
+    setCollapsed(stored ? stored==='closed' : (window.innerWidth<1080));
+    tog.addEventListener('click',function(){ setCollapsed(!nav.classList.contains('collapsed')); });
+
+    var links=[].slice.call(nav.querySelectorAll('a[data-sec]'));
+    var byId={}; links.forEach(function(a){ byId[a.dataset.sec]=a; });
+    // Highlight the section nearest the top of the viewport as it scrolls.
+    if('IntersectionObserver' in window){
+      var vis={};
+      var obs=new IntersectionObserver(function(ents){
+        ents.forEach(function(e){ vis[e.target.id]=e.isIntersecting?e.intersectionRatio:0; });
+        var best=null, bestR=0;
+        Object.keys(vis).forEach(function(id){ if(vis[id]>bestR){bestR=vis[id];best=id;} });
+        links.forEach(function(a){ a.classList.toggle('active', a.dataset.sec===best); });
+      },{rootMargin:'-10% 0px -70% 0px',threshold:[0,0.25,0.5,1]});
+      links.forEach(function(a){ var el=document.getElementById(a.dataset.sec); if(el) obs.observe(el); });
+    }
+  })();
 
   buildFilterBar();
   render();
@@ -2251,6 +2504,19 @@ def build_performance_dashboard(
     )
 
     body = (
+        # Collapsible right-hand section nav. Fixed to the viewport so it stays
+        # put while the long dashboard scrolls; the toggle persists its state.
+        '<nav class="secnav" id="secNav" aria-label="Section navigation">'
+        '<button class="secnav-tog" id="secNavTog" type="button" aria-expanded="true" '
+        'aria-controls="secNavInner" title="Collapse / expand section navigation"></button>'
+        '<div class="secnav-inner" id="secNavInner">'
+        '<div class="secnav-hd">On this page</div>'
+        '<a href="#kpiSec" data-sec="kpiSec"><i></i>Overview &amp; KPIs</a>'
+        '<a href="#funnelSec" data-sec="funnelSec"><i></i>Conversion funnel</a>'
+        '<a href="#skSec" data-sec="skSec"><i></i>Scale or kill</a>'
+        '<a href="#tablesSec" data-sec="tablesSec"><i></i>Creative attributes</a>'
+        '<a href="#rankSec" data-sec="rankSec"><i></i>Meta rating vs ROAS</a>'
+        '</div></nav>'
         '<div class="topbar"><div>'
         "<h1>Creative performance</h1>"
         f'<div class="sub">{sub}</div></div>'
@@ -2283,7 +2549,7 @@ def build_performance_dashboard(
         '<button class="fbtn" id="resetFilters" type="button">Reset</button>'
         "</div>"
         '<div class="fstat" id="fstat"></div></div>'
-        '<div class="kpis" id="kpis"></div>'
+        '<section id="kpiSec"><div class="kpis" id="kpis"></div></section>'
         '<div class="note" id="attrNote"></div>'
         '<section class="viz" id="funnelSec">'
         '<h2>Conversion funnel <span class="h2sub">where the drop-off is</span></h2>'
@@ -2305,11 +2571,23 @@ def build_performance_dashboard(
         '<div class="vizbar">'
         '<span class="flabel">Metric</span>'
         '<span class="segs" id="skMetric">'
-        '<button class="seg on" data-m="cpa" type="button">CPA</button>'
-        '<button class="seg" data-m="roas" type="button">ROAS</button>'
+        '<button class="seg on" data-m="cpa" type="button" title="Cost per purchase — lower-funnel efficiency">CPA</button>'
+        '<button class="seg" data-m="roas" type="button" title="Return on ad spend">ROAS</button>'
+        '<button class="seg" data-m="cpm" type="button" title="Cost per 1,000 impressions — reach efficiency for prospecting">CPM</button>'
+        '<button class="seg" data-m="cpv" type="button" title="Cost per 3-second video view — upper-funnel / hook efficiency (video ads only)">3s view</button>'
         "</span>"
         '<span class="flabel tgt">Target</span>'
-        '<input class="tin" id="skTarget" type="number" step="0.01" min="0">'
+        '<input class="tin" id="skTarget" type="number" step="0.01" min="0" '
+        'title="Absolute target for the active metric. Defaults to the account average.">'
+        '<span class="flabel tgt">vs&nbsp;avg</span>'
+        '<span class="segs" id="skAdj" '
+        'title="Tighten the target below the account average by this much">'
+        '<button class="seg on" data-adj="0" type="button">Avg</button>'
+        '<button class="seg" data-adj="0.05" type="button">&minus;5%</button>'
+        '<button class="seg" data-adj="0.1" type="button">&minus;10%</button>'
+        '<button class="seg" data-adj="0.15" type="button">&minus;15%</button>'
+        '<button class="seg" data-adj="0.2" type="button">&minus;20%</button>'
+        "</span>"
         '<span class="flabel tgt">Launched</span>'
         '<span class="chip"><select id="skLaunch"></select></span>'
         '<span class="spacer"></span>'
@@ -2321,8 +2599,9 @@ def build_performance_dashboard(
         '<div class="note" id="skNote"></div>'
         '<div id="skTable"></div>'
         '<div id="adPanel"></div></section>'
+        '<section id="tablesSec">'
         '<div class="note" id="cov"></div>'
-        '<div id="tables"></div>'
+        '<div id="tables"></div></section>'
         '<section class="viz" id="rankSec">'
         '<h2>Meta rating vs ROAS <span class="h2sub">does the platform\'s own '
         "grade predict return?</span></h2>"
