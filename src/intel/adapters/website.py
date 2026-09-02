@@ -43,6 +43,15 @@ STEALTH_ARGS = [
     "--disable-features=IsolateOrigins,site-per-process",
 ]
 
+# Launch via the `chromium` channel = Playwright's NEW headless mode (real
+# Chromium headless) rather than the legacy `chrome-headless-shell` binary that
+# `launch(headless=True)` still defaults to. Some bank/brokerage sites
+# fingerprint and block the old shell outright: fidelity.com returns
+# ERR_HTTP2_PROTOCOL_ERROR to chrome-headless-shell (and merely times out with
+# --disable-http2) while serving a normal 200 to this channel. STEALTH_ARGS alone
+# was not enough. Verified 2026-09-02 against the Edward Jones competitive set.
+BROWSER_CHANNEL = "chromium"
+
 # Emulate a New York City visitor so geo-gated offers/pricing render as a
 # NYC shopper would see them. Sets the browser Geolocation API position +
 # timezone + Accept-Language; spread into every new_context() below. Note this
@@ -613,7 +622,7 @@ def scrape_landing_page(
     out_dir.mkdir(parents=True, exist_ok=True)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless, args=STEALTH_ARGS)
+        browser = p.chromium.launch(headless=headless, channel=BROWSER_CHANNEL, args=STEALTH_ARGS)
         context = browser.new_context(
             user_agent=USER_AGENT,
             viewport={"width": 1440, "height": 900},
@@ -709,7 +718,7 @@ def scrape_homepage(
     page_raw_dir.mkdir(parents=True, exist_ok=True)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless, args=STEALTH_ARGS)
+        browser = p.chromium.launch(headless=headless, channel=BROWSER_CHANNEL, args=STEALTH_ARGS)
         context = browser.new_context(
             user_agent=USER_AGENT,
             viewport={"width": 1440, "height": 900},

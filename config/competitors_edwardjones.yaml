@@ -1,0 +1,259 @@
+# Source registry for the EDWARD JONES (US) wealth-management competitive set.
+#
+# NOTE ON NAMES: the brief said "Edwards Jones" and "Ameripris". The real entities
+# are **Edward Jones** (no trailing s; legally Edward D. Jones & Co., L.P. / The
+# Jones Financial Companies) and **Ameriprise Financial**. Spellings corrected
+# throughout — flag if a different entity was actually intended.
+#
+# Edward Jones positioning: full-service, advisor-led wealth management built on a
+# ~19,000-branch, largely ONE-ADVISOR-PER-OFFICE model with deep Main Street / small
+# -town and suburban US coverage. Sells the in-person, local, long-horizon advisor
+# relationship — explicitly NOT a discount broker or a self-directed platform.
+# Subject brand of this deployment. US-market scope (edwardjones.com/us-en).
+#
+# Competitive set (all five named by the client 2026-09-02):
+#   - Ameriprise Financial — the closest STRUCTURAL comp in the set. Full-service,
+#                    advisor-led, franchise/independent-advisor network, mass-affluent
+#                    retirement-planning focus. Nearest true head-to-head.
+#   - Merrill        — Bank of America's wealth arm. Closest full-service-advisor
+#                    analog at scale, but affluent/HNW-skewed and sold through the
+#                    BofA bank channel. Two distinct sub-brands (see CAVEAT below):
+#                    Merrill Lynch Wealth Management (advisor) vs Merrill Edge
+#                    (self-directed).
+#   - Charles Schwab — competes on advice but acquires customers on a fundamentally
+#                    different model: digital/self-serve first, plus the largest RIA
+#                    custodian business. Read it as the "scale + low-cost" pole
+#                    against Edward Jones's "local relationship" pole.
+#   - Fidelity Investments — mass-market/mass-affluent digital, and the dominant
+#                    workplace-retirement (401k) player. Its retirement franchise is
+#                    the biggest structural threat to Edward Jones rollover flows.
+#   - Wells Fargo    — Wells Fargo Advisors, full-service brokerage integrated into
+#                    the bank. Carries post-scandal reputational baggage, so expect
+#                    trust/rebuild themes in creative. Heaviest confound in the set
+#                    (see CAVEAT).
+#
+# -----------------------------------------------------------------------------
+# ⚠ CAVEAT — BRAND-vs-BUSINESS-UNIT CONFOUND. Read before interpreting any
+# volume comparison out of this deployment.
+#
+# Edward Jones and Ameriprise are near pure-play wealth-advisory advertisers: almost
+# everything on their Meta page is wealth/retirement creative. The other three are
+# NOT. Their page-level ad pools mix wealth advisory with businesses Edward Jones
+# does not compete in at all:
+#   Wells Fargo → retail banking, credit cards, auto, mortgage. Wealth advisory is
+#                 likely a SMALL MINORITY of page ad volume.
+#   Fidelity    → self-directed brokerage, crypto, workplace 401k, HSA.
+#   Merrill     → Merrill Edge self-directed sits alongside advisor creative.
+#   Schwab      → self-directed trading and thinkorswim platform creative.
+# Consequence: raw "ads live" or "share of creative" counts will OVERSTATE these
+# three as wealth competitors. Compare on wealth-advisory-tagged creative, not on
+# page totals. This is the single most important read-me for this set — treat the
+# funnel/volume charts as unfiltered until creative tagging is applied.
+#
+# -----------------------------------------------------------------------------
+# Meta Ad Library page_id resolution — ALL SIX RESOLVED + VERIFIED 2026-09-02.
+#
+# Resolution method (from config/competitors_jdsports.yaml; the other paths fail):
+#   1. ✗ Graph free-text `search_terms` — spam-ranked, unusable. Re-confirmed here:
+#        an Ad Library keyword search for "Merrill Lynch" returned "Base Camp
+#        Trading", "The Pattern Trader" and assorted diet-supplement pages ahead of
+#        anything real. Do NOT trust free-text ranking for discovery.
+#   2. ✗ Graph `ads_archive` + `search_page_ids` — unusable in this run for a second
+#        reason: META_AD_LIBRARY_ACCESS_TOKEN in .env EXPIRED 2026-08-01. Not a
+#        blocker, because every meta_ads source here uses `method: scrape`, which
+#        needs no token. Renew the token only if you want the Graph path back.
+#   3. ✓ Load facebook.com/<slug> in Playwright, read the numeric id out of the
+#        embedded "delegate_page" JSON, then CONFIRM by running the real ingest path
+#        (meta_ads_scrape.scrape_page_ads) against that id.
+#   Codified as: scripts/resolve_meta_page_ids.py (new — the JD run did this ad hoc).
+#
+# ⚠ VERIFICATION NOTE — page_name is NOT usable as the identity check for this set.
+# The scrape path returned page_name as a zero-width space (\u200b) for the Edward
+# Jones page, and _extract_page_name is unreliable generally. Identity was instead
+# confirmed on two signals that DID hold: (a) the brand name is the first line of
+# body_text on every card, and (b) the landing-page domain. Note most of these
+# brands wrap clicks in ad.doubleclick.net, so domain alone is weak — the body_text
+# brand line is the load-bearing check.
+#
+#   edwardjones → 202226521097     VERIFIED. Client-supplied, and CORRECT — unlike
+#                 the JD Sports case. Confirmed as the NATIONAL US brand page, not a
+#                 branch page: 25/25 cards link to edwardjones.com/us-en/ with
+#                 utm_medium=paidsocial, running the national "Let's find your rich"
+#                 / "Let's find your way forward" campaign and "100 years of
+#                 experience" copy. No advisor names or local geography present.
+#   ameriprise  → 161275430585313  VERIFIED (facebook.com/ameriprise). 15/15 cards
+#                 link to ameriprise.com. Purest wealth-advisory creative in the set
+#                 ("Retire to something, not from something").
+#                 ⚠ REJECTED: facebook.com/ameripriseadvisors → 884438364931346,
+#                 which is "Michael Harrison - Ameriprise Financial Services, LLC |
+#                 Flint TX" — an individual advisor branch page. Using it would have
+#                 produced a single-advisor local ad pool. Ameriprise, like Edward
+#                 Jones, runs many such pages; always confirm you have the national
+#                 one.
+#   merrill     → 308176149048132  VERIFIED. NOT resolvable by slug — facebook.com/
+#                 merrill and /Merrill both resolve to 524372884089890 "Merrill
+#                 Oakes", an unrelated PERSON, and /merrilllynch, /merrilledge,
+#                 /merrillwealthmanagement etc. are all login-gated or absent.
+#                 Recovered instead by reading page_id/page_name pairs out of the Ad
+#                 Library keyword-search result JSON, then confirming via scrape.
+#                 Copy is advisor-led ("A Merrill advisor on your team",
+#                 "Retirement planning starts here") = Merrill Lynch Wealth
+#                 Management, NOT Merrill Edge. No separate Edge page was found; if
+#                 one surfaces later, wire it as its own competitor id.
+#   schwab      → 59062845587      VERIFIED ("Charles Schwab | Westlake TX" — Schwab's
+#                 corporate HQ, i.e. the national page). Creative is brokerage-
+#                 positioned ("#1 Overall Broker").
+#   fidelity    → 241760048297     VERIFIED ("Fidelity Investments"). Sample creative
+#                 is Active ETFs — self-directed product, see CAVEAT.
+#   wellsfargo  → 152789358067261  VERIFIED ("Wells Fargo"). This is the BANK page and
+#                 no separate Wells Fargo Advisors page was found. Sample creative is
+#                 the Autograph Journey CREDIT CARD — see CAVEAT.
+#
+# The CAVEAT above is now EVIDENCED, not just suspected. Top-ranked creative pulled
+# during verification: Wells Fargo = credit card, Fidelity = Active ETFs, Schwab =
+# broker ranking, Merrill + Ameriprise = advisor/retirement. Only Ameriprise and
+# Merrill are advisory-led like Edward Jones. Do not compare raw ad volume.
+#
+# Website URLs: all six VERIFIED live 2026-09-02 (HTTP 200). edwardjones.com
+# canonicalizes to /us-en, which is the URL used here.
+#
+# Google Ads Transparency Center: NOT wired. SerpApi ATC lookups on 2026-09-02
+# returned no advertiser records for any of the six brands, by domain search or by
+# brand-name text search, on the current Free plan key (250 searches remaining, so
+# not a quota issue). Per the JD/Wegmans precedent, no advertiser_id is guessed — an
+# unverified or indirect/holding entity is worse than an absent source. Revisit if
+# the SerpApi plan is upgraded.
+
+# -----------------------------------------------------------------------------
+# RUN NOTES — first full run 2026-09-02 (window: --days 30).
+#
+# Ingested: 606 ads / 836 creatives (125 MB of assets), all 836 vision-analyzed.
+#
+# ⚠ AD COUNTS ARE TRUNCATED FOR THREE BRANDS. meta_ads_scrape.scrape_page_ads
+# defaults to max_cards=200, and schwab, wellsfargo AND fidelity each landed on
+# EXACTLY 200 — i.e. all three hit the cap, so their totals are FLOORS, not true
+# counts. edwardjones (44), ameriprise (16) and merrill (10) are complete. Any
+# "share of voice" or ad-volume ranking across this set is therefore invalid as-is.
+# To fix, raise max_cards for those two sources, or cap every brand equally and
+# compare like-for-like. Combined with the mixed-business CAVEAT above, volume is
+# the LEAST trustworthy metric in this deployment; attribute mix is the sound one.
+#
+# ⚠ TWO BOT-BLOCKS HIT AND FIXED (code change in src/intel/adapters/website.py):
+#   fidelity.com returned ERR_HTTP2_PROTOCOL_ERROR, and schwab.com's landing
+#   capture returned an anti-bot page ("we were unable to authorize your request")
+#   that was initially ingested as if it were real homepage content. Both were the
+#   legacy chrome-headless-shell binary being fingerprinted. Fixed by launching the
+#   `chromium` channel (Playwright's new headless mode) — see BROWSER_CHANNEL in
+#   website.py. This is a SHARED-CODE change and benefits every deployment, but the
+#   other deployments' historical captures were taken before it, so any past
+#   landing/homepage capture that looks like an error page is suspect.
+#
+# Note the schwab.com landing screenshot was re-captured after the fix and its
+# vision analysis redone; the pre-fix analysis was discarded rather than kept.
+#
+# Environment: the repo's committed .venv was built at another user's path and its
+# interpreter was missing, so it was rebuilt against Homebrew python@3.13 (the
+# machine had only 3.9.6, below the >=3.11 floor in pyproject.toml).
+#
+# Also worth knowing: creatives.competitor_id is NULL for scrape-path rows (767 of
+# 769 on the first pass). This is PRE-EXISTING, not new — jdsports.db shows 1271 of
+# 2334 NULL. Per-brand grouping must join creatives.ad_id → ads.id, which is what
+# the readouts do. `analyze-creatives --competitor <id>` is the command that would
+# mis-filter on it.
+
+competitors:
+  - id: edwardjones
+    name: Edward Jones
+    vertical: wealth_management
+    priority: high            # subject brand
+    sources:
+      - type: website
+        url: https://www.edwardjones.com/us-en
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "202226521097"            # Edward Jones (national US) — client-supplied, VERIFIED
+        page_name: Edward Jones
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: ameriprise
+    name: Ameriprise Financial
+    vertical: wealth_management
+    priority: high            # closest structural head-to-head
+    sources:
+      - type: website
+        url: https://www.ameriprise.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "161275430585313"         # Ameriprise Financial — VERIFIED (NOT the /ameripriseadvisors branch page)
+        page_name: Ameriprise Financial
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: merrill
+    name: Merrill
+    vertical: wealth_management
+    priority: high
+    sources:
+      - type: website
+        url: https://www.merrill.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "308176149048132"         # Merrill (Lynch Wealth Mgmt) — VERIFIED via Ad Library search JSON, not slug
+        page_name: Merrill
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: schwab
+    name: Charles Schwab
+    vertical: wealth_management
+    priority: high
+    sources:
+      - type: website
+        url: https://www.schwab.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "59062845587"             # Charles Schwab — VERIFIED
+        page_name: Charles Schwab
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: fidelity
+    name: Fidelity Investments
+    vertical: wealth_management
+    priority: high
+    sources:
+      - type: website
+        url: https://www.fidelity.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "241760048297"            # Fidelity Investments — VERIFIED
+        page_name: Fidelity Investments
+        country: US
+        cadence: daily
+        method: scrape
+
+  - id: wellsfargo
+    name: Wells Fargo
+    vertical: wealth_management
+    priority: medium          # heaviest brand-vs-business-unit confound (see CAVEAT)
+    sources:
+      - type: website
+        url: https://www.wellsfargo.com
+        cadence: daily
+        watch: [hero, promo_banner, popup]
+      - type: meta_ads
+        page_id: "152789358067261"         # Wells Fargo (BANK page; no Advisors page found) — VERIFIED
+        page_name: Wells Fargo
+        country: US
+        cadence: daily
+        method: scrape

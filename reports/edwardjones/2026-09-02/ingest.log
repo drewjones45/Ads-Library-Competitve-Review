@@ -1,0 +1,41 @@
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+goto failed for https://www.fidelity.com: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.fidelity.com/
+Call log:
+  - navigating to "https://www.fidelity.com/", waiting until "domcontentloaded"
+
+hero LLM call failed ("Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted")
+                                Ingestion report                                
+┏━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━┳━━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━┓
+┃ competitor ┃ source    ┃ ok ┃ changed ┃ sev  ┃ new_ads ┃ offers ┃ summary    ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━╇━━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━┩
+│ edwardjon… │ website|… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+│ edwardjon… │ meta_ads… │ ✓  │ yes     │ 1.00 │ 44      │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+│ ameriprise │ website|… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+│ ameriprise │ meta_ads… │ ✓  │ yes     │ 1.00 │ 16      │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+│ merrill    │ website|… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+│ merrill    │ meta_ads… │ ✓  │ yes     │ 1.00 │ 10      │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+│ schwab     │ website|… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+│ schwab     │ meta_ads… │ ✓  │ yes     │ 1.00 │ 200     │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+│ fidelity   │ website|… │ ✗  │ no      │ 0.00 │ 0       │ 0      │ goto       │
+│            │           │    │         │      │         │        │ failed:    │
+│            │           │    │         │      │         │        │ Error:     │
+│            │           │    │         │      │         │        │ Page.goto: │
+│            │           │    │         │      │         │        │ net::ERR_… │
+│ fidelity   │ meta_ads… │ ✓  │ yes     │ 1.00 │ 136     │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+│ wellsfargo │ website|… │ ✓  │ yes     │ 1.00 │ 0       │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+│ wellsfargo │ meta_ads… │ ✓  │ yes     │ 1.00 │ 200     │ 0      │ first      │
+│            │           │    │         │      │         │        │ observati… │
+└────────────┴───────────┴────┴─────────┴──────┴─────────┴────────┴────────────┘
