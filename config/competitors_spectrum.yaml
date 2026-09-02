@@ -1,0 +1,54 @@
+# Source registry for the SPECTRUM owned-performance deployment.
+#
+# Purpose: this deployment is NOT a competitive Ad Library run. It exists to
+# build the owned-Meta creative-performance dashboard (`intel perf-ingest` →
+# `intel perf-dashboard`) for the Spectrum ad accounts reachable by the HMI
+# Analytics API system-user token, mirroring the JD Sports performance lane.
+#
+# Isolation (see quickstart_spectrum.sh):
+#   - INTEL_DB_PATH          -> data/spectrum.db
+#   - INTEL_DATA_DIR         -> data/spectrum_assets/
+#   - INTEL_COMPETITORS_FILE -> this file
+#   - reports                -> reports/spectrum/<UTC-date>/
+#
+# -----------------------------------------------------------------------------
+# Ad account access (validated 2026-09-01 against Graph v21.0 with the
+# MetaAPI_Token_HMI_Analytics_API system-user token; scopes: ads_read,
+# ads_management; token does not expire).
+#
+# `/me/adaccounts` returns exactly TWO accounts — both Spectrum, both active:
+#
+#   144017769649506   Spectrum Reach     USD  active  lifetime spend $374,114
+#                     created 2018-01-10. 71 ads delivering in the trailing 90d,
+#                     continuous monthly spend through today (~$19-24k/mo).
+#                     >>> This is the only account with data. It IS the report.
+#
+#   2144122622552367  Spectrum Networks  USD  active  lifetime spend $0
+#                     created 2019-03-21. Has 2 campaigns and 5 ads, but ZERO
+#                     delivery: account-level insights return no rows for any
+#                     window tested (2024-09-01 -> 2026-09-01) and lifetime
+#                     amount_spent is 0. Nothing to report on. It is wired into
+#                     the ingest script below and simply produces no rows; if
+#                     Spectrum ever activates it, the run picks it up with no
+#                     config change.
+#
+# NOTE ON SCOPE: the token has ads_read/ads_management but NOT
+# business_management, so `/me/adaccounts` can only enumerate accounts directly
+# assigned to this system user. If Spectrum owns further ad accounts under a
+# Business Manager that were never assigned to this system user, they are
+# invisible to this token and are NOT in this report. Confirm the assigned-
+# account list in Business Manager if more accounts are expected.
+# -----------------------------------------------------------------------------
+
+competitors:
+  - id: spectrum
+    name: Spectrum
+    vertical: telecom_isp
+    priority: high            # subject brand — owned-account performance lane
+    # No `sources:` on purpose. Owned-account performance is ingested directly
+    # from the Meta Marketing API by `intel perf-ingest --account ... --competitor
+    # spectrum`, which lands ads under source='meta_owned'. The website /
+    # meta_ads / google_ads adapters here would drive the *competitive* Ad
+    # Library lane, which this deployment does not run. Add them only if a
+    # Spectrum competitive set is commissioned later.
+    sources: []

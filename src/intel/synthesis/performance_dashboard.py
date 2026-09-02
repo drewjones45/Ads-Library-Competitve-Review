@@ -1492,7 +1492,22 @@ JS = r"""
   // two standard errors. That is what produces the reference's decaying kill
   // curve and rising scale curve — an ad is only called when its spend is
   // enough to distinguish it from the target.
-  var SK_K=2.0, SK_METRIC='cpa', SK_TARGET=null, SK_FRAME=null, SK_PLAYING=false, SK_TIMER=null;
+  // Does the account report any conversion at all? CPA is the right default
+  // lens for a purchase-driven account, but a lead-gen / call-driven account
+  // (Call now, Learn more) returns zero purchases and zero revenue for every
+  // ad, so every CPA is null. Defaulting to CPA there produced a scatter whose
+  // y-values were all null and whose axis maths resolved to NaN — the chart
+  // drew nothing and only surfaced as SVG attribute errors in the console.
+  // Fall back to CPM, which is computable whenever impressions exist.
+  function skHasConv(){
+    for(var i=0;i<ADS.length;i++){
+      var d=ADS[i].D; if(!d) continue;
+      for(var j=0;j<d.length;j++){ if((d[j][2]||0)>0||(d[j][3]||0)>0) return true; }
+    }
+    return false;
+  }
+  var SK_HASCONV=skHasConv();
+  var SK_K=2.0, SK_METRIC=SK_HASCONV?'cpa':'cpm', SK_TARGET=null, SK_FRAME=null, SK_PLAYING=false, SK_TIMER=null;
   var SK_SPEED=1;   // timeline playback speed multiplier (1× / 0.5× / 0.25×)
   var SK_LAUNCH='', SK_ZONE='k';   // default to the kill list; '' = every zone
   // Fractional reduction applied to the auto (account-average) target: 0 =
@@ -1632,6 +1647,13 @@ JS = r"""
   // animation stutter. They refresh in full the moment playback pauses or ends.
   function renderSK(pool, light){
     var host=document.getElementById('skPlot');
+    // The metric segs ship with CPA pre-marked in the static markup. Sync them to
+    // the metric actually in use, so the data-driven default (see SK_HASCONV)
+    // does not leave the button bar disagreeing with the axis. Done before any
+    // early return so the empty states are labelled correctly too.
+    document.querySelectorAll('#skMetric .seg').forEach(function(b){
+      b.classList.toggle('on', b.dataset.m===SK_METRIC);
+    });
     var hasDaily=pool.filter(function(a){return a.D&&a.D.length;});
     var launchInfo=fillLaunchSelect(hasDaily);
     var withDaily=hasDaily.filter(skLaunchPass);
@@ -1664,6 +1686,23 @@ JS = r"""
     if(SK_FRAME===null) SK_FRAME=DAYS.length-1;
 
     var tot=skTotals(withDaily,SK_FRAME);
+    // Even with the smarter default above, the user can switch to a metric this
+    // account cannot produce (CPA on an account with no purchases). Say so
+    // rather than plotting NaN.
+    var computable=tot.filter(function(t){
+      var v=skValue(t); return v!==null&&v!==undefined&&isFinite(v);
+    });
+    if(tot.length&&!computable.length){
+      host.innerHTML='<div class="empty">No <b>'+esc(skDef().lab)+'</b> to plot — '+
+        'this account reported no '+(SK_METRIC==='cpa'?'purchases':'data for this metric')+
+        ' in the window, so every ad&rsquo;s '+esc(skDef().lab)+' is undefined. '+
+        'Switch the metric to CPM or cost per 3-second view.</div>';
+      document.getElementById('skZones').innerHTML='';
+      document.getElementById('skTl').style.display='none';
+      document.getElementById('skNote').innerHTML='';
+      document.getElementById('skTable').innerHTML='';
+      return;
+    }
     // Default target = the filtered population's own blended value for the active
     // metric at the full window, so "target" means "the account's current
     // average" until the user types a real business target or dials in a
@@ -1682,6 +1721,21 @@ JS = r"""
     // exclusive (each clears the other), so this never compounds.
     var base=(SK_TARGET!==null&&SK_TARGET>0)?SK_TARGET:autoTarget;
     var target=base*(1-SK_ADJ);
+    // A non-positive or non-finite target makes every band degenerate (the
+    // zone boundaries are target * (1 +/- K/sqrt(n))), which is what fed NaN
+    // into the axis and dot positions. Reachable when the account has spend
+    // but no revenue at all and the user selects ROAS.
+    if(!isFinite(target)||target<=0){
+      host.innerHTML='<div class="empty">No <b>'+esc(skDef().lab)+'</b> target can be '+
+        'derived — this account reported no '+(SK_METRIC==='roas'?'revenue':'value for this metric')+
+        ' in the window, so there is nothing to measure each ad against. '+
+        'Switch the metric, or type a target above.</div>';
+      document.getElementById('skZones').innerHTML='';
+      document.getElementById('skTl').style.display='none';
+      document.getElementById('skNote').innerHTML='';
+      document.getElementById('skTable').innerHTML='';
+      return;
+    }
     var tin=document.getElementById('skTarget');
     tin.step=(SK_METRIC==='cpv')?'0.001':'0.01';
     if(document.activeElement!==tin) tin.value=(SK_METRIC==='cpv')?target.toFixed(3):target.toFixed(2);

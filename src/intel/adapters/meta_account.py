@@ -148,6 +148,64 @@ def _get(client: httpx.Client, url: str, params: dict | None, *, tries: int = 3)
     raise MetaAccountError(f"giving up after {tries} tries: {last}")
 
 
+def _batch_get(
+    client: httpx.Client,
+    ids: list[str],
+    fields: str,
+    *,
+    tries: int = 3,
+) -> dict[str, dict[str, Any]]:
+    """Fetch `fields` for many object ids, keyed by id.
+
+    Replaces the old `GET /?ids=a,b,c&fields=...` fan-out. Meta removed the
+    `ids` query parameter in v26.0+ and now rejects it with a 500 whose body
+    reads "The ids query parameter is deprecated in v26.0+." — note that the
+    version pin in GRAPH does NOT protect against this: v21.0 is past its
+    two-year lifetime, so Meta serves these calls with the current version's
+    rules regardless of the path prefix.
+
+    The supported equivalent is the Batch API: one POST carrying up to 50
+    sub-requests. Each element of the response is an envelope with its own
+    `code` and a `body` holding the JSON string, so a single bad id degrades to
+    one missing key rather than failing the whole chunk.
+    """
+    if not ids:
+        return {}
+    batch = json.dumps([
+        {"method": "GET", "relative_url": f"{i}?fields={fields}"} for i in ids
+    ])
+    last = None
+    for attempt in range(tries):
+        try:
+            r = client.post(GRAPH + "/", data={"access_token": _token(), "batch": batch})
+            if r.status_code == 200:
+                out: dict[str, dict[str, Any]] = {}
+                for oid, item in zip(ids, r.json() or []):
+                    if not item or item.get("code") != 200:
+                        log.warning("batch item %s: %s", oid,
+                                    str(item.get("body"))[:200] if item else "no response")
+                        continue
+                    try:
+                        body = json.loads(item["body"])
+                    except (ValueError, KeyError, TypeError):
+                        continue
+                    # Prefer the id Graph echoes back; fall back to the one we asked for.
+                    out[str(body.get("id") or oid)] = body
+                return out
+            body = r.text[:400]
+            transient_400 = (
+                r.status_code == 400
+                and ("1504044" in body or "temporarily unavailable" in body.lower())
+            )
+            if r.status_code < 500 and r.status_code != 429 and not transient_400:
+                raise MetaAccountError(f"{r.status_code} {body[:300]}")
+            last = f"{r.status_code} {body[:200]}"
+        except httpx.HTTPError as exc:
+            last = str(exc)
+        time.sleep(1.5 * (attempt + 1))
+    raise MetaAccountError(f"giving up after {tries} tries: {last}")
+
+
 # ---------------------------------------------------------------- insights ---
 
 def fetch_insights(
@@ -386,11 +444,7 @@ def fetch_ad_meta(
         for i in range(0, len(ad_ids), ID_CHUNK):
             chunk = ad_ids[i:i + ID_CHUNK]
             try:
-                data = _get(c, f"{GRAPH}/", {
-                    "access_token": _token(),
-                    "ids": ",".join(chunk),
-                    "fields": CREATIVE_FIELDS,
-                })
+                data = _batch_get(c, chunk, CREATIVE_FIELDS)
             except MetaAccountError as exc:
                 # One bad chunk shouldn't lose the rest of the account.
                 log.warning("creative chunk %d-%d failed: %s", i, i + len(chunk), exc)
@@ -535,6 +589,31 @@ def preview_iframe_url(creative_id: str, *, ad_format: str = "MOBILE_FEED_STANDA
     return html.unescape(m.group(1)) if m else None
 
 
+def _launch_chromium(p, *, headless: bool = True):
+    """Launch Chromium, falling back to a system-installed browser.
+
+    Playwright's own `chrome-headless-shell` lives under %LOCALAPPDATA% and
+    managed Windows endpoints routinely block executing it — the launch dies
+    with `spawn EPERM` before Chromium prints anything, so there is nothing in
+    the browser log to diagnose. The installed Edge/Chrome sit in Program Files
+    and are allowed by the same policy, so try the bundled build first (it is
+    version-matched to Playwright) and fall back to the system channels.
+    """
+    try:
+        return p.chromium.launch(headless=headless)
+    except Exception as exc:  # noqa: BLE001 - re-raised below if no channel works
+        first = exc
+    for channel in ("msedge", "chrome"):
+        try:
+            b = p.chromium.launch(headless=headless, channel=channel)
+            log.warning("bundled chromium unavailable (%s); using system %s",
+                        str(first).splitlines()[0][:80], channel)
+            return b
+        except Exception:  # noqa: BLE001,S112 - try the next channel
+            continue
+    raise first
+
+
 def render_previews(
     jobs: list[tuple[str, Path]],
     *,
@@ -552,7 +631,7 @@ def render_previews(
     if not jobs:
         return results
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless)
+        browser = _launch_chromium(p, headless=headless)
         ctx = browser.new_context(
             user_agent=USER_AGENT,
             viewport={"width": viewport[0], "height": viewport[1]},
@@ -733,11 +812,7 @@ def fetch_adsets(
         for i in range(0, len(ids), ID_CHUNK):
             chunk = ids[i:i + ID_CHUNK]
             try:
-                data = _get(c, f"{GRAPH}/", {
-                    "access_token": _token(),
-                    "ids": ",".join(chunk),
-                    "fields": ADSET_FIELDS,
-                })
+                data = _batch_get(c, chunk, ADSET_FIELDS)
             except MetaAccountError as exc:
                 log.warning("adset chunk %d failed: %s", i, exc)
                 continue

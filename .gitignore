@@ -17,3 +17,4 @@ build/
 
 # Screen recordings dropped in as references (large binaries)
 *.mov
+.env.original-notes

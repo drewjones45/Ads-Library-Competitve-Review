@@ -59,7 +59,11 @@ def ingest_account(
         )
         if not raw_rows:
             log.warning("account %s returned no delivering ads for the window", account_id)
+            # `preview_attempted` must be present here too: the CLI's summary
+            # line formats it unconditionally, so omitting it turned a legitimate
+            # "account had no delivery in this window" into a KeyError crash.
             return {"account_id": account_id, "ads": 0, "assets": 0, "previews": 0,
+                    "preview_attempted": 0,
                     "coverage": {"by_class": {}, "total_spend": 0.0,
                                  "analyzable_spend": 0.0, "analyzable_pct": 0.0}}
 
