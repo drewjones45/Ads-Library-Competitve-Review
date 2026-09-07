@@ -42,8 +42,14 @@ def ingest_account(
     date_preset: str = "last_90d",
     render_previews: bool = True,
     max_previews: int = 0,
+    fetch_videos: bool = True,
 ) -> dict[str, Any]:
     """Ingest one owned account. Returns a summary dict.
+
+    `fetch_videos` also pulls the mp4 behind each video creative, which is what
+    lets the performance dashboard play an ad rather than show a still. It costs
+    one extra Graph call per video and is skipped silently wherever the token
+    lacks the permission, so it is safe to leave on.
 
     `max_previews` caps how many preview screenshots are rendered (0 = no cap).
     Rendering drives a real browser per ad, so it is the slowest step by far;
@@ -63,6 +69,7 @@ def ingest_account(
             # line formats it unconditionally, so omitting it turned a legitimate
             # "account had no delivery in this window" into a KeyError crash.
             return {"account_id": account_id, "ads": 0, "assets": 0, "previews": 0,
+                    "videos": 0, "videos_gated": 0,
                     "preview_attempted": 0,
                     "coverage": {"by_class": {}, "total_spend": 0.0,
                                  "analyzable_spend": 0.0, "analyzable_pct": 0.0}}
@@ -102,6 +109,7 @@ def ingest_account(
         preview_jobs: list[tuple[str, Path]] = []
         preview_targets: list[tuple[str, str, Path]] = []  # (ad_id, creative_id, dest)
         assets_written = 0
+        videos_ok = videos_gated = 0
 
         # Highest spend first so a capped preview run covers what matters most.
         perf.sort(key=lambda r: r.get("spend") or 0, reverse=True)
@@ -175,6 +183,33 @@ def ingest_account(
                     )
                     assets_written += 1
 
+                # The thumbnail is only a frame of the video. Ask for the mp4 too,
+                # so the dashboard can play the ad instead of showing a still —
+                # Meta returns these at the CDN's own size, unlike thumbnail_url
+                # whose crop is baked into the signed URL and cannot be widened.
+                # `source` is gated separately from the rest of ad read, so this
+                # is best-effort by design: no mp4 just means the thumbnail
+                # remains what the lightbox shows.
+                vid = asset.get("video_id")
+                if fetch_videos and vid:
+                    vdest = dest_dir / f"video_{idx}.mp4"
+                    if vdest.exists():
+                        storage.upsert_creative(
+                            conn, ad_db_id, "video", str(vdest),
+                            competitor_id=competitor_id, source="meta_owned",
+                        )
+                    else:
+                        src = ma.video_source_url(vid, client=client)
+                        if src and ma.download_asset(src, vdest, client=client):
+                            storage.upsert_creative(
+                                conn, ad_db_id, "video", str(vdest),
+                                competitor_id=competitor_id, source="meta_owned",
+                            )
+                            assets_written += 1
+                            videos_ok += 1
+                        else:
+                            videos_gated += 1
+
             # A rendered preview is the best available asset — the ad as served,
             # with copy and social proof composited in. DPA ads have no fixed
             # creative, so Meta refuses to render them; don't waste a browser
@@ -221,6 +256,7 @@ def ingest_account(
             "account_id": account_id, "account_name": account_name,
             "competitor_id": competitor_id,
             "ads": len(perf), "assets": assets_written,
+            "videos": videos_ok, "videos_gated": videos_gated,
             "previews": previews_ok, "preview_attempted": len(preview_targets),
             "coverage": coverage,
         }

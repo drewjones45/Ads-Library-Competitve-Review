@@ -54,7 +54,11 @@ VARIANT_LABELS = {
     "with-tv-dashboard": "Dashboard + Google + TV",
     "with-tv-dashboard-v2": "Dashboard + Google + TV (v2)",
     # Owned-account creative performance (first-party spend/ROAS joined to
-    # creative attributes). Self-contained HTML — no asset refs to rewrite.
+    # creative attributes). These DO carry creative refs; whether there is
+    # anything to rewrite depends on where the assets live. A dashboard whose
+    # refs were moved to S3 by scripts/s3_assets.py has none left and copies
+    # nothing (spectrum), while one still pointing at data/*_assets copies every
+    # thumbnail into dist/ (jdsports, ~168 MB).
     "performance-dashboard": "Creative performance (owned accounts)",
 }
 

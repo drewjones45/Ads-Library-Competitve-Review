@@ -111,11 +111,20 @@ class MetaAccountError(RuntimeError):
 
 
 def _token() -> str:
-    tok = os.environ.get("META_AD_LIBRARY_ACCESS_TOKEN")
+    """The owned-account token, falling back to the Ad Library one.
+
+    These are different credentials in practice: reading act_* insights needs
+    ads_read/ads_management, while /ads_archive needs an app allow-listed for the
+    Ad Library — and a token for one is refused by the other with `(#10)
+    Application does not have permission`. Deployments that predate the split set
+    only META_AD_LIBRARY_ACCESS_TOKEN, so the fallback keeps them working.
+    """
+    tok = (os.environ.get("META_OWNED_ACCESS_TOKEN")
+           or os.environ.get("META_AD_LIBRARY_ACCESS_TOKEN"))
     if not tok:
         raise MetaAccountError(
-            "META_AD_LIBRARY_ACCESS_TOKEN not set — owned-account ingest needs a "
-            "token with the `ads_read` permission."
+            "no owned-account token — set META_OWNED_ACCESS_TOKEN (or "
+            "META_AD_LIBRARY_ACCESS_TOKEN) to one with the `ads_read` permission."
         )
     return tok
 
@@ -558,6 +567,28 @@ def download_asset(url: str, dest: Path, *, client: httpx.Client | None = None) 
     except httpx.HTTPError as exc:
         log.debug("asset download failed (%s): %s", url[:80], exc)
         return False
+    finally:
+        if owns:
+            c.close()
+
+
+def video_source_url(video_id: str, *, client: httpx.Client | None = None) -> str | None:
+    """The playable mp4 URL for a video on the account, or None.
+
+    `source` is permission-gated separately from the rest of the ad read scope:
+    a token that happily returns the creative and its thumbnail can still be
+    refused the bytes, and the refusal is a normal 400/403 rather than an
+    exception worth propagating. Callers treat None as "no video available" and
+    fall back to the thumbnail, which is a real frame of the same video.
+    """
+    owns = client is None
+    c = client or httpx.Client(timeout=60)
+    try:
+        data = _get(c, f"{GRAPH}/{video_id}", {"fields": "source", "access_token": _token()})
+        return data.get("source") or None
+    except (MetaAccountError, httpx.HTTPError, ValueError) as exc:
+        log.debug("video source unavailable for %s: %s", video_id, exc)
+        return None
     finally:
         if owns:
             c.close()
