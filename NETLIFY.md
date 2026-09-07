@@ -24,6 +24,14 @@ gitignored, so its dashboards still render broken images in a CI build. The
 build now prints a loud `⚠ … could not be resolved` warning listing anything it
 could not find. Deploy locally (below) if you need bobs' images.
 
+There is now an alternative that sidesteps all of this: host the creative on S3
+and point the dashboard at it, so `build_site.py` has nothing to copy and the
+gitignored/committed distinction stops mattering. Spectrum is running that way —
+its `dist/` output is 336 KB instead of the 168 MB jdsports needs for the same
+kind of dashboard. See **S3_ASSETS.md**; it is tested and working, with one
+bucket-policy change outstanding to make the URLs permanent rather than
+7-day presigned.
+
 ## One-time setup
 
 ```bash
