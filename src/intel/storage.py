@@ -797,6 +797,23 @@ def upsert_ad(
     return cur.lastrowid or 0, True
 
 
+def asset_key(asset_path: str) -> str:
+    """Machine-independent identity of an asset file.
+
+    `asset_path` is stored absolute, so the same file ingested from a different
+    checkout — another machine, or the same repo cloned elsewhere — carries a
+    different string. Everything from the `creative/` or `creative_owned/`
+    segment onward is stable across all of them (it is brand / ad id / filename),
+    and separators are normalised so a Windows-written row matches a POSIX one.
+    """
+    p = asset_path.replace("\\", "/")
+    for marker in ("/creative_owned/", "/creative/"):
+        i = p.rfind(marker)
+        if i >= 0:
+            return p[i + 1:]
+    return p.rsplit("/", 1)[-1]
+
+
 def upsert_creative(
     conn: sqlite3.Connection,
     ad_id: int | None,
@@ -807,8 +824,13 @@ def upsert_creative(
     competitor_id: str | None = None,
     source: str = "meta",
 ) -> tuple[int, bool]:
-    """Insert a creative asset row. Idempotent on `asset_path` (unique per file
-    on disk regardless of whether it came from an ad or a brand store).
+    """Insert a creative asset row. Idempotent on the asset's identity, not on the
+    literal `asset_path` string — see `asset_key`. Re-ingesting a db that was first
+    built on another machine therefore ADOPTS the existing row and repoints it at
+    the local file, instead of inserting a second row for the same asset. That
+    matters because the vision analysis hangs off the original row: duplicating it
+    would strand `analysis_json` behind an invisible twin and double every asset in
+    the dashboard's creative gallery.
     `ad_id` may be None for non-ad assets (brand store, website screenshot);
     in that case `competitor_id` must be provided.
     `source` is the ad platform ('meta' | 'google'); defaults to 'meta'.
@@ -821,6 +843,28 @@ def upsert_creative(
     ).fetchone()
     if existing:
         return existing["id"], False
+    # Same asset, different absolute path. Narrow on filename first so this stays
+    # an index-free but tiny scan, then confirm on the full stable key.
+    key = asset_key(asset_path)
+    base = key.rsplit("/", 1)[-1]
+    if ad_id is None:
+        rows = conn.execute(
+            "SELECT id, asset_path FROM creatives "
+            "WHERE ad_id IS NULL AND competitor_id=? AND asset_type=? AND asset_path LIKE ?",
+            (competitor_id, asset_type, f"%{base}"),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT id, asset_path FROM creatives "
+            "WHERE ad_id=? AND asset_type=? AND asset_path LIKE ?",
+            (ad_id, asset_type, f"%{base}"),
+        ).fetchall()
+    for r in rows:
+        if asset_key(r["asset_path"]) == key:
+            conn.execute(
+                "UPDATE creatives SET asset_path=? WHERE id=?", (asset_path, r["id"])
+            )
+            return r["id"], False
     cur = conn.execute(
         "INSERT INTO creatives(ad_id, competitor_id, source, asset_type, asset_path, phash) "
         "VALUES (?,?,?,?,?,?)",
