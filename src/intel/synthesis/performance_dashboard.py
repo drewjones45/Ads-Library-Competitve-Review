@@ -215,7 +215,7 @@ def _fetch(conn: sqlite3.Connection, competitor_ids: list[str] | None) -> list[d
     rows = conn.execute(f"""
         SELECT oa.platform_ad_id, oa.competitor_id, oa.account_name, oa.ad_name,
                oa.campaign_name, oa.creative_class, oa.object_type, oa.cta_type,
-               oa.title, oa.body,
+               oa.title, oa.body, oa.account_id,
                oa.audience_stage, oa.audience_gender, oa.audience_age,
                oa.audience_geo, oa.audience_name, oa.optimization_goal,
                oa.created_time,
@@ -301,19 +301,26 @@ def _fetch(conn: sqlite3.Connection, competitor_ids: list[str] | None) -> list[d
                     d["analysis"] = json.loads(cre["analysis_json"])
                 except json.JSONDecodeError:
                     d["analysis"] = None
-        if not d["asset_path"]:
-            # No analyzed creative (typically a DPA ad) — still try to show
-            # whatever asset exists so the drill-down isn't blank.
-            any_asset = conn.execute("""
-                SELECT c.asset_path, c.asset_type FROM creatives c
+        # Every asset on the ad, preview first. The card shows one thumbnail, but
+        # the lightbox pages through all of them — dynamic-creative ads carry a
+        # separate video_thumb per placement variant, and until this landed those
+        # variants were downloaded and then never shown anywhere.
+        d["gallery"] = [
+            {"t": a["asset_type"], "p": a["asset_path"]}
+            for a in conn.execute("""
+                SELECT c.asset_type, c.asset_path FROM creatives c
                 JOIN owned_ads oa ON oa.ad_db_id = c.ad_id
-                WHERE oa.platform_ad_id = ?
-                ORDER BY CASE c.asset_type WHEN 'ad_preview' THEN 0 ELSE 1 END, c.id
-                LIMIT 1
-            """, (d["platform_ad_id"],)).fetchone()
-            if any_asset:
-                d["asset_path"] = any_asset["asset_path"]
-                d["asset_type"] = any_asset["asset_type"]
+                WHERE oa.platform_ad_id = ? AND c.asset_path IS NOT NULL
+                ORDER BY CASE c.asset_type
+                           WHEN 'ad_preview' THEN 0 WHEN 'video' THEN 1 ELSE 2 END,
+                         c.id
+            """, (d["platform_ad_id"],)).fetchall()
+        ]
+        if not d["asset_path"] and d["gallery"]:
+            # No analyzed creative (typically a DPA ad) — still show whatever
+            # asset exists so the drill-down isn't blank.
+            d["asset_path"] = d["gallery"][0]["p"]
+            d["asset_type"] = d["gallery"][0]["t"]
         # An ad in owned_ads that did not deliver in this window (e.g. it only
         # ran in the comparison period) has no metrics here — drop it rather
         # than carrying a phantom zero-impression row into the tables.
@@ -713,6 +720,39 @@ justify-content:space-between;flex-wrap:wrap;gap:8px}
 display:flex;flex-direction:column}
 .asset .thumb{width:100%;aspect-ratio:9/16;max-height:280px;object-fit:cover;object-position:top;
 background:var(--panel2);display:block}
+/* The card crops its thumbnail to a 9:16 box, so the click target is not
+   decoration — it is the only way to see the whole creative as served. */
+.asset .shot{position:relative;display:block;width:100%;border:0;padding:0;margin:0;
+background:none;cursor:zoom-in;font:inherit;color:inherit}
+.asset .shot:hover .thumb{opacity:.88}
+.asset .shot:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.asset .badge{position:absolute;left:7px;bottom:7px;display:flex;gap:4px;align-items:center;
+background:rgba(0,0,0,.66);color:#fff;font-size:10px;letter-spacing:.03em;
+padding:2px 7px;border-radius:99px;pointer-events:none}
+#lightbox{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);
+align-items:center;justify-content:center}
+#lightbox.open{display:flex}
+#lightbox .stage{max-width:92vw;max-height:88vh;display:flex;align-items:center;
+justify-content:center;flex-direction:column;gap:10px}
+#lightbox img,#lightbox video{max-width:92vw;max-height:78vh;border-radius:8px;
+box-shadow:0 10px 40px rgba(0,0,0,.6);background:#000}
+/* Meta's video thumbnails come back tiny (64x64 up to 228x128). Letting one fill
+   the viewport just renders a wall of pixels, so cap the blow-up at something
+   that still reads as a reference frame. */
+#lightbox img.small{max-width:min(92vw,340px);max-height:min(78vh,340px);
+image-rendering:auto}
+#lightbox .lbbar{display:flex;gap:10px;align-items:center;color:#d8dee9;font-size:12px}
+#lightbox .lbnav{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);
+color:#fff;border-radius:6px;padding:4px 11px;font-size:13px;cursor:pointer;line-height:1.5}
+#lightbox .lbnav:hover{background:rgba(255,255,255,.2)}
+#lightbox .lbnav[disabled]{opacity:.32;cursor:default}
+#lightbox .lbcta{background:var(--accent);color:#fff;text-decoration:none;border-radius:6px;
+padding:4px 12px;font-size:12px}
+#lightbox .lbcta:hover{filter:brightness(1.12)}
+#lightbox .lbclose{position:absolute;top:14px;right:18px;background:none;border:none;
+color:#cfd6e4;font-size:26px;line-height:1;cursor:pointer;padding:4px 10px}
+#lightbox .lbclose:hover{color:#fff}
+#lightbox .lbnote{color:#98a2b3;font-size:11.5px;max-width:62ch;text-align:center}
 .asset .noimg{width:100%;aspect-ratio:9/16;max-height:280px;background:var(--panel2);
 display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:11px;
 text-align:center;padding:10px}
@@ -2319,9 +2359,34 @@ JS = r"""
   }
 
   // --- card rendering for the drill-down ---
+  // Index by the account's native ad id so the lightbox can find an ad from a
+  // click without re-serialising the whole record into data- attributes.
+  var AD_BY_ID={};
+  ADS.forEach(function(a){ if(a.id) AD_BY_ID[a.id]=a; });
+
+  // How many playable/browsable pieces of creative an ad has beyond its card
+  // thumbnail. Drives the badge, so the badge never promises a gallery that
+  // turns out to be one image.
+  function shots(a){
+    var g=(a.g||[]).filter(function(x){return x.p;});
+    if(!g.length) return a.img?[{t:a.at||'image',p:a.img}]:[];
+    return g;
+  }
+  function nVideos(a){
+    return shots(a).filter(function(x){return x.t==='video'||x.t==='video_thumb';}).length;
+  }
+
   function card(a){
-    var img=a.img?'<img class="thumb" loading="lazy" src="'+esc(a.img)+'" alt="">'
-      :'<div class="noimg">no fixed creative<br>(catalog / dynamic ad)</div>';
+    var sh=shots(a), nv=nVideos(a);
+    var badge='';
+    if(nv>1) badge='<span class="badge">▶ '+nv+' video variants</span>';
+    else if(nv===1) badge='<span class="badge">▶ video</span>';
+    else if(sh.length>1) badge='<span class="badge">'+sh.length+' assets</span>';
+    var img=a.img
+      ? '<button class="shot" type="button" data-ad="'+esc(a.id)+'" '+
+          'aria-label="Open creative for '+esc(a.nm||'this ad')+'">'+
+          '<img class="thumb" loading="lazy" src="'+esc(a.img)+'" alt="">'+badge+'</button>'
+      : '<div class="noimg">no fixed creative<br>(catalog / dynamic ad)</div>';
     var pills='<span class="pill'+(a.cl==='analyzable'?'':' dpa')+'">'+esc(a.cl==='analyzable'?(a.at||'creative'):a.cl)+'</span>';
     if(a.stage) pills+='<span class="pill aud">'+esc(a.stage)+'</span>';
     return '<div class="asset">'+img+'<div class="body">'+pills+
@@ -3409,6 +3474,116 @@ JS = r"""
     }).join('');
   }
 
+  // --- lightbox -------------------------------------------------------------
+  // Mirrors the competitive dashboard's _openLightbox: an mp4 we hold locally
+  // plays inline, anything else renders as an image. The difference here is what
+  // "anything else" means. Owned-account ingest cannot download video bytes —
+  // Meta gates them behind a permission the ads_read token does not carry — so
+  // for a video ad what we hold is one thumbnail per placement variant, each a
+  // real frame of its video. Those are shown as a browsable set with a link to
+  // Ads Manager, where the ad plays. If a future ingest does write mp4s next to
+  // them (asset_type 'video'), this plays them with no further change.
+  var LB={items:[],i:0,ad:null};
+
+  function lbRender(){
+    var box=document.getElementById('lightbox');
+    var it=LB.items[LB.i]; if(!it) return;
+    var a=LB.ad||{};
+    var stage=box.querySelector('.stage');
+    stage.innerHTML='';
+    var isMp4=it.t==='video'&&/\.mp4($|\?)/i.test(it.p);
+    if(isMp4){
+      var v=document.createElement('video');
+      v.src=it.p; v.controls=true; v.autoplay=true; v.playsInline=true; v.loop=false;
+      // A sibling thumbnail makes a poster, so the frame is not black while it buffers.
+      var th=LB.items.filter(function(x){return x.t==='video_thumb';})[0];
+      if(th) v.poster=th.p;
+      stage.appendChild(v);
+    }else{
+      var im=document.createElement('img');
+      im.src=it.p; im.alt=(a.nm||'ad creative');
+      // Intrinsic size is only known once decoded, hence the load hook rather
+      // than branching on asset type — an ad_preview is always big, but a
+      // thumbnail's size varies by placement.
+      im.addEventListener('load',function(){
+        if(im.naturalWidth&&im.naturalWidth<400) im.classList.add('small');
+      });
+      stage.appendChild(im);
+    }
+    var bar=document.createElement('div'); bar.className='lbbar';
+    if(LB.items.length>1){
+      var prev=document.createElement('button');
+      prev.className='lbnav'; prev.type='button'; prev.textContent='‹';
+      prev.setAttribute('aria-label','Previous asset');
+      prev.disabled=LB.i===0;
+      prev.addEventListener('click',function(e){e.stopPropagation();lbGo(-1);});
+      var nxt=document.createElement('button');
+      nxt.className='lbnav'; nxt.type='button'; nxt.textContent='›';
+      nxt.setAttribute('aria-label','Next asset');
+      nxt.disabled=LB.i===LB.items.length-1;
+      nxt.addEventListener('click',function(e){e.stopPropagation();lbGo(1);});
+      var lbl=document.createElement('span');
+      lbl.textContent=(LB.i+1)+' / '+LB.items.length+' · '+
+        (it.t==='ad_preview'?'ad as served':it.t==='video_thumb'?'video variant':
+         it.t==='video'?'video':'image');
+      bar.appendChild(prev); bar.appendChild(lbl); bar.appendChild(nxt);
+    }
+    if(a.am){
+      var cta=document.createElement('a');
+      cta.className='lbcta'; cta.href=a.am; cta.target='_blank'; cta.rel='noopener';
+      cta.textContent=nVideos(a)?'Play in Ads Manager →':'Open in Ads Manager →';
+      cta.addEventListener('click',function(e){e.stopPropagation();});
+      bar.appendChild(cta);
+    }
+    if(bar.childNodes.length) stage.appendChild(bar);
+    if(!isMp4&&it.t==='video_thumb'){
+      var note=document.createElement('div');
+      note.className='lbnote';
+      note.textContent='Reference frame at Meta\u2019s thumbnail resolution. The '+
+        'owned-account ingest stores video thumbnails, not the video files, so '+
+        'the ad in motion lives in Ads Manager.';
+      stage.appendChild(note);
+    }
+  }
+
+  function lbGo(step){
+    var n=LB.i+step;
+    if(n<0||n>=LB.items.length) return;
+    LB.i=n; lbRender();
+  }
+
+  function lbClose(){
+    var box=document.getElementById('lightbox');
+    box.classList.remove('open');
+    box.querySelector('.stage').innerHTML='';  // stops any playing video
+    LB.items=[]; LB.ad=null;
+  }
+
+  function lbOpen(adId){
+    var a=AD_BY_ID[adId]; if(!a) return;
+    var items=shots(a); if(!items.length) return;
+    LB.ad=a; LB.items=items; LB.i=0;
+    document.getElementById('lightbox').classList.add('open');
+    lbRender();
+  }
+
+  // Delegated, because cards are built lazily when a drill-down row is opened —
+  // binding per card would miss every grid rendered after this runs.
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest&&e.target.closest('.asset .shot');
+    if(btn){ e.preventDefault(); lbOpen(btn.dataset.ad); }
+  });
+  document.getElementById('lightbox').addEventListener('click',function(e){
+    if(e.target.id==='lightbox'||e.target.classList.contains('stage')) lbClose();
+  });
+  document.querySelector('#lightbox .lbclose').addEventListener('click',lbClose);
+  document.addEventListener('keydown',function(e){
+    if(!document.getElementById('lightbox').classList.contains('open')) return;
+    if(e.key==='Escape') lbClose();
+    else if(e.key==='ArrowLeft') lbGo(-1);
+    else if(e.key==='ArrowRight') lbGo(1);
+  });
+
   function wireRows(){
     document.querySelectorAll('tr.sum').forEach(function(tr){
       tr.addEventListener('click',function(){
@@ -3623,6 +3798,19 @@ def build_performance_dashboard(
                 rec["attr"] = json.loads(r["attribution_json"])
             except (json.JSONDecodeError, TypeError):
                 pass
+        # Lightbox payload. `g` is every asset on the ad (type + path) and is only
+        # shipped when it adds something the card thumbnail does not already show.
+        gal = r.get("gallery") or []
+        if len(gal) > 1 or any(g["t"] in ("video", "video_thumb") for g in gal):
+            rec["g"] = [{"t": g["t"], "p": g["p"]} for g in gal]
+        # Where to actually watch the ad run. Owned-account ads are usually dark
+        # posts, so a facebook.com permalink built from effective_object_story_id
+        # 404s for anyone but the page admin — and often for them too. The Ads
+        # Manager deep link is the one destination guaranteed to resolve for the
+        # people this dashboard is built for, and its preview pane plays the video.
+        if r.get("account_id") and rec["id"]:
+            rec["am"] = ("https://adsmanager.facebook.com/adsmanager/manage/ads"
+                         f"?act={r['account_id']}&selected_ad_ids={rec['id']}")
         rk = r.get("_rank")
         if rk:
             rec["R"] = rk
@@ -3914,6 +4102,9 @@ def build_performance_dashboard(
         "<meta name='viewport' content='width=device-width,initial-scale=1'>"
         "<title>Creative performance — owned Meta accounts</title>"
         f"<style>{CSS}</style></head><body><div class='wrap'>{body}</div>"
+        "<div id='lightbox' role='dialog' aria-modal='true' aria-label='Ad creative'>"
+        "<button class='lbclose' type='button' aria-label='Close'>&times;</button>"
+        "<div class='stage'></div></div>"
         f"<script>var ADS={json.dumps(ads, separators=(',', ':'))};"
         f"var FILTERS={filt_json};"
         f"var META_SPECS={json.dumps(meta_specs)};"

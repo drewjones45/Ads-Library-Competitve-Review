@@ -204,6 +204,13 @@ The sizing is baked into the signed URL — **stripping the `stp=` crop param to
 a larger image returns 403.** Video `source` bytes are permission-gated, so a
 ~160×160 `thumbnail_url` is the ceiling for video assets without a rendered preview.
 
+Ingest now also asks `GET /{video_id}?fields=source` for each video creative and
+saves the mp4 as `video_{idx}.mp4` when the token is allowed it (`--no-videos`
+to skip). This is best-effort by design: the call is expected to be refused on
+some tokens, the refusal is logged at debug and counted as `videos_gated` in the
+run summary, and the dashboard falls back to the thumbnail. An mp4 is what lets
+the dashboard's lightbox *play* an ad instead of showing a still.
+
 ### 3.7 API gotchas that cost real debugging time
 
 | Symptom | Cause / fix |
@@ -380,6 +387,7 @@ Plus a `competitors(id, name, vertical, priority, meta_json)` lookup for brand l
     preview.png        # rendered ad preview — best fidelity
     image_0.jpg        # direct image_url
     video_thumb_1.jpg  # thumbnail_url (a real video frame, ~160x160)
+    video_1.mp4        # video source bytes, when the token is granted them
 ```
 
 ---
@@ -559,6 +567,11 @@ LIMIT 1
 `ad_preview` wins because it is the ad **as actually served**. If nothing is
 analyzed, fall back to any asset at all so the drill-down isn't blank.
 
+That query picks the ONE creative whose vision analysis represents the ad. It is
+deliberately not what the lightbox shows — see §7.8; a separate query collects
+every asset so the variants a dynamic-creative ad serves are browsable rather
+than downloaded and then never displayed.
+
 ### 6.4 Running it with an API key
 
 ```bash
@@ -671,7 +684,10 @@ Ad record (short keys — the payload is inlined, so key length is ~15% of file 
   b, ac, cp, an,                // brand, account, campaign, ad set
   cta, ot, cl,                  // CTA type, object type, creative class
   stage, gen, age, geo, opt,    // audience facets + optimisation goal
-  at, img,                      // asset type, asset path
+  at, img,                      // asset type, asset path (the card thumbnail)
+  g,                            // [{t: asset_type, p: path}] every asset on the
+                                //   ad — omitted when it adds nothing over `img`
+  am,                           // Ads Manager deep link for this exact ad
   sp, im, ck, pu, rv,           // spend, impressions, clicks, purchases, revenue
   v3, vp, tp, lc, atc, ic,      // 3s views, video plays, thruplays, link clicks, cart, checkout
   cr,                           // created_time[:10] — launch date
@@ -689,6 +705,37 @@ Note: `landing_page_views` and `view_content` are stored in SQL but **not** ship
 Series ship **component metrics only**. Derived rates (CTR, ROAS, scroll-stop) are
 recomputed per bucket in the browser so a filtered sparkline stays exact rather
 than averaging pre-computed per-ad rates.
+
+### 7.8 Creative lightbox
+
+The drill-down card crops its thumbnail to a 9:16 box, so clicking it is the only
+way to see the whole creative. `.asset .shot` opens a lightbox over the ad's `g`
+gallery, ordered `ad_preview` → `video` → everything else. The click handler is
+delegated from `document` because card grids are built lazily when a row is
+expanded — per-card binding would miss every grid rendered after load.
+
+Three render branches, mirroring the competitive dashboard's `_openLightbox`:
+
+| Asset | Renders as |
+|---|---|
+| `video` + `.mp4` | inline `<video controls autoplay playsinline>`, postered from a sibling thumbnail |
+| `ad_preview` / `image` | `<img>` at natural size |
+| `video_thumb` | `<img>`, capped at 340px, with a note saying it is a reference frame |
+
+That cap matters: thumbnails arrive between 64×64 and 228×128, and letting one
+fill the viewport renders a wall of pixels. The `.small` class is applied on the
+image's `load` event rather than by asset type, since intrinsic size is only
+known after decode.
+
+Every ad also carries `am`, a deep link to itself in Ads Manager, shown as
+"Play in Ads Manager →" for video ads. Ads Manager rather than a facebook.com
+permalink: owned-account ads are typically dark posts, so a permalink built from
+`effective_object_story_id` 404s for most viewers, while the Ads Manager link
+always resolves for the account owner — who is this dashboard's audience — and
+its preview pane plays the video.
+
+Closing (Esc, backdrop click, or the ✕) empties the stage, which is what stops a
+playing video. ← / → page through the gallery.
 
 ---
 
