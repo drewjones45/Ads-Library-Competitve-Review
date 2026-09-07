@@ -27,10 +27,15 @@ elif [[ -x "$ROOT/.venv/bin/intel"         ]]; then INTEL="$ROOT/.venv/bin/intel
 else echo "intel CLI not found in .venv — run: py -m venv .venv && .venv/Scripts/python -m pip install -e ." >&2; exit 1
 fi
 
-# load credentials (META_AD_LIBRARY_ACCESS_TOKEN drives the owned-account adapter too)
+# Load credentials. The owned-account lane wants META_OWNED_ACCESS_TOKEN (ads_read
+# on the act_*); META_AD_LIBRARY_ACCESS_TOKEN is a different app's credential for
+# /ads_archive and is refused here, so it is only a fallback for older setups.
 if [[ -f "$ROOT/.env" ]]; then set -a; . "$ROOT/.env"; set +a; fi
-if [[ -z "${META_AD_LIBRARY_ACCESS_TOKEN:-}" ]]; then
-  echo "META_AD_LIBRARY_ACCESS_TOKEN not set — owned-account ingest needs ads_read" >&2; exit 1
+if [[ -z "${META_OWNED_ACCESS_TOKEN:-}${META_AD_LIBRARY_ACCESS_TOKEN:-}" ]]; then
+  echo "no Meta token — set META_OWNED_ACCESS_TOKEN (needs ads_read on the account)" >&2; exit 1
+fi
+if [[ -z "${META_OWNED_ACCESS_TOKEN:-}" ]]; then
+  echo "note: META_OWNED_ACCESS_TOKEN unset, falling back to the Ad Library token" >&2
 fi
 
 UNTIL="${2:-$(date -u +%Y-%m-%d)}"
@@ -72,5 +77,28 @@ for row in "${ACCOUNTS[@]}"; do
     --since "$SINCE" --until "$UNTIL" --increment 1
   echo "--- cooldown ${COOL}s ---"; sleep "$COOL"
 done
+
+echo "############ DASHBOARD ############"
+"$INTEL" perf-dashboard --out "$ROOT/reports/spectrum/$UNTIL/performance-dashboard"
+
+# The generator writes local filesystem paths, so the S3 rewrite has to run after
+# every rebuild or the dashboard reverts to images only this machine can see.
+# Upload is content-addressed and therefore safe to repeat: unchanged bytes are
+# already in the bucket under the same key and are skipped.
+if [[ -n "${AWS_ACCESS_KEY_ID:-}" ]]; then
+  echo "############ S3 ASSETS ############"
+  PY="$ROOT/.venv/bin/python"; [[ -x "$PY" ]] || PY="$ROOT/.venv/Scripts/python.exe"
+  "$PY" "$ROOT/scripts/s3_assets.py" upload \
+    --local-dir "$INTEL_DATA_DIR" \
+    --bucket "${AWS_S3_BUCKET:?}" --prefix "${AWS_S3_PREFIX:?}" --region "${AWS_REGION:-us-east-1}"
+  "$PY" "$ROOT/scripts/s3_assets.py" rewrite \
+    --html "$ROOT/reports/spectrum/$UNTIL/performance-dashboard/index.html" \
+    --bucket "$AWS_S3_BUCKET" --prefix "$AWS_S3_PREFIX" --region "${AWS_REGION:-us-east-1}" \
+    --mode "${S3_URL_MODE:-presign}"
+  "$PY" "$ROOT/scripts/s3_assets.py" verify \
+    --html "$ROOT/reports/spectrum/$UNTIL/performance-dashboard/index.html"
+else
+  echo "AWS_ACCESS_KEY_ID unset — skipping S3 step; dashboard keeps local image paths" >&2
+fi
 
 echo "############ REFRESH COMPLETE ############"

@@ -58,6 +58,13 @@ def status() -> None:
         "META_AD_LIBRARY_ACCESS_TOKEN",
         "set" if os.environ.get("META_AD_LIBRARY_ACCESS_TOKEN") else "[yellow]missing[/yellow]",
     )
+    # Separate credential: owned-account ingest needs ads_read on the act_*, which
+    # an Ad Library token does not carry. Falls back to the one above when unset.
+    t.add_row(
+        "META_OWNED_ACCESS_TOKEN",
+        "set" if os.environ.get("META_OWNED_ACCESS_TOKEN")
+        else "[dim]unset (falls back to Ad Library token)[/dim]",
+    )
     # Whisper API key — optional, gates voice-over transcription on video ads.
     has_whisper = bool(os.environ.get("OPENAI_API_KEY") or os.environ.get("INTEL_WHISPER_API_KEY"))
     t.add_row(
@@ -1330,9 +1337,11 @@ def analytics_import_cmd(competitor_id: str, in_path: str, dataset_label: str | 
               help="skip rendering ad previews (much faster; loses the best creative asset)")
 @click.option("--max-previews", "max_previews", default=0, show_default=True,
               help="cap preview renders (0 = no cap). Highest-spend ads render first.")
+@click.option("--no-videos", is_flag=True, default=False,
+              help="skip downloading video files (the dashboard then shows stills only)")
 def perf_ingest_cmd(account_id: str, competitor_id: str, account_name: str | None,
                     days: int, since: str | None, until: str | None,
-                    no_previews: bool, max_previews: int) -> None:
+                    no_previews: bool, max_previews: int, no_videos: bool) -> None:
     """Ingest first-party performance + creative from an owned Meta ad account.
 
     Unlike the Ad Library lane (which can only see that an ad exists), this brings
@@ -1368,6 +1377,7 @@ def perf_ingest_cmd(account_id: str, competitor_id: str, account_name: str | Non
                 since=since, until=until,
                 render_previews=not no_previews,
                 max_previews=max_previews,
+                fetch_videos=not no_videos,
             )
     except MetaAccountError as exc:
         console.print(f"[red]✗ {exc}[/red]")
@@ -1378,6 +1388,15 @@ def perf_ingest_cmd(account_id: str, competitor_id: str, account_name: str | Non
         f"[green]✓[/green] {res['ads']} ads · {res['assets']} assets · "
         f"{res['previews']}/{res['preview_attempted']} previews rendered"
     )
+    if res.get("videos") or res.get("videos_gated"):
+        line = f"  {res['videos']} video file(s) downloaded"
+        if res.get("videos_gated"):
+            # Not a failure worth a red mark: the thumbnail still carries a real
+            # frame, and the dashboard falls back to it. Say so plainly so nobody
+            # goes hunting for a bug that is a permission boundary.
+            line += (f" · {res['videos_gated']} unavailable to this token "
+                     f"(dashboard shows their thumbnails instead)")
+        console.print(line)
     if cov["total_spend"]:
         console.print(
             f"  spend ${cov['total_spend']:,.0f} · "
