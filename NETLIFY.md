@@ -24,6 +24,10 @@ gitignored, so its dashboards still render broken images in a CI build. The
 build now prints a loud `⚠ … could not be resolved` warning listing anything it
 could not find. Deploy locally (below) if you need bobs' images.
 
+Spectrum currently publishes TWO builds of the same dashboard: a bundled-asset
+one that renders today, and an S3-backed one that will render once the bucket
+policy lands. The landing page labels both. See S3_ASSETS.md.
+
 There is now an alternative that sidesteps all of this: host the creative on S3
 and point the dashboard at it, so `build_site.py` has nothing to copy and the
 gitignored/committed distinction stops mattering. Spectrum is running that way —

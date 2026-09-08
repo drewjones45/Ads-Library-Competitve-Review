@@ -60,6 +60,12 @@ VARIANT_LABELS = {
     # nothing (spectrum), while one still pointing at data/*_assets copies every
     # thumbnail into dist/ (jdsports, ~168 MB).
     "performance-dashboard": "Creative performance (owned accounts)",
+    # Spectrum ships both: the S3 build is the direction of travel but its images
+    # 403 until the bucket policy lands, so a bundled-asset build is published
+    # beside it and is the one that actually renders today. Keep both labels
+    # explicit — a viewer landing on a page of grey boxes has no way to tell that
+    # it is a pending permission rather than a broken report.
+    "bundled-performance-dashboard": "Creative performance — images bundled (works now)",
 }
 
 
@@ -256,6 +262,10 @@ def build_landing(site: dict, out: Path, generated_for: str) -> None:
         for date in sorted(dates, reverse=True):
             for variant, dest_rel in sorted(dates[date].items()):
                 label = VARIANT_LABELS.get(variant, variant)
+                # An S3-backed build sitting next to a bundled one would otherwise
+                # look like the newer, better copy. Say which is which.
+                if variant == "performance-dashboard" and "bundled-performance-dashboard" in dates[date]:
+                    label += " — images via S3 (needs bucket policy)"
                 cards.append(
                     f'<a class="card" href="{html.escape(dest_rel)}">'
                     f'<div class="v">{html.escape(label)}</div>'

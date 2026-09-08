@@ -185,6 +185,34 @@ python3 scripts/s3_assets.py rewrite --html <dash>/index.html \
   --bucket $B --prefix $P --mode public    # before committing
 ```
 
+## The web app publishes both builds
+
+Until the bucket policy lands, an S3-backed dashboard renders grey boxes on
+Netlify. So Spectrum ships two variants for the same date and the landing page
+labels which is which:
+
+| Report path | Site label | Renders today |
+|---|---|---|
+| `2026-09-07/bundled/performance-dashboard/` | Creative performance — images bundled (works now) | **yes** — 202/202, assets copied into `dist/` |
+| `2026-09-07/performance-dashboard/` | … — images via S3 (needs bucket policy) | no — 403 until the policy exists |
+
+Both come from the same `intel perf-dashboard` run; the S3 one just has
+`s3_assets.py rewrite` applied afterwards. Regenerate the bundled one with no
+rewrite step:
+
+```bash
+intel perf-dashboard --out reports/spectrum/<date>/bundled/performance-dashboard
+```
+
+`build_site.py` flattens nested variant dirs, so `bundled/performance-dashboard`
+becomes the single directory `bundled-performance-dashboard` in `dist/` and its
+`../assets/` refs resolve. The 93 asset files are committed, so a Netlify CI
+build from a clean checkout resolves them too.
+
+Once the policy is in place the bundled variant can simply be deleted — that is
+the ~10 MB of duplicated bytes in `dist/` that moving to S3 was meant to remove,
+and it is only being carried while the permission is pending.
+
 ## Presigned-URL caveats
 
 Real, and the reason this is a stopgap rather than the destination:
