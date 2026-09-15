@@ -23,6 +23,13 @@ Pointing the refs at S3 removes both problems. After the rewrite, Spectrum's
 
 ## Doing it
 
+Needs `boto3`, which is an optional extra, not a base dependency (nothing
+under `src/intel/` imports it — only this script does):
+
+```bash
+.venv/bin/pip install -e '.[s3]'
+```
+
 `AWS_REGION` / `AWS_S3_BUCKET` / `AWS_S3_PREFIX` are in `.env.example` — copy
 them into `.env` (they're not secrets; the bucket and prefix are already
 visible in every committed public-mode dashboard URL) and
@@ -55,9 +62,13 @@ python3 scripts/s3_assets.py verify \
 
 ## Layout: content-addressed, so nothing is stored twice
 
-Keys are `<prefix>/by-hash/<ab>/<sha256>.<ext>` — the object's own content hash,
-not a mirror of its local path. That is load-bearing, because the same bytes
-appear at many local paths:
+Keys are `<prefix>/<client>/by-hash/<ab>/<sha256>.<ext>` — the object's own
+content hash, not a mirror of its local path. `<prefix>` is the shared base
+(`AWS_S3_PREFIX`); `<client>` is derived automatically from the `data/<client>_assets`
+dirname (`upload` from `--local-dir`, `rewrite`/`prune` from each ref's own
+tree) — never a flag you pass by hand, so it can't drift from the tree that
+actually produced the bytes. Hashing is load-bearing, because the same bytes
+appear at many local paths within one client's tree:
 
 | Tree | Files | Distinct blobs | Waste |
 |---|---|---|---|
@@ -86,12 +97,29 @@ into local copies.
 
 `prune` lists every object under the prefix that no local asset tree accounts
 for — retired path-mirrored keys, and hashes whose source files are gone. It
-reports by default and only deletes with `--delete`:
+reports by default and only deletes with `--delete`, and now prints each
+orphan's size and S3 `LastModified` date alongside the key, to help judge
+whether something old-and-unreferenced is safe to actually remove:
 
 ```bash
 python3 scripts/s3_assets.py prune --bucket $B --prefix $P            # report
 python3 scripts/s3_assets.py prune --bucket $B --prefix $P --delete   # act
 ```
+
+⚠ `prune` reconstructs the wanted-set from every `data/*_assets` tree it finds
+**on the machine it runs on** — there's no per-client filter. Run it only from
+a machine that has every deployment's assets present, or it will treat other
+deployments' still-live objects as orphans just because they're not checked out
+locally right now.
+
+⚠ **Migration note for the client-scoped layout above:** before this, keys had
+no client segment (`<prefix>/by-hash/...`); now they do
+(`<prefix>/<client>/by-hash/...`). Any already-published dashboard still
+pointing at the old flat-prefix keys will **not** be recognised as "ours" by
+`prune`'s wanted-set anymore — those objects will show up as orphans even
+though a live dashboard still references them. Rebuild and re-`rewrite` every
+such dashboard onto the new client-scoped keys *before* running
+`prune --delete`, or exclude the old prefix from that pass by hand.
 
 If a dashboard published under the old path-mirrored layout still needs to work
 after a prune, re-key it first with `rewrite --relink`, which recognises those

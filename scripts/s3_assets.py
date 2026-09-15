@@ -113,10 +113,32 @@ HASH_SEG = "by-hash"
 
 def content_key(path: Path, prefix: str) -> tuple[str, str]:
     """(sha256, key) for a local file. The two-char fan-out directory keeps any
-    single S3 listing page small enough to page through comfortably."""
+    single S3 listing page small enough to page through comfortably.
+
+    `prefix` is expected to already be client-scoped (see `client_prefix`) — this
+    function itself has no notion of client, it just hashes and joins."""
     h = hashlib.sha256(path.read_bytes()).hexdigest()
     ext = path.suffix.lower()
     return h, f"{prefix}/{HASH_SEG}/{h[:2]}/{h}{ext}"
+
+
+def client_slug(assets_dirname: str) -> str:
+    """'spectrum_assets' -> 'spectrum'. The deployment-naming convention used
+    throughout this repo (data/<client>_assets, INTEL_DATA_DIR, ...) already
+    carries the client name — this just strips the trailing '_assets'."""
+    return assets_dirname[:-len("_assets")] if assets_dirname.endswith("_assets") else assets_dirname
+
+
+def client_prefix(base_prefix: str, assets_dirname: str) -> str:
+    """Join a base prefix with the client segment derived from a data/<x>_assets
+    dirname, e.g. ('outbound/competitive-intel', 'spectrum_assets') ->
+    'outbound/competitive-intel/spectrum'.
+
+    Scoping keys per client is deliberate: without it, `prune` (which has to
+    reconstruct every client's wanted-set from local data/*_assets trees to know
+    what's still referenced) has no way to tell one client's objects from
+    another's under a shared flat prefix."""
+    return f"{base_prefix.strip('/')}/{client_slug(assets_dirname)}"
 
 
 def _client(region: str, signature: str = "s3v4"):
@@ -130,7 +152,7 @@ def _client(region: str, signature: str = "s3v4"):
         import boto3
         from botocore.config import Config
     except ImportError:
-        sys.exit("boto3 not installed — run: .venv/bin/python -m pip install boto3")
+        sys.exit("boto3 not installed — run: .venv/bin/pip install -e '.[s3]'")
     return boto3.client("s3", region_name=region, config=Config(signature_version=signature))
 
 
@@ -186,7 +208,7 @@ def cmd_upload(args) -> int:
         sys.exit(f"no media files under {local}")
 
     s3 = _client(args.region)
-    prefix = args.prefix.strip("/")
+    prefix = client_prefix(args.prefix, local.name)
 
     # Hash first, upload second. Files that share bytes collapse onto one key here,
     # before anything touches the network — which is the whole point: the same
@@ -266,7 +288,7 @@ def cmd_rewrite(args) -> int:
     html_path = (ROOT / args.html) if not Path(args.html).is_absolute() else Path(args.html)
     text, refs = scan(html_path, relink=args.relink)
 
-    prefix = args.prefix.strip("/")
+    base_prefix = args.prefix.strip("/")
     s3 = _client(args.region, args.signature) if args.mode == "presign" else None
     host = args.base_url.rstrip("/") if args.base_url else f"https://{args.bucket}.s3.{args.region}.amazonaws.com"
 
@@ -281,9 +303,12 @@ def cmd_rewrite(args) -> int:
     # reissued in whatever --mode now asks for. Switching is a real workflow, not a
     # repair — presign to view a dashboard before the bucket policy exists, public
     # to commit one, since a presigned URL carries the access key id and expires.
+    # The client segment between base_prefix and HASH_SEG is matched generically
+    # (one path segment, any name) rather than pinned to a specific client, so a
+    # dashboard is still recognised as "ours" regardless of which client it is.
     own = re.compile(
-        r"""(["'])(https://[^"']*?/(%s/%s/[0-9a-f]{2}/[0-9a-f]{64}\.(?:%s))(?:\?[^"']*)?)\1"""
-        % (re.escape(prefix), re.escape(HASH_SEG), "|".join(EXTS)),
+        r"""(["'])(https://[^"']*?/(%s/[^/"']+/%s/[0-9a-f]{2}/[0-9a-f]{64}\.(?:%s))(?:\?[^"']*)?)\1"""
+        % (re.escape(base_prefix), re.escape(HASH_SEG), "|".join(EXTS)),
         re.IGNORECASE,
     )
     remoded = 0
@@ -322,6 +347,12 @@ def cmd_rewrite(args) -> int:
         if not src.is_file():
             unresolved.append(rel)
             continue
+        # rel is "<client>_assets/..." (see rel_under_data) — the client segment
+        # of the key comes from the SAME tree each ref actually lives under, not
+        # from a single assumed client, so one dashboard's refs resolve correctly
+        # even if (hypothetically) they spanned more than one _assets tree.
+        tree_name = rel.split("/", 1)[0]
+        prefix = client_prefix(base_prefix, tree_name)
         _, key = content_key(src, prefix)
         keys_by_ref[raw] = key
         if args.mode == "presign":
@@ -421,36 +452,47 @@ def cmd_prune(args) -> int:
     say what would go rather than to go do it.
     """
     s3 = _client(args.region)
-    prefix = args.prefix.strip("/")
+    base_prefix = args.prefix.strip("/")
 
+    # Each local tree is scoped to its own client segment (client_prefix), same
+    # as upload/rewrite — otherwise every client's wanted-set would collide under
+    # one flat namespace and this could never tell them apart.
     wanted: set[str] = set()
     trees = 0
     for tree in sorted((ROOT / "data").glob("*_assets")):
         trees += 1
+        full_prefix = client_prefix(base_prefix, tree.name)
         for f in tree.rglob("*"):
             if f.is_file() and f.suffix.lower().lstrip(".") in EXTS:
-                wanted.add(content_key(f, prefix)[1])
+                wanted.add(content_key(f, full_prefix)[1])
     print(f"{len(wanted)} distinct object(s) referenced by {trees} local asset tree(s)")
 
-    live: dict[str, int] = {}
+    # size + last-modified per object — LastModified doesn't change the key
+    # scheme, it's just carried through from the listing for the report below.
+    live: dict[str, dict] = {}
     paginator = s3.get_paginator("list_objects_v2")
-    for page in paginator.paginate(Bucket=args.bucket, Prefix=f"{prefix}/"):
+    for page in paginator.paginate(Bucket=args.bucket, Prefix=f"{base_prefix}/"):
         for o in page.get("Contents", []):
-            live[o["Key"]] = o["Size"]
-    print(f"{len(live)} object(s) currently under s3://{args.bucket}/{prefix}/")
+            live[o["Key"]] = {"size": o["Size"], "modified": o.get("LastModified")}
+    print(f"{len(live)} object(s) currently under s3://{args.bucket}/{base_prefix}/")
 
-    # The manifests describe the store; they are not themselves assets.
+    # The manifests describe the store; they are not themselves assets. Matched
+    # as a path segment rather than a prefix startswith, since a manifest can now
+    # sit under any client's sub-prefix (<base_prefix>/<client>/manifest/...).
     orphans = {k: v for k, v in live.items()
-               if k not in wanted and not k.startswith(f"{prefix}/manifest/")}
+               if k not in wanted and "/manifest/" not in k}
     legacy = {k: v for k, v in orphans.items() if f"/{HASH_SEG}/" not in k}
     stale = {k: v for k, v in orphans.items() if f"/{HASH_SEG}/" in k}
-    print(f"\n{len(orphans)} unreferenced ({sum(orphans.values()) / 1e6:.1f} MB):")
+    orphan_bytes = sum(v["size"] for v in orphans.values())
+    print(f"\n{len(orphans)} unreferenced ({orphan_bytes / 1e6:.1f} MB):")
     print(f"  {len(legacy)} from the old path-mirrored layout "
-          f"({sum(legacy.values()) / 1e6:.1f} MB)")
+          f"({sum(v['size'] for v in legacy.values()) / 1e6:.1f} MB)")
     print(f"  {len(stale)} content keys with no local source "
-          f"({sum(stale.values()) / 1e6:.1f} MB)")
-    for k in list(orphans)[:8]:
-        print(f"    {k}")
+          f"({sum(v['size'] for v in stale.values()) / 1e6:.1f} MB)")
+    for k, v in list(orphans.items())[:8]:
+        mod = v["modified"]
+        when = f"{mod:%Y-%m-%d}" if mod else "unknown date"
+        print(f"    {k}  ({v['size'] / 1e6:.2f} MB, modified {when})")
     if len(orphans) > 8:
         print(f"    … and {len(orphans) - 8} more")
 
@@ -477,7 +519,10 @@ def main() -> int:
 
     def common(p):
         p.add_argument("--bucket", required=True)
-        p.add_argument("--prefix", default="outbound/competitive-intel")
+        p.add_argument("--prefix", default="outbound/competitive-intel",
+                        help="base prefix, shared across clients — a client segment "
+                             "(from --local-dir's <client>_assets name, or from each "
+                             "ref's own tree for rewrite/prune) is appended automatically")
         p.add_argument("--region", default="us-east-1")
 
     up = sub.add_parser("upload", help="mirror a local assets tree into S3")

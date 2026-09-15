@@ -17,6 +17,7 @@ dependencies = [
 
 [project.optional-dependencies]
 browser = ["playwright>=1.45.0"]
+s3 = ["boto3>=1.28.0"]  # scripts/s3_assets.py only — not imported by src/intel/
 dev = ["pytest>=8.0.0"]
 
 [project.scripts]
