@@ -23,10 +23,22 @@ Pointing the refs at S3 removes both problems. After the rewrite, Spectrum's
 
 ## Doing it
 
+`AWS_REGION` / `AWS_S3_BUCKET` / `AWS_S3_PREFIX` are in `.env.example` — copy
+them into `.env` (they're not secrets; the bucket and prefix are already
+visible in every committed public-mode dashboard URL) and
+`scripts/refresh_spectrum_perf.sh` picks them up automatically, no flags
+needed. `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` are deliberately **not**
+in that file — export them separately, or use `~/.aws/credentials` / an
+instance role. Nothing AWS-credential-shaped belongs in a repo-tracked file.
+
+Running `scripts/s3_assets.py` directly (outside the refresh script) still
+takes bucket/prefix as CLI flags rather than reading the env vars, so export
+them into shell variables first if you're doing this by hand:
+
 ```bash
 export AWS_ACCESS_KEY_ID=...  AWS_SECRET_ACCESS_KEY=...
-B=next-ext-commerce-us-east-1
-P=outbound/competitive-intel
+set -a; source .env; set +a   # or: B=$AWS_S3_BUCKET  P=$AWS_S3_PREFIX
+B="$AWS_S3_BUCKET"; P="$AWS_S3_PREFIX"
 
 # 1. mirror the local assets tree to S3 (idempotent — re-uploads only changed files)
 python3 scripts/s3_assets.py upload --local-dir data/spectrum_assets --bucket $B --prefix $P
