@@ -70,6 +70,7 @@ import mimetypes
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -404,6 +405,41 @@ def cmd_verify(args) -> int:
         print(f"  {code or 'ERR'}  {u.split('?')[0]}  {info}")
     if ok:
         print(f"  sample content-type: {ok[0][2]}")
+
+    # An anonymous 403 is indistinguishable from a 404 — S3 deliberately hides
+    # whether a key exists from callers who may not read it. On a private bucket
+    # that means a dashboard pointing at the WRONG keys looks exactly like one
+    # pointing at right keys it may not fetch yet, and stays broken silently until
+    # the policy lands. So when credentials are present, ask S3 directly.
+    # (This is how a prefix mismatch went unnoticed: 51 URLs, all 403, all wrong.)
+    if bad and args.bucket:
+        try:
+            s3 = _client(args.region)
+            keys = [urllib.parse.urlparse(u).path.lstrip("/") for u, _, _ in bad]
+
+            def exists(k: str) -> bool:
+                try:
+                    s3.head_object(Bucket=args.bucket, Key=k)
+                    return True
+                except Exception:  # noqa: BLE001
+                    return False
+
+            with ThreadPoolExecutor(max_workers=12) as pool:
+                present = list(pool.map(exists, keys))
+            missing = [k for k, p in zip(keys, present) if not p]
+            if missing:
+                print(f"  ** {len(missing)} of those key(s) DO NOT EXIST in "
+                      f"s3://{args.bucket} — the HTML points at the wrong keys, "
+                      f"not merely unreadable ones. Re-run `upload` with the same "
+                      f"--prefix used by `rewrite`.")
+                for k in missing[:5]:
+                    print(f"       {k}")
+            else:
+                print(f"  all {len(keys)} key(s) exist and are readable with "
+                      f"credentials — the 403s are the missing bucket policy only.")
+        except Exception as exc:  # noqa: BLE001 — diagnosis is best-effort
+            print(f"  (could not check key existence: {exc})")
+
     return 1 if bad else 0
 
 
@@ -504,6 +540,10 @@ def main() -> int:
 
     vf = sub.add_parser("verify", help="fetch every rewritten URL and report status")
     vf.add_argument("--html", required=True)
+    # Optional: with these, a failing verify can also say whether the keys exist,
+    # which is the difference between "not public yet" and "pointing at nothing".
+    vf.add_argument("--bucket", default="")
+    vf.add_argument("--region", default="us-east-1")
     vf.set_defaults(func=cmd_verify)
 
     pr = sub.add_parser("prune", help="find objects under the prefix nothing references")

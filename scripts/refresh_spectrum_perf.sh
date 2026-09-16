@@ -96,7 +96,8 @@ if [[ -n "${AWS_ACCESS_KEY_ID:-}" ]]; then
     --bucket "$AWS_S3_BUCKET" --prefix "$AWS_S3_PREFIX" --region "${AWS_REGION:-us-east-1}" \
     --mode "${S3_URL_MODE:-presign}"
   "$PY" "$ROOT/scripts/s3_assets.py" verify \
-    --html "$ROOT/reports/spectrum/$UNTIL/performance-dashboard/index.html"
+    --html "$ROOT/reports/spectrum/$UNTIL/performance-dashboard/index.html" \
+    --bucket "$AWS_S3_BUCKET" --region "${AWS_REGION:-us-east-1}" || true
 else
   echo "AWS_ACCESS_KEY_ID unset — skipping S3 step; dashboard keeps local image paths" >&2
 fi
