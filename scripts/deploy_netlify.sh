@@ -73,10 +73,14 @@ if ! command -v netlify >/dev/null 2>&1; then
   exit 1
 fi
 
+# --no-build is essential, not tidiness. netlify.toml declares a build `command`
+# for the git-CI path, and the CLI runs it again at deploy time — which would
+# regenerate dist/ from reports/ and silently throw away the presigned URLs this
+# script just wrote, publishing a site whose every image 403s.
 if [[ $PROD -eq 1 ]]; then
   echo "==> deploying to PRODUCTION"
-  netlify deploy --dir dist --prod ${DEPLOY_ARGS[@]+"${DEPLOY_ARGS[@]}"}
+  netlify deploy --dir dist --prod --no-build ${DEPLOY_ARGS[@]+"${DEPLOY_ARGS[@]}"}
 else
   echo "==> draft deploy (preview URL; add --prod to publish)"
-  netlify deploy --dir dist ${DEPLOY_ARGS[@]+"${DEPLOY_ARGS[@]}"}
+  netlify deploy --dir dist --no-build ${DEPLOY_ARGS[@]+"${DEPLOY_ARGS[@]}"}
 fi
