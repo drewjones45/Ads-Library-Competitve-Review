@@ -64,6 +64,12 @@ Verify: `.venv/bin/intel --help` should print the command list, and
 `.venv/bin/python -c "from playwright.sync_api import sync_playwright"` should
 not error.
 
+**If the deployment hosts dashboard creative on S3** (Spectrum-style, see
+[S3_ASSETS.md](S3_ASSETS.md)) — `scripts/s3_assets.py` needs `boto3`, a
+separate optional extra since nothing under `src/intel/` imports it:
+`.venv/bin/pip install -e '.[s3]'`. Skip this for a pure competitive-audit
+deployment (Edward Jones, JD Sports, ...) — it doesn't touch S3 at all.
+
 **Gotcha:** Playwright's browser processes may get killed by a sandboxed shell
 tool. If a scrape fails with `Target page, context or browser has been closed`
 or `kill EPERM`, retry with the sandbox disabled for that command rather than
