@@ -36,6 +36,35 @@ done
 echo "==> building dist/ (scripts/build_site.py ${BUILD_ARGS[*]:-})"
 python3 scripts/build_site.py ${BUILD_ARGS[@]+"${BUILD_ARGS[@]}"}
 
+# ---------------------------------------------------------------- presign step
+# Only the DEPLOYED copy gets presigned URLs. reports/ stays on credential-free
+# public-mode URLs because it is committed to a public repo (s3_assets.py refuses
+# to presign into reports/ for that reason), and because those URLs become the
+# permanent answer if a bucket policy ever lands.
+#
+# Presigning here also means every deploy resets the expiry clock, so the site
+# cannot age out while it is being maintained.
+#
+# SCOPE: Spectrum only. It is the sole deployment whose creative lives in S3 —
+# every other dashboard references assets copied into dist/ and has no S3 URL to
+# rewrite. The explicit path glob keeps it that way even if that changes, so
+# turning on S3 for another deployment stays a deliberate act.
+S3_TREES=("spectrum")
+
+if [[ -n "${AWS_ACCESS_KEY_ID:-}" && -n "${AWS_S3_BUCKET:-}" ]]; then
+  PY="$ROOT/.venv/bin/python"; [[ -x "$PY" ]] || PY="python3"
+  for tree in "${S3_TREES[@]}"; do
+    while IFS= read -r page; do
+      echo "==> presigning $(realpath --relative-to="$ROOT" "$page" 2>/dev/null || echo "$page")"
+      "$PY" "$ROOT/scripts/s3_assets.py" rewrite         --html "$page"         --bucket "$AWS_S3_BUCKET" --prefix "${AWS_S3_PREFIX:?}"         --region "${AWS_REGION:-us-east-1}"         --mode presign --signature "${S3_SIGNATURE:-s3}"         --expires "${S3_PRESIGN_TTL:-31536000}"
+      "$PY" "$ROOT/scripts/s3_assets.py" verify         --html "$page" --bucket "$AWS_S3_BUCKET" --region "${AWS_REGION:-us-east-1}"
+    done < <(find "$ROOT/dist/$tree" -name index.html 2>/dev/null)
+  done
+else
+  echo "==> AWS creds or AWS_S3_BUCKET unset — skipping presign step." >&2
+  echo "    dist/ keeps public-mode S3 URLs, which 403 until a bucket policy exists." >&2
+fi
+
 if ! command -v netlify >/dev/null 2>&1; then
   echo
   echo "netlify CLI not found. Either:"

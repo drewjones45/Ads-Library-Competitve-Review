@@ -164,26 +164,55 @@ plainly: `0 video file(s) downloaded · 41 unavailable to this token`. Video ads
 therefore render as stills with a "Play in Ads Manager" link, and that is a
 permission ceiling, not a bug to keep poking at.
 
-## Which mode to commit
+## Operating model: presign at deploy, public in git
 
-**Committed dashboards use `--mode public`.** A presigned URL embeds the AWS access
-key id — 110 times per Spectrum report — and this repo is public on GitHub, where
-an `AKIA…` string trips secret scanning and can get the key quarantined by AWS.
-It also expires in 7 days, so a presigned dashboard in git history is dead
-almost immediately anyway.
+Presigned URLs are how the images actually reach the deployed site, because the
+bucket policy needed for plain public reads is not available (see below). The two
+copies therefore carry different URL modes, and this split is load-bearing:
 
-Public-mode URLs carry no credential and never expire. They 403 until the bucket
-policy above lands, then work permanently with no further edit.
+| Copy | Mode | Why |
+|---|---|---|
+| `reports/**` — committed | `--mode public`, credential-free | This repo is PUBLIC. A presigned URL embeds the AWS access key id, and an `AKIA…` string in a public repo trips GitHub secret scanning → AWS → possible key quarantine. It would also freeze a dead link into permanent history. |
+| `dist/**` — deployed | presigned, SigV2, 1 year | Only the live site carries the signature, and **every deploy refreshes the expiry**, so the site cannot age out while it is being maintained. |
 
-Switching is one command and round-trips byte-identically, so presign locally to
-look at a dashboard, and put it back before committing:
+`scripts/deploy_netlify.sh` does the presigning automatically after
+`build_site.py`, scoped to `dist/spectrum/` — Spectrum is the only deployment
+whose creative lives in S3, and the explicit path keeps enabling another one a
+deliberate act. Override with `S3_SIGNATURE` / `S3_PRESIGN_TTL` if needed. With
+no AWS credentials in the environment the step is skipped and `dist/` keeps its
+public-mode URLs (which 403) — it never silently half-works.
 
-```bash
-python3 scripts/s3_assets.py rewrite --html <dash>/index.html \
-  --bucket $B --prefix $P --mode presign   # to view now
-python3 scripts/s3_assets.py rewrite --html <dash>/index.html \
-  --bucket $B --prefix $P --mode public    # before committing
-```
+Two guards enforce the split, because "remember not to commit the presigned one"
+is not a control:
+
+* `s3_assets.py rewrite --mode presign` **refuses** to write into `reports/`
+  (`--allow-reports` to override).
+* `scripts/check_no_credentials.sh` fails if anything git tracks carries an
+  AWS key id or signature. Install it as a pre-commit hook with:
+  `ln -sf ../../scripts/check_no_credentials.sh .git/hooks/pre-commit`
+
+### On SigV2, and the expiry
+
+`--signature s3` (SigV2) is used rather than SigV4 because SigV4 caps expiry at 7
+days, and a manually-deployed site would go dark 8 days after the last deploy.
+SigV2 accepts any expiry — verified against this bucket at 90 days, 1 year and 3
+years, all HTTP 206 — because it predates 2020-06-24. AWS has deprecated SigV2
+and could withdraw it without notice, which would break every image at once.
+
+`s3_assets.py verify` therefore leads with the expiry and exits non-zero when it
+is inside `--warn-days` (default 30) or already past, so staleness surfaces as a
+failed check rather than as blank thumbnails nobody can explain.
+
+### What this does NOT solve
+
+The Netlify site has no authentication — the URL is the only thing keeping it
+private. A presigned URL on that site is readable by anyone who has the site URL
+for the whole validity window, which in practical terms is close to what a public
+bucket policy would give. It additionally publishes the AWS account's key id.
+
+So this route answers "we cannot get an admin to change the bucket", not "these
+images must not be publicly readable". If the latter is ever the requirement,
+Netlify password protection is the cheap fix and applies equally to either route.
 
 ## The web app publishes both builds
 

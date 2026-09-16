@@ -265,6 +265,30 @@ def cmd_upload(args) -> int:
 
 def cmd_rewrite(args) -> int:
     html_path = (ROOT / args.html) if not Path(args.html).is_absolute() else Path(args.html)
+    dest_path = Path(args.out) if args.out else html_path
+    if not dest_path.is_absolute():
+        dest_path = ROOT / dest_path
+
+    # A presigned URL embeds the AWS access key id and an expiry. reports/ is
+    # tracked in a PUBLIC repo, so a presigned URL written there would publish the
+    # key id into permanent history and freeze a dead link into the record. The
+    # operating model is: reports/ holds credential-free public-mode URLs, and
+    # presigning happens on the dist/ copy at deploy time, where it also gets its
+    # expiry refreshed by every deploy.
+    if args.mode == "presign" and not args.allow_reports:
+        try:
+            under_reports = dest_path.resolve().is_relative_to((ROOT / "reports").resolve())
+        except (AttributeError, ValueError):  # py<3.9 / unrelated drive
+            under_reports = str(dest_path.resolve()).startswith(str((ROOT / "reports").resolve()))
+        if under_reports:
+            sys.exit(
+                f"refusing to write presigned URLs into {dest_path.relative_to(ROOT)}\n"
+                "  reports/ is committed to a public repo; a presigned URL there leaks the\n"
+                "  AWS access key id and expires. Presign the dist/ copy at deploy time\n"
+                "  instead (scripts/deploy_netlify.sh does this), or pass --allow-reports\n"
+                "  if you really mean it."
+            )
+
     text, refs = scan(html_path, relink=args.relink)
 
     prefix = args.prefix.strip("/")
@@ -375,13 +399,59 @@ def _presign_note(args) -> None:
 # --------------------------------------------------------------------------- verify
 
 
+def _signature_expiry(url: str) -> "datetime.datetime | None":
+    """When a presigned URL stops working, or None if it is not presigned.
+
+    Two query shapes, because the two signing schemes disagree: SigV2 carries an
+    absolute unix `Expires`, SigV4 carries `X-Amz-Date` plus a relative
+    `X-Amz-Expires`.
+    """
+    import datetime
+    q = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+    if "Expires" in q:  # SigV2
+        try:
+            return datetime.datetime.fromtimestamp(int(q["Expires"][0]), datetime.timezone.utc)
+        except (ValueError, KeyError):
+            return None
+    if "X-Amz-Date" in q and "X-Amz-Expires" in q:  # SigV4
+        try:
+            t0 = datetime.datetime.strptime(q["X-Amz-Date"][0], "%Y%m%dT%H%M%SZ").replace(
+                tzinfo=datetime.timezone.utc)
+            return t0 + datetime.timedelta(seconds=int(q["X-Amz-Expires"][0]))
+        except (ValueError, KeyError):
+            return None
+    return None
+
+
 def cmd_verify(args) -> int:
+    import datetime
     html_path = (ROOT / args.html) if not Path(args.html).is_absolute() else Path(args.html)
     text = html_path.read_text(encoding="utf-8")
     urls = sorted({m.group(2) for m in URL_RE.finditer(text)})
     if not urls:
         print(f"no https asset URLs in {html_path} — has it been rewritten?")
         return 1
+
+    # Expiry first: a presigned dashboard fails as blank thumbnails with no error
+    # anywhere, so the days-remaining number is the thing worth seeing before the
+    # fetch results. Public-mode URLs have no expiry and skip this entirely.
+    expiries = [e for e in (_signature_expiry(u) for u in urls) if e]
+    stale = False
+    if expiries:
+        now = datetime.datetime.now(datetime.timezone.utc)
+        soonest = min(expiries)
+        days = (soonest - now).total_seconds() / 86400
+        scheme = "SigV2" if "Expires=" in urls[0] else "SigV4"
+        if days < 0:
+            print(f"** EXPIRED {-days:.1f} days ago ({scheme}, {soonest:%Y-%m-%d %H:%M UTC}) — "
+                  f"redeploy to refresh **")
+            stale = True
+        elif days < args.warn_days:
+            print(f"** expires in {days:.1f} days ({scheme}, {soonest:%Y-%m-%d}) — "
+                  f"under the {args.warn_days}-day threshold, redeploy soon **")
+            stale = True
+        else:
+            print(f"presigned {scheme}, expires {soonest:%Y-%m-%d} ({days:.0f} days away)")
 
     def head(u: str):
         # S3 rejects a presigned GET signature used on a HEAD, so fetch the object
@@ -440,7 +510,7 @@ def cmd_verify(args) -> int:
         except Exception as exc:  # noqa: BLE001 — diagnosis is best-effort
             print(f"  (could not check key existence: {exc})")
 
-    return 1 if bad else 0
+    return 1 if (bad or stale) else 0
 
 
 def cmd_prune(args) -> int:
@@ -536,6 +606,8 @@ def main() -> int:
                     help="also re-key https URLs left by the retired path-mirrored layout")
     rw.add_argument("--out", default="", help="write here instead of editing in place")
     rw.add_argument("--map-out", default="", help="also dump a {relpath: url} JSON map")
+    rw.add_argument("--allow-reports", action="store_true",
+                    help="permit writing presigned URLs into reports/ (they must not be committed)")
     rw.set_defaults(func=cmd_rewrite)
 
     vf = sub.add_parser("verify", help="fetch every rewritten URL and report status")
@@ -544,6 +616,8 @@ def main() -> int:
     # which is the difference between "not public yet" and "pointing at nothing".
     vf.add_argument("--bucket", default="")
     vf.add_argument("--region", default="us-east-1")
+    vf.add_argument("--warn-days", type=float, default=30.0,
+                    help="fail if presigned URLs expire sooner than this many days")
     vf.set_defaults(func=cmd_verify)
 
     pr = sub.add_parser("prune", help="find objects under the prefix nothing references")
