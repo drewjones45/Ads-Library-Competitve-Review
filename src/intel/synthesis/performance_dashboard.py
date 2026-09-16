@@ -34,119 +34,22 @@ log = logging.getLogger("intel.performance_dashboard")
 
 # Attributes worth cross-tabbing. Scalar (string/bool) attributes become one
 # bucket per value; list attributes fan out so an ad contributes to each value.
-SCALAR_ATTRS = [
-    ("production_style", "Production style"),
-    ("photography_style", "Photography style"),
-    ("product_emphasis", "Product emphasis"),
-    ("hook_style", "Hook style"),
-    ("emotional_vs_rational", "Emotional vs rational"),
-    ("aspect_ratio_guess", "Aspect ratio"),
-    ("background_color", "Background colour"),
-    ("model_gender", "Model gender"),
-    ("logo_visible", "Retailer logo visible"),
-    ("before_after_present", "Before/after present"),
-]
-LIST_ATTRS = [
-    ("value_props", "Value props"),
-    ("key_features", "Key features"),
-    ("products_visible", "Products shown"),
-    ("seasonal_tags", "Seasonal hooks"),
-]
-NESTED_ATTRS = [
-    ("text_overlay.density", "Text-overlay density"),
-    ("text_overlay.copy_lean", "Copy lean"),
-    ("urgency_cues.present", "Urgency cues present"),
-    ("casting.people_visible", "People visible"),
-]
+# The creative attribute set is per client — see analysis/taxonomies.py. These
+# names stay bound to the RETAIL defaults so every existing deployment renders
+# exactly as before; build_performance_dashboard() swaps in another taxonomy's
+# lists for a run that asks for one.
+from ..analysis.taxonomies import RETAIL as _DEFAULT_TAXONOMY, resolve as resolve_taxonomy
+
+SCALAR_ATTRS = _DEFAULT_TAXONOMY.scalar_attrs
+LIST_ATTRS = _DEFAULT_TAXONOMY.list_attrs
+NESTED_ATTRS = _DEFAULT_TAXONOMY.nested_attrs
 
 # What each creative tag MEANS and which values the vision taxonomy is allowed to
 # emit for it. Mirrors CREATIVE_TAXONOMY_PROMPT / VIDEO_TAXONOMY_PROMPT — the tag
 # manager in the dashboard edits this, and its export is what gets folded back
 # into those prompts. `opts` empty = open vocabulary (the model writes free text),
 # so the manager shows only what was actually observed.
-TAG_META: dict[str, dict[str, Any]] = {
-    "production_style": {
-        "desc": "How the ad was produced — brand-polished vs creator-style vs meme graphic.",
-        "opts": ["polished_brand", "ugc_creator_style", "meme_graphic", "mixed"],
-    },
-    "photography_style": {
-        "desc": "How the product or subject is shot or rendered.",
-        "opts": ["model_on_figure", "flat_lay", "lifestyle", "studio_product_only",
-                 "screenshot_ui", "text_only", "mixed"],
-    },
-    "product_emphasis": {
-        "desc": "Whether the frame sells the product itself or the lifestyle around it.",
-        "opts": ["product_forward", "lifestyle_forward", "balanced"],
-    },
-    "hook_style": {
-        "desc": "The persuasion device the creative leads with.",
-        "opts": ["problem_solution", "social_proof", "urgency", "founder_story", "demo",
-                 "testimonial", "meme", "aesthetic", "unknown"],
-    },
-    "emotional_vs_rational": {
-        "desc": "Whether the appeal is feeling-led or reason-led.",
-        "opts": ["emotional", "rational", "mixed"],
-    },
-    "aspect_ratio_guess": {
-        "desc": "Frame shape as judged from the rendered creative.",
-        "opts": ["1:1", "4:5", "9:16", "16:9", "other"],
-    },
-    "background_color": {
-        "desc": "Dominant background treatment behind the subject.",
-        "opts": ["white", "black", "gray", "beige", "brown", "red", "orange", "yellow",
-                 "green", "blue", "purple", "pink", "multi", "gradient", "n/a"],
-    },
-    "model_gender": {
-        "desc": "Presented gender of the people on screen, if any.",
-        "opts": ["male", "female", "mixed", "ambiguous", "not_visible"],
-    },
-    "logo_visible": {
-        "desc": "Whether a retailer or brand logo appears in the creative.",
-        "opts": ["yes", "no"],
-    },
-    "before_after_present": {
-        "desc": "Whether the creative shows a before/after comparison.",
-        "opts": ["yes", "no"],
-    },
-    "text_overlay.density": {
-        "desc": "How much type is burned into the creative.",
-        "opts": ["none", "light", "medium", "heavy"],
-    },
-    "text_overlay.copy_lean": {
-        "desc": "What the on-image copy leads with.",
-        "opts": ["offer_led", "benefit_led", "brand_led", "none"],
-    },
-    "urgency_cues.present": {
-        "desc": "Whether the creative uses scarcity or deadline cues.",
-        "opts": ["yes", "no"],
-    },
-    "casting.people_visible": {
-        "desc": "Whether any person appears in the creative.",
-        "opts": ["yes", "no"],
-    },
-    "value_props": {
-        "desc": "Benefits the ad argues for. Multi-select — an ad can carry several.",
-        "opts": ["efficacy", "price", "sustainability", "inclusivity", "convenience",
-                 "social_proof", "novelty"],
-    },
-    "key_features": {
-        "desc": "Visual elements present in the frame. Multi-select — an ad can carry several.",
-        "opts": ["price_visible", "discount_badge", "free_shipping_badge", "free_gift_badge",
-                 "brand_logo", "cta_button_in_image", "countdown_timer", "before_after",
-                 "star_rating_visible", "review_quote_overlay", "model_present", "creator_face",
-                 "lifestyle_setting", "product_close_up", "multi_product_collage",
-                 "video_thumbnail", "text_only_card", "price_compare", "limited_time_text",
-                 "shipping_callout"],
-    },
-    "products_visible": {
-        "desc": "Product types shown, as free-form noun phrases. Open vocabulary.",
-        "opts": [],
-    },
-    "seasonal_tags": {
-        "desc": "Seasonal or calendar hooks the creative leans on. Open vocabulary.",
-        "opts": [],
-    },
-}
+TAG_META: dict[str, dict[str, Any]] = _DEFAULT_TAXONOMY.tag_meta
 
 
 def _dig(d: dict, path: str) -> Any:
@@ -3720,16 +3623,27 @@ def build_performance_dashboard(
     out_dir: Path,
     competitor_ids: list[str] | None = None,
     min_impressions: int = 1000,
+    taxonomy: Any = None,
 ) -> dict[str, Any] | None:
+    """`taxonomy` selects the creative attribute set (analysis/taxonomies.py).
+
+    None resolves via the client pin, which is RETAIL for every existing
+    deployment — so omitting it reproduces the previous output exactly. The
+    attribute tables are built in the browser from `vision_specs` and `TAG_META`,
+    so those two are the whole taxonomy surface here.
+    """
+    t = taxonomy or resolve_taxonomy(
+        client=(competitor_ids[0] if competitor_ids else None)
+    )
     rows = _fetch(conn, competitor_ids)
     if not rows:
         return None
 
     # Vision attribute specs shipped to the client: (key, label, kind, is_vision)
     vision_specs = (
-        [(k, lab, "scalar", True) for k, lab in SCALAR_ATTRS]
-        + [(k, lab, "scalar", True) for k, lab in NESTED_ATTRS]
-        + [(k, lab, "list", True) for k, lab in LIST_ATTRS]
+        [(k, lab, "scalar", True) for k, lab in t.scalar_attrs]
+        + [(k, lab, "scalar", True) for k, lab in t.nested_attrs]
+        + [(k, lab, "list", True) for k, lab in t.list_attrs]
     )
     meta_specs = [(k, lab, kind, False) for k, lab, kind in META_SPECS]
     tail_specs = [(k, lab, kind, False) for k, lab, kind in TAIL_SPECS]
@@ -3837,15 +3751,18 @@ def build_performance_dashboard(
         if r.get("analysis") and _is_readable(r):
             a = r["analysis"]
             attrs: dict[str, Any] = {}
-            for k, _lab in SCALAR_ATTRS:
+            # The SELECTED taxonomy, not the module default — these must be the
+            # same keys the browser is told to tabulate via VISION_SPECS, or an
+            # attribute is advertised in the nav and then has no values to bucket.
+            for k, _lab in t.scalar_attrs:
                 v = _norm(a.get(k))
                 if v:
                     attrs[k] = v
-            for k, _lab in NESTED_ATTRS:
+            for k, _lab in t.nested_attrs:
                 v = _norm(_dig(a, k))
                 if v:
                     attrs[k] = v
-            for k, _lab in LIST_ATTRS:
+            for k, _lab in t.list_attrs:
                 vals = a.get(k)
                 if isinstance(vals, list):
                     clean = [_norm(x) for x in vals]
@@ -4110,7 +4027,7 @@ def build_performance_dashboard(
         f"var META_SPECS={json.dumps(meta_specs)};"
         f"var TAIL_SPECS={json.dumps(tail_specs)};"
         f"var VISION_SPECS={json.dumps(vision_specs)};"
-        f"var TAG_META={json.dumps(TAG_META)};"
+        f"var TAG_META={json.dumps(t.tag_meta)};"
         f"var TAG_SAVED={json.dumps(saved_tags)};"
         f"var MINIMP={int(min_impressions)};var MAXC={MAX_CARDS_PER_BUCKET};"
         f"var BUCKETS={json.dumps(buckets)};"
@@ -4122,5 +4039,6 @@ def build_performance_dashboard(
     )
     return {
         "path": str(path), "brands": len(brands), "ads": len(ads),
+        "taxonomy": t.name,
         "spend": total_spend, "analyzed": len(analyzed),
     }

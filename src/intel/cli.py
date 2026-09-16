@@ -1422,9 +1422,13 @@ def perf_ingest_cmd(account_id: str, competitor_id: str, account_name: str | Non
               help="output directory for the dashboard")
 @click.option("--min-impressions", "min_impressions", default=1000, show_default=True,
               help="drop attribute buckets thinner than this many impressions")
+@click.option("--taxonomy", "taxonomy_name", default=None,
+              help="creative attribute set (e.g. retail, spectrum_b2b). "
+                   "Default: the client's pin, which is retail everywhere today.")
 @click.option("--open", "open_after", is_flag=True, default=False, help="open when done")
 def perf_dashboard_cmd(competitor_ids: tuple[str, ...], out_dir: str,
-                       min_impressions: int, open_after: bool) -> None:
+                       min_impressions: int, taxonomy_name: str | None,
+                       open_after: bool) -> None:
     """Build the creative-performance dashboard for owned ad accounts.
 
     Cross-tabulates first-party performance against the vision-derived creative
@@ -1432,6 +1436,7 @@ def perf_dashboard_cmd(competitor_ids: tuple[str, ...], out_dir: str,
     rather than just which creatives exist.
     """
     from .synthesis.performance_dashboard import build_performance_dashboard
+    from .analysis.taxonomies import resolve as resolve_taxonomy
 
     out = Path(out_dir)
     with connect() as conn:
@@ -1439,6 +1444,10 @@ def perf_dashboard_cmd(competitor_ids: tuple[str, ...], out_dir: str,
             conn, out_dir=out,
             competitor_ids=list(competitor_ids) or None,
             min_impressions=min_impressions,
+            taxonomy=resolve_taxonomy(
+                client=(competitor_ids[0] if competitor_ids else None),
+                name=taxonomy_name,
+            ),
         )
     if not res:
         console.print("[yellow]no owned-account performance data — run `intel perf-ingest` first[/yellow]")
@@ -1446,7 +1455,7 @@ def perf_dashboard_cmd(competitor_ids: tuple[str, ...], out_dir: str,
     console.print(
         f"[green]wrote[/green] {res['path']}  "
         f"({res['brands']} brand(s) · {res['ads']} ads · ${res['spend']:,.0f} spend · "
-        f"{res['analyzed']} analyzed creatives)"
+        f"{res['analyzed']} analyzed creatives · taxonomy: {res['taxonomy']})"
     )
     if open_after:
         import webbrowser

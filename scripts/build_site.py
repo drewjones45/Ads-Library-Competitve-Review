@@ -64,6 +64,10 @@ VARIANT_LABELS = {
     # Retired once deploy-time presigning started serving the images: the label is
     # kept so an older report date that still has one renders with a sane name.
     "bundled-performance-dashboard": "Creative performance — images bundled",
+    # Same ads, same spend, re-analysed under the B2B taxonomy (see
+    # analysis/taxonomies.py). Published beside v1 rather than replacing it so the
+    # two attribute sets can be compared on identical delivery data.
+    "v2-performance-dashboard": "Creative performance v2 — B2B taxonomy",
 }
 
 

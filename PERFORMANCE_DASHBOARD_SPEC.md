@@ -706,6 +706,31 @@ Series ship **component metrics only**. Derived rates (CTR, ROAS, scroll-stop) a
 recomputed per bucket in the browser so a filtered sparkline stays exact rather
 than averaging pre-computed per-ad rates.
 
+### 7.7b Taxonomy selection (per client)
+
+The creative attribute set is per client, defined in `src/intel/analysis/taxonomies.py`.
+A `Taxonomy` carries both the JSON schema spliced into the vision prompt and the
+attribute lists the dashboard tabulates, so what the model emits and what the
+dashboard buckets cannot drift apart.
+
+`RETAIL` is the original set and the default; its prompt is byte-identical to the
+one that shipped before the split, and every existing deployment renders
+byte-identically. Resolution order is **explicit name > INTEL_TAXONOMY > client
+pin > RETAIL** — explicit beats the client pin because a v2 of a client runs from
+the same competitor id as its v1, so client lookup alone cannot tell them apart.
+
+`SPECTRUM_B2B` is the second set, built by reading Spectrum Reach's own creative.
+Entry requirement for an attribute was that it be observed VARYING: measured on
+the retail set, four of thirteen scalar attributes came back constant
+(`production_style`, `logo_visible`, `before_after_present`, `urgency_cues.present`)
+and a constant column cannot correlate with CTR or ROAS. The B2B set has zero
+constant attributes across the same 48 creatives.
+
+Both `vision_specs` AND the per-ad `A` payload must come from the selected
+taxonomy. Missing the second is a silent failure: the nav advertises an attribute
+and the browser then has no values to bucket, so only the keys the two taxonomies
+happen to share render.
+
 ### 7.8 Creative lightbox
 
 The drill-down card crops its thumbnail to a 9:16 box, so clicking it is the only
