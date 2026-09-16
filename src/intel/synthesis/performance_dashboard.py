@@ -39,6 +39,13 @@ log = logging.getLogger("intel.performance_dashboard")
 # exactly as before; build_performance_dashboard() swaps in another taxonomy's
 # lists for a run that asks for one.
 from ..analysis.taxonomies import RETAIL as _DEFAULT_TAXONOMY, resolve as resolve_taxonomy
+from .conversion_events import (
+    KIND_LABEL,
+    PURCHASE_SENTINEL,
+    build_catalog as build_event_catalog,
+    default_event as default_conversion_event,
+    per_ad_counts as per_ad_event_counts,
+)
 
 SCALAR_ATTRS = _DEFAULT_TAXONOMY.scalar_attrs
 LIST_ATTRS = _DEFAULT_TAXONOMY.list_attrs
@@ -134,7 +141,12 @@ def _fetch(conn: sqlite3.Connection, competitor_ids: list[str] | None) -> list[d
                MAX(p.frequency) AS frequency,
                -- One row per ad in the scoped window, so MAX just picks that
                -- ad's blob; NULL for ads ingested before attribution existed.
-               MAX(p.attribution_json) AS attribution_json
+               MAX(p.attribution_json) AS attribution_json,
+               -- Every conversion Meta reported for the ad, under its own
+               -- action_type. The flat columns above expose only the five the
+               -- retail funnel needs; a lead-gen account's outcomes have always
+               -- been in here, unread. See synthesis/conversion_events.py.
+               MAX(p.extra_json) AS extra_json
         FROM owned_ads oa
         LEFT JOIN ad_performance p
           ON p.platform_ad_id = oa.platform_ad_id{join_extra}
@@ -343,12 +355,16 @@ def _fetch_prior(conn: sqlite3.Connection, prior: tuple[str, str] | None,
         where.append(f"oa.competitor_id IN ({','.join('?' * len(competitor_ids))})")
         params.extend(competitor_ids)
     rows = conn.execute(f"""
-        SELECT oa.competitor_id, oa.account_name, oa.creative_class,
+        SELECT oa.platform_ad_id, oa.competitor_id, oa.account_name, oa.creative_class,
                oa.audience_stage, oa.audience_gender, oa.audience_age, oa.audience_geo,
                SUM(p.impressions) im, SUM(p.spend) sp, SUM(p.clicks) ck,
                SUM(p.purchases) pu, SUM(p.revenue) rv,
                SUM(p.video_3s) v3, SUM(p.video_plays) vp,
-               MAX(p.attribution_json) attribution_json
+               MAX(p.attribution_json) attribution_json,
+               -- The prior side has to be able to count the SAME event as the
+               -- current side; without it a "vs prior period" delta on leads
+               -- would be comparing leads against purchases.
+               MAX(p.extra_json) extra_json
         FROM owned_ads oa
         JOIN ad_performance p ON p.platform_ad_id = oa.platform_ad_id
         WHERE {' AND '.join(where)}
@@ -714,6 +730,10 @@ text-overflow:ellipsis}
 .chip select:hover{border-color:var(--accent)}
 .chip select:focus{outline:none;border-color:var(--accent)}
 .chip.set select{border-color:var(--accent);color:var(--accent)}
+/* A control that cannot act on the current selection, rather than one that is
+   merely unset — the attribution window while a custom conversion event is
+   chosen. Dimmed and non-interactive, but still readable. */
+.chip.off select{opacity:.45;cursor:not-allowed}
 .chip:after{content:"⌄";position:absolute;right:12px;top:47%;transform:translateY(-50%);
 pointer-events:none;color:var(--dim);font-size:13px}
 .chip.locked{background:var(--panel2);border:1px solid var(--line);border-radius:999px;
@@ -1043,6 +1063,14 @@ JS = r"""
   // attribution setting), so it is byte-identical to the pre-feature dashboard.
   var ATTR='default';
   function cv(a,m){
+    // A selected event replaces the conversion count and its value outright.
+    // Routing it through the same read-point as attribution means every
+    // surface that already respected the attribution window — tiles, CVR,
+    // funnel, attribute tables — follows the event for free.
+    if(CONV!==CONV_PU){
+      if(m==='pu') return (a.ev&&a.ev[CONV])||0;
+      if(m==='rv') return (a.evv&&a.evv[CONV])||0;
+    }
     if(ATTR==='default'||!a.attr) return a[m]||0;
     var w=a.attr[ATTR];
     return (w && w[m]!=null) ? w[m] : (a[m]||0);
@@ -1051,9 +1079,91 @@ JS = r"""
     '1d_click':'1-day click','7d_click':'7-day click','28d_click':'28-day click'};
   var HAS_ATTR=ADS.some(function(a){return a.attr;});
 
+  // --- outcome event ---------------------------------------------------------
+  // WHICH conversion this account is buying. Everything downstream — the
+  // conversion tile, CVR, CPA, the outcome column on every attribute table —
+  // counts whatever is selected here, so a lead-gen account reads in leads or
+  // phone calls instead of in purchases it never makes.
+  //
+  // CONV_PU is the sentinel for "the purchases/revenue columns as ingested". It
+  // is the default wherever revenue exists, and selecting it makes cv() fall
+  // straight through to the fields the dashboard always read.
+  //
+  // One asymmetry is deliberate and is surfaced in the note rather than papered
+  // over: attribution re-weighting only exists for purchases and revenue,
+  // because `attribution_json` breaks those out by window and arbitrary events
+  // are only reported on the account default. Picking a custom event therefore
+  // pins the window, and the attribution selector says so.
+  var CONV=CONV_DEFAULT;
+  var CONV_BY_KEY={};
+  CONV_EVENTS.forEach(function(e){CONV_BY_KEY[e.k]=e;});
+  function convDef(){ return CONV_BY_KEY[CONV]||null; }
+  function convLabel(){ var d=convDef(); return d?d.lab:'Purchases'; }
+  // Singular, for "cost per ___". Carried on the event rather than derived,
+  // because the head noun is not always last: "Calls placed" singularises to
+  // "call placed", which no trailing-s rule gets right.
+  function convOne(){
+    var d=convDef();
+    return d&&d.one ? d.one : convLabel().toLowerCase();
+  }
+  // Whether the SELECTED event carries revenue. This, not the account, is what
+  // makes ROAS real: an account can report revenue on purchases and none at all
+  // on the lead event you are looking at.
+  function convHasValue(){
+    var d=convDef();
+    return d ? !!d.hv : !!HAS_REV;
+  }
+  function convAttrLocked(){ return CONV!==CONV_PU; }
+  function convRateLabel(){
+    var one=convOne();
+    return one.charAt(0).toUpperCase()+one.slice(1)+' rate';
+  }
+
+  // What the outcome numbers are counting, in words. Always rendered where a
+  // non-purchase event is in play, because every conversion figure on the page
+  // then means something different from what this dashboard has meant before,
+  // and the reader has no other way to know which of Meta's forty-odd action
+  // types produced it.
+  function convNote(){
+    var d=convDef();
+    if(!d) return '';
+    var n='<b>Counting:</b> every conversion number on this page is <b>'+esc(d.lab)+
+      '</b>'+(d.al&&d.al.length?' (<code>'+esc(d.al[0])+'</code>)':'')+
+      ' — the tiles, the conversion rate, cost per '+esc(convOne())+
+      ', and the outcome column on every attribute table.';
+    if(!d.hv){
+      n+=' This event reports no revenue, so <b>ROAS and Revenue are not shown</b>: '+
+         'there is nothing to divide by, and a column of $0 would read as a '+
+         'measured result rather than an absent one.';
+    }
+    // Arbitrary events exist only on the account default window, because
+    // attribution_json breaks out purchases and revenue and nothing else.
+    n+=' Attribution windows are fixed to the account default while a custom '+
+       'event is selected — Meta only breaks conversions out by window for '+
+       'purchases and revenue. The <b>scale/kill</b> and <b>early read</b> '+
+       'charts, and the tile sparklines, are built on the daily and weekly '+
+       'series, which store purchases only — so they do not follow this choice.';
+    return n;
+  }
+
   function renderAttrNote(all){
     var el=document.getElementById('attrNote'); if(!el) return;
-    if(!HAS_ATTR){ el.style.display='none'; return; }
+    var cn=convNote();
+    // The attribution selector cannot do anything for a custom event, so it is
+    // disabled rather than left looking live and silently ignored.
+    var asel=document.getElementById('attrSel');
+    if(asel){
+      asel.disabled=convAttrLocked();
+      if(asel.disabled){ asel.value='default'; ATTR='default'; }
+      asel.closest('.chip').classList.toggle('off', asel.disabled);
+    }
+    // With the window locked, the attribution paragraph would contradict the
+    // one above it — it describes conversions moving with a selector that
+    // cannot move. The conversion note already states the lock and why.
+    if(!HAS_ATTR||convAttrLocked()){
+      if(!cn){ el.style.display='none'; return; }
+      el.style.display=''; el.innerHTML=cn; return;
+    }
     el.style.display='';
     var base='<b>Attribution:</b> conversions credited on the <b>'+ATTR_LABEL[ATTR]+
       '</b> window. Only conversions move with this — purchases, revenue, ROAS, CVR '+
@@ -1076,7 +1186,7 @@ JS = r"""
       extra=' At <b>28-day click</b>, the longest window, credit is at its most generous — '+
         'ROAS reads highest here because slow-converting click paths are all counted.';
     }
-    el.innerHTML=base+extra+caveat;
+    el.innerHTML=(cn?cn+'<br>':'')+base+extra+caveat;
   }
 
   // --- aggregation (single definition, used for buckets and baselines) ---
@@ -1094,6 +1204,11 @@ JS = r"""
     }
     return {ads:list.length,im:im,sp:sp,ck:ck,pu:pu,rv:rv,
       ctr:im?100*ck/im:0, cpm:im?1000*sp/im:0, roas:sp?rv/sp:0,
+      // Cost per conversion, in whichever event is selected. Zero conversions
+      // gives 0 rather than Infinity, and the formatter renders that as a dash
+      // — a bucket that produced none has no cost per one, and "$0.00" would
+      // read as free.
+      cpa:pu?sp/pu:0,
       // Conversion rate is purchases per CLICK, matching the CTR tile's
       // denominator so impressions → clicks → purchases reads as one chain.
       cvr:ck?100*pu/ck:0,
@@ -1104,9 +1219,14 @@ JS = r"""
     return st.ssr.toFixed(2)+'%<span class="vn" title="'+st.vads+
       ' video ad'+(st.vads===1?'':'s')+' of '+st.ads+'">&nbsp;('+st.vads+')</span>';
   }
-  function idxCell(v){
+  // `lower` marks a cost index, where 80 means 20% cheaper than the baseline
+  // and is GOOD. The number stays faithful to the ratio and only the colour
+  // flips — inverting the ratio instead would make the column read "higher is
+  // better" while silently no longer being a cost.
+  function idxCell(v,lower){
     if(!v||!isFinite(v)) return '<span class="flat">&mdash;</span>';
-    var c=v>=105?'up':(v<=95?'down':'flat');
+    var good=lower?(v<=95):(v>=105), bad=lower?(v>=105):(v<=95);
+    var c=good?'up':(bad?'down':'flat');
     return '<span class="idx '+c+'">'+v.toFixed(0)+'</span>';
   }
 
@@ -1449,7 +1569,16 @@ JS = r"""
     }
     return false;
   }
-  var SK_HASCONV=skHasConv();
+  // Revenue asked separately, because an account can report conversions and no
+  // revenue at all — which is exactly the case ROAS must disappear for.
+  function skHasRev(){
+    for(var i=0;i<ADS.length;i++){
+      var d=ADS[i].D; if(!d) continue;
+      for(var j=0;j<d.length;j++){ if((d[j][3]||0)>0) return true; }
+    }
+    return false;
+  }
+  var SK_HASCONV=skHasConv(), SK_HASREV=skHasRev();
   var SK_K=2.0, SK_METRIC=SK_HASCONV?'cpa':'cpm', SK_TARGET=null, SK_FRAME=null, SK_PLAYING=false, SK_TIMER=null;
   var SK_SPEED=1;   // timeline playback speed multiplier (1× / 0.5× / 0.25×)
   var SK_LAUNCH='', SK_ZONE='k';   // default to the kill list; '' = every zone
@@ -1595,7 +1724,13 @@ JS = r"""
     // does not leave the button bar disagreeing with the axis. Done before any
     // early return so the empty states are labelled correctly too.
     document.querySelectorAll('#skMetric .seg').forEach(function(b){
-      b.classList.toggle('on', b.dataset.m===SK_METRIC);
+      // A metric with nothing behind it is removed rather than offered and then
+      // silently blank. The daily series stores purchases and revenue only, so
+      // on a lead-gen account CPA has no numerator and ROAS has no dividend —
+      // and an option that always draws an empty chart reads as a broken page.
+      var dead=(b.dataset.m==='cpa'&&!SK_HASCONV)||(b.dataset.m==='roas'&&!SK_HASREV);
+      b.hidden=dead;
+      b.classList.toggle('on', !dead && b.dataset.m===SK_METRIC);
     });
     var hasDaily=pool.filter(function(a){return a.D&&a.D.length;});
     var launchInfo=fillLaunchSelect(hasDaily);
@@ -2378,7 +2513,7 @@ JS = r"""
     if(!n) return null;
     return {ads:n,im:im,sp:sp,ck:ck,pu:pu,rv:rv,
       ctr:im?100*ck/im:0, cpm:im?1000*sp/im:0, cvr:ck?100*pu/ck:0,
-      roas:sp?rv/sp:0, ssr:vim?100*v3/vim:null};
+      roas:sp?rv/sp:0, cpa:pu?sp/pu:0, ssr:vim?100*v3/vim:null};
   }
 
   function renderKpis(pool, all){
@@ -2391,6 +2526,10 @@ JS = r"""
     // soon as two tiles are both percentages with different precision.
     // hib = higher-is-better, which drives the delta COLOUR: a fall in CPM is
     // good news. null = neutral, where up is neither good nor bad.
+    // The weekly series behind the sparklines only breaks out purchases and
+    // revenue, so a custom event gets the tile without a sparkline rather than
+    // a purchases sparkline mislabelled as leads.
+    var isPu=(CONV===CONV_PU);
     var tiles=[
       {k:'Total spend',   cur:all.sp,   prev:P&&P.sp,   s:S&&S.sp,   hib:null, f:money},
       {k:'Impressions',   cur:all.im,   prev:P&&P.im,   s:S&&S.im,   hib:true, f:num},
@@ -2398,11 +2537,23 @@ JS = r"""
       {k:'Scroll-stop rate', cur:all.ssr, prev:P&&P.ssr, s:S&&S.ssr, hib:true, f:pct2},
       {k:'Clicks',        cur:all.ck,   prev:P&&P.ck,   s:S&&S.ck,   hib:true, f:num},
       {k:'Click through rate', cur:all.ctr, prev:P&&P.ctr, s:S&&S.ctr, hib:true, f:pct2},
-      {k:'Purchases',     cur:all.pu,   prev:P&&P.pu,   s:S&&S.pu,   hib:true, f:num},
-      {k:'Conversion rate',cur:all.cvr, prev:P&&P.cvr,  s:S&&S.cvr,  hib:true, f:pct2},
-      {k:'Revenue',       cur:all.rv,   prev:P&&P.rv,   s:S&&S.rv,   hib:true, f:money},
-      {k:'ROAS',          cur:all.roas, prev:P&&P.roas, s:S&&S.roas, hib:true, f:mult}
+      {k:isPu?'Purchases':convLabel(), cur:all.pu, prev:P&&P.pu,
+       s:isPu?(S&&S.pu):null, hib:true, f:num},
+      {k:isPu?'Conversion rate':convRateLabel(), cur:all.cvr,
+       prev:P&&P.cvr, s:isPu?(S&&S.cvr):null, hib:true, f:pct2}
     ];
+    // Revenue and ROAS exist only where the selected event carries revenue.
+    // Where it does not, the two tiles are replaced by the number a lead-gen
+    // account manages to — cost per conversion — rather than left showing $0.
+    if(convHasValue()){
+      tiles.push({k:'Revenue', cur:all.rv, prev:P&&P.rv,
+                  s:isPu?(S&&S.rv):null, hib:true, f:money});
+      tiles.push({k:'ROAS', cur:all.roas, prev:P&&P.roas,
+                  s:isPu?(S&&S.roas):null, hib:true, f:mult});
+    }else{
+      tiles.push({k:'Cost per '+convOne(), cur:all.cpa, prev:P&&P.cpa,
+                  s:null, hib:false, f:money2});
+    }
     document.getElementById('kpis').innerHTML=tiles.map(function(t){
       var pct=null;
       if(t.prev!==null&&t.prev!==undefined&&t.prev!==0&&t.cur!==null) pct=100*(t.cur-t.prev)/t.prev;
@@ -2422,6 +2573,47 @@ JS = r"""
         '<div class="delta '+cls+'">'+arrow+' '+(pct===null?'n/a':(pct>0?'+':'')+pct.toFixed(1)+'%')+'</div>'+
         '</div>'+(t.s?sparkline(t.s,hue):'')+'</div></div>';
     }).join('');
+  }
+
+  // ================================================ outcome column registry ===
+  // The last two columns of every attribute table, and the third index chart.
+  //
+  // ROAS is not hidden behind a toggle when there is no revenue — it is absent
+  // from the list, because there is nothing to divide by. That is the whole
+  // point: a column of `0.00` reads like a measured result, and on Spectrum it
+  // was eleven rows of measured nothing. Where revenue does exist the default
+  // is still ROAS, so a commerce dashboard opens exactly as it always did.
+  //
+  // `lower` marks a cost metric. It drives the index colour only — see idxCell.
+  var OUT_DEFS={
+    // Bare 2dp, matching the header rather than repeating the unit in every
+    // cell; the `x` suffix is used on the KPI tile where there is no header.
+    roas:{lab:function(){return 'ROAS';}, idx:function(){return 'ROAS idx';},
+          chart:function(){return 'ROAS index';}, lower:false,
+          fmt:function(v){return (v||0).toFixed(2);},
+          get:function(t){return t.roas;},
+          help:'revenue attributed to the ad / its spend'},
+    cpa:{lab:function(){return 'Cost per '+convOne();},
+         idx:function(){return 'CPA idx';},
+         chart:function(){return 'Cost per '+convOne()+' index';}, lower:true,
+         fmt:function(v){return v?money2(v):'\u2014';},
+         get:function(t){return t.cpa;},
+         help:'spend / conversions. Lower is better, so the index colours are '+
+              'inverted: below 100 means cheaper than the current filter average'},
+    cvr:{lab:function(){return convRateLabel();},
+         idx:function(){return 'CVR idx';},
+         chart:function(){return convRateLabel()+' index';}, lower:false,
+         fmt:pct2, get:function(t){return t.cvr;},
+         help:'conversions / clicks'}
+  };
+  var OUT=null;
+  function outOpts(){ return convHasValue()?['roas','cpa','cvr']:['cpa','cvr']; }
+  function outDef(){
+    // Also the repair path: switching to an event with no revenue while ROAS is
+    // selected drops to the first still-valid option rather than rendering NaN.
+    var opts=outOpts();
+    if(opts.indexOf(OUT)<0) OUT=opts[0];
+    return OUT_DEFS[OUT];
   }
 
   // One compact diverging bar chart for an attribute, indexing each value's
@@ -2453,7 +2645,9 @@ JS = r"""
        '" stroke="var(--fg)" stroke-dasharray="3 3" opacity=".45"/>';
     rows.forEach(function(r,i){
       var cy=PT+i*RH+RH/2;
-      var col=r.idx>=105?'var(--good)':(r.idx<=95?'var(--bad)':'var(--dim)');
+      var up=mk.lower?(r.idx<=95):(r.idx>=105);
+      var dn=mk.lower?(r.idx>=105):(r.idx<=95);
+      var col=up?'var(--good)':(dn?'var(--bad)':'var(--dim)');
       var x1=Math.min(zx,xo(r.idx)), x2=Math.max(zx,xo(r.idx)), good=r.idx>=100;
       s+='<text x="'+(PL-8)+'" y="'+(cy+3).toFixed(1)+'" text-anchor="end" '+
          'style="font-size:10px;fill:var(--fg)">'+esc(String(r.v).slice(0,18))+'</text>'+
@@ -2468,9 +2662,10 @@ JS = r"""
   }
 
   function attrCharts(ents, base){
+    var od=outDef();
     var c=attrBarChart(ents,{lab:'Scroll-stop index',bv:base.ssr,get:function(e){return e.ssr;}})+
           attrBarChart(ents,{lab:'CTR index',bv:base.ctr,get:function(e){return e.ctr;}})+
-          attrBarChart(ents,{lab:'ROAS index',bv:base.roas,get:function(e){return e.roas;}});
+          attrBarChart(ents,{lab:od.chart(),bv:od.get(base),get:od.get,lower:od.lower});
     return c?('<div class="ztrends attrtrends">'+c+'</div>'):'';
   }
 
@@ -2570,9 +2765,11 @@ JS = r"""
     if(ents.length<2) return '';
     ents.sort(function(x,y){return y.im-x.im;});
     var maxi=ents[0].im||1;
+    var od=outDef();
     var rows=ents.map(function(e,i){
       var rid=tid+'-'+i;
-      var ctrIdx=base.ctr?100*e.ctr/base.ctr:0, roasIdx=base.roas?100*e.roas/base.roas:0;
+      var ctrIdx=base.ctr?100*e.ctr/base.ctr:0;
+      var oB=od.get(base), oIdx=oB?100*od.get(e)/oB:0;
       var ssrIdx=(base.ssr&&e.ssr!==null)?100*e.ssr/base.ssr:0;
       DRILL[rid]=e.ads_list;
       return '<tr class="sum" data-target="'+rid+'">'+
@@ -2581,7 +2778,7 @@ JS = r"""
         '<td class="n">'+e.ads+'</td><td>'+num(e.im)+'</td><td>'+money(e.sp)+'</td>'+
         '<td>'+ssrCell(e)+'</td><td>'+idxCell(ssrIdx)+'</td>'+
         '<td>'+e.ctr.toFixed(2)+'%</td><td>'+idxCell(ctrIdx)+'</td>'+
-        '<td>$'+e.cpm.toFixed(2)+'</td><td>'+e.roas.toFixed(2)+'</td><td>'+idxCell(roasIdx)+'</td></tr>'+
+        '<td>$'+e.cpm.toFixed(2)+'</td><td>'+od.fmt(od.get(e))+'</td><td>'+idxCell(oIdx,od.lower)+'</td></tr>'+
         '<tr class="detail" id="'+rid+'" hidden><td colspan="11"><div class="drill"></div></td></tr>';
     }).join('');
     var secId='sec-'+tid;
@@ -2598,12 +2795,14 @@ JS = r"""
       '<th>impressions</th><th>spend</th>'+
       '<th title="3-second video views / impressions of video ads only">scroll-stop</th>'+
       '<th>SSR idx</th><th>CTR</th><th>CTR idx</th><th>CPM</th>'+
-      '<th>ROAS</th><th>ROAS idx</th></tr></thead><tbody>'+rows+'</tbody>'+
+      '<th title="'+esc(od.help)+'">'+esc(od.lab())+'</th>'+
+      '<th title="100 = the current filter baseline">'+esc(od.idx())+'</th>'+
+      '</tr></thead><tbody>'+rows+'</tbody>'+
       '<tfoot><tr><td class="n">baseline (current filter)</td><td class="n">'+base.ads+'</td>'+
       '<td class="n">'+num(base.im)+'</td><td class="n">'+money(base.sp)+'</td>'+
       '<td class="n">'+(base.ssr===null?'&mdash;':base.ssr.toFixed(2)+'%')+'</td><td class="n">100</td>'+
       '<td class="n">'+base.ctr.toFixed(2)+'%</td><td class="n">100</td>'+
-      '<td class="n">$'+base.cpm.toFixed(2)+'</td><td class="n">'+base.roas.toFixed(2)+'</td>'+
+      '<td class="n">$'+base.cpm.toFixed(2)+'</td><td class="n">'+od.fmt(od.get(base))+'</td>'+
       '<td class="n">100</td></tr></tfoot></table></div></section>';
   }
 
@@ -2724,7 +2923,13 @@ JS = r"""
       host.querySelectorAll('[data-mc]').forEach(function(b){b.classList.toggle('on',+b.dataset.mc===ER_MINCLK);});
       return;
     }
-    var sigBtns=['cpc','cpm','ctr','cvr','roas'].map(function(k){
+    // CVR and ROAS are computed from the same daily purchases/revenue columns,
+    // so they are offered only where those columns carry something.
+    var sigKeys=['cpc','cpm','ctr'];
+    if(SK_HASCONV) sigKeys.push('cvr');
+    if(SK_HASREV)  sigKeys.push('roas');
+    if(sigKeys.indexOf(ER_SIGNAL)<0) ER_SIGNAL=sigKeys[0];
+    var sigBtns=sigKeys.map(function(k){
       return '<button class="seg'+(k===ER_SIGNAL?' on':'')+'" data-sig="'+k+'" type="button">'+
         ER_SIGNALS[k].lab+'</button>';}).join('');
     var outBtns=[['final','Final spend'],['post','Post-window']].map(function(o){
@@ -3529,6 +3734,63 @@ JS = r"""
     render();
   });
 
+  // --- conversion event + outcome metric -------------------------------------
+  // Both lists are built from the account's own delivery, so a deployment that
+  // only ever produces leads never sees a purchase option and vice versa.
+  function fillOutSel(){
+    var sel=document.getElementById('outSel');
+    sel.innerHTML=outOpts().map(function(k){
+      return '<option value="'+k+'"'+(k===OUT?' selected':'')+'>'+
+             esc(OUT_DEFS[k].lab())+'</option>';
+    }).join('');
+  }
+  function buildConvControls(){
+    var wrap=['convLbl','convChip','outLbl','outChip'].map(function(id){
+      return document.getElementById(id);
+    });
+    // Nothing to choose between: no catalogue and no revenue means there is no
+    // outcome to report at all, and two empty dropdowns would only be noise.
+    if(!CONV_EVENTS.length && !HAS_REV){
+      wrap.forEach(function(el){ if(el) el.style.display='none'; });
+      return;
+    }
+    var sel=document.getElementById('convSel'), html='';
+    if(HAS_REV){
+      html+='<option value="'+esc(CONV_PU)+'"'+(CONV===CONV_PU?' selected':'')+
+            '>Purchases (as ingested)</option>';
+    }
+    var kinds=[];
+    CONV_EVENTS.forEach(function(e){ if(kinds.indexOf(e.kind)<0) kinds.push(e.kind); });
+    kinds.forEach(function(kind){
+      var group=CONV_EVENTS.filter(function(e){return e.kind===kind;});
+      html+='<optgroup label="'+esc(KIND_LABEL[kind]||kind)+'">';
+      group.forEach(function(e){
+        // The tooltip carries the raw Meta action types the number is summed
+        // from — the reader is picking a denominator for a cost target, and
+        // which surface it came from is what makes it auditable.
+        html+='<option value="'+esc(e.k)+'"'+(e.k===CONV?' selected':'')+
+              ' title="'+esc(e.al.join(', '))+'">'+esc(e.lab)+
+              ' \u00b7 '+num(e.n)+'</option>';
+      });
+      html+='</optgroup>';
+    });
+    sel.innerHTML=html;
+    outDef(); fillOutSel();
+    sel.addEventListener('change',function(){
+      CONV=this.value;
+      this.closest('.chip').classList.toggle('set', CONV!==CONV_DEFAULT);
+      // Switching to an event with no revenue must drop ROAS before anything
+      // renders, or the outcome column divides by a revenue that is not there.
+      outDef(); fillOutSel();
+      render();
+    });
+    document.getElementById('outSel').addEventListener('change',function(){
+      OUT=this.value;
+      this.closest('.chip').classList.toggle('set', OUT!==outOpts()[0]);
+      render();
+    });
+  }
+
   document.querySelectorAll('#rankSegs .seg').forEach(function(b){
     b.addEventListener('click',function(){
       document.querySelectorAll('#rankSegs .seg').forEach(function(x){x.classList.remove('on');});
@@ -3610,6 +3872,7 @@ JS = r"""
   })();
 
   buildFilterBar();
+  buildConvControls();
   render();
   renderTags();
   wireTags();
@@ -3647,6 +3910,27 @@ def build_performance_dashboard(
     )
     meta_specs = [(k, lab, kind, False) for k, lab, kind in META_SPECS]
     tail_specs = [(k, lab, kind, False) for k, lab, kind in TAIL_SPECS]
+
+    # ---------------------------------------------------------- outcomes ---
+    # What this account is actually trying to buy. A retailer buys revenue and
+    # the dashboard's ROAS column is the right headline; a lead-gen account buys
+    # leads or phone calls, and ROAS is a column of zeros that crowds out the
+    # only numbers that matter. Both the event list and the opening choice are
+    # derived from delivery, so nothing has to be configured per client.
+    #
+    # `has_revenue` is the switch. Where revenue exists the default is the
+    # purchase sentinel, which reads the same `pu`/`rv` fields the dashboard has
+    # always read — so a commerce deployment renders byte-identically to before
+    # this feature and ROAS stays exactly where it was.
+    total_revenue = sum(r.get("revenue") or 0 for r in rows)
+    conv_catalog = build_event_catalog(rows)
+    conv_default = default_conversion_event(
+        conv_catalog, has_revenue=total_revenue > 0
+    )
+    ev_counts, ev_values = per_ad_event_counts(rows, conv_catalog)
+    log.info("conversion events: %d in catalogue, default=%s (revenue %s)",
+             len(conv_catalog), conv_default,
+             "present" if total_revenue > 0 else "absent")
 
     # Shipped taxonomy customisations. The tag manager exports a creative_tags.json;
     # dropping it next to the dashboard makes those edits the default everyone sees
@@ -3704,6 +3988,15 @@ def build_performance_dashboard(
             # "how has this asset performed since launch" answerable.
             "cr": (r.get("created_time") or "")[:10],
         }
+        # Per-event conversion counts, zeros omitted. Only shipped when the
+        # account has more outcomes than the purchase columns already carry, so
+        # a commerce dashboard's payload is unchanged.
+        evc = ev_counts.get(rec["id"])
+        if evc:
+            rec["ev"] = {k: round(v, 2) for k, v in evc.items()}
+        evv = ev_values.get(rec["id"])
+        if evv:
+            rec["evv"] = {k: round(v, 2) for k, v in evv.items()}
         # Per-window conversion components. The dashboard re-weights purchases,
         # revenue and the funnel conversion steps from this; `default` equals the
         # flat fields above. Absent for ads ingested before attribution existed.
@@ -3779,6 +4072,9 @@ def build_performance_dashboard(
     rank_window = rows[0].get("_rank_window") if rows else None
     days: list[str] = (rows[0].get("_days") or []) if rows else []
     prior_rows = _fetch_prior(conn, prior_window, competitor_ids)
+    # Counted against the CURRENT period's catalogue, not the prior period's own
+    # — the point of comparison is one event measured twice.
+    pev_counts, pev_values = per_ad_event_counts(prior_rows, conv_catalog)
     def _prow(pr: dict) -> dict:
         rec = {"b": pr.get("competitor_id") or "", "ac": pr.get("account_name") or "",
                "cl": pr.get("creative_class") or "unknown",
@@ -3796,6 +4092,13 @@ def build_performance_dashboard(
                 rec["attr"] = json.loads(pr["attribution_json"])
             except (json.JSONDecodeError, TypeError):
                 pass
+        pid = pr.get("platform_ad_id") or ""
+        pc = pev_counts.get(pid)
+        if pc:
+            rec["ev"] = {k: round(v, 2) for k, v in pc.items()}
+        pv = pev_values.get(pid)
+        if pv:
+            rec["evv"] = {k: round(v, 2) for k, v in pv.items()}
         return rec
     pads = [_prow(pr) for pr in prior_rows]
 
@@ -3854,6 +4157,13 @@ def build_performance_dashboard(
         '<option value="1d_click">1-day click</option>'
         '<option value="7d_click">7-day click</option>'
         '<option value="28d_click">28-day click</option>'
+        '</select></span>'
+        '<span class="flabel" id="convLbl">Conversion</span>'
+        '<span class="chip conv" id="convChip"><select id="convSel" '
+        'title="Which conversion event every outcome number counts"></select></span>'
+        '<span class="flabel" id="outLbl">Outcome</span>'
+        '<span class="chip conv" id="outChip"><select id="outSel" '
+        'title="The metric in the last two columns of every attribute table">'
         '</select></span>'
         '<span class="flabel">Compare</span>'
         '<span class="segs">'
@@ -3999,9 +4309,13 @@ def build_performance_dashboard(
         "the scale/kill chart accumulates day by day so an ad's position reflects spend up "
         "to the selected date. Zone boundaries are a confidence band around a target, not a "
         "fixed threshold — see the note under that chart for the formula and its limits. "
-        "CTR/ROAS index: 100 = the baseline for the <em>current filter</em>, so "
+        "Every index column: 100 = the baseline for the <em>current filter</em>, so "
         "indices re-base as you narrow. Above 100 is better than that baseline, below is "
-        "worse. Audience facets are derived from each ad set's targeting spec (custom "
+        "worse &mdash; except on a <em>cost</em> index, where below 100 is cheaper and "
+        "therefore better, and the colours invert to match. The outcome column is "
+        "whichever metric the <em>Outcome</em> selector holds, counting whichever event "
+        "the <em>Conversion</em> selector holds; ROAS is offered only when that event "
+        "actually reports revenue. Audience facets are derived from each ad set's targeting spec (custom "
         "audiences, age, gender, geo); funnel stage is inferred, since Meta exposes no "
         "explicit prospecting/retargeting flag. Scroll-stop rate is 3-second video views "
         "divided by the impressions of <em>video ads only</em> — static and catalog-image "
@@ -4029,6 +4343,11 @@ def build_performance_dashboard(
         f"var VISION_SPECS={json.dumps(vision_specs)};"
         f"var TAG_META={json.dumps(t.tag_meta)};"
         f"var TAG_SAVED={json.dumps(saved_tags)};"
+        f"var CONV_EVENTS={json.dumps([e.to_json() for e in conv_catalog])};"
+        f"var KIND_LABEL={json.dumps(KIND_LABEL)};"
+        f"var CONV_DEFAULT={json.dumps(conv_default)};"
+        f"var CONV_PU={json.dumps(PURCHASE_SENTINEL)};"
+        f"var HAS_REV={json.dumps(total_revenue > 0)};"
         f"var MINIMP={int(min_impressions)};var MAXC={MAX_CARDS_PER_BUCKET};"
         f"var BUCKETS={json.dumps(buckets)};"
         f"var DAYS={json.dumps(days)};"
