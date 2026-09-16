@@ -68,6 +68,12 @@ VARIANT_LABELS = {
     # analysis/taxonomies.py). Published beside v1 rather than replacing it so the
     # two attribute sets can be compared on identical delivery data.
     "v2-performance-dashboard": "Creative performance v2 — B2B taxonomy",
+    # Same ads and the same B2B taxonomy as v2, rebuilt once the outcome metric
+    # became per account (see PERFORMANCE_DASHBOARD_SPEC.md §7.7c). v2's outcome
+    # column was ROAS on an account with no revenue, so it read 0.00 throughout;
+    # v3 counts leads and shows cost per lead. Published beside v2 rather than
+    # replacing it so the difference the change makes is visible.
+    "v3-performance-dashboard": "Creative performance v3 — lead outcomes",
 }
 
 
