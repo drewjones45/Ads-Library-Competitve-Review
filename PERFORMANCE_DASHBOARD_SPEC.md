@@ -731,6 +731,70 @@ taxonomy. Missing the second is a silent failure: the nav advertises an attribut
 and the browser then has no values to bucket, so only the keys the two taxonomies
 happen to share render.
 
+### 7.7c Conversion event selection (per account)
+
+The dashboard was built for a retailer, so its outcome column was ROAS and its
+conversion count was `purchases`. On a lead-gen account both are structurally
+zero — Spectrum Reach reports $0 revenue and 0 purchases on every ad — leaving
+eleven rows of `0.00` that read as a measured result rather than an absent one.
+The conversions were never missing: they sit in `ad_performance.extra_json` under
+names nothing read (496 `lead`, 2,997 `click_to_call_native_call_placed`).
+
+`src/intel/synthesis/conversion_events.py` turns that blob into a short catalogue
+and the dashboard offers it as a **Conversion** selector, with an **Outcome**
+selector beside it (ROAS / cost per conversion / conversion rate).
+
+**De-duplication is the hard part.** Meta reports the same conversion many times:
+Spectrum's 48 raw `action_type`s are 35 distinct conversions, JD Sports' 101 are
+78. Three sources, three passes:
+
+| duplicate source | example | handled by |
+|---|---|---|
+| attribution surface | `lead`, `onsite_web_lead`, `offsite_conversion.fb_pixel_lead` | named families |
+| conversion sets | six Spectrum events all worth exactly 737 | dropping `*_add_<set>` outright |
+| `*_grouped` roll-ups | `call_confirm_grouped` = `click_to_call_call_confirm` | per-ad value identity |
+
+Name-matching alone misses the 737s (no shared stem). Value-identity alone splits
+the leads (`lead` 496 vs `offsite_conversion.fb_pixel_lead` 494). Both are needed.
+Within a group the canonical NAME is scored, not just shortened — the shortest of
+Spectrum's seven 737s is `offsite_purchase_add_20_s_calls`, which would present
+phone calls as purchases on an account with no purchases at all.
+
+**Engagement is classified, then dropped.** `page_engagement`, `post_reaction`,
+`video_view` and friends are identified positively so they can be excluded: a
+page like is not an outcome, and allowing one as the CPA denominator produces a
+confident-looking cost-per-like.
+
+**Default selection.** `has_revenue` settles it. Where revenue exists the default
+is the `__pu` sentinel — the `pu`/`rv` columns as ingested — so **every commerce
+deployment renders byte-identically** and ROAS stays exactly where it was.
+Otherwise the highest-priority kind present wins, broken by ad coverage
+(purchase > lead > call > signup > message > app > funnel > traffic > other).
+On Spectrum that picks `lead`, matching the `OFFSITE_CONVERSIONS` goal 46 of its
+adsets optimise for.
+
+**ROAS is absent, not hidden**, when the *selected event* carries no revenue —
+note the subject: an account can report revenue on purchases and none on the lead
+event in view, so availability is a property of the event, not the account.
+Revenue and ROAS tiles are replaced by a cost-per-conversion tile.
+
+**One read-point does the work.** `cv(a,'pu')` already existed as the single
+place attribution re-weighting was applied; a selected event overrides `pu`/`rv`
+there, so tiles, CVR, the funnel, baselines and every attribute table follow for
+free. Two surfaces cannot follow and say so in the note: `ad_performance_series`
+and `ad_daily` store purchases and revenue only, so the **scale/kill** and
+**early read** charts and the tile sparklines stay on purchases — and their
+purchase-derived options are hidden outright where those columns are empty.
+
+**Attribution is pinned** to the account default while a custom event is
+selected, and the selector is visibly disabled. `attribution_json` breaks out
+purchases and revenue by window and nothing else.
+
+**Cost indices invert colour, not value.** A CPA index stays a faithful ratio —
+80 means 20% cheaper than the filter baseline — and only the green/red flips.
+Inverting the ratio instead would leave a column that reads "higher is better"
+while silently no longer being a cost.
+
 ### 7.8 Creative lightbox
 
 The drill-down card crops its thumbnail to a 9:16 box, so clicking it is the only
@@ -773,9 +837,9 @@ CTRs lets a 200-impression ad swing the mean as hard as a 2M-impression one.
 CTR            = 100 * Σclicks / Σimpressions
 CPM            = 1000 * Σspend / Σimpressions
 CPC            = Σspend / Σclicks
-ROAS           = Σrevenue / Σspend
-CPA            = Σspend / Σpurchases
-CVR            = 100 * Σpurchases / Σclicks     ← per CLICK, matching CTR's chain
+ROAS           = Σrevenue / Σspend              ← only where the event has revenue
+CPA            = Σspend / Σconversions
+CVR            = 100 * Σconversions / Σclicks   ← per CLICK, matching CTR's chain
 Scroll-stop    = 100 * Σvideo_3s / Σimpressions_of_video_ads_only
 Cost / 3s view = Σspend / Σvideo_3s
 ```
@@ -786,8 +850,14 @@ rate toward zero for reasons unrelated to the creative. Only ads with
 `video_plays > 0` contribute impressions, and the count of such ads (`vads`) is
 surfaced in brackets next to every value so a thin video sample is visible.
 
-**Indices**: `ctr_index = 100 * bucket.ctr / baseline.ctr`, same for ROAS.
-`100` = the baseline **for the current filter**, so indices re-base as you narrow.
+`Σconversions` is whichever event the **Conversion** selector holds (§7.7c);
+it is `purchases` wherever the account reports revenue, which is every commerce
+deployment.
+
+**Indices**: `ctr_index = 100 * bucket.ctr / baseline.ctr`, same for the outcome
+column. `100` = the baseline **for the current filter**, so indices re-base as you
+narrow. On a **cost** index (CPA) below 100 is cheaper and therefore better; the
+value stays a faithful ratio and only the colour inverts.
 
 **Bucket floor**: any attribute value with fewer than `min_impressions` (default
 1,000) impressions is dropped. A table with fewer than 2 surviving buckets is not
