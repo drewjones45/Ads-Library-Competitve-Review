@@ -32,6 +32,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from intel.storage import popularity_score  # noqa: E402
+from s3_assets import ensure_local  # noqa: E402 — same dir; no-op if S3 isn't configured
 
 ASSET_TYPE_TO_CONTEXT = {
     "image": "meta_ad",
@@ -147,7 +148,7 @@ def main() -> None:
                 "popularity": round(g["score"], 3),
             }
             if fam == "video":
-                sidecar = Path(g["path"]).parent / "video_meta.json"
+                sidecar = ensure_local(Path(g["path"]).parent / "video_meta.json")
                 task["sidecar_path"] = str(sidecar)
                 if sidecar.exists():
                     try:
@@ -155,7 +156,7 @@ def main() -> None:
                         task["frames"] = [
                             {"path": f["path"], "t_sec": f.get("t_sec")}
                             for f in (meta.get("frames") or [])
-                            if Path(f["path"]).exists()
+                            if ensure_local(f["path"]).exists()
                         ]
                         task["duration_sec"] = meta.get("duration_sec")
                         task["transcript_full"] = meta.get("transcript_full")
@@ -163,7 +164,7 @@ def main() -> None:
                     except Exception as e:
                         task["sidecar_error"] = str(e)
             elif fam == "landing":
-                sidecar = Path(g["path"]).parent / "landing_meta.json"
+                sidecar = ensure_local(Path(g["path"]).parent / "landing_meta.json")
                 if sidecar.exists():
                     try:
                         meta = json.loads(sidecar.read_text())

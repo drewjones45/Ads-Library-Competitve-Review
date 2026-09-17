@@ -22,7 +22,21 @@ from .creative import analyze_creative_image
 from .landing_analysis import analyze_landing_page
 from .text_ad_analysis import analyze_text_ad
 from .video import analyze_creative_video
-from ..config import load_settings
+from ..config import ROOT, load_settings
+
+try:
+    # scripts/s3_assets.py isn't part of the installed package (it's a
+    # standalone script, deliberately — see its own docstring), so this
+    # crosses the layering boundary the other direction from how every other
+    # scripts/*.py already imports FROM intel.*. Guarded because a missing/
+    # unimportable script must never break plain local vision analysis for a
+    # deployment that's never touched S3 at all.
+    import sys as _sys
+    _sys.path.insert(0, str(ROOT / "scripts"))
+    from s3_assets import ensure_local  # noqa: E402
+except Exception:  # noqa: BLE001
+    def ensure_local(path):  # type: ignore[misc]
+        return Path(path)
 from ..storage import audit, connect, utcnow
 
 
@@ -166,7 +180,7 @@ def analyze_pending(
         report.examined = len(rows)
 
         for row in rows:
-            path = Path(row["asset_path"])
+            path = ensure_local(row["asset_path"])
             if not path.exists():
                 report.skipped_missing_file += 1
                 continue
@@ -190,7 +204,7 @@ def analyze_pending(
                 if asset_type in ("video", "video_evicted"):
                     # Video pipeline: read sidecar next to the mp4 (or first
                     # frame, for evicted ones) and analyze the frame sequence.
-                    sidecar = path.parent / "video_meta.json"
+                    sidecar = ensure_local(path.parent / "video_meta.json")
                     if not sidecar.exists():
                         report.failed += 1
                         report.errors.append({
@@ -204,7 +218,7 @@ def analyze_pending(
                     # CTA, page intent, trust signals, what works/misses) rather
                     # than the ad-creative taxonomy. The URL + classified section
                     # live in a sidecar written at capture time.
-                    sidecar = path.parent / "landing_meta.json"
+                    sidecar = ensure_local(path.parent / "landing_meta.json")
                     meta = {}
                     if sidecar.exists():
                         try:

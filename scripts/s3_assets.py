@@ -67,6 +67,7 @@ import argparse
 import hashlib
 import json
 import mimetypes
+import os
 import re
 import sys
 import urllib.error
@@ -140,6 +141,106 @@ def client_prefix(base_prefix: str, assets_dirname: str) -> str:
     what's still referenced) has no way to tell one client's objects from
     another's under a shared flat prefix."""
     return f"{base_prefix.strip('/')}/{client_slug(assets_dirname)}"
+
+
+# --------------------------------------------------------------- sidecar archive
+#
+# Non-media files (video_meta.json, landing_meta.json, the raw landing.html
+# capture) are never referenced by a dashboard's <img>/<video> tags, so they
+# have no business in EXTS or the rewrite/verify pipeline built for those —
+# nothing should ever try to turn one into a public-facing URL. But they ARE
+# real re-analysis input (analysis/creative_batch.py and
+# scripts/cc_vision_prep.py both read video_meta.json straight off disk), so
+# once a deployment's assets are untracked from git, a fresh machine loses the
+# ability to re-analyze video ads unless these are backed up somewhere too.
+#
+# Kept under a distinct top segment (SIDECAR_SEG, not HASH_SEG) specifically so
+# `prune`'s orphan-detection — which only ever computes HASH_SEG keys for
+# EXTS-matching files — doesn't mistake an archived sidecar for garbage. See
+# cmd_prune, which was taught about this segment for exactly that reason.
+SIDECAR_SEG = "sidecars"
+DEFAULT_SIDECAR_EXCLUDE = {".ds_store"}  # OS junk — never worth archiving
+
+
+def sidecar_key(path: Path, prefix: str) -> tuple[str, str]:
+    """(sha256, key) for a non-media sidecar file — same content-addressing as
+    content_key, different top segment so the two namespaces can never collide
+    or be confused by tooling that only knows about one of them."""
+    h = hashlib.sha256(path.read_bytes()).hexdigest()
+    ext = path.suffix.lower()
+    return h, f"{prefix}/{SIDECAR_SEG}/{h[:2]}/{h}{ext}"
+
+
+def _tree_relpath(path: Path) -> tuple[str, str] | None:
+    """('spectrum_assets', 'creative/x/video_meta.json') for a path somewhere
+    under data/<x>_assets/, or None if it isn't under one. Used by ensure_local
+    to figure out which client's manifest to consult for an arbitrary local
+    path — the same walk-up-to-the-tree-root rel_under_data relies on."""
+    for parent in path.resolve().parents:
+        if parent.name.endswith("_assets") and parent.parent.name == "data":
+            return parent.name, path.resolve().relative_to(parent).as_posix()
+    return None
+
+
+_manifest_cache: dict[tuple[str, str, str], dict[str, str]] = {}
+
+
+def _fetch_manifest(bucket: str, region: str, prefix: str, tree: str, which: str) -> dict[str, str]:
+    """which: 'manifest' (images) or 'sidecars-manifest'. Cached per (bucket,
+    prefix, tree, which) so a batch touching hundreds of creatives fetches each
+    manifest once, not once per file."""
+    ck = (bucket, f"{prefix}/{which}", tree)
+    if ck in _manifest_cache:
+        return _manifest_cache[ck]
+    s3 = _client(region)
+    key = f"{client_prefix(prefix, tree)}/{which}/{tree}.json"
+    try:
+        body = s3.get_object(Bucket=bucket, Key=key)["Body"].read()
+        manifest = json.loads(body)
+    except Exception:  # noqa: BLE001 — no manifest yet, or no network/creds
+        manifest = {}
+    _manifest_cache[ck] = manifest
+    return manifest
+
+
+def ensure_local(path: Path | str) -> Path:
+    """If `path` doesn't exist locally but sits under a data/<client>_assets/
+    tree that's been archived to S3 (images via `upload`, everything else via
+    `archive-sidecars`), fetch it and write it into place. Returns `path`
+    either way — callers keep their existing `.exists()` check as the only
+    thing that changes is whether it now succeeds.
+
+    Deliberately fails silent, not loud: no AWS_S3_BUCKET/AWS_S3_PREFIX set, no
+    boto3 installed, no network, no entry in the manifest — any of these just
+    means `path` still doesn't exist afterward, exactly like before this
+    function existed. This is a nice-to-have overlay on a workflow that already
+    worked without it, never a new hard dependency for callers that don't
+    configure S3 at all.
+    """
+    p = Path(path)
+    if p.exists():
+        return p
+    bucket = os.environ.get("AWS_S3_BUCKET")
+    base_prefix = os.environ.get("AWS_S3_PREFIX")
+    region = os.environ.get("AWS_REGION", "us-east-1")
+    if not bucket or not base_prefix:
+        return p
+    located = _tree_relpath(p)
+    if located is None:
+        return p
+    tree, rel = located
+    try:
+        s3 = _client(region)
+        for which in ("sidecars-manifest", "manifest"):
+            manifest = _fetch_manifest(bucket, region, base_prefix, tree, which)
+            key = manifest.get(rel)
+            if key:
+                p.parent.mkdir(parents=True, exist_ok=True)
+                s3.download_file(bucket, key, str(p))
+                return p
+    except Exception:  # noqa: BLE001 — see docstring: fail silent, not loud
+        pass
+    return p
 
 
 def _client(region: str, signature: str = "s3v4"):
@@ -278,6 +379,86 @@ def cmd_upload(args) -> int:
     print(f"uploaded {put}, failed {failed}  "
           f"({uniq_bytes / 1e6:.1f} MB unique of {local_bytes / 1e6:.1f} MB on disk)")
     print(f"prefix:   s3://{args.bucket}/{prefix}/{HASH_SEG}/")
+    print(f"manifest: s3://{args.bucket}/{mkey}")
+    return 1 if failed else 0
+
+
+# -------------------------------------------------------------------- archive-sidecars
+
+
+def cmd_archive_sidecars(args) -> int:
+    """Back up the non-media files upload/rewrite/verify/prune never touch —
+    video_meta.json, landing_meta.json, the raw landing.html capture — so a
+    machine other than the one that first ingested a deployment can still
+    re-analyze its video/landing creative later. See ensure_local(), which is
+    what actually reads this archive back."""
+    local = (ROOT / args.local_dir) if not Path(args.local_dir).is_absolute() else Path(args.local_dir)
+    if not local.is_dir():
+        sys.exit(f"not a directory: {local}")
+    files = [p for p in sorted(local.rglob("*"))
+             if p.is_file()
+             and p.suffix.lower().lstrip(".") not in EXTS
+             and p.name.lower() not in DEFAULT_SIDECAR_EXCLUDE]
+    if not files:
+        print(f"no non-media files under {local} (or all excluded)")
+        return 0
+
+    s3 = _client(args.region)
+    prefix = client_prefix(args.prefix, local.name)
+
+    by_key: dict[str, Path] = {}
+    manifest: dict[str, str] = {}
+    for p in files:
+        _, key = sidecar_key(p, prefix)
+        by_key.setdefault(key, p)
+        manifest[p.relative_to(local).as_posix()] = key
+
+    existing: set[str] = set()
+    paginator = s3.get_paginator("list_objects_v2")
+    for page in paginator.paginate(Bucket=args.bucket, Prefix=f"{prefix}/{SIDECAR_SEG}/"):
+        for o in page.get("Contents", []):
+            existing.add(o["Key"])
+
+    todo = {k: v for k, v in by_key.items() if k not in existing}
+    dupes = len(files) - len(by_key)
+    print(f"{len(files)} local non-media file(s), {len(by_key)} distinct "
+          f"({dupes} duplicate{'' if dupes == 1 else 's'} collapsed)")
+    print(f"{len(by_key) - len(todo)} already archived, {len(todo)} to upload")
+
+    if args.dry_run:
+        for k, p in list(todo.items())[:10]:
+            print(f"  would put {k}  <- {p.name}")
+        return 0
+
+    put = failed = 0
+
+    def send(item):
+        nonlocal put, failed
+        key, p = item
+        ctype = mimetypes.guess_type(p.name)[0] or "application/octet-stream"
+        try:
+            s3.put_object(Bucket=args.bucket, Key=key, Body=p.read_bytes(),
+                          ContentType=ctype, CacheControl="no-cache")
+            put += 1
+        except Exception as exc:  # noqa: BLE001
+            failed += 1
+            print(f"  FAIL {key}: {exc}", file=sys.stderr)
+
+    with ThreadPoolExecutor(max_workers=args.workers) as pool:
+        list(pool.map(send, todo.items()))
+
+    mkey = f"{prefix}/sidecars-manifest/{local.name}.json"
+    try:
+        s3.put_object(
+            Bucket=args.bucket, Key=mkey,
+            Body=json.dumps(manifest, indent=1, sort_keys=True).encode(),
+            ContentType="application/json", CacheControl="no-cache",
+        )
+    except Exception as exc:  # noqa: BLE001
+        print(f"  WARNING: manifest not written: {exc}", file=sys.stderr)
+
+    print(f"archived {put}, failed {failed}")
+    print(f"prefix:   s3://{args.bucket}/{prefix}/{SIDECAR_SEG}/")
     print(f"manifest: s3://{args.bucket}/{mkey}")
     return 1 if failed else 0
 
@@ -562,15 +743,24 @@ def cmd_prune(args) -> int:
 
     # Each local tree is scoped to its own client segment (client_prefix), same
     # as upload/rewrite — otherwise every client's wanted-set would collide under
-    # one flat namespace and this could never tell them apart.
+    # one flat namespace and this could never tell them apart. Sidecar-archived
+    # files (SIDECAR_SEG) are included here too, not just HASH_SEG — otherwise
+    # every video_meta.json/landing.html ensure_local() can fetch would look
+    # unreferenced (prune has no other way to know about them) and --delete
+    # would remove the only backup copy that exists.
     wanted: set[str] = set()
     trees = 0
     for tree in sorted((ROOT / "data").glob("*_assets")):
         trees += 1
         full_prefix = client_prefix(base_prefix, tree.name)
         for f in tree.rglob("*"):
-            if f.is_file() and f.suffix.lower().lstrip(".") in EXTS:
+            if not f.is_file():
+                continue
+            suffix = f.suffix.lower().lstrip(".")
+            if suffix in EXTS:
                 wanted.add(content_key(f, full_prefix)[1])
+            elif f.name.lower() not in DEFAULT_SIDECAR_EXCLUDE:
+                wanted.add(sidecar_key(f, full_prefix)[1])
     print(f"{len(wanted)} distinct object(s) referenced by {trees} local asset tree(s)")
 
     # size + last-modified per object — LastModified doesn't change the key
@@ -585,16 +775,24 @@ def cmd_prune(args) -> int:
     # The manifests describe the store; they are not themselves assets. Matched
     # as a path segment rather than a prefix startswith, since a manifest can now
     # sit under any client's sub-prefix (<base_prefix>/<client>/manifest/...).
+    # "/sidecars-manifest/" is checked separately — it does NOT contain "/manifest/"
+    # as a substring (the character before "manifest" is "-", not "/").
     orphans = {k: v for k, v in live.items()
-               if k not in wanted and "/manifest/" not in k}
-    legacy = {k: v for k, v in orphans.items() if f"/{HASH_SEG}/" not in k}
+               if k not in wanted
+               and "/manifest/" not in k
+               and "/sidecars-manifest/" not in k}
     stale = {k: v for k, v in orphans.items() if f"/{HASH_SEG}/" in k}
+    stale_sidecar = {k: v for k, v in orphans.items() if f"/{SIDECAR_SEG}/" in k}
+    legacy = {k: v for k, v in orphans.items()
+              if f"/{HASH_SEG}/" not in k and f"/{SIDECAR_SEG}/" not in k}
     orphan_bytes = sum(v["size"] for v in orphans.values())
     print(f"\n{len(orphans)} unreferenced ({orphan_bytes / 1e6:.1f} MB):")
     print(f"  {len(legacy)} from the old path-mirrored layout "
           f"({sum(v['size'] for v in legacy.values()) / 1e6:.1f} MB)")
     print(f"  {len(stale)} content keys with no local source "
           f"({sum(v['size'] for v in stale.values()) / 1e6:.1f} MB)")
+    print(f"  {len(stale_sidecar)} archived sidecars with no local source "
+          f"({sum(v['size'] for v in stale_sidecar.values()) / 1e6:.1f} MB)")
     for k, v in list(orphans.items())[:8]:
         mod = v["modified"]
         when = f"{mod:%Y-%m-%d}" if mod else "unknown date"
@@ -637,6 +835,15 @@ def main() -> int:
     up.add_argument("--workers", type=int, default=8)
     up.add_argument("--dry-run", action="store_true")
     up.set_defaults(func=cmd_upload)
+
+    ar = sub.add_parser("archive-sidecars",
+                        help="back up non-media files (video_meta.json, landing.html, ...) "
+                             "so ensure_local() can recover them on another machine")
+    common(ar)
+    ar.add_argument("--local-dir", required=True, help="e.g. data/spectrum_assets")
+    ar.add_argument("--workers", type=int, default=8)
+    ar.add_argument("--dry-run", action="store_true")
+    ar.set_defaults(func=cmd_archive_sidecars)
 
     rw = sub.add_parser("rewrite", help="point a dashboard's asset refs at S3")
     common(rw)
