@@ -45,11 +45,12 @@ python3 scripts/build_site.py ${BUILD_ARGS[@]+"${BUILD_ARGS[@]}"}
 # Presigning here also means every deploy resets the expiry clock, so the site
 # cannot age out while it is being maintained.
 #
-# SCOPE: Spectrum only. It is the sole deployment whose creative lives in S3 —
-# every other dashboard references assets copied into dist/ and has no S3 URL to
-# rewrite. The explicit path glob keeps it that way even if that changes, so
-# turning on S3 for another deployment stays a deliberate act.
-S3_TREES=("spectrum")
+# SCOPE: each deployment migrated onto S3-hosted creative gets added here
+# explicitly — turning it on for a deployment stays a deliberate act, not
+# something build_site.py silently picks up because a dashboard happens to
+# reference an https:// URL. TREX added 2026-09-16 (data/trex_assets/
+# untracked from git; see .gitignore's data/*_assets/ rule).
+S3_TREES=("spectrum" "trex")
 
 if [[ -n "${AWS_ACCESS_KEY_ID:-}" && -n "${AWS_S3_BUCKET:-}" ]]; then
   PY="$ROOT/.venv/bin/python"; [[ -x "$PY" ]] || PY="python3"

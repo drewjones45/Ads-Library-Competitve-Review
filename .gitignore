@@ -8,6 +8,16 @@ data/intel.db-journal
 data/snapshots/
 data/creative/
 data/raw/
+# Per-client creative asset trees, once a deployment's dashboards are fully
+# S3-hosted (see S3_ASSETS.md) — files stay on disk, just stop being tracked.
+# Doesn't retroactively affect deployments not yet migrated (git keeps
+# tracking already-tracked paths regardless of a later-added ignore rule).
+data/*_assets/
+# Local-path preview copy of a dashboard, kept alongside the S3-mode index.html
+# that actually gets committed/deployed — for reviewing images on a machine
+# that still has data/*_assets/ on disk, before pushing. Never committed:
+# its refs are absolute local paths, meaningless anywhere else.
+reports/**/index.local.html
 .pytest_cache/
 dist/
 build/

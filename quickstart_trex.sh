@@ -186,7 +186,15 @@ echo "outputs:"
 find "$REPORTS" -maxdepth 2 -type f | sort | sed 's/^/  /'
 echo
 green "view a report:"
-echo "    open $REPORTS/dashboard/index.html        ← single-page HTML dashboard"
+# Once this dashboard has been through scripts/s3_assets.py rewrite, its
+# index.html holds S3 URLs and a local-path preview copy (index.local.html)
+# sits beside it — that's the one that actually renders images on this
+# machine. A fresh run has no such sibling yet, so fall back to index.html.
+if [[ -f "$REPORTS/dashboard/index.local.html" ]]; then
+  echo "    open $REPORTS/dashboard/index.local.html  ← local-path preview (images from disk)"
+else
+  echo "    open $REPORTS/dashboard/index.html        ← single-page HTML dashboard"
+fi
 echo "    open $REPORTS/creative_comparison.md"
 echo "    open $REPORTS/by-brand/trex.md"
 echo "    open $REPORTS/briefing.md"

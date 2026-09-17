@@ -40,6 +40,20 @@ from .synthesis.whitespace import detect_whitespace
 console = Console()
 
 
+def _open_dashboard(generated_path: str | Path) -> None:
+    """Open a generated dashboard in the browser — preferring the local-path
+    preview copy (index.local.html) over the canonical file if one sits
+    alongside it. Once a deployment's assets are on S3, the canonical
+    index.html holds S3 URLs (see S3_ASSETS.md); only the .local.html sibling
+    still points at data/*_assets/ on disk, so it's the one that actually
+    renders images when opened straight from the filesystem. Deployments not
+    yet migrated have no such sibling, so this is a no-op fallback for them."""
+    import webbrowser
+    path = Path(generated_path).resolve()
+    preview = path.with_name("index.local.html")
+    webbrowser.open(f"file://{preview if preview.is_file() else path}")
+
+
 @click.group()
 def cli() -> None:
     """Agentic competitive intelligence tools."""
@@ -770,8 +784,7 @@ def dashboard(out: str | None, days: int, org_name: str, product_name: str | Non
                   f"({result['n_brands']} brands · {result['n_analyzed']} analyzed creatives · "
                   f"{result['size_bytes']//1024} KB)")
     if open_after:
-        import webbrowser
-        webbrowser.open(f"file://{Path(result['path']).resolve()}")
+        _open_dashboard(result['path'])
 
 
 @cli.command()
@@ -1458,8 +1471,7 @@ def perf_dashboard_cmd(competitor_ids: tuple[str, ...], out_dir: str,
         f"{res['analyzed']} analyzed creatives · taxonomy: {res['taxonomy']})"
     )
     if open_after:
-        import webbrowser
-        webbrowser.open(f"file://{Path(res['path']).resolve()}")
+        _open_dashboard(res['path'])
 
 
 @cli.command("perf-series")
