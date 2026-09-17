@@ -22,21 +22,7 @@ from .creative import analyze_creative_image
 from .landing_analysis import analyze_landing_page
 from .text_ad_analysis import analyze_text_ad
 from .video import analyze_creative_video
-from ..config import ROOT, load_settings
-
-try:
-    # scripts/s3_assets.py isn't part of the installed package (it's a
-    # standalone script, deliberately — see its own docstring), so this
-    # crosses the layering boundary the other direction from how every other
-    # scripts/*.py already imports FROM intel.*. Guarded because a missing/
-    # unimportable script must never break plain local vision analysis for a
-    # deployment that's never touched S3 at all.
-    import sys as _sys
-    _sys.path.insert(0, str(ROOT / "scripts"))
-    from s3_assets import ensure_local  # noqa: E402
-except Exception:  # noqa: BLE001
-    def ensure_local(path):  # type: ignore[misc]
-        return Path(path)
+from ..config import ensure_local, load_settings
 from ..storage import audit, connect, utcnow
 
 

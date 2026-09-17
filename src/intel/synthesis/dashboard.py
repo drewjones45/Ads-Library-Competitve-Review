@@ -23,7 +23,7 @@ from ..analysis.landing import (
     classify_url,
     parse_url,
 )
-from ..config import DATA_DIR, get_competitor
+from ..config import DATA_DIR, ensure_local, get_competitor
 from ..storage import connect, popularity_score
 from .creative_readout import (
     _LIST_ATTRS,
@@ -477,7 +477,7 @@ def _collect(conn: sqlite3.Connection, *, days: int,
         ).fetchall()
         by_url: dict[str, dict] = {}
         for r in rows:
-            sidecar = Path(r["asset_path"]).parent / "landing_meta.json"
+            sidecar = ensure_local(Path(r["asset_path"]).parent / "landing_meta.json")
             try:
                 meta = json.loads(sidecar.read_text())
             except Exception:

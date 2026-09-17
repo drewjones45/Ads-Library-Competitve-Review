@@ -45,26 +45,11 @@ python3 scripts/build_site.py ${BUILD_ARGS[@]+"${BUILD_ARGS[@]}"}
 # Presigning here also means every deploy resets the expiry clock, so the site
 # cannot age out while it is being maintained.
 #
-# SCOPE: each deployment migrated onto S3-hosted creative gets added here
-# explicitly — turning it on for a deployment stays a deliberate act, not
-# something build_site.py silently picks up because a dashboard happens to
-# reference an https:// URL. TREX added 2026-09-16 (data/trex_assets/
-# untracked from git; see .gitignore's data/*_assets/ rule).
-S3_TREES=("spectrum" "trex")
-
-if [[ -n "${AWS_ACCESS_KEY_ID:-}" && -n "${AWS_S3_BUCKET:-}" ]]; then
-  PY="$ROOT/.venv/bin/python"; [[ -x "$PY" ]] || PY="python3"
-  for tree in "${S3_TREES[@]}"; do
-    while IFS= read -r page; do
-      echo "==> presigning $(realpath --relative-to="$ROOT" "$page" 2>/dev/null || echo "$page")"
-      "$PY" "$ROOT/scripts/s3_assets.py" rewrite         --html "$page"         --bucket "$AWS_S3_BUCKET" --prefix "${AWS_S3_PREFIX:?}"         --region "${AWS_REGION:-us-east-1}"         --mode presign --signature "${S3_SIGNATURE:-s3}"         --expires "${S3_PRESIGN_TTL:-31536000}"
-      "$PY" "$ROOT/scripts/s3_assets.py" verify         --html "$page" --bucket "$AWS_S3_BUCKET" --region "${AWS_REGION:-us-east-1}"
-    done < <(find "$ROOT/dist/$tree" -name index.html 2>/dev/null)
-  done
-else
-  echo "==> AWS creds or AWS_S3_BUCKET unset — skipping presign step." >&2
-  echo "    dist/ keeps public-mode S3 URLs, which 403 until a bucket policy exists." >&2
-fi
+# Delegated to scripts/ci_presign.py (which carries S3_TREES itself now) rather
+# than looped here inline, so this manual path and whatever CI path eventually
+# runs the same script can never drift onto two different deployment lists.
+PY="$ROOT/.venv/bin/python"; [[ -x "$PY" ]] || PY="python3"
+"$PY" "$ROOT/scripts/ci_presign.py" --dist "$ROOT/dist"
 
 if ! command -v netlify >/dev/null 2>&1; then
   echo

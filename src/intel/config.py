@@ -15,6 +15,30 @@ CONFIG_DIR = ROOT / "config"
 DATA_DIR = Path(os.environ.get("INTEL_DATA_DIR", ROOT / "data")).resolve()
 DB_PATH = Path(os.environ.get("INTEL_DB_PATH", DATA_DIR / "intel.db")).resolve()
 
+
+def ensure_local(path: str | Path) -> Path:
+    """If `path` is missing locally but its deployment's assets have been
+    archived to S3 (see scripts/s3_assets.py — images via `upload`, sidecars
+    via `archive-sidecars`), fetch it into place. Returns `path` unchanged
+    either way, so every caller's existing `.exists()` check is the only
+    thing that changes, never a new failure mode.
+
+    scripts/s3_assets.py is a standalone script, not part of this package
+    (deliberately — see its own docstring), so importing it crosses the
+    layering boundary every other scripts/*.py already crosses the opposite
+    direction. Guarded because a missing/unimportable script, no boto3, no
+    AWS_S3_BUCKET configured, or no S3 access at all must never break plain
+    local analysis for a deployment that's never touched S3 — ensure_local()
+    itself degrades the same way internally; this just adds one more layer
+    of guarantee for the case where the import itself fails."""
+    try:
+        import sys
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from s3_assets import ensure_local as _ensure_local
+        return _ensure_local(path)
+    except Exception:  # noqa: BLE001
+        return Path(path)
+
 SOURCE_TYPES = Literal["website", "meta_ads", "google_ads", "rss", "retailer", "amazon_brand_store", "tv_ads"]
 
 
