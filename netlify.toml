@@ -14,6 +14,24 @@
 [build]
   publish = "dist"
   command = "python3 scripts/build_site.py"
+  # SPECIFIC TO THE GITHUB ACTIONS DEPLOY OPTION — see
+  # .github/workflows/deploy-dashboards.yml. That workflow presigns every
+  # S3-hosted dashboard and deploys itself; if this Git-triggered build keeps
+  # running too, the two race on every push, and whichever finishes last wins
+  # — unsigned images if it's this one. `ignore = "exit 0"` unconditionally
+  # skips this build (Netlify's own convention: exit 0 = skip, non-zero =
+  # proceed), so the workflow is the only thing that ever publishes.
+  #
+  # ⚠ IF ANDREW PICKS THE OTHER OPTION INSTEAD (updating this same `command`
+  # to build+presign in place, using Netlify's own env vars) — DELETE THIS
+  # LINE. It would otherwise skip that build too, which needs to actually run.
+  #
+  # This is a belt-and-suspenders addition, not a substitute for using
+  # Netlify's own "Stop builds" toggle (Site configuration → Build & deploy) —
+  # that's the first-class, dashboard-verified way to disable this; this line
+  # is the second, repo-visible guard in case that toggle ever gets flipped
+  # back on by accident.
+  ignore = "exit 0"
 
 [build.environment]
   # Exclude the captured competitor assets from secret scanning. Everything under
