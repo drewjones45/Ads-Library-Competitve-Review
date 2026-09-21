@@ -1,19 +1,42 @@
 # Netlify configuration for the competitive-intelligence dashboards.
 #
-# IMPORTANT: the site is built LOCALLY, not in Netlify CI. The dashboards pull
-# from data/*_assets/ (gitignored, ~hundreds of MB) which is not in the repo, so
-# a Git-connected CI build cannot regenerate them. Build here, deploy the folder:
+# Two independent things build+publish this site, and both matter here:
 #
-#     python3 scripts/build_site.py        # produces dist/
-#     netlify deploy --dir dist --prod     # or drag-drop dist/ at app.netlify.com
+# 1. Netlify's own Git-triggered CI build (this `command`, on every push to
+#    main). Works for any deployment whose assets are either committed to git
+#    (data/*_assets/ for not-yet-S3 deployments) or hosted on S3 — see
+#    S3_ASSETS.md. It CANNOT build the `bobs` deployment, whose assets live
+#    under the gitignored data/creative/; that one 404s in this build (a loud
+#    "⚠ … could not be resolved" warning names the missing files) and needs
+#    the manual path below instead.
+# 2. `./scripts/deploy_netlify.sh [--prod]` — build + presign + deploy from a
+#    machine that has the full data/ tree, for anything Netlify's own build
+#    can't handle, or to force an immediate redeploy. Passes `--no-build` so
+#    the CLI doesn't re-run the command below and clobber the presigned URLs
+#    this script just wrote (see that script's own comments).
 #
-# (See NETLIFY.md.) `publish` is declared so `netlify deploy` and drag-drop both
-# know dist/ is the site root. The build `command` is a safety net for the case
-# where you DO build on a machine that has the data — it is a no-op-ish rebuild.
+# ⚠ Decision record (2026-09-21): S3-hosted dashboards (Spectrum, TREX) need a
+# presign step between build_site.py and publish, or their images 403 (no
+# public bucket policy — see S3_ASSETS.md). Two options were sent to Andrew
+# for how to make Netlify's own CI build do this:
+#   Option 1 (chosen): update this `command` to chain scripts/ci_presign.py in,
+#     using Netlify's own env vars (Site configuration → Environment variables)
+#     for AWS credentials. One build path, no new infra.
+#   Option 2 (not chosen): pause this build entirely (`ignore = "exit 0"`) and
+#     let a GitHub Actions workflow do build+presign+deploy instead, using
+#     GitHub Secrets for the same AWS credentials. Was PR #1
+#     (branch gha-deploy-workflow) — closed without merging once Option 1 was
+#     picked; that workflow file was never added to main.
+# Required Netlify env vars for this build to presign correctly (Site
+# configuration → Environment variables, NOT this file, NOT git):
+# AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_BUCKET, AWS_S3_PREFIX,
+# AWS_REGION. Missing them is not a hard failure — ci_presign.py fails soft
+# and dist/ just keeps whatever public-mode URLs build_site.py already wrote
+# (403 until a bucket policy exists), same as before this change.
 
 [build]
   publish = "dist"
-  command = "python3 scripts/build_site.py"
+  command = "python3 scripts/build_site.py && python3 scripts/ci_presign.py"
 
 [build.environment]
   # Exclude the captured competitor assets from secret scanning. Everything under

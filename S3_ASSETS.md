@@ -425,3 +425,10 @@ separate message yet — worth bundling into whatever the next IT conversation i
 * **Is access logging or CloudTrail enabled for this bucket?** Also unknown,
   same reason. Matters most for `tables/` — if that credential is ever misused,
   logging is the only way anyone would know.
+* Netlify's own CI build now also holds AWS credentials (as of the
+  `netlify.toml` presign-chaining change — see NETLIFY.md), so it's a second
+  concrete consumer for that read-only key once it exists: the build only ever
+  presigns/verifies, never uploads, so it never needed `Put`/`Delete` in the
+  first place. Sitting in Andrew's personal Netlify account's env vars in the
+  meantime is exactly the kind of exposure a move to Horizon-owned hosting
+  infra (see NETLIFY.md) is meant to close off, not a reason to wait on it.

@@ -7,11 +7,21 @@ static site** (`dist/`) that copies + rewrites every asset reference to be
 portable, then deploy that folder to Netlify.
 
 **Git-push deploys work** (2026-07-14). The site is Git-connected: a push to
-`main` triggers Netlify CI, which runs `python3 scripts/build_site.py` (stdlib
+`main` triggers Netlify CI, which runs `netlify.toml`'s `command` (stdlib
 only — nothing to install) and publishes `dist/`. This works because the
 `philo`/`trex`/`wegmans` deployments' `data/*_assets/` ARE committed, and
 because `build_site.py` resolves asset refs against the repo's own `data/` tree
 rather than the absolute paths baked into the HTML.
+
+That `command` is `build_site.py && ci_presign.py` — the second step presigns
+every S3-hosted dashboard (Spectrum, TREX) so their images don't 403 on
+Netlify's own build, not just the manual `deploy_netlify.sh` path. This needs
+AWS credentials as Netlify's own environment variables (Site configuration →
+Environment variables): `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`,
+`AWS_S3_BUCKET`, `AWS_S3_PREFIX`, `AWS_REGION`. See netlify.toml's decision
+record comment for why this — an in-place `command` update using Netlify's own
+env vars — won out over the alternative (a GitHub Actions workflow using
+GitHub Secrets, which was PR #1 and got closed unmerged once this was picked).
 
 That last part is the whole trick, and it used to be broken: the dashboards
 embed absolute paths from the machine that generated them
