@@ -1,0 +1,91 @@
+# Build the static dashboard site, presign every S3-hosted dashboard, and
+# publish to Netlify — the automated equivalent of running
+# `scripts/deploy_netlify.sh --prod` by hand.
+#
+# THIS IS ONE OF TWO OPTIONS, NOT BOTH. The other is updating netlify.toml's
+# own `command` to do build+presign in-place, using Netlify's own environment
+# variables instead of GitHub Secrets. See the note sent to Andrew — pick one.
+# If this workflow is the one kept, it must be the ONLY thing that publishes
+# this site. Netlify's own Git-triggered auto-deploy runs bare
+# `python3 scripts/build_site.py` with no presign step at all; if that stays
+# enabled alongside this workflow, the two will race on every push, and
+# whichever finishes last is what's actually live — the exact bug this whole
+# thing exists to fix. Whoever administers the Netlify site needs to disable
+# its auto-publish (or otherwise make sure it can't run) before this is
+# trusted as the real deploy path.
+#
+# Required repo configuration (Settings -> Secrets and variables -> Actions):
+#   Secrets (masked in logs, actually sensitive):
+#     AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY  — the `commerce` IAM key
+#     NETLIFY_AUTH_TOKEN                        — a Netlify personal/team access token
+#   Variables (visible in logs, not secret — bucket/prefix are already
+#   readable in every committed public-mode dashboard URL):
+#     AWS_S3_BUCKET, AWS_S3_PREFIX, AWS_REGION
+#   NETLIFY_SITE_ID is NOT a secret either (it's an opaque identifier, not a
+#   credential — grants nothing without a valid auth token) and is hardcoded
+#   below, taken from this repo's own .netlify/state.json (gitignored locally,
+#   never committed).
+#
+# Current dependency worth knowing: build_site.py still needs data/*_assets/
+# on disk for any deployment not yet migrated onto S3 (Philo, JD Sports,
+# Wegmans, Edward Jones as of this writing) — this works today because
+# those trees are still git-tracked, so a normal checkout has them. Once
+# every deployment is S3-hosted, that stops mattering at all.
+#
+# ci_presign.py fails soft (exit 0) if AWS_S3_BUCKET/AWS_S3_PREFIX aren't
+# configured — dist/ would then keep plain public-mode URLs, which 403 until
+# a bucket policy exists. It fails hard (non-zero) on an actual presign or
+# verify failure, which intentionally stops this job before the Deploy step —
+# publishing a mixed/partially-broken state automatically is worse than not
+# publishing at all.
+
+name: Build, presign, and deploy dashboards
+
+"on":
+  push:
+    branches: [main]
+  workflow_dispatch: {}  # manual "run now" button — e.g. to just refresh presign expiry
+
+concurrency:
+  group: netlify-deploy
+  cancel-in-progress: false  # let an in-flight deploy finish rather than publish a half-built dist/
+
+env:
+  AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+  AWS_S3_PREFIX: ${{ vars.AWS_S3_PREFIX }}
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  NETLIFY_SITE_ID: ff173208-7da5-44bf-9bf1-77fbc54f448f
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install boto3
+        run: pip install boto3  # build_site.py itself is stdlib-only; only ci_presign.py needs this
+
+      - name: Build dist/
+        run: python3 scripts/build_site.py
+
+      - name: Presign every S3-hosted dashboard
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: python3 scripts/ci_presign.py
+
+      - name: Install netlify-cli
+        run: npm install -g netlify-cli
+
+      # --no-build: nothing left for the CLI to build, and it's the setting
+      # that avoids netlify.toml's own `command` re-running here and throwing
+      # the presign step away (see scripts/deploy_netlify.sh's own comment
+      # on this exact flag).
+      - name: Deploy to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: netlify deploy --dir dist --prod --no-build
