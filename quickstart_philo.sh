@@ -56,7 +56,7 @@ red()    { printf "\033[31m%s\033[0m\n" "$*"; }
 rule()   { printf "\033[2m%s\033[0m\n" "────────────────────────────────────────────────────────────"; }
 
 # ---- preflight ----
-bold "[1/9] preflight (PHILO deployment)"
+bold "[1/10] preflight (PHILO deployment)"
 rule
 if [[ ! -x ".venv/bin/intel" ]]; then
   red "  ✗ .venv/bin/intel not found. Run:"
@@ -94,13 +94,30 @@ mkdir -p "$REPORTS"
 green "  ✓ writing reports to: $REPORTS/"
 echo
 
-# ---- 2. init ----
-bold "[2/9] init db (philo.db)"; rule
+# ---- 2. sync db from S3 ----
+# data/philo.db is no longer git-tracked (moved to S3, see S3_ASSETS.md) — on
+# a machine that's never run this before, or one that's behind another
+# operator's last audit run, this pulls the latest before init/ingest touch
+# it. Skips gracefully (not a hard fail) if S3 isn't configured, so a
+# local-only/offline run still works, same spirit as the ANTHROPIC/META
+# token checks above.
+bold "[2/10] sync db from S3"; rule
+if [[ -n "${AWS_S3_BUCKET:-}" ]] && .venv/bin/python3 -c "import boto3" >/dev/null 2>&1; then
+  .venv/bin/python3 scripts/export_db_to_s3.py sync --db "$INTEL_DB_PATH" \
+    --bucket "$AWS_S3_BUCKET" --prefix "${AWS_S3_PREFIX:-outbound/competitive-intel}" \
+    --region "${AWS_REGION:-us-east-1}"
+else
+  yellow "  skipped — AWS_S3_BUCKET not set or boto3 not installed (.venv/bin/pip install -e '.[s3,etl]')"
+fi
+echo
+
+# ---- 3. init ----
+bold "[3/10] init db (philo.db)"; rule
 .venv/bin/intel init
 echo
 
-# ---- 3. ingest ----
-bold "[3/9] ingest"; rule
+# ---- 4. ingest ----
+bold "[4/10] ingest"; rule
 if [[ $SKIP_INGEST -eq 1 ]]; then
   yellow "  skipped (--skip-ingest)"
 else
@@ -109,7 +126,7 @@ fi
 echo
 
 # ---- 4. capture landing pages ----
-bold "[4/9] capture landing pages"; rule
+bold "[5/10] capture landing pages"; rule
 if [[ $SKIP_INGEST -eq 1 ]]; then
   yellow "  skipped (--skip-ingest)"
 else
@@ -118,7 +135,7 @@ fi
 echo
 
 # ---- 5. analyze creatives ----
-bold "[5/9] vision-analyze creatives"; rule
+bold "[6/10] vision-analyze creatives"; rule
 if [[ $HAS_ANTHROPIC -eq 1 ]]; then
   .venv/bin/intel analyze-creatives 2>&1 | tee "$REPORTS/creative_analysis.log"
 else
@@ -128,7 +145,7 @@ fi
 echo
 
 # ---- 6. per-brand readouts ----
-bold "[6/9] per-brand creative readouts"; rule
+bold "[7/10] per-brand creative readouts"; rule
 mkdir -p "$REPORTS/by-brand"
 .venv/bin/python - "$REPORTS/by-brand" "$DAYS" <<'PY'
 import os, sys, subprocess, sqlite3, pathlib
@@ -147,12 +164,12 @@ PY
 echo
 
 # ---- 7. cross-set comparison ----
-bold "[7/9] cross-set comparison"; rule
+bold "[8/10] cross-set comparison"; rule
 .venv/bin/intel creative-comparison --days "$DAYS" --save "$REPORTS/creative_comparison.md"
 echo
 
 # ---- 8. briefing ----
-bold "[8/9] briefing"; rule
+bold "[9/10] briefing"; rule
 BRIEF="$REPORTS/briefing.md"
 if [[ $HAS_ANTHROPIC -eq 1 ]]; then
   green "  using LLM-synthesized briefing"
@@ -186,7 +203,7 @@ echo
 # ---- 9. HTML dashboard ----
 # Plain (Meta) set + the all-platform "with-google" set. The with-google set is
 # where Google ATC ads AND uploaded creative analytics (traffic/CVR chips) show.
-bold "[9/9] HTML dashboard"; rule
+bold "[10/10] HTML dashboard"; rule
 .venv/bin/intel dashboard    --out "$REPORTS/dashboard"    --days "$DAYS"
 .venv/bin/intel dashboard --v2 --out "$REPORTS/dashboard-v2" --days "$DAYS"
 .venv/bin/intel dashboard --platform all    --out "$REPORTS/with-google/dashboard"    --days "$DAYS"

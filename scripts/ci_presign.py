@@ -43,7 +43,7 @@ import s3_assets as s3a  # noqa: E402 — reuse cmd_rewrite/cmd_verify, no dupli
 # deploy_netlify.sh's own S3_TREES (which now just imports this): a deployment
 # migrating onto S3 gets a one-line addition here, on purpose, never picked up
 # silently just because a dashboard happens to reference our bucket.
-S3_TREES = ["spectrum", "trex"]
+S3_TREES = ["spectrum", "trex", "philo", "jdsports", "wegmans", "edwardjones"]
 
 
 def _presign_one(idx: Path, *, bucket: str, prefix: str, region: str,

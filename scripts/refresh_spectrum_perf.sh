@@ -38,6 +38,19 @@ if [[ -z "${META_OWNED_ACCESS_TOKEN:-}" ]]; then
   echo "note: META_OWNED_ACCESS_TOKEN unset, falling back to the Ad Library token" >&2
 fi
 
+# data/spectrum.db is no longer git-tracked (moved to S3, see S3_ASSETS.md) —
+# pull the latest before this refresh touches it, same as quickstart_*.sh's
+# own sync step. Skips gracefully if S3 isn't configured.
+PY="$ROOT/.venv/bin/python"; [[ -x "$PY" ]] || PY="$ROOT/.venv/Scripts/python.exe"
+if [[ -n "${AWS_S3_BUCKET:-}" ]] && "$PY" -c "import boto3" >/dev/null 2>&1; then
+  echo "############ SYNC DB FROM S3 ############"
+  "$PY" "$ROOT/scripts/export_db_to_s3.py" sync --db "$INTEL_DB_PATH" \
+    --bucket "$AWS_S3_BUCKET" --prefix "${AWS_S3_PREFIX:-outbound/competitive-intel}" \
+    --region "${AWS_REGION:-us-east-1}"
+else
+  echo "AWS_S3_BUCKET unset or boto3 missing — skipping db sync" >&2
+fi
+
 UNTIL="${2:-$(date -u +%Y-%m-%d)}"
 SINCE="${1:-$(date -u -d '90 days ago' +%Y-%m-%d 2>/dev/null || date -u -v-90d +%Y-%m-%d)}"
 COOL=20

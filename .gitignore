@@ -17,13 +17,20 @@ data/*_assets/
 # <prefix>/<client>/tables/ is the durable one, these are just its local
 # working copy before/after upload, regeneratable any time from the db.
 data/*_tables/
-# TREX's db, once its tables were fully synced to S3 (export_db_to_s3.py,
+# Each client's db, once its tables were fully synced to S3 (export_db_to_s3.py,
 # see S3_ASSETS.md) — same "stays on disk, stops being tracked" pattern as
-# data/*_assets/ above. `quickstart_trex.sh` calls `sync` to pull the latest
-# from S3 before use, so a fresh machine isn't just starting from empty.
-# Other clients' .db files are untouched — this is TREX-only, not a blanket
-# data/*.db rule, until/unless they get migrated the same way.
+# data/*_assets/ above. Each one's quickstart_*.sh (or, for spectrum,
+# refresh_spectrum_perf.sh) calls `sync` to pull the latest from S3 before
+# use, so a fresh machine isn't just starting from empty. Listed explicitly,
+# one per migrated client, not a blanket data/*.db rule — spectrum_v2.db
+# (unused experiment, not part of the live pipeline) and any future client
+# stay tracked until they get migrated the same way.
 data/trex.db
+data/philo.db
+data/jdsports.db
+data/wegmans.db
+data/edwardjones.db
+data/spectrum.db
 # Local-path preview copy of a dashboard, kept alongside the S3-mode index.html
 # that actually gets committed/deployed — for reviewing images on a machine
 # that still has data/*_assets/ on disk, before pushing. Never committed:
