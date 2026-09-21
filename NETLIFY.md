@@ -12,21 +12,29 @@ static site** (`dist/`) that copies + rewrites every asset reference to be
 portable, then deploy that folder to Netlify.
 
 **Git-push deploys work** (2026-07-14). The site is Git-connected: a push to
-`main` triggers Netlify CI, which runs `netlify.toml`'s `command` (stdlib
-only — nothing to install) and publishes `dist/`. This works because the
-`philo`/`trex`/`wegmans` deployments' `data/*_assets/` ARE committed, and
-because `build_site.py` resolves asset refs against the repo's own `data/` tree
-rather than the absolute paths baked into the HTML.
+`main` triggers Netlify CI, which runs `netlify.toml`'s `command` and
+publishes `dist/`. This works because the `philo`/`trex`/`wegmans`
+deployments' `data/*_assets/` ARE committed, and because `build_site.py`
+resolves asset refs against the repo's own `data/` tree rather than the
+absolute paths baked into the HTML.
 
-That `command` is `build_site.py && ci_presign.py` — the second step presigns
-every S3-hosted dashboard (Spectrum, TREX) so their images don't 403 on
-Netlify's own build, not just the manual `deploy_netlify.sh` path. This needs
+That `command` is `pip install boto3 && build_site.py && ci_presign.py` — the
+`pip install` is required, not decorative (Netlify's build container starts
+with no `boto3` at all — confirmed the hard way when it was missing, see
+netlify.toml's comment). The `ci_presign.py` step presigns every S3-hosted
+dashboard (Spectrum, TREX) so their images don't 403 on Netlify's own build,
+not just the manual `deploy_netlify.sh` path. This needs
 AWS credentials as Netlify's own environment variables (Site configuration →
-Environment variables): `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`,
-`AWS_S3_BUCKET`, `AWS_S3_PREFIX`, `AWS_REGION`. See netlify.toml's decision
-record comment for why this — an in-place `command` update using Netlify's own
-env vars — won out over the alternative (a GitHub Actions workflow using
-GitHub Secrets, which was PR #1 and got closed unmerged once this was picked).
+Environment variables): `AWS_S3_BUCKET`, `AWS_S3_PREFIX`, and — **not**
+`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`, both reserved and rejected
+outright by Netlify — `S3_ACCESS_KEY_ID`/`S3_SECRET_ACCESS_KEY` instead
+(`scripts/s3_assets.py`'s `_client()` checks those names as a fallback
+specifically for this; see its docstring and netlify.toml's comment). Region
+doesn't need setting — also reserved, and `ci_presign.py` already defaults to
+the right one. See netlify.toml's decision record comment for why this — an
+in-place `command` update using Netlify's own env vars — won out over the
+alternative (a GitHub Actions workflow using GitHub Secrets, which was PR #1
+and got closed unmerged once this was picked).
 
 That last part is the whole trick, and it used to be broken: the dashboards
 embed absolute paths from the machine that generated them

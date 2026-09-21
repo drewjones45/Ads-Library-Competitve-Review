@@ -40,6 +40,18 @@ of exposure as it has in Netlify's env vars today, just under a Horizon-owned
 account instead of Andrew's personal one. ([AWS Amplify Hosting — IAM
 compute roles for SSR](https://docs.aws.amazon.com/amplify/latest/userguide/amplify-SSR-compute-role.html))
 
+This exact class of friction already bit us on the Netlify side while wiring
+up the interim setup (2026-09-22): Netlify's own Site environment variables
+reject `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` outright ("is a reserved
+environment variable") — the workaround was custom-named
+`S3_ACCESS_KEY_ID`/`S3_SECRET_ACCESS_KEY` vars plus a small `_client()`
+fallback in `scripts/s3_assets.py`. Amplify may or may not have the identical
+reservation (untested), but the underlying lesson generalizes: any hosting
+vendor's build environment is liable to have its own opinions about the
+standard AWS SDK env var names, which is one more reason the Lambda-presign
+design below — no AWS credential of any name sitting in a hosting vendor's
+env vars at all — is the sturdier target, not just the more secure one.
+
 So there are two real options, not one:
 
 * **Phase 1 (lift-and-shift):** same architecture as today — `build_site.py`

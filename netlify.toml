@@ -31,14 +31,30 @@
 #     picked; that workflow file was never added to main.
 # Required Netlify env vars for this build to presign correctly (Site
 # configuration → Environment variables, NOT this file, NOT git):
-# AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_BUCKET, AWS_S3_PREFIX,
-# AWS_REGION. Missing them is not a hard failure — ci_presign.py fails soft
-# and dist/ just keeps whatever public-mode URLs build_site.py already wrote
-# (403 until a bucket policy exists), same as before this change.
+# AWS_S3_BUCKET, AWS_S3_PREFIX, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY.
+#
+# ⚠ NOT AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (confirmed 2026-09-22, both
+# the UI and CLI reject them outright — "AWS_ACCESS_KEY_ID is a reserved
+# environment variable" — along with AWS_SESSION_TOKEN and plain AWS_REGION;
+# AWS_DEFAULT_REGION is NOT reserved but isn't needed, see below). Netlify's
+# build platform reserves the standard AWS SDK env var names for its own use,
+# so scripts/s3_assets.py's `_client()` checks S3_ACCESS_KEY_ID/
+# S3_SECRET_ACCESS_KEY as an explicit fallback specifically for this — set
+# those two under the custom names in Netlify, not the standard ones.
+# AWS_REGION doesn't need setting at all: also reserved (silently a no-op,
+# not even an error, if you try), but ci_presign.py already defaults to
+# us-east-1 when unset, which is what this bucket needs anyway.
+#
+# ⚠ `pip install boto3` below is required, not decorative — confirmed the hard
+# way (2026-09-22): Netlify's build container starts with no boto3 at all, so
+# ci_presign.py's own `import boto3` fails immediately with "boto3 not
+# installed" and the whole command exits 1. Testing this chain locally in a
+# .venv that already had boto3 from other work didn't catch it — that's on
+# this comment's author, not a Netlify quirk.
 
 [build]
   publish = "dist"
-  command = "python3 scripts/build_site.py && python3 scripts/ci_presign.py"
+  command = "python3 -m pip install --quiet boto3 && python3 scripts/build_site.py && python3 scripts/ci_presign.py"
 
 [build.environment]
   # Exclude the captured competitor assets from secret scanning. Everything under

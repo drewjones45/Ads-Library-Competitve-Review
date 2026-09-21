@@ -263,13 +263,30 @@ def _client(region: str, signature: str = "s3v4"):
     Worth pinning explicitly: botocore picks SigV2 on its own for us-east-1
     presigned URLs, which silently changes the expiry ceiling (SigV4 caps at 7
     days, SigV2 does not) and quietly puts a deprecated scheme on the wire.
+
+    Credentials: boto3's own default chain (AWS_ACCESS_KEY_ID/
+    AWS_SECRET_ACCESS_KEY env vars, ~/.aws/credentials, instance role) is
+    still what every local/CLI invocation uses, unchanged. S3_ACCESS_KEY_ID/
+    S3_SECRET_ACCESS_KEY are an explicit fallback on top of that, needed
+    because Netlify's own Site environment variables reject AWS_ACCESS_KEY_ID/
+    AWS_SECRET_ACCESS_KEY outright ("is a reserved environment variable" —
+    confirmed via both its UI and CLI, 2026-09-22) — ci_presign.py runs inside
+    that build, so it can't rely on the standard names the way a developer
+    machine's .env can. Only kicks in when both are actually set, so nothing
+    changes for any existing invocation that doesn't set them.
     """
     try:
         import boto3
         from botocore.config import Config
     except ImportError:
         sys.exit("boto3 not installed — run: .venv/bin/pip install -e '.[s3]'")
-    return boto3.client("s3", region_name=region, config=Config(signature_version=signature))
+    kwargs = {}
+    access_key = os.environ.get("S3_ACCESS_KEY_ID")
+    secret_key = os.environ.get("S3_SECRET_ACCESS_KEY")
+    if access_key and secret_key:
+        kwargs["aws_access_key_id"] = access_key
+        kwargs["aws_secret_access_key"] = secret_key
+    return boto3.client("s3", region_name=region, config=Config(signature_version=signature), **kwargs)
 
 
 def rel_under_data(raw: str) -> str | None:
