@@ -208,6 +208,16 @@ If public reads are not acceptable at all, put CloudFront in front of the bucket
 with an Origin Access Control and pass the distribution domain to
 `rewrite --mode public --base-url https://dxxxx.cloudfront.net`.
 
+⚠ **CloudFront is off the table — Jesse (Horizon Business Intelligence) has previously
+discounted introducing it, regardless of technical merit.** The actual
+recommended path is a small Lambda function that signs short-lived SigV4
+URLs per dashboard page load, no public bucket policy and no CDN required —
+see `AMPLIFY_MIGRATION.md`'s "Could dashboards be served dynamically"
+section, scoped out as part of moving hosting off Netlify's personal-account
+setup. If that plan goes ahead, the IT ask becomes "one Lambda + execution
+role," which **supersedes** the public-bucket-policy JSON above entirely; no
+reason to request that policy separately.
+
 ## Tables and sidecars: deliberately not under static/
 
 Two other kinds of content live under this same bucket/prefix, and neither is

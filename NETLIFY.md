@@ -1,5 +1,10 @@
 # Hosting the dashboards on Netlify
 
+⚠ This Netlify site runs under Andrew's personal account — moving it to a
+Horizon-owned AWS Amplify setup is scoped out in **AMPLIFY_MIGRATION.md**
+(nothing built yet, scoping + IT asks only). Everything below still describes
+the live, current setup.
+
 The `intel dashboard` HTML is built for **local** (`file://`) viewing — it embeds
 absolute filesystem paths and pulls images from `data/*_assets/`, which is
 gitignored and large. To put the dashboards online, we build a **self-contained

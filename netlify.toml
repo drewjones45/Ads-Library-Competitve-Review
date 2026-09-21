@@ -1,4 +1,6 @@
-# Netlify configuration for the competitive-intelligence dashboards.
+# Netlify configuration for the dashboards this repo builds — both the
+# competitive-intelligence ones and the Creative Performance Dashboard
+# (owned-account creative + spend analysis, see PERFORMANCE_DASHBOARD_SPEC.md).
 #
 # Two independent things build+publish this site, and both matter here:
 #
