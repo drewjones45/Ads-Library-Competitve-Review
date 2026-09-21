@@ -17,6 +17,13 @@ data/*_assets/
 # <prefix>/<client>/tables/ is the durable one, these are just its local
 # working copy before/after upload, regeneratable any time from the db.
 data/*_tables/
+# TREX's db, once its tables were fully synced to S3 (export_db_to_s3.py,
+# see S3_ASSETS.md) — same "stays on disk, stops being tracked" pattern as
+# data/*_assets/ above. `quickstart_trex.sh` calls `sync` to pull the latest
+# from S3 before use, so a fresh machine isn't just starting from empty.
+# Other clients' .db files are untouched — this is TREX-only, not a blanket
+# data/*.db rule, until/unless they get migrated the same way.
+data/trex.db
 # Local-path preview copy of a dashboard, kept alongside the S3-mode index.html
 # that actually gets committed/deployed — for reviewing images on a machine
 # that still has data/*_assets/ on disk, before pushing. Never committed:
