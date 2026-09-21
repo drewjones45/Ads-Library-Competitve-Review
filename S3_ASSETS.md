@@ -62,13 +62,17 @@ python3 scripts/s3_assets.py verify \
 
 ## Layout: content-addressed, so nothing is stored twice
 
-Keys are `<prefix>/<client>/by-hash/<ab>/<sha256>.<ext>` — the object's own
-content hash, not a mirror of its local path. `<prefix>` is the shared base
+Keys are `<prefix>/<client>/static/by-hash/<ab>/<sha256>.<ext>` — the object's
+own content hash, not a mirror of its local path. `<prefix>` is the shared base
 (`AWS_S3_PREFIX`); `<client>` is derived automatically from the `data/<client>_assets`
 dirname (`upload` from `--local-dir`, `rewrite`/`prune` from each ref's own
 tree) — never a flag you pass by hand, so it can't drift from the tree that
 actually produced the bytes. Hashing is load-bearing, because the same bytes
 appear at many local paths within one client's tree:
+
+`static/` is a deliberate, fixed segment — see "The one blocker" below for why
+it exists (a scoped, narrow bucket-policy ask) and "Tables and sidecars" for
+what deliberately does NOT live under it.
 
 | Tree | Files | Distinct blobs | Waste |
 |---|---|---|---|
@@ -125,6 +129,16 @@ If a dashboard published under the old path-mirrored layout still needs to work
 after a prune, re-key it first with `rewrite --relink`, which recognises those
 URLs and points them at the content-addressed objects.
 
+⚠ **Second migration note, same shape as the one above:** images then moved
+again, from `<prefix>/<client>/by-hash/...` to `<prefix>/<client>/static/by-hash/...`,
+to make the bucket-policy ask above narrowly scopable once `tables/`/`sidecars/`
+existed under the same prefix. `rewrite`'s "own URL" detection was updated to
+require the `static/` segment, so — same consequence as last time — a dashboard
+still on the pre-`static/` keys won't be recognised as "ours" and would show as
+orphaned on the next `prune`. Every dashboard as of 2026-09-21 (Spectrum, TREX)
+has already been moved; any new one built from a fresh `upload` lands on the
+`static/` keys automatically and needs no manual re-key.
+
 `rewrite` is idempotent: run it twice and the second pass reports
 "no local asset refs" rather than double-rewriting.
 
@@ -157,8 +171,11 @@ currently uses.
 
 ### Permanent fix
 
-Ask whoever administers the bucket to allow anonymous reads on this one prefix
-(this is the whole change — it does not open the rest of the bucket):
+Ask whoever administers the bucket to allow anonymous reads on this one
+sub-prefix (this is the whole change — it does not open the rest of the
+bucket, and does not open `tables/`, `sidecars/`, or `manifest/` for any
+client either — see "Tables and sidecars" below for why that distinction
+now matters):
 
 ```json
 {
@@ -168,10 +185,19 @@ Ask whoever administers the bucket to allow anonymous reads on this one prefix
     "Effect": "Allow",
     "Principal": "*",
     "Action": "s3:GetObject",
-    "Resource": "arn:aws:s3:::next-ext-commerce-us-east-1/outbound/competitive-intel/*"
+    "Resource": "arn:aws:s3:::next-ext-commerce-us-east-1/outbound/competitive-intel/*/static/*"
   }]
 }
 ```
+
+⚠ **This replaces an earlier draft of this same policy that was already sent
+to IT**, scoped to the whole `outbound/competitive-intel/*` prefix. That
+version predates `tables/` and `sidecars/` existing under the same prefix —
+approving it as originally written would also have made every client's raw
+ad copy, competitive observations, synthesized briefings, and (for
+owned-account deployments) spend/revenue figures publicly readable, which was
+never the intent. If IT already has the old JSON, send this corrected version
+instead of assuming the difference doesn't matter.
 
 The bucket's Block Public Access settings must also allow it — specifically
 `BlockPublicPolicy` and `RestrictPublicBuckets` off. Then re-run `rewrite` with
@@ -181,6 +207,75 @@ credential material.
 If public reads are not acceptable at all, put CloudFront in front of the bucket
 with an Origin Access Control and pass the distribution domain to
 `rewrite --mode public --base-url https://dxxxx.cloudfront.net`.
+
+## Tables and sidecars: deliberately not under static/
+
+Two other kinds of content live under this same bucket/prefix, and neither is
+under `static/`, on purpose:
+
+* **`<prefix>/<client>/sidecars/...`** (`scripts/s3_assets.py archive-sidecars`)
+  — `video_meta.json`, `landing_meta.json`, the raw `landing.html` capture.
+  Real re-analysis input (`analysis/creative_batch.py`,
+  `scripts/cc_vision_prep.py` both read these off disk), never rendered as a
+  dashboard `<img>`/`<video>` src. Nothing needs these to be public.
+* **`<prefix>/<client>/tables/...`** (`scripts/export_db_to_s3.py`) — every
+  table in `data/<client>.db`, as Parquet: ad copy, competitive observations,
+  synthesized briefings, audit logs, and for owned-account deployments,
+  spend/revenue. This is the most sensitive thing this repo puts in S3 —
+  meaningfully more so than a creative thumbnail — and it has no
+  consumer-facing URL at all today; the only way to read it is with real AWS
+  credentials.
+
+Both are read back with real credentials only (`ensure_local()` for sidecars,
+`export_db_to_s3.py restore`/`sync` for tables) — never an anonymous or
+presigned URL — so neither one needs, or should get, a public-read grant.
+This is the whole reason the policy above is scoped to `.../*/static/*`
+rather than the older `.../*` draft: `static/` is the one segment that's
+actually meant to become public; everything else living under the same
+prefix should not be swept in just because it happens to be a neighbor.
+
+## Keeping data/<client>.db in sync with S3, across operator machines
+
+`scripts/export_db_to_s3.py` has three subcommands:
+
+* `export --db data/trex.db --bucket ... --prefix ...` — push local db to S3
+  (Parquet per table, under `tables/`, plus a `_schema.json` capturing the
+  exact `CREATE TABLE` statements so a later restore is schema-faithful, not
+  just Parquet-inferred-type-faithful).
+* `restore --db data/trex.db --bucket ... --prefix ...` — rebuild a local db
+  from S3 from nothing. Refuses to overwrite an existing file unless
+  `--force`; when it does overwrite, it backs the old file up to
+  `<db>.pre-sync-backup` first, and carries forward any local-only tables
+  that were never part of the export scope (this codebase's own
+  `eval_runs`/`eval_task_results`/`llm_calls` telemetry) so they survive the
+  rebuild instead of only living in the one-shot backup file.
+* `sync --db data/trex.db --bucket ... --prefix ...` — the one to actually
+  run day to day. Compares local file mtime against the newest
+  `LastModified` across that client's `tables/*.parquet` objects: pulls if
+  local is missing, pushes if S3 has nothing yet for that client, and
+  otherwise **the more-recently-modified side wins** — automatically, no
+  prompt. This is a real, deliberate precedence rule, not a placeholder for
+  something smarter: it resolves "which whole snapshot do I trust" when two
+  operators on different machines have both been running audits against the
+  same client, but it is a heuristic, not a merge — it does not reconcile
+  row-level differences if both sides changed different things since the
+  last sync, and it inherits whatever clock skew exists between machines.
+  See the module docstring in `scripts/export_db_to_s3.py` for the sharper
+  edges (notably: running `sync` immediately after a `restore` will look
+  like local just "won" and push straight back to S3 — harmless, just a
+  known artifact of using mtime as the signal).
+
+Verified against real TREX data (2026-09-21): round-tripped `data/trex.db`
+through `export` → `restore --force` → full row-by-row diff against the
+original for every exported table, byte-for-byte identical logically (the
+rebuilt file is not byte-identical at the SQLite page level — that's
+expected for any from-scratch rebuild — but every table, column, and row
+matched).
+
+Not yet wired up: none of the `quickstart_*.sh` scripts call `sync`
+automatically. Running it is a manual step for now — deciding whether/how to
+make it automatic (e.g. at the start of a quickstart run) is a separate,
+bigger decision than adding the tool itself.
 
 ## Two Meta tokens, and what neither of them buys
 
@@ -310,3 +405,23 @@ clicked — load the page in a headless browser, expand the `tr.sum` rows, and
 count `img.thumb` elements with `naturalWidth > 0`. Tested both from `file://`
 and from a local HTTP server over the built `dist/`, which is the Netlify shape:
 202/202 in both.
+
+## Backlog — questions for IT, not yet asked
+
+Noted here so they don't get lost, not urgent enough on their own to justify a
+separate message yet — worth bundling into whatever the next IT conversation is:
+
+* **A second, narrowly-scoped IAM key or role for `tables/`/`sidecars/`.** The
+  `commerce` key (`Put`/`Get`/`List`/`Delete` on the whole bucket) is already
+  more privileged than a pure-read display use case needs (see "The one
+  blocker" above); it now also touches meaningfully more sensitive data
+  (competitive observations, briefings, spend/revenue) than when that
+  over-privilege concern was first raised. A read-only key scoped to just
+  `.../tables/*` and `.../sidecars/*`, separate from whatever key does the
+  writing, would shrink the blast radius of a leak of either credential.
+* **Does this bucket have default server-side encryption (SSE) enabled?**
+  Unknown — the `commerce` key can't call `GetBucketEncryption` any more than
+  it can call `GetBucketPolicy`, so this can't be checked from here.
+* **Is access logging or CloudTrail enabled for this bucket?** Also unknown,
+  same reason. Matters most for `tables/` — if that credential is ever misused,
+  logging is the only way anyone would know.

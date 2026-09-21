@@ -112,6 +112,20 @@ CACHE_CONTROL = "public, max-age=31536000, immutable"
 MAX_PRESIGN_V4 = 604800  # SigV4 rejects anything longer with a 400
 HASH_SEG = "by-hash"
 
+# Every image key lives under this segment specifically so a bucket policy can
+# grant public read with ONE simple, narrow Resource ARN —
+# arn:aws:s3:::<bucket>/<base_prefix>/*/static/* — that covers every client's
+# creative and nothing else. Before this existed, the policy already sent to
+# IT was scoped to the whole <base_prefix>/* wildcard, which meant approving
+# it as-drafted would also have made sidecars/ and tables/ (competitive
+# observations, ad copy, owned-account spend/revenue) publicly readable —
+# never the intent, just a consequence of tables/sidecars having been added
+# under the same prefix after that draft was already written. manifest/ is
+# deliberately NOT under static/ — nothing ever serves it as a public URL
+# (ensure_local reads it with real credentials, never anonymously), so there's
+# no reason to widen the public grant to include it.
+STATIC_SEG = "static"
+
 
 def content_key(path: Path, prefix: str) -> tuple[str, str]:
     """(sha256, key) for a local file. The two-char fan-out directory keeps any
@@ -121,7 +135,7 @@ def content_key(path: Path, prefix: str) -> tuple[str, str]:
     function itself has no notion of client, it just hashes and joins."""
     h = hashlib.sha256(path.read_bytes()).hexdigest()
     ext = path.suffix.lower()
-    return h, f"{prefix}/{HASH_SEG}/{h[:2]}/{h}{ext}"
+    return h, f"{prefix}/{STATIC_SEG}/{HASH_SEG}/{h[:2]}/{h}{ext}"
 
 
 def client_slug(assets_dirname: str) -> str:
@@ -330,7 +344,7 @@ def cmd_upload(args) -> int:
     # "the key exists" is the whole check — no ETag comparison needed.
     existing: set[str] = set()
     paginator = s3.get_paginator("list_objects_v2")
-    for page in paginator.paginate(Bucket=args.bucket, Prefix=f"{prefix}/{HASH_SEG}/"):
+    for page in paginator.paginate(Bucket=args.bucket, Prefix=f"{prefix}/{STATIC_SEG}/{HASH_SEG}/"):
         for o in page.get("Contents", []):
             existing.add(o["Key"])
 
@@ -378,7 +392,7 @@ def cmd_upload(args) -> int:
 
     print(f"uploaded {put}, failed {failed}  "
           f"({uniq_bytes / 1e6:.1f} MB unique of {local_bytes / 1e6:.1f} MB on disk)")
-    print(f"prefix:   s3://{args.bucket}/{prefix}/{HASH_SEG}/")
+    print(f"prefix:   s3://{args.bucket}/{prefix}/{STATIC_SEG}/{HASH_SEG}/")
     print(f"manifest: s3://{args.bucket}/{mkey}")
     return 1 if failed else 0
 
@@ -509,12 +523,14 @@ def cmd_rewrite(args) -> int:
     # reissued in whatever --mode now asks for. Switching is a real workflow, not a
     # repair — presign to view a dashboard before the bucket policy exists, public
     # to commit one, since a presigned URL carries the access key id and expires.
-    # The client segment between base_prefix and HASH_SEG is matched generically
-    # (one path segment, any name) rather than pinned to a specific client, so a
-    # dashboard is still recognised as "ours" regardless of which client it is.
+    # The client segment between base_prefix and STATIC_SEG/HASH_SEG is matched
+    # generically (one path segment, any name) rather than pinned to a specific
+    # client, so a dashboard is still recognised as "ours" regardless of which
+    # client it is. STATIC_SEG itself is fixed, not wildcarded — it's the whole
+    # point of the segment that its name is a known, narrow constant.
     own = re.compile(
-        r"""(["'])(https://[^"']*?/(%s/[^/"']+/%s/[0-9a-f]{2}/[0-9a-f]{64}\.(?:%s))(?:\?[^"']*)?)\1"""
-        % (re.escape(base_prefix), re.escape(HASH_SEG), "|".join(EXTS)),
+        r"""(["'])(https://[^"']*?/(%s/[^/"']+/%s/%s/[0-9a-f]{2}/[0-9a-f]{64}\.(?:%s))(?:\?[^"']*)?)\1"""
+        % (re.escape(base_prefix), re.escape(STATIC_SEG), re.escape(HASH_SEG), "|".join(EXTS)),
         re.IGNORECASE,
     )
     remoded = 0
@@ -777,10 +793,17 @@ def cmd_prune(args) -> int:
     # sit under any client's sub-prefix (<base_prefix>/<client>/manifest/...).
     # "/sidecars-manifest/" is checked separately — it does NOT contain "/manifest/"
     # as a substring (the character before "manifest" is "-", not "/").
+    #
+    # "/tables/" (scripts/export_db_to_s3.py) is excluded outright, not just its
+    # manifest — unlike images/sidecars, a table export has no corresponding
+    # local asset-tree file for `wanted` to ever contain; it's generated FROM
+    # the db, not archived from disk. Without this, every table export would
+    # look orphaned on the very next prune and be a --delete candidate.
     orphans = {k: v for k, v in live.items()
                if k not in wanted
                and "/manifest/" not in k
-               and "/sidecars-manifest/" not in k}
+               and "/sidecars-manifest/" not in k
+               and "/tables/" not in k}
     stale = {k: v for k, v in orphans.items() if f"/{HASH_SEG}/" in k}
     stale_sidecar = {k: v for k, v in orphans.items() if f"/{SIDECAR_SEG}/" in k}
     legacy = {k: v for k, v in orphans.items()

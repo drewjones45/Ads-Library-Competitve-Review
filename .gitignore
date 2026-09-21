@@ -13,6 +13,10 @@ data/raw/
 # Doesn't retroactively affect deployments not yet migrated (git keeps
 # tracking already-tracked paths regardless of a later-added ignore rule).
 data/*_assets/
+# Local Parquet staging for scripts/export_db_to_s3.py — the S3 copy under
+# <prefix>/<client>/tables/ is the durable one, these are just its local
+# working copy before/after upload, regeneratable any time from the db.
+data/*_tables/
 # Local-path preview copy of a dashboard, kept alongside the S3-mode index.html
 # that actually gets committed/deployed — for reviewing images on a machine
 # that still has data/*_assets/ on disk, before pushing. Never committed:
