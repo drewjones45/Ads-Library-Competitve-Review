@@ -256,10 +256,8 @@ different architecture.
 No custom domain exists today — the site is on Netlify's default subdomain
 (no CNAME or `netlify.app` reference found anywhere in this repo). Amplify's
 equivalent default is an `*.amplifyapp.com` subdomain, so there's no
-regression either way. Whether to also request a real subdomain under a
-Horizon-owned domain (e.g. `competitive-intel.horizoncommerce.com`, via
-Amplify's custom-domain feature + Horizon's DNS) is an open decision, not a
-blocker — listed as an ask below in case the answer is yes, skippable if not.
+regression either way. The request for a Horizon-owned subdomain (e.g. `tools.horizoncommerce.com`, via
+Amplify's custom-domain feature + Horizon's DNS) is listed as an ask below.
 
 ## What does NOT need to change
 
@@ -285,48 +283,52 @@ than assuming either way.
 
 ## Exact asks for Horizon IT
 
-*Written to hand to IT directly — assumes no prior context on this project
-beyond what's stated here.*
+This request is for our dashboard tooling currently hosted on Netlify under a personal account.
+We have active client work underway a Spectrum POC that depends on the S3 infrastructure this ask covers, so a prompt turnaround directly affects that delivery date.
 
-This is for our internal dashboard tooling — both the competitive-intelligence
-dashboards and the **Creative Performance Dashboard** (owned-account creative
-+ ad-spend analysis), currently hosted on Netlify under a personal account.
-The Creative Performance Dashboard specifically has **active client work
-underway with a delivery timeline** riding on this — it's the one already
-depending on the S3 image hosting this ask covers, so a prompt turnaround
-here directly affects that delivery date.
+We want to move hosting to AWS Amplify under a Horizon-owned AWS account and implement dynamic SigV4
+pre-signing for S3 image access. This supersedes an earlier request about a public S3 bucket policy for `next-ext-commerce-us-east-1`.
 
-We want to move hosting to AWS Amplify under a Horizon-owned AWS account,
-replacing that personal-account dependency. This also **supersedes** an
-earlier, separate request about adding a public S3 bucket policy for
-`next-ext-commerce-us-east-1` (see below) — please disregard that one if
-it's still pending; item 3 below replaces it with a narrower, CloudFront-free
-ask (no CDN in front of the bucket, per your earlier guidance on CloudFront).
+### A. AWS Account & Amplify Hosting
 
 1. **Confirm which AWS account this should live in.** Our working assumption
    is the same account that already owns the `next-ext-commerce-us-east-1` S3
    bucket and the `commerce` IAM user we currently use (account ID
-   `254947843672`, `us-east-1`) — please confirm or correct.
+   `254947843672`, `us-east-1`). Please confirm or correct.
 2. **Provision an AWS Amplify Hosting app** in that account/region, connected
-   to this GitHub repository via the AWS Amplify GitHub App (repo-level
-   access grant is sufficient — no repo transfer needed for this step).
-3. **One AWS Lambda function with its own IAM execution role**, scoped to
-   `s3:GetObject` only on
-   `arn:aws:s3:::next-ext-commerce-us-east-1/outbound/competitive-intel/*/static/*`,
-   exposed via a Lambda Function URL (or a single API Gateway route). This
-   signs short-lived S3 URLs on demand per dashboard page load, replacing
-   both the old public-bucket-policy request and the CloudFront option — no
-   public bucket access, no CDN, no static AWS keys anywhere in this path.
-4. **A read-only IAM policy/role scoped to `.../tables/*` and
-   `.../sidecars/*`** for the same bucket — unrelated to hosting directly,
-   but already an open ask from an earlier security review of this bucket;
-   bundling it into the same conversation since it's the same bucket and the
-   same IT contact.
-5. **Optional — a subdomain under a Horizon-owned domain** (e.g.
-   `competitive-intel.horizoncommerce.com`) pointed at the Amplify app, if
-   Horizon wants this off Amplify's default `*.amplifyapp.com` domain. Not a
-   blocker either way.
-6. **Separately, not this bucket:** confirm whether this bucket has default
-   server-side encryption and access logging/CloudTrail enabled — open
-   questions from the earlier security review, still unanswered because our
-   current IAM user can't query either setting itself.
+   to this GitHub repository (`github.com/HorizonMedia/Ads-Library-Competitive-Review`)
+   via the AWS Amplify GitHub App. Repo-level access grant is sufficient.
+   - Build image: AL2023 (default)
+   - Build command: `python3 scripts/build_site.py`
+   - Artifacts directory: `dist/`
+
+### B. Lambda Pre-signing & IAM Execution Role
+
+3. **One AWS Lambda function** (name: `ads-library-s3-presign` or equivalent),
+   Python 3.11+ runtime, with a dedicated IAM execution role, exposed via Lambda
+   Function URL (preferred) or a single API Gateway route.
+   
+   **Function spec:**
+   - **Purpose:** On demand, sign short-lived SigV4 URLs for S3 objects in the
+     `next-ext-commerce-us-east-1` bucket's competitive-intel asset path.
+   - **Trigger:** HTTP POST requests with JSON input: `{"keys": ["outbound/competitive-intel/trex/static/...", ...]}`
+   - **Response:** JSON map `{key: presigned_url}` where each URL is a SigV4 pre-signed GET request valid for 15 minutes.
+   - **Authorization:** Public endpoint (unauthenticated requests allowed; URL serves as the authorization token).
+   
+   **IAM Execution Role spec:**
+   - **Permissions:** `s3:GetObject` only
+   - **Resource ARN:** `arn:aws:s3:::next-ext-commerce-us-east-1/outbound/competitive-intel/*/static/*`
+   - Standard Lambda execution role trust policy (allow `lambda.amazonaws.com`)
+
+### C. Additional S3 Bucket Configuration
+
+4. **A read-only IAM policy/role scoped to `.../tables/*` and `.../sidecars/*`** for the `next-ext-commerce-us-east-1` bucket.
+   (Purpose: dashboards read raw competitive-intel data from these paths, separate from the static asset images.)
+
+5. **Confirm bucket configuration:** does `next-ext-commerce-us-east-1` have default server-side encryption and CloudTrail logging enabled?
+   (Purpose: verify security baseline for this bucket.)
+
+### D. Custom Domain
+
+6. **A subdomain under a Horizon-owned domain** (e.g. `competitive-intel.horizoncommerce.com`) pointed at the Amplify app, preferred over Amplify's default `*.amplifyapp.com` domain.
+   (Not a blocker. It can be added later.)
